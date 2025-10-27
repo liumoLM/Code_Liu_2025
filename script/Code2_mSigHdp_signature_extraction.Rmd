@@ -1,0 +1,182 @@
+---
+title: "Code2_mSigHdp_signature_extraction"
+author: "Mo Liu & Steven G. Rozen"
+date: "2025-09-21"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(ICAMS)
+library(mSigHdp)
+library(hdpx)
+Indel83.catalog <- ICAMS::ReadCatalog("~/Working/DBS_Indel_Signature/Indel83.catalog.csv")
+Indel89.catalog <- ICAMS::ReadCatalog("~/Working/DBS_Indel_Signature/Indel89.catalog.csv")
+
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+all.meta <- readRDS("~/Working/DBS_Indel_Signature/all.sample.meta.rds")
+```
+
+## Indel83 signature from all samples
+```{r cars}
+print(cancertype)
+mSigHdp::RunHdpxParallel(
+  input.catalog = Indel83.catalog,
+  seedNumber = 1234,
+  K.guess = 10,
+  out.dir = "./",
+  multi.types = FALSE,
+  burnin = 1000,
+  burnin.multiplier = 20, # 20 is recommended. you can set to 1 or 2 for a quick test run
+  post.n = 200, # 200 is recommended. you can set to 10 or 20 for a quick test run
+  post.space = 100, # 100 is recommended.this you set to 10 or 20 for a quick test run
+  num.child.process = 20, # usually I set to 10, for parallel running
+  CPU.cores = 20,# usually I set to 10 (same number as num.child.process, for parallel running) but 2 is okay for a test run
+  high.confidence.prop = 0.8,
+  gamma.alpha = 1,
+  gamma.beta = 50,
+  checkpoint = F,
+  verbose = T,
+  downsample_threshold = 3000
+)
+```
+
+## Indel83 signature from each cancertype
+
+```{r cars}
+cancertypes <- unique(all.meta$cancertype)
+for(cancertype in cancertypes){
+  print(cancertype)
+  mSigHdp::RunHdpxParallel(
+    input.catalog = Indel83.catalog[,grepl(cancertype,colnames(Indel83.catalog))],
+    seedNumber = 1234,
+    K.guess = 10,
+    out.dir = paste0("~/Working/DBS_Indel_Signature/mSigHdp.indel.signature.seed1234.20240926.",cancertype,".beta100/"),
+    multi.types = FALSE,
+    burnin = 1000,
+    burnin.multiplier = 20, # 20 is recommended. you can set to 1 or 2 for a quick test run
+    post.n = 200, # 200 is recommended. you can set to 10 or 20 for a quick test run
+    post.space = 100, # 100 is recommended.this you set to 10 or 20 for a quick test run
+    num.child.process = 20, # usually I set to 10, for parallel running
+    CPU.cores = 20,# usually I set to 10 (same number as num.child.process, for parallel running) but 2 is okay for a test run
+    high.confidence.prop = 0.8,
+    gamma.alpha = 1,
+    gamma.beta = 50,
+    checkpoint = F,
+    verbose = T,
+    downsample_threshold = 3000 ## downsampling for reducing the memory usage
+  )
+}
+```
+
+## Indel83 signature from MSI-H samples
+
+```{r cars}
+
+mSigHdp::RunHdpxParallel(
+  input.catalog = Indel83.catalog[,colnames(Indel83.catalog) %in% all.meta$final_ID[all.meta$MSIseq=="MSI-H"]],
+  seedNumber = 1234,
+  K.guess = 10,
+  out.dir = "./",
+  multi.types = FALSE,
+  burnin = 1000,
+  burnin.multiplier = 20, # 20 is recommended. you can set to 1 or 2 for a quick test run
+  post.n = 200, # 200 is recommended. you can set to 10 or 20 for a quick test run
+  post.space = 100, # 100 is recommended.this you set to 10 or 20 for a quick test run
+  num.child.process = 20, # usually I set to 10, for parallel running
+  CPU.cores = 20,# usually I set to 10 (same number as num.child.process, for parallel running) but 2 is okay for a test run
+  high.confidence.prop = 0.8,
+  gamma.alpha = 1,
+  gamma.beta = 50,
+  checkpoint = F,
+  verbose = T,
+  downsample_threshold = 3000
+)
+
+```
+
+## Indel89 signature from all samples
+
+```{r cars}
+print(cancertype)
+mSigHdp::RunHdpxParallel(
+  input.catalog = Indel89.catalog,
+  seedNumber = 1234,
+  K.guess = 10,
+  out.dir = "./",
+  multi.types = FALSE,
+  burnin = 1000,
+  burnin.multiplier = 20, # 20 is recommended. you can set to 1 or 2 for a quick test run
+  post.n = 200, # 200 is recommended. you can set to 10 or 20 for a quick test run
+  post.space = 100, # 100 is recommended.this you set to 10 or 20 for a quick test run
+  num.child.process = 20, # usually I set to 10, for parallel running
+  CPU.cores = 20,# usually I set to 10 (same number as num.child.process, for parallel running) but 2 is okay for a test run
+  high.confidence.prop = 0.8,
+  gamma.alpha = 1,
+  gamma.beta = 50,
+  checkpoint = F,
+  verbose = T,
+  downsample_threshold = 3000
+)
+```
+
+## Indel89.catalog signature from each cancertype
+
+```{r cars}
+cancertypes <- unique(all.meta$cancertype)
+for(cancertype in cancertypes){
+  print(cancertype)
+  mSigHdp::RunHdpxParallel(
+    input.catalog = Indel89.catalog[,grepl(cancertype,colnames(Indel89.catalog))],
+    seedNumber = 1234,
+    K.guess = 10,
+    out.dir = "./",
+    multi.types = FALSE,
+    burnin = 1000,
+    burnin.multiplier = 20, # 20 is recommended. you can set to 1 or 2 for a quick test run
+    post.n = 200, # 200 is recommended. you can set to 10 or 20 for a quick test run
+    post.space = 100, # 100 is recommended.this you set to 10 or 20 for a quick test run
+    num.child.process = 20, # usually I set to 10, for parallel running
+    CPU.cores = 20,# usually I set to 10 (same number as num.child.process, for parallel running) but 2 is okay for a test run
+    high.confidence.prop = 0.8,
+    gamma.alpha = 1,
+    gamma.beta = 50,
+    checkpoint = F,
+    verbose = T,
+    downsample_threshold = 3000
+  )
+}
+```
+
+## Indel83 signature from MSI-H samples
+
+```{r cars}
+
+mSigHdp::RunHdpxParallel(
+  input.catalog = Indel89.catalog[,colnames(Indel89.catalog) %in% all.meta$final_ID[all.meta$MSIseq=="MSI-H"]],
+  seedNumber = 1234,
+  K.guess = 10,
+  out.dir = "./",
+  multi.types = FALSE,
+  burnin = 1000,
+  burnin.multiplier = 20, # 20 is recommended. you can set to 1 or 2 for a quick test run
+  post.n = 200, # 200 is recommended. you can set to 10 or 20 for a quick test run
+  post.space = 100, # 100 is recommended.this you set to 10 or 20 for a quick test run
+  num.child.process = 20, # usually I set to 10, for parallel running
+  CPU.cores = 20,# usually I set to 10 (same number as num.child.process, for parallel running) but 2 is okay for a test run
+  high.confidence.prop = 0.8,
+  gamma.alpha = 1,
+  gamma.beta = 50,
+  checkpoint = F,
+  verbose = T,
+  downsample_threshold = 3000
+)
+
+```

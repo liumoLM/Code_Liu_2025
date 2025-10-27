@@ -1,0 +1,92 @@
+---
+title: "mSigHdp_signature_extraction"
+author: "Mo Liu & Steven G. Rozen"
+date: "2025-09-21"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+## load data from test_data folder
+## The parameters used in this code are for quick testing. Please refer to the paper for the parameters used in running real data
+```{r setup, include=FALSE}
+library(ICAMS)
+library(mSigHdp)
+library(hdpx)
+library(data.table)
+Indel83.catalog <- fread("../test_data/test_ID83_catalog.tsv")
+Indel89.catalog <- fread("../test_data/test_ID89_catalog.tsv")
+Indel476.catalog <-fread("../test_data/test_ID476_catalog.tsv")
+
+```
+
+
+## Indel83 signature from extraction
+```{r cars}
+mSigHdp::RunHdpxParallel(
+  input.catalog = Indel83.catalog[,-1], # the first column is mutation type, remove it when running signature extraction
+  seedNumber = 1234,
+  K.guess = 10,
+  out.dir = "../test_output/test_ID83_mSigHdp_run",
+  multi.types = T,
+  burnin = 1000,
+  burnin.multiplier = 1, # 20 is recommended. you can set to 1 or 2 for a quick test run
+  post.n = 2, # 200 is recommended. you can set to 10 or 20 for a quick test run
+  post.space = 100, # 100 is recommended.this you set to 10 or 20 for a quick test run
+  num.child.process = 2, # usually I set to 20, for parallel running
+  CPU.cores = 2,# usually I set to 10 (same number as num.child.process, for parallel running) but 1 is okay for a test run
+  high.confidence.prop = 0.8,
+  gamma.alpha = 1,
+  gamma.beta = 50,
+  checkpoint = F,
+  verbose = T,
+  downsample_threshold = 3000 
+)
+```
+
+## Indel89 signature from extraction
+```{r cars}
+mSigHdp::RunHdpxParallel(
+  input.catalog = Indel89.catalog[,-1], # the first column is mutation type, remove it when running signature extraction
+  seedNumber = 1234,
+  K.guess = 10,
+  out.dir = "../test_output/test_ID89_mSigHdp_run",
+  multi.types = FALSE,
+  burnin = 1000,
+  burnin.multiplier = 1, # 20 is recommended. you can set to 1 or 2 for a quick test run
+  post.n = 2, # 200 is recommended. you can set to 10 or 20 for a quick test run
+  post.space = 100, # 100 is recommended.this you set to 10 or 20 for a quick test run
+  num.child.process = 2, # usually I set to 20, for parallel running
+  CPU.cores = 2,# usually I set to 10 (same number as num.child.process, for parallel running) but 1 is okay for a test run
+  high.confidence.prop = 0.8,
+  gamma.alpha = 1,
+  gamma.beta = 50,
+  checkpoint = F,
+  verbose = T,
+  downsample_threshold = 3000 
+)
+```
+
+## Indel476 signature from extraction
+```{r cars}
+mSigHdp::RunHdpxParallel(
+  input.catalog = Indel476.catalog[,-1], # the first column is mutation type, remove it when running signature extraction
+  seedNumber = 1234,
+  K.guess = 10,
+  out.dir = "../test_output/test_ID476_mSigHdp_run",
+  multi.types = T,
+  burnin = 1000,
+  burnin.multiplier = 1, # 20 is recommended. you can set to 1 or 2 for a quick test run
+  post.n = 2, # 200 is recommended. you can set to 10 or 20 for a quick test run
+  post.space = 100, # 100 is recommended.this you set to 10 or 20 for a quick test run
+  num.child.process = 2, # usually I set to 20, for parallel running
+  CPU.cores = 2,# usually I set to 10 (same number as num.child.process, for parallel running) but 1 is okay for a test run
+  high.confidence.prop = 0.8,
+  gamma.alpha = 1,
+  gamma.beta = 50,
+  checkpoint = F,
+  verbose = T,
+  downsample_threshold = 3000 
+)
+```

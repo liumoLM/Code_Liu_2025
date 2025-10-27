@@ -1,0 +1,5 @@
+Signatures	Stability	Total Mutations
+CH89A	0.999	92017
+CH89B	0.987	16825
+CH89C	0.996	14987
+CH89D	0.995	12583
