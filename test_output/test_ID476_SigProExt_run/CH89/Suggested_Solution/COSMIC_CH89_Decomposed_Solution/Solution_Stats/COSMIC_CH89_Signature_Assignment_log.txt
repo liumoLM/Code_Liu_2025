@@ -1,0 +1,2000 @@
+************************ Stepwise Description of Signature Assignment to Samples ************************
+
+
+
+
+                    ################ Sample 1 #################
+############################# Initial Composition ####################################
+      0     1     2     3     4
+0  11.0  29.0  27.0  59.0  20.0
+L2 Error %: 0.6
+Cosine Similarity: 0.8
+############################## Composition After Initial Remove ###############################
+          1          3
+0  39.47024  106.52976
+L2 Error %: 0.66
+Cosine Similarity: 0.75
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '3']
+L2 Error % 0.66
+Cosine Similarity 0.75
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '3']
+L2 Error % 0.66
+Cosine Similarity 0.75
+
+#################### Final Composition #################################
+['1', '3']
+L2 Error % 0.66
+Cosine Similarity 0.75
+####################################### Composition After Add-Remove #######################################
+      1      3
+0  39.0  107.0
+L2 Error %: 0.66
+Cosine Similarity: 0.75
+
+
+
+
+
+                    ################ Sample 2 #################
+############################# Initial Composition ####################################
+      1     2     3      4
+0  24.0  17.0  79.0  142.0
+L2 Error %: 0.5
+Cosine Similarity: 0.86
+############################## Composition After Initial Remove ###############################
+            3           4
+0  106.422665  155.577335
+L2 Error %: 0.53
+Cosine Similarity: 0.85
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3', '4']
+L2 Error % 0.53
+Cosine Similarity 0.85
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3', '4']
+L2 Error % 0.53
+Cosine Similarity 0.85
+
+#################### Final Composition #################################
+['3', '4']
+L2 Error % 0.53
+Cosine Similarity 0.85
+####################################### Composition After Add-Remove #######################################
+       3      4
+0  106.0  156.0
+L2 Error %: 0.53
+Cosine Similarity: 0.85
+
+
+
+
+
+                    ################ Sample 3 #################
+############################# Initial Composition ####################################
+      0      1      2      3      4
+0  32.0  527.0  146.0  179.0  271.0
+L2 Error %: 0.3
+Cosine Similarity: 0.95
+############################## Composition After Initial Remove ###############################
+            1           2           4
+0  595.842661  193.462223  365.695116
+L2 Error %: 0.33
+Cosine Similarity: 0.94
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '2', '4']
+L2 Error % 0.33
+Cosine Similarity 0.94
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '2', '4']
+L2 Error % 0.33
+Cosine Similarity 0.94
+
+#################### Final Composition #################################
+['1', '2', '4']
+L2 Error % 0.33
+Cosine Similarity 0.94
+####################################### Composition After Add-Remove #######################################
+       1      2      4
+0  596.0  193.0  366.0
+L2 Error %: 0.33
+Cosine Similarity: 0.94
+
+
+
+
+
+                    ################ Sample 4 #################
+############################# Initial Composition ####################################
+      1    2     3     4
+0  14.0  6.0  77.0  11.0
+L2 Error %: 0.5
+Cosine Similarity: 0.86
+############################## Composition After Initial Remove ###############################
+       3
+0  108.0
+L2 Error %: 0.54
+Cosine Similarity: 0.84
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3']
+L2 Error % 0.54
+Cosine Similarity 0.84
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3']
+L2 Error % 0.54
+Cosine Similarity 0.84
+
+#################### Final Composition #################################
+['3']
+L2 Error % 0.54
+Cosine Similarity 0.84
+####################################### Composition After Add-Remove #######################################
+       3
+0  108.0
+L2 Error %: 0.54
+Cosine Similarity: 0.84
+
+
+
+
+
+                    ################ Sample 5 #################
+############################# Initial Composition ####################################
+      0     1      2      3      4
+0  41.0  78.0  455.0  175.0  221.0
+L2 Error %: 0.25
+Cosine Similarity: 0.97
+############################## Composition After Initial Remove ###############################
+          2           3           4
+0  475.9699  236.107379  257.922721
+L2 Error %: 0.29
+Cosine Similarity: 0.96
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['2', '3', '4']
+L2 Error % 0.29
+Cosine Similarity 0.96
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['2', '3', '4']
+L2 Error % 0.29
+Cosine Similarity 0.96
+
+#################### Final Composition #################################
+['2', '3', '4']
+L2 Error % 0.29
+Cosine Similarity 0.96
+####################################### Composition After Add-Remove #######################################
+       2      3      4
+0  476.0  236.0  258.0
+L2 Error %: 0.29
+Cosine Similarity: 0.96
+
+
+
+
+
+                    ################ Sample 6 #################
+############################# Initial Composition ####################################
+       0       1     2    3     4
+0  140.0  1514.0  41.0  4.0  85.0
+L2 Error %: 0.15
+Cosine Similarity: 0.99
+############################## Composition After Initial Remove ###############################
+        1
+0  1784.0
+L2 Error %: 0.17
+Cosine Similarity: 0.98
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1']
+L2 Error % 0.17
+Cosine Similarity 0.98
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1']
+L2 Error % 0.17
+Cosine Similarity 0.98
+
+#################### Final Composition #################################
+['1']
+L2 Error % 0.17
+Cosine Similarity 0.98
+####################################### Composition After Add-Remove #######################################
+        1
+0  1784.0
+L2 Error %: 0.17
+Cosine Similarity: 0.98
+
+
+
+
+
+                    ################ Sample 7 #################
+############################# Initial Composition ####################################
+       0       1      2      4
+0  180.0  1816.0  152.0  109.0
+L2 Error %: 0.15
+Cosine Similarity: 0.99
+############################## Composition After Initial Remove ###############################
+        1
+0  2257.0
+L2 Error %: 0.19
+Cosine Similarity: 0.98
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1']
+L2 Error % 0.19
+Cosine Similarity 0.98
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1']
+L2 Error % 0.19
+Cosine Similarity 0.98
+
+#################### Final Composition #################################
+['1']
+L2 Error % 0.19
+Cosine Similarity 0.98
+####################################### Composition After Add-Remove #######################################
+        1
+0  2257.0
+L2 Error %: 0.19
+Cosine Similarity: 0.98
+
+
+
+
+
+                    ################ Sample 8 #################
+############################# Initial Composition ####################################
+      0      1      2      3      4
+0  31.0  357.0  138.0  336.0  698.0
+L2 Error %: 0.35
+Cosine Similarity: 0.94
+############################## Composition After Initial Remove ###############################
+            1           3           4
+0  376.361308  408.027325  775.611367
+L2 Error %: 0.37
+Cosine Similarity: 0.93
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '3', '4']
+L2 Error % 0.37
+Cosine Similarity 0.93
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '3', '4']
+L2 Error % 0.37
+Cosine Similarity 0.93
+
+#################### Final Composition #################################
+['1', '3', '4']
+L2 Error % 0.37
+Cosine Similarity 0.93
+####################################### Composition After Add-Remove #######################################
+       1      3      4
+0  376.0  408.0  776.0
+L2 Error %: 0.37
+Cosine Similarity: 0.93
+
+
+
+
+
+                    ################ Sample 9 #################
+############################# Initial Composition ####################################
+      0     1     2     3     4
+0  10.0  15.0  21.0  71.0  26.0
+L2 Error %: 0.52
+Cosine Similarity: 0.85
+############################## Composition After Initial Remove ###############################
+       3
+0  143.0
+L2 Error %: 0.61
+Cosine Similarity: 0.8
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3']
+L2 Error % 0.61
+Cosine Similarity 0.8
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3']
+L2 Error % 0.61
+Cosine Similarity 0.8
+
+#################### Final Composition #################################
+['3']
+L2 Error % 0.61
+Cosine Similarity 0.8
+####################################### Composition After Add-Remove #######################################
+       3
+0  143.0
+L2 Error %: 0.61
+Cosine Similarity: 0.8
+
+
+
+
+
+                    ################ Sample 10 #################
+############################# Initial Composition ####################################
+     1     3
+0  8.0  43.0
+L2 Error %: 0.58
+Cosine Similarity: 0.82
+############################## Composition After Initial Remove ###############################
+      3
+0  51.0
+L2 Error %: 0.6
+Cosine Similarity: 0.8
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3']
+L2 Error % 0.6
+Cosine Similarity 0.8
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3']
+L2 Error % 0.6
+Cosine Similarity 0.8
+
+#################### Final Composition #################################
+['3']
+L2 Error % 0.6
+Cosine Similarity 0.8
+####################################### Composition After Add-Remove #######################################
+      3
+0  51.0
+L2 Error %: 0.6
+Cosine Similarity: 0.8
+
+
+
+
+
+                    ################ Sample 11 #################
+############################# Initial Composition ####################################
+      0      1      2      3      4
+0  29.0  240.0  134.0  357.0  212.0
+L2 Error %: 0.31
+Cosine Similarity: 0.95
+############################## Composition After Initial Remove ###############################
+           1           3          4
+0  260.76924  445.661681  265.56908
+L2 Error %: 0.36
+Cosine Similarity: 0.93
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '3', '4']
+L2 Error % 0.36
+Cosine Similarity 0.93
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '3', '4']
+L2 Error % 0.36
+Cosine Similarity 0.93
+
+#################### Final Composition #################################
+['1', '3', '4']
+L2 Error % 0.36
+Cosine Similarity 0.93
+####################################### Composition After Add-Remove #######################################
+       1      3      4
+0  261.0  445.0  266.0
+L2 Error %: 0.36
+Cosine Similarity: 0.93
+
+
+
+
+
+                    ################ Sample 12 #################
+############################# Initial Composition ####################################
+      0     1     2      3    4
+0  17.0  72.0  42.0  119.0  5.0
+L2 Error %: 0.42
+Cosine Similarity: 0.91
+############################## Composition After Initial Remove ###############################
+           1           3
+0  86.638621  168.361379
+L2 Error %: 0.47
+Cosine Similarity: 0.88
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '3']
+L2 Error % 0.47
+Cosine Similarity 0.88
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '3']
+L2 Error % 0.47
+Cosine Similarity 0.88
+
+#################### Final Composition #################################
+['1', '3']
+L2 Error % 0.47
+Cosine Similarity 0.88
+####################################### Composition After Add-Remove #######################################
+      1      3
+0  87.0  168.0
+L2 Error %: 0.47
+Cosine Similarity: 0.88
+
+
+
+
+
+                    ################ Sample 13 #################
+############################# Initial Composition ####################################
+      1    2      3     4
+0  97.0  9.0  504.0  12.0
+L2 Error %: 0.22
+Cosine Similarity: 0.97
+############################## Composition After Initial Remove ###############################
+           1           3
+0  99.529713  522.470287
+L2 Error %: 0.22
+Cosine Similarity: 0.97
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '3']
+L2 Error % 0.22
+Cosine Similarity 0.97
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '3']
+L2 Error % 0.22
+Cosine Similarity 0.97
+
+#################### Final Composition #################################
+['1', '3']
+L2 Error % 0.22
+Cosine Similarity 0.97
+####################################### Composition After Add-Remove #######################################
+       1      3
+0  100.0  522.0
+L2 Error %: 0.22
+Cosine Similarity: 0.97
+
+
+
+
+
+                    ################ Sample 14 #################
+############################# Initial Composition ####################################
+      0      1     2     3      4
+0  57.0  342.0  20.0  62.0  582.0
+L2 Error %: 0.27
+Cosine Similarity: 0.96
+############################## Composition After Initial Remove ###############################
+            1           4
+0  382.404176  680.595824
+L2 Error %: 0.29
+Cosine Similarity: 0.96
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '4']
+L2 Error % 0.29
+Cosine Similarity 0.96
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '4']
+L2 Error % 0.29
+Cosine Similarity 0.96
+
+#################### Final Composition #################################
+['1', '4']
+L2 Error % 0.29
+Cosine Similarity 0.96
+####################################### Composition After Add-Remove #######################################
+       1      4
+0  382.0  681.0
+L2 Error %: 0.29
+Cosine Similarity: 0.96
+
+
+
+
+
+                    ################ Sample 15 #################
+############################# Initial Composition ####################################
+       0     1       2      3     4
+0  127.0  79.0  5440.0  236.0  96.0
+L2 Error %: 0.07
+Cosine Similarity: 1.0
+############################## Composition After Initial Remove ###############################
+        2
+0  5978.0
+L2 Error %: 0.09
+Cosine Similarity: 1.0
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['2']
+L2 Error % 0.09
+Cosine Similarity 1.0
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['2']
+L2 Error % 0.09
+Cosine Similarity 1.0
+
+#################### Final Composition #################################
+['2']
+L2 Error % 0.09
+Cosine Similarity 1.0
+####################################### Composition After Add-Remove #######################################
+        2
+0  5978.0
+L2 Error %: 0.09
+Cosine Similarity: 1.0
+
+
+
+
+
+                    ################ Sample 16 #################
+############################# Initial Composition ####################################
+     0     1     2      3      4
+0  3.0  45.0  69.0  124.0  360.0
+L2 Error %: 0.34
+Cosine Similarity: 0.94
+############################## Composition After Initial Remove ###############################
+            3           4
+0  191.038717  409.961283
+L2 Error %: 0.4
+Cosine Similarity: 0.92
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3', '4']
+L2 Error % 0.4
+Cosine Similarity 0.92
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3', '4']
+L2 Error % 0.4
+Cosine Similarity 0.92
+
+#################### Final Composition #################################
+['3', '4']
+L2 Error % 0.4
+Cosine Similarity 0.92
+####################################### Composition After Add-Remove #######################################
+       3      4
+0  191.0  410.0
+L2 Error %: 0.4
+Cosine Similarity: 0.92
+
+
+
+
+
+                    ################ Sample 17 #################
+############################# Initial Composition ####################################
+      1     2     3     4
+0  10.0  13.0  54.0  91.0
+L2 Error %: 0.5
+Cosine Similarity: 0.87
+############################## Composition After Initial Remove ###############################
+           3          4
+0  68.125801  99.874199
+L2 Error %: 0.52
+Cosine Similarity: 0.85
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3', '4']
+L2 Error % 0.52
+Cosine Similarity 0.85
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3', '4']
+L2 Error % 0.52
+Cosine Similarity 0.85
+
+#################### Final Composition #################################
+['3', '4']
+L2 Error % 0.52
+Cosine Similarity 0.85
+####################################### Composition After Add-Remove #######################################
+      3      4
+0  68.0  100.0
+L2 Error %: 0.52
+Cosine Similarity: 0.85
+
+
+
+
+
+                    ################ Sample 18 #################
+############################# Initial Composition ####################################
+     1      3
+0  9.0  139.0
+L2 Error %: 0.6
+Cosine Similarity: 0.8
+############################## Composition After Initial Remove ###############################
+       3
+0  148.0
+L2 Error %: 0.6
+Cosine Similarity: 0.8
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3']
+L2 Error % 0.6
+Cosine Similarity 0.8
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3']
+L2 Error % 0.6
+Cosine Similarity 0.8
+
+#################### Final Composition #################################
+['3']
+L2 Error % 0.6
+Cosine Similarity 0.8
+####################################### Composition After Add-Remove #######################################
+       3
+0  148.0
+L2 Error %: 0.6
+Cosine Similarity: 0.8
+
+
+
+
+
+                    ################ Sample 19 #################
+############################# Initial Composition ####################################
+      0     1     2      3      4
+0  36.0  50.0  81.0  184.0  269.0
+L2 Error %: 0.41
+Cosine Similarity: 0.91
+############################## Composition After Initial Remove ###############################
+            3           4
+0  277.488271  342.511729
+L2 Error %: 0.48
+Cosine Similarity: 0.88
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3', '4']
+L2 Error % 0.48
+Cosine Similarity 0.88
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3', '4']
+L2 Error % 0.48
+Cosine Similarity 0.88
+
+#################### Final Composition #################################
+['3', '4']
+L2 Error % 0.48
+Cosine Similarity 0.88
+####################################### Composition After Add-Remove #######################################
+       3      4
+0  277.0  343.0
+L2 Error %: 0.48
+Cosine Similarity: 0.88
+
+
+
+
+
+                    ################ Sample 20 #################
+############################# Initial Composition ####################################
+      1     2     3      4
+0  18.0  35.0  65.0  704.0
+L2 Error %: 0.28
+Cosine Similarity: 0.96
+############################## Composition After Initial Remove ###############################
+       4
+0  822.0
+L2 Error %: 0.32
+Cosine Similarity: 0.95
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['4']
+L2 Error % 0.32
+Cosine Similarity 0.95
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['4']
+L2 Error % 0.32
+Cosine Similarity 0.95
+
+#################### Final Composition #################################
+['4']
+L2 Error % 0.32
+Cosine Similarity 0.95
+####################################### Composition After Add-Remove #######################################
+       4
+0  822.0
+L2 Error %: 0.32
+Cosine Similarity: 0.95
+
+
+
+
+
+                    ################ Sample 21 #################
+############################# Initial Composition ####################################
+      1      3
+0  41.0  226.0
+L2 Error %: 0.54
+Cosine Similarity: 0.84
+############################## Composition After Initial Remove ###############################
+       3
+0  267.0
+L2 Error %: 0.57
+Cosine Similarity: 0.82
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3']
+L2 Error % 0.57
+Cosine Similarity 0.82
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3']
+L2 Error % 0.57
+Cosine Similarity 0.82
+
+#################### Final Composition #################################
+['3']
+L2 Error % 0.57
+Cosine Similarity 0.82
+####################################### Composition After Add-Remove #######################################
+       3
+0  267.0
+L2 Error %: 0.57
+Cosine Similarity: 0.82
+
+
+
+
+
+                    ################ Sample 22 #################
+############################# Initial Composition ####################################
+      0     2       3      4
+0  39.0  31.0  1080.0  116.0
+L2 Error %: 0.41
+Cosine Similarity: 0.91
+############################## Composition After Initial Remove ###############################
+        3
+0  1266.0
+L2 Error %: 0.42
+Cosine Similarity: 0.91
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3']
+L2 Error % 0.42
+Cosine Similarity 0.91
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3']
+L2 Error % 0.42
+Cosine Similarity 0.91
+
+#################### Final Composition #################################
+['3']
+L2 Error % 0.42
+Cosine Similarity 0.91
+####################################### Composition After Add-Remove #######################################
+        3
+0  1266.0
+L2 Error %: 0.42
+Cosine Similarity: 0.91
+
+
+
+
+
+                    ################ Sample 23 #################
+############################# Initial Composition ####################################
+      0     2      3      4
+0  32.0  45.0  924.0  104.0
+L2 Error %: 0.48
+Cosine Similarity: 0.88
+############################## Composition After Initial Remove ###############################
+        3
+0  1105.0
+L2 Error %: 0.49
+Cosine Similarity: 0.87
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3']
+L2 Error % 0.49
+Cosine Similarity 0.87
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3']
+L2 Error % 0.49
+Cosine Similarity 0.87
+
+#################### Final Composition #################################
+['3']
+L2 Error % 0.49
+Cosine Similarity 0.87
+####################################### Composition After Add-Remove #######################################
+        3
+0  1105.0
+L2 Error %: 0.49
+Cosine Similarity: 0.87
+
+
+
+
+
+                    ################ Sample 24 #################
+############################# Initial Composition ####################################
+       0     1     3       4
+0  555.0  59.0  22.0  1684.0
+L2 Error %: 0.29
+Cosine Similarity: 0.96
+############################## Composition After Initial Remove ###############################
+            0            4
+0  565.068737  1754.931263
+L2 Error %: 0.29
+Cosine Similarity: 0.96
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['0', '4']
+L2 Error % 0.29
+Cosine Similarity 0.96
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['0', '4']
+L2 Error % 0.29
+Cosine Similarity 0.96
+
+#################### Final Composition #################################
+['0', '4']
+L2 Error % 0.29
+Cosine Similarity 0.96
+####################################### Composition After Add-Remove #######################################
+       0       4
+0  565.0  1755.0
+L2 Error %: 0.29
+Cosine Similarity: 0.96
+
+
+
+
+
+                    ################ Sample 25 #################
+############################# Initial Composition ####################################
+      0      1     2      3    4
+0  19.0  227.0  20.0  428.0  1.0
+L2 Error %: 0.43
+Cosine Similarity: 0.9
+############################## Composition After Initial Remove ###############################
+            1           3
+0  236.680131  458.319869
+L2 Error %: 0.44
+Cosine Similarity: 0.9
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '3']
+L2 Error % 0.44
+Cosine Similarity 0.9
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '3']
+L2 Error % 0.44
+Cosine Similarity 0.9
+
+#################### Final Composition #################################
+['1', '3']
+L2 Error % 0.44
+Cosine Similarity 0.9
+####################################### Composition After Add-Remove #######################################
+       1      3
+0  237.0  458.0
+L2 Error %: 0.44
+Cosine Similarity: 0.9
+
+
+
+
+
+                    ################ Sample 26 #################
+############################# Initial Composition ####################################
+       1      2      3      4
+0  732.0  153.0  105.0  235.0
+L2 Error %: 0.23
+Cosine Similarity: 0.97
+############################## Composition After Initial Remove ###############################
+            1           4
+0  865.490854  359.509146
+L2 Error %: 0.28
+Cosine Similarity: 0.96
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '4']
+L2 Error % 0.28
+Cosine Similarity 0.96
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '4']
+L2 Error % 0.28
+Cosine Similarity 0.96
+
+#################### Final Composition #################################
+['1', '4']
+L2 Error % 0.28
+Cosine Similarity 0.96
+####################################### Composition After Add-Remove #######################################
+       1      4
+0  865.0  360.0
+L2 Error %: 0.28
+Cosine Similarity: 0.96
+
+
+
+
+
+                    ################ Sample 27 #################
+############################# Initial Composition ####################################
+      1    2      3      4
+0  56.0  1.0  161.0  115.0
+L2 Error %: 0.4
+Cosine Similarity: 0.92
+############################## Composition After Initial Remove ###############################
+           1          3           4
+0  56.215578  161.75871  115.025712
+L2 Error %: 0.4
+Cosine Similarity: 0.92
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '3', '4']
+L2 Error % 0.4
+Cosine Similarity 0.92
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '3', '4']
+L2 Error % 0.4
+Cosine Similarity 0.92
+
+#################### Final Composition #################################
+['1', '3', '4']
+L2 Error % 0.4
+Cosine Similarity 0.92
+####################################### Composition After Add-Remove #######################################
+      1      3      4
+0  56.0  162.0  115.0
+L2 Error %: 0.4
+Cosine Similarity: 0.92
+
+
+
+
+
+                    ################ Sample 28 #################
+############################# Initial Composition ####################################
+     0     1      3     4
+0  3.0  21.0  112.0  13.0
+L2 Error %: 0.53
+Cosine Similarity: 0.85
+############################## Composition After Initial Remove ###############################
+       3
+0  149.0
+L2 Error %: 0.56
+Cosine Similarity: 0.83
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3']
+L2 Error % 0.56
+Cosine Similarity 0.83
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3']
+L2 Error % 0.56
+Cosine Similarity 0.83
+
+#################### Final Composition #################################
+['3']
+L2 Error % 0.56
+Cosine Similarity 0.83
+####################################### Composition After Add-Remove #######################################
+       3
+0  149.0
+L2 Error %: 0.56
+Cosine Similarity: 0.83
+
+
+
+
+
+                    ################ Sample 29 #################
+############################# Initial Composition ####################################
+      1      3     4
+0  35.0  118.0  24.0
+L2 Error %: 0.48
+Cosine Similarity: 0.88
+############################## Composition After Initial Remove ###############################
+           1           3
+0  39.786152  137.213848
+L2 Error %: 0.49
+Cosine Similarity: 0.87
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '3']
+L2 Error % 0.49
+Cosine Similarity 0.87
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '3']
+L2 Error % 0.49
+Cosine Similarity 0.87
+
+#################### Final Composition #################################
+['1', '3']
+L2 Error % 0.49
+Cosine Similarity 0.87
+####################################### Composition After Add-Remove #######################################
+      1      3
+0  40.0  137.0
+L2 Error %: 0.49
+Cosine Similarity: 0.87
+
+
+
+
+
+                    ################ Sample 30 #################
+############################# Initial Composition ####################################
+      0     1     2      3
+0  36.0  46.0  37.0  123.0
+L2 Error %: 0.42
+Cosine Similarity: 0.91
+############################## Composition After Initial Remove ###############################
+           1           3
+0  57.370116  184.629884
+L2 Error %: 0.51
+Cosine Similarity: 0.86
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '3']
+L2 Error % 0.51
+Cosine Similarity 0.86
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '3']
+L2 Error % 0.51
+Cosine Similarity 0.86
+
+#################### Final Composition #################################
+['1', '3']
+L2 Error % 0.51
+Cosine Similarity 0.86
+####################################### Composition After Add-Remove #######################################
+      1      3
+0  57.0  185.0
+L2 Error %: 0.51
+Cosine Similarity: 0.86
+
+
+
+
+
+                    ################ Sample 31 #################
+############################# Initial Composition ####################################
+      0     1       2      3     4
+0  36.0  31.0  2847.0  174.0  60.0
+L2 Error %: 0.13
+Cosine Similarity: 0.99
+############################## Composition After Initial Remove ###############################
+        2
+0  3148.0
+L2 Error %: 0.15
+Cosine Similarity: 0.99
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['2']
+L2 Error % 0.15
+Cosine Similarity 0.99
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['2']
+L2 Error % 0.15
+Cosine Similarity 0.99
+
+#################### Final Composition #################################
+['2']
+L2 Error % 0.15
+Cosine Similarity 0.99
+####################################### Composition After Add-Remove #######################################
+        2
+0  3148.0
+L2 Error %: 0.15
+Cosine Similarity: 0.99
+
+
+
+
+
+                    ################ Sample 32 #################
+############################# Initial Composition ####################################
+     0     1     2      3      4
+0  5.0  52.0  17.0  209.0  105.0
+L2 Error %: 0.44
+Cosine Similarity: 0.9
+############################## Composition After Initial Remove ###############################
+            3           4
+0  265.702047  122.297953
+L2 Error %: 0.49
+Cosine Similarity: 0.87
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3', '4']
+L2 Error % 0.49
+Cosine Similarity 0.87
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3', '4']
+L2 Error % 0.49
+Cosine Similarity 0.87
+
+#################### Final Composition #################################
+['3', '4']
+L2 Error % 0.49
+Cosine Similarity 0.87
+####################################### Composition After Add-Remove #######################################
+       3      4
+0  266.0  122.0
+L2 Error %: 0.49
+Cosine Similarity: 0.87
+
+
+
+
+
+                    ################ Sample 33 #################
+############################# Initial Composition ####################################
+      0     1     2      3      4
+0  10.0  63.0  32.0  157.0  110.0
+L2 Error %: 0.43
+Cosine Similarity: 0.9
+############################## Composition After Initial Remove ###############################
+           1           3           4
+0  66.519812  179.827995  125.652193
+L2 Error %: 0.45
+Cosine Similarity: 0.9
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '3', '4']
+L2 Error % 0.45
+Cosine Similarity 0.9
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '3', '4']
+L2 Error % 0.45
+Cosine Similarity 0.9
+
+#################### Final Composition #################################
+['1', '3', '4']
+L2 Error % 0.45
+Cosine Similarity 0.9
+####################################### Composition After Add-Remove #######################################
+      1      3      4
+0  67.0  179.0  126.0
+L2 Error %: 0.45
+Cosine Similarity: 0.9
+
+
+
+
+
+                    ################ Sample 34 #################
+############################# Initial Composition ####################################
+      0      1      2      3      4
+0  41.0  139.0  653.0  318.0  319.0
+L2 Error %: 0.32
+Cosine Similarity: 0.95
+############################## Composition After Initial Remove ###############################
+            2           3           4
+0  679.362942  425.449703  365.187355
+L2 Error %: 0.35
+Cosine Similarity: 0.93
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['2', '3', '4']
+L2 Error % 0.35
+Cosine Similarity 0.93
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['2', '3', '4']
+L2 Error % 0.35
+Cosine Similarity 0.93
+
+#################### Final Composition #################################
+['2', '3', '4']
+L2 Error % 0.35
+Cosine Similarity 0.93
+####################################### Composition After Add-Remove #######################################
+       2      3      4
+0  680.0  425.0  365.0
+L2 Error %: 0.35
+Cosine Similarity: 0.93
+
+
+
+
+
+                    ################ Sample 35 #################
+############################# Initial Composition ####################################
+       0     1     2      3       4
+0  577.0  16.0  49.0  249.0  1292.0
+L2 Error %: 0.56
+Cosine Similarity: 0.83
+############################## Composition After Initial Remove ###############################
+            0            4
+0  627.510034  1555.489966
+L2 Error %: 0.58
+Cosine Similarity: 0.82
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['0', '4']
+L2 Error % 0.58
+Cosine Similarity 0.82
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['0', '4']
+L2 Error % 0.58
+Cosine Similarity 0.82
+
+#################### Final Composition #################################
+['0', '4']
+L2 Error % 0.58
+Cosine Similarity 0.82
+####################################### Composition After Add-Remove #######################################
+       0       4
+0  628.0  1555.0
+L2 Error %: 0.58
+Cosine Similarity: 0.82
+
+
+
+
+
+                    ################ Sample 36 #################
+############################# Initial Composition ####################################
+      0      1     2      3      4
+0  26.0  249.0  27.0  220.0  546.0
+L2 Error %: 0.25
+Cosine Similarity: 0.97
+############################## Composition After Initial Remove ###############################
+            1           3           4
+0  254.532667  237.164107  576.303226
+L2 Error %: 0.25
+Cosine Similarity: 0.97
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '3', '4']
+L2 Error % 0.25
+Cosine Similarity 0.97
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '3', '4']
+L2 Error % 0.25
+Cosine Similarity 0.97
+
+#################### Final Composition #################################
+['1', '3', '4']
+L2 Error % 0.25
+Cosine Similarity 0.97
+####################################### Composition After Add-Remove #######################################
+       1      3      4
+0  255.0  237.0  576.0
+L2 Error %: 0.25
+Cosine Similarity: 0.97
+
+
+
+
+
+                    ################ Sample 37 #################
+############################# Initial Composition ####################################
+       0       1     2     4
+0  114.0  1779.0  27.0  12.0
+L2 Error %: 0.2
+Cosine Similarity: 0.98
+############################## Composition After Initial Remove ###############################
+        1
+0  1932.0
+L2 Error %: 0.21
+Cosine Similarity: 0.98
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1']
+L2 Error % 0.21
+Cosine Similarity 0.98
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1']
+L2 Error % 0.21
+Cosine Similarity 0.98
+
+#################### Final Composition #################################
+['1']
+L2 Error % 0.21
+Cosine Similarity 0.98
+####################################### Composition After Add-Remove #######################################
+        1
+0  1932.0
+L2 Error %: 0.21
+Cosine Similarity: 0.98
+
+
+
+
+
+                    ################ Sample 38 #################
+############################# Initial Composition ####################################
+      0       1      3
+0  76.0  2014.0  459.0
+L2 Error %: 0.22
+Cosine Similarity: 0.98
+############################## Composition After Initial Remove ###############################
+        1
+0  2549.0
+L2 Error %: 0.26
+Cosine Similarity: 0.97
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1']
+L2 Error % 0.26
+Cosine Similarity 0.97
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1']
+L2 Error % 0.26
+Cosine Similarity 0.97
+
+#################### Final Composition #################################
+['1']
+L2 Error % 0.26
+Cosine Similarity 0.97
+####################################### Composition After Add-Remove #######################################
+        1
+0  2549.0
+L2 Error %: 0.26
+Cosine Similarity: 0.97
+
+
+
+
+
+                    ################ Sample 39 #################
+############################# Initial Composition ####################################
+      0       1     2     3      4
+0  24.0  1284.0  45.0  91.0  431.0
+L2 Error %: 0.17
+Cosine Similarity: 0.99
+############################## Composition After Initial Remove ###############################
+             1           4
+0  1363.368489  511.631511
+L2 Error %: 0.18
+Cosine Similarity: 0.98
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '4']
+L2 Error % 0.18
+Cosine Similarity 0.98
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '4']
+L2 Error % 0.18
+Cosine Similarity 0.98
+
+#################### Final Composition #################################
+['1', '4']
+L2 Error % 0.18
+Cosine Similarity 0.98
+####################################### Composition After Add-Remove #######################################
+        1      4
+0  1363.0  512.0
+L2 Error %: 0.18
+Cosine Similarity: 0.98
+
+
+
+
+
+                    ################ Sample 40 #################
+############################# Initial Composition ####################################
+      0      1      2      3      4
+0  18.0  137.0  119.0  251.0  136.0
+L2 Error %: 0.41
+Cosine Similarity: 0.91
+############################## Composition After Initial Remove ###############################
+            1           2           3
+0  165.379783  151.211184  344.409033
+L2 Error %: 0.45
+Cosine Similarity: 0.89
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '2', '3']
+L2 Error % 0.45
+Cosine Similarity 0.89
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '2', '3']
+L2 Error % 0.45
+Cosine Similarity 0.89
+
+#################### Final Composition #################################
+['1', '2', '3']
+L2 Error % 0.45
+Cosine Similarity 0.89
+####################################### Composition After Add-Remove #######################################
+       1      2      3
+0  165.0  151.0  345.0
+L2 Error %: 0.45
+Cosine Similarity: 0.89
+
+
+
+
+
+                    ################ Sample 41 #################
+############################# Initial Composition ####################################
+      0     1     2      3      4
+0  89.0  50.0  23.0  126.0  355.0
+L2 Error %: 0.32
+Cosine Similarity: 0.95
+############################## Composition After Initial Remove ###############################
+           0           3           4
+0  91.729995  171.774727  379.495278
+L2 Error %: 0.35
+Cosine Similarity: 0.94
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['0', '3', '4']
+L2 Error % 0.35
+Cosine Similarity 0.94
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['0', '3', '4']
+L2 Error % 0.35
+Cosine Similarity 0.94
+
+#################### Final Composition #################################
+['0', '3', '4']
+L2 Error % 0.35
+Cosine Similarity 0.94
+####################################### Composition After Add-Remove #######################################
+      0      3      4
+0  92.0  172.0  379.0
+L2 Error %: 0.35
+Cosine Similarity: 0.94
+
+
+
+
+
+                    ################ Sample 42 #################
+############################# Initial Composition ####################################
+      1     2      3     4
+0  39.0  27.0  125.0  70.0
+L2 Error %: 0.47
+Cosine Similarity: 0.88
+############################## Composition After Initial Remove ###############################
+       3
+0  261.0
+L2 Error %: 0.58
+Cosine Similarity: 0.81
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3']
+L2 Error % 0.58
+Cosine Similarity 0.81
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3']
+L2 Error % 0.58
+Cosine Similarity 0.81
+
+#################### Final Composition #################################
+['3']
+L2 Error % 0.58
+Cosine Similarity 0.81
+####################################### Composition After Add-Remove #######################################
+       3
+0  261.0
+L2 Error %: 0.58
+Cosine Similarity: 0.81
+
+
+
+
+
+                    ################ Sample 43 #################
+############################# Initial Composition ####################################
+      0     1    2     3     4
+0  18.0  23.0  1.0  49.0  68.0
+L2 Error %: 0.59
+Cosine Similarity: 0.81
+############################## Composition After Initial Remove ###############################
+           3          4
+0  71.217256  87.782744
+L2 Error %: 0.64
+Cosine Similarity: 0.77
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3', '4']
+L2 Error % 0.64
+Cosine Similarity 0.77
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3', '4']
+L2 Error % 0.64
+Cosine Similarity 0.77
+
+#################### Final Composition #################################
+['3', '4']
+L2 Error % 0.64
+Cosine Similarity 0.77
+####################################### Composition After Add-Remove #######################################
+      3     4
+0  71.0  88.0
+L2 Error %: 0.64
+Cosine Similarity: 0.77
+
+
+
+
+
+                    ################ Sample 44 #################
+############################# Initial Composition ####################################
+      0      1     2      3      4
+0  33.0  141.0  87.0  217.0  313.0
+L2 Error %: 0.36
+Cosine Similarity: 0.93
+############################## Composition After Initial Remove ###############################
+            1           3           4
+0  151.013176  270.893911  369.092913
+L2 Error %: 0.4
+Cosine Similarity: 0.92
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '3', '4']
+L2 Error % 0.4
+Cosine Similarity 0.92
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '3', '4']
+L2 Error % 0.4
+Cosine Similarity 0.92
+
+#################### Final Composition #################################
+['1', '3', '4']
+L2 Error % 0.4
+Cosine Similarity 0.92
+####################################### Composition After Add-Remove #######################################
+       1      3      4
+0  151.0  271.0  369.0
+L2 Error %: 0.4
+Cosine Similarity: 0.92
+
+
+
+
+
+                    ################ Sample 45 #################
+############################# Initial Composition ####################################
+     0     1      3
+0  1.0  57.0  597.0
+L2 Error %: 0.34
+Cosine Similarity: 0.94
+############################## Composition After Initial Remove ###############################
+       3
+0  655.0
+L2 Error %: 0.36
+Cosine Similarity: 0.93
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3']
+L2 Error % 0.36
+Cosine Similarity 0.93
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3']
+L2 Error % 0.36
+Cosine Similarity 0.93
+
+#################### Final Composition #################################
+['3']
+L2 Error % 0.36
+Cosine Similarity 0.93
+####################################### Composition After Add-Remove #######################################
+       3
+0  655.0
+L2 Error %: 0.36
+Cosine Similarity: 0.93
+
+
+
+
+
+                    ################ Sample 46 #################
+############################# Initial Composition ####################################
+     0     1     2      3     4
+0  9.0  17.0  29.0  111.0  15.0
+L2 Error %: 0.52
+Cosine Similarity: 0.85
+############################## Composition After Initial Remove ###############################
+       3
+0  181.0
+L2 Error %: 0.58
+Cosine Similarity: 0.82
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3']
+L2 Error % 0.58
+Cosine Similarity 0.82
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3']
+L2 Error % 0.58
+Cosine Similarity 0.82
+
+#################### Final Composition #################################
+['3']
+L2 Error % 0.58
+Cosine Similarity 0.82
+####################################### Composition After Add-Remove #######################################
+       3
+0  181.0
+L2 Error %: 0.58
+Cosine Similarity: 0.82
+
+
+
+
+
+                    ################ Sample 47 #################
+############################# Initial Composition ####################################
+      0     1     2      3     4
+0  12.0  30.0  13.0  315.0  37.0
+L2 Error %: 0.44
+Cosine Similarity: 0.9
+############################## Composition After Initial Remove ###############################
+       3
+0  407.0
+L2 Error %: 0.46
+Cosine Similarity: 0.89
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3']
+L2 Error % 0.46
+Cosine Similarity 0.89
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['3']
+L2 Error % 0.46
+Cosine Similarity 0.89
+
+#################### Final Composition #################################
+['3']
+L2 Error % 0.46
+Cosine Similarity 0.89
+####################################### Composition After Add-Remove #######################################
+       3
+0  407.0
+L2 Error %: 0.46
+Cosine Similarity: 0.89
+
+
+
+
+
+                    ################ Sample 48 #################
+############################# Initial Composition ####################################
+      0     1      3     4
+0  25.0  52.0  258.0  62.0
+L2 Error %: 0.25
+Cosine Similarity: 0.97
+############################## Composition After Initial Remove ###############################
+           1           3
+0  62.663076  334.336924
+L2 Error %: 0.31
+Cosine Similarity: 0.95
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '3']
+L2 Error % 0.31
+Cosine Similarity 0.95
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '3']
+L2 Error % 0.31
+Cosine Similarity 0.95
+
+#################### Final Composition #################################
+['1', '3']
+L2 Error % 0.31
+Cosine Similarity 0.95
+####################################### Composition After Add-Remove #######################################
+      1      3
+0  63.0  334.0
+L2 Error %: 0.31
+Cosine Similarity: 0.95
+
+
+
+
+
+                    ################ Sample 49 #################
+############################# Initial Composition ####################################
+         0      2      3
+0  88367.0  185.0  378.0
+L2 Error %: 0.07
+Cosine Similarity: 1.0
+############################## Composition After Initial Remove ###############################
+         0
+0  88930.0
+L2 Error %: 0.07
+Cosine Similarity: 1.0
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['0']
+L2 Error % 0.07
+Cosine Similarity 1.0
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['0']
+L2 Error % 0.07
+Cosine Similarity 1.0
+
+#################### Final Composition #################################
+['0']
+L2 Error % 0.07
+Cosine Similarity 1.0
+####################################### Composition After Add-Remove #######################################
+         0
+0  88930.0
+L2 Error %: 0.07
+Cosine Similarity: 1.0
+
+
+
+
+
+                    ################ Sample 50 #################
+############################# Initial Composition ####################################
+      0      1     2      3     4
+0  13.0  368.0  66.0  367.0  64.0
+L2 Error %: 0.43
+Cosine Similarity: 0.9
+############################## Composition After Initial Remove ###############################
+            1           3
+0  413.741556  464.258444
+L2 Error %: 0.44
+Cosine Similarity: 0.9
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '3']
+L2 Error % 0.44
+Cosine Similarity 0.9
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['1', '3']
+L2 Error % 0.44
+Cosine Similarity 0.9
+
+#################### Final Composition #################################
+['1', '3']
+L2 Error % 0.44
+Cosine Similarity 0.9
+####################################### Composition After Add-Remove #######################################
+       1      3
+0  414.0  464.0
+L2 Error %: 0.44
+Cosine Similarity: 0.9

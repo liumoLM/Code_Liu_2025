@@ -1,0 +1,1487 @@
+
+
+
+
+
+                    ################ Sample 1 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   11.0   27.0   63.0   26.0   19.0
+L2 Error %: 0.6
+Cosine Similarity: 0.8
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   11.0   27.0   63.0   26.0   19.0
+L2 Error %: 0.6
+Cosine Similarity: 0.8
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+                    ################ Sample 2 #################
+############################# Initial Composition ####################################
+   CH89B  CH89C  CH89D  CH89E
+0   24.0   82.0   17.0  139.0
+L2 Error %: 0.51
+Cosine Similarity: 0.86
+############################## Composition After Initial Remove ###############################
+   CH89B  CH89C  CH89D  CH89E
+0   24.0   82.0   17.0  139.0
+L2 Error %: 0.51
+Cosine Similarity: 0.86
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89B', 'CH89C', 'CH89E']
+L2 Error % 0.51
+Cosine Similarity 0.86
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89B', 'CH89C', 'CH89E']
+L2 Error % 0.51
+Cosine Similarity 0.86
+
+#################### Final Composition #################################
+['CH89B', 'CH89C', 'CH89E']
+L2 Error % 0.51
+Cosine Similarity 0.86
+####################################### Composition After Add-Remove #######################################
+   CH89B  CH89C  CH89E
+0   24.0   91.0  147.0
+L2 Error %: 0.51
+Cosine Similarity: 0.86
+
+
+
+
+
+                    ################ Sample 3 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   30.0  515.0  201.0  143.0  266.0
+L2 Error %: 0.3
+Cosine Similarity: 0.95
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   30.0  515.0  201.0  143.0  266.0
+L2 Error %: 0.3
+Cosine Similarity: 0.95
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+                    ################ Sample 4 #################
+############################# Initial Composition ####################################
+   CH89B  CH89C  CH89D  CH89E
+0   13.0   80.0    5.0   10.0
+L2 Error %: 0.51
+Cosine Similarity: 0.86
+############################## Composition After Initial Remove ###############################
+   CH89B  CH89C  CH89D  CH89E
+0   13.0   80.0    5.0   10.0
+L2 Error %: 0.51
+Cosine Similarity: 0.86
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89B', 'CH89C']
+L2 Error % 0.51
+Cosine Similarity 0.86
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89B', 'CH89C']
+L2 Error % 0.51
+Cosine Similarity 0.86
+
+#################### Final Composition #################################
+['CH89B', 'CH89C']
+L2 Error % 0.51
+Cosine Similarity 0.86
+####################################### Composition After Add-Remove #######################################
+   CH89B  CH89C
+0   15.0   93.0
+L2 Error %: 0.51
+Cosine Similarity: 0.86
+
+
+
+
+
+                    ################ Sample 5 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   41.0   75.0  185.0  454.0  215.0
+L2 Error %: 0.25
+Cosine Similarity: 0.97
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   41.0   75.0  185.0  454.0  215.0
+L2 Error %: 0.25
+Cosine Similarity: 0.97
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+                    ################ Sample 6 #################
+############################# Initial Composition ####################################
+   CH89A   CH89B  CH89C  CH89D  CH89E
+0  138.0  1494.0   21.0   40.0   91.0
+L2 Error %: 0.15
+Cosine Similarity: 0.99
+############################## Composition After Initial Remove ###############################
+   CH89A   CH89B  CH89C  CH89D  CH89E
+0  138.0  1494.0   21.0   40.0   91.0
+L2 Error %: 0.15
+Cosine Similarity: 0.99
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+                    ################ Sample 7 #################
+############################# Initial Composition ####################################
+   CH89A   CH89B  CH89C  CH89D  CH89E
+0  179.0  1792.0   18.0  151.0  117.0
+L2 Error %: 0.15
+Cosine Similarity: 0.99
+############################## Composition After Initial Remove ###############################
+   CH89A   CH89B  CH89C  CH89D  CH89E
+0  179.0  1792.0   18.0  151.0  117.0
+L2 Error %: 0.15
+Cosine Similarity: 0.99
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+                    ################ Sample 8 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   26.0  344.0  367.0  134.0  689.0
+L2 Error %: 0.34
+Cosine Similarity: 0.94
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   26.0  344.0  367.0  134.0  689.0
+L2 Error %: 0.34
+Cosine Similarity: 0.94
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+                    ################ Sample 9 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   10.0   15.0   72.0   21.0   25.0
+L2 Error %: 0.53
+Cosine Similarity: 0.85
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   10.0   15.0   72.0   21.0   25.0
+L2 Error %: 0.53
+Cosine Similarity: 0.85
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+                    ################ Sample 10 #################
+############################# Initial Composition ####################################
+   CH89B  CH89C
+0    7.0   44.0
+L2 Error %: 0.59
+Cosine Similarity: 0.81
+############################## Composition After Initial Remove ###############################
+   CH89B  CH89C
+0    7.0   44.0
+L2 Error %: 0.59
+Cosine Similarity: 0.81
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89B', 'CH89C']
+L2 Error % 0.59
+Cosine Similarity 0.81
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89B', 'CH89C']
+L2 Error % 0.59
+Cosine Similarity 0.81
+
+#################### Final Composition #################################
+['CH89B', 'CH89C']
+L2 Error % 0.59
+Cosine Similarity 0.81
+####################################### Composition After Add-Remove #######################################
+   CH89B  CH89C
+0    7.0   44.0
+L2 Error %: 0.59
+Cosine Similarity: 0.81
+
+
+
+
+
+                    ################ Sample 11 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   27.0  232.0  377.0  132.0  204.0
+L2 Error %: 0.31
+Cosine Similarity: 0.95
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   27.0  232.0  377.0  132.0  204.0
+L2 Error %: 0.31
+Cosine Similarity: 0.95
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+                    ################ Sample 12 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   17.0   70.0  124.0   41.0    3.0
+L2 Error %: 0.42
+Cosine Similarity: 0.91
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   17.0   70.0  124.0   41.0    3.0
+L2 Error %: 0.42
+Cosine Similarity: 0.91
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+                    ################ Sample 13 #################
+############################# Initial Composition ####################################
+   CH89B  CH89C  CH89D  CH89E
+0   93.0  513.0   11.0    5.0
+L2 Error %: 0.23
+Cosine Similarity: 0.97
+############################## Composition After Initial Remove ###############################
+   CH89B  CH89C  CH89D  CH89E
+0   93.0  513.0   11.0    5.0
+L2 Error %: 0.23
+Cosine Similarity: 0.97
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89B', 'CH89C']
+L2 Error % 0.23
+Cosine Similarity 0.97
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89B', 'CH89C']
+L2 Error % 0.23
+Cosine Similarity 0.97
+
+#################### Final Composition #################################
+['CH89B', 'CH89C']
+L2 Error % 0.23
+Cosine Similarity 0.97
+####################################### Composition After Add-Remove #######################################
+   CH89B  CH89C
+0   94.0  528.0
+L2 Error %: 0.23
+Cosine Similarity: 0.97
+
+
+
+
+
+                    ################ Sample 14 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   54.0  340.0   67.0   21.0  581.0
+L2 Error %: 0.27
+Cosine Similarity: 0.96
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   54.0  340.0   67.0   21.0  581.0
+L2 Error %: 0.27
+Cosine Similarity: 0.96
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+                    ################ Sample 15 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C   CH89D  CH89E
+0  149.0   80.0  279.0  5429.0   41.0
+L2 Error %: 0.07
+Cosine Similarity: 1.0
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C   CH89D  CH89E
+0  149.0   80.0  279.0  5429.0   41.0
+L2 Error %: 0.07
+Cosine Similarity: 1.0
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+                    ################ Sample 16 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0    1.0   45.0  129.0   69.0  357.0
+L2 Error %: 0.34
+Cosine Similarity: 0.94
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0    1.0   45.0  129.0   69.0  357.0
+L2 Error %: 0.34
+Cosine Similarity: 0.94
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+                    ################ Sample 17 #################
+############################# Initial Composition ####################################
+   CH89B  CH89C  CH89D  CH89E
+0    9.0   57.0   13.0   89.0
+L2 Error %: 0.5
+Cosine Similarity: 0.86
+############################## Composition After Initial Remove ###############################
+   CH89B  CH89C  CH89D  CH89E
+0    9.0   57.0   13.0   89.0
+L2 Error %: 0.5
+Cosine Similarity: 0.86
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89C', 'CH89E']
+L2 Error % 0.52
+Cosine Similarity 0.85
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89C', 'CH89E']
+L2 Error % 0.52
+Cosine Similarity 0.85
+
+#################### Final Composition #################################
+['CH89C', 'CH89E']
+L2 Error % 0.52
+Cosine Similarity 0.85
+####################################### Composition After Add-Remove #######################################
+   CH89C  CH89E
+0   71.0   97.0
+L2 Error %: 0.52
+Cosine Similarity: 0.85
+
+
+
+
+
+                    ################ Sample 18 #################
+############################# Initial Composition ####################################
+   CH89B  CH89C
+0    8.0  140.0
+L2 Error %: 0.61
+Cosine Similarity: 0.79
+############################## Composition After Initial Remove ###############################
+   CH89B  CH89C
+0    8.0  140.0
+L2 Error %: 0.61
+Cosine Similarity: 0.79
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89C']
+L2 Error % 0.61
+Cosine Similarity 0.79
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89C']
+L2 Error % 0.61
+Cosine Similarity 0.79
+
+#################### Final Composition #################################
+['CH89C']
+L2 Error % 0.61
+Cosine Similarity 0.79
+####################################### Composition After Add-Remove #######################################
+   CH89C
+0  148.0
+L2 Error %: 0.61
+Cosine Similarity: 0.79
+
+
+
+
+
+                    ################ Sample 19 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   34.0   47.0  194.0   79.0  266.0
+L2 Error %: 0.4
+Cosine Similarity: 0.92
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   34.0   47.0  194.0   79.0  266.0
+L2 Error %: 0.4
+Cosine Similarity: 0.92
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+                    ################ Sample 20 #################
+############################# Initial Composition ####################################
+   CH89B  CH89C  CH89D  CH89E
+0   19.0   71.0   34.0  698.0
+L2 Error %: 0.29
+Cosine Similarity: 0.96
+############################## Composition After Initial Remove ###############################
+   CH89B  CH89C  CH89D  CH89E
+0   19.0   71.0   34.0  698.0
+L2 Error %: 0.29
+Cosine Similarity: 0.96
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89C', 'CH89E']
+L2 Error % 0.29
+Cosine Similarity 0.96
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89C', 'CH89E']
+L2 Error % 0.29
+Cosine Similarity 0.96
+
+#################### Final Composition #################################
+['CH89C', 'CH89E']
+L2 Error % 0.29
+Cosine Similarity 0.96
+####################################### Composition After Add-Remove #######################################
+   CH89C  CH89E
+0   97.0  725.0
+L2 Error %: 0.29
+Cosine Similarity: 0.96
+
+
+
+
+
+                    ################ Sample 21 #################
+############################# Initial Composition ####################################
+   CH89B  CH89C
+0   39.0  228.0
+L2 Error %: 0.55
+Cosine Similarity: 0.84
+############################## Composition After Initial Remove ###############################
+   CH89B  CH89C
+0   39.0  228.0
+L2 Error %: 0.55
+Cosine Similarity: 0.84
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89B', 'CH89C']
+L2 Error % 0.55
+Cosine Similarity 0.84
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89B', 'CH89C']
+L2 Error % 0.55
+Cosine Similarity 0.84
+
+#################### Final Composition #################################
+['CH89B', 'CH89C']
+L2 Error % 0.55
+Cosine Similarity 0.84
+####################################### Composition After Add-Remove #######################################
+   CH89B  CH89C
+0   39.0  228.0
+L2 Error %: 0.55
+Cosine Similarity: 0.84
+
+
+
+
+
+                    ################ Sample 22 #################
+############################# Initial Composition ####################################
+   CH89A   CH89C  CH89D  CH89E
+0   34.0  1083.0   39.0  110.0
+L2 Error %: 0.42
+Cosine Similarity: 0.91
+############################## Composition After Initial Remove ###############################
+   CH89A   CH89C  CH89D  CH89E
+0   34.0  1083.0   39.0  110.0
+L2 Error %: 0.42
+Cosine Similarity: 0.91
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89C']
+L2 Error % 0.43
+Cosine Similarity 0.9
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89C']
+L2 Error % 0.43
+Cosine Similarity 0.9
+
+#################### Final Composition #################################
+['CH89C']
+L2 Error % 0.43
+Cosine Similarity 0.9
+####################################### Composition After Add-Remove #######################################
+    CH89C
+0  1266.0
+L2 Error %: 0.43
+Cosine Similarity: 0.9
+
+
+
+
+
+                    ################ Sample 23 #################
+############################# Initial Composition ####################################
+   CH89A  CH89C  CH89D  CH89E
+0   28.0  926.0   52.0   99.0
+L2 Error %: 0.49
+Cosine Similarity: 0.87
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89C  CH89D  CH89E
+0   28.0  926.0   52.0   99.0
+L2 Error %: 0.49
+Cosine Similarity: 0.87
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89C']
+L2 Error % 0.49
+Cosine Similarity 0.87
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89C']
+L2 Error % 0.49
+Cosine Similarity 0.87
+
+#################### Final Composition #################################
+['CH89C']
+L2 Error % 0.49
+Cosine Similarity 0.87
+####################################### Composition After Add-Remove #######################################
+    CH89C
+0  1105.0
+L2 Error %: 0.49
+Cosine Similarity: 0.87
+
+
+
+
+
+                    ################ Sample 24 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C   CH89E
+0  546.0   67.0   24.0  1683.0
+L2 Error %: 0.28
+Cosine Similarity: 0.96
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C   CH89E
+0  546.0   67.0   24.0  1683.0
+L2 Error %: 0.28
+Cosine Similarity: 0.96
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89A', 'CH89E']
+L2 Error % 0.29
+Cosine Similarity 0.96
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89A', 'CH89E']
+L2 Error % 0.29
+Cosine Similarity 0.96
+
+#################### Final Composition #################################
+['CH89A', 'CH89E']
+L2 Error % 0.29
+Cosine Similarity 0.96
+####################################### Composition After Add-Remove #######################################
+   CH89A   CH89E
+0  557.0  1763.0
+L2 Error %: 0.29
+Cosine Similarity: 0.96
+
+
+
+
+
+                    ################ Sample 25 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C  CH89D
+0   17.0  216.0  445.0   17.0
+L2 Error %: 0.43
+Cosine Similarity: 0.9
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C  CH89D
+0   17.0  216.0  445.0   17.0
+L2 Error %: 0.43
+Cosine Similarity: 0.9
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89B', 'CH89C']
+L2 Error % 0.43
+Cosine Similarity 0.9
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89B', 'CH89C']
+L2 Error % 0.43
+Cosine Similarity 0.9
+
+#################### Final Composition #################################
+['CH89B', 'CH89C']
+L2 Error % 0.43
+Cosine Similarity 0.9
+####################################### Composition After Add-Remove #######################################
+   CH89B  CH89C
+0  224.0  471.0
+L2 Error %: 0.43
+Cosine Similarity: 0.9
+
+
+
+
+
+                    ################ Sample 26 #################
+############################# Initial Composition ####################################
+   CH89B  CH89C  CH89D  CH89E
+0  720.0  119.0  152.0  234.0
+L2 Error %: 0.23
+Cosine Similarity: 0.97
+############################## Composition After Initial Remove ###############################
+   CH89B  CH89C  CH89D  CH89E
+0  720.0  119.0  152.0  234.0
+L2 Error %: 0.23
+Cosine Similarity: 0.97
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89B', 'CH89C', 'CH89D', 'CH89E']
+L2 Error % 0.23
+Cosine Similarity 0.97
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89B', 'CH89C', 'CH89D', 'CH89E']
+L2 Error % 0.23
+Cosine Similarity 0.97
+
+#################### Final Composition #################################
+['CH89B', 'CH89C', 'CH89D', 'CH89E']
+L2 Error % 0.23
+Cosine Similarity 0.97
+####################################### Composition After Add-Remove #######################################
+   CH89B  CH89C  CH89D  CH89E
+0  720.0  119.0  152.0  234.0
+L2 Error %: 0.23
+Cosine Similarity: 0.97
+
+
+
+
+
+                    ################ Sample 27 #################
+############################# Initial Composition ####################################
+   CH89B  CH89C  CH89D  CH89E
+0   55.0  165.0    2.0  111.0
+L2 Error %: 0.41
+Cosine Similarity: 0.91
+############################## Composition After Initial Remove ###############################
+   CH89B  CH89C  CH89D  CH89E
+0   55.0  165.0    2.0  111.0
+L2 Error %: 0.41
+Cosine Similarity: 0.91
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89B', 'CH89C', 'CH89E']
+L2 Error % 0.41
+Cosine Similarity 0.91
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89B', 'CH89C', 'CH89E']
+L2 Error % 0.41
+Cosine Similarity 0.91
+
+#################### Final Composition #################################
+['CH89B', 'CH89C', 'CH89E']
+L2 Error % 0.41
+Cosine Similarity 0.91
+####################################### Composition After Add-Remove #######################################
+   CH89B  CH89C  CH89E
+0   55.0  166.0  112.0
+L2 Error %: 0.41
+Cosine Similarity: 0.91
+
+
+
+
+
+                    ################ Sample 28 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C  CH89E
+0    2.0   20.0  115.0   12.0
+L2 Error %: 0.53
+Cosine Similarity: 0.85
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C  CH89E
+0    2.0   20.0  115.0   12.0
+L2 Error %: 0.53
+Cosine Similarity: 0.85
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89B', 'CH89C']
+L2 Error % 0.53
+Cosine Similarity 0.85
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89B', 'CH89C']
+L2 Error % 0.53
+Cosine Similarity 0.85
+
+#################### Final Composition #################################
+['CH89B', 'CH89C']
+L2 Error % 0.53
+Cosine Similarity 0.85
+####################################### Composition After Add-Remove #######################################
+   CH89B  CH89C
+0   21.0  128.0
+L2 Error %: 0.53
+Cosine Similarity: 0.85
+
+
+
+
+
+                    ################ Sample 29 #################
+############################# Initial Composition ####################################
+   CH89B  CH89C  CH89E
+0   33.0  122.0   22.0
+L2 Error %: 0.47
+Cosine Similarity: 0.88
+############################## Composition After Initial Remove ###############################
+   CH89B  CH89C  CH89E
+0   33.0  122.0   22.0
+L2 Error %: 0.47
+Cosine Similarity: 0.88
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89B', 'CH89C']
+L2 Error % 0.48
+Cosine Similarity 0.88
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89B', 'CH89C']
+L2 Error % 0.48
+Cosine Similarity 0.88
+
+#################### Final Composition #################################
+['CH89B', 'CH89C']
+L2 Error % 0.48
+Cosine Similarity 0.88
+####################################### Composition After Add-Remove #######################################
+   CH89B  CH89C
+0   37.0  140.0
+L2 Error %: 0.48
+Cosine Similarity: 0.88
+
+
+
+
+
+                    ################ Sample 30 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C  CH89D
+0   35.0   43.0  127.0   37.0
+L2 Error %: 0.42
+Cosine Similarity: 0.91
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C  CH89D
+0   35.0   43.0  127.0   37.0
+L2 Error %: 0.42
+Cosine Similarity: 0.91
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89A', 'CH89B', 'CH89C', 'CH89D']
+L2 Error % 0.42
+Cosine Similarity 0.91
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89A', 'CH89B', 'CH89C', 'CH89D']
+L2 Error % 0.42
+Cosine Similarity 0.91
+
+#################### Final Composition #################################
+['CH89A', 'CH89B', 'CH89C', 'CH89D']
+L2 Error % 0.42
+Cosine Similarity 0.91
+####################################### Composition After Add-Remove #######################################
+   CH89A  CH89B  CH89C  CH89D
+0   35.0   43.0  127.0   37.0
+L2 Error %: 0.42
+Cosine Similarity: 0.91
+
+
+
+
+
+                    ################ Sample 31 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C   CH89D  CH89E
+0   47.0   30.0  198.0  2839.0   34.0
+L2 Error %: 0.13
+Cosine Similarity: 0.99
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C   CH89D  CH89E
+0   47.0   30.0  198.0  2839.0   34.0
+L2 Error %: 0.13
+Cosine Similarity: 0.99
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+                    ################ Sample 32 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0    4.0   51.0  213.0   18.0  102.0
+L2 Error %: 0.45
+Cosine Similarity: 0.89
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0    4.0   51.0  213.0   18.0  102.0
+L2 Error %: 0.45
+Cosine Similarity: 0.89
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+                    ################ Sample 33 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0    9.0   62.0  162.0   33.0  106.0
+L2 Error %: 0.43
+Cosine Similarity: 0.9
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0    9.0   62.0  162.0   33.0  106.0
+L2 Error %: 0.43
+Cosine Similarity: 0.9
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+                    ################ Sample 34 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   41.0  136.0  331.0  655.0  307.0
+L2 Error %: 0.31
+Cosine Similarity: 0.95
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   41.0  136.0  331.0  655.0  307.0
+L2 Error %: 0.31
+Cosine Similarity: 0.95
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+                    ################ Sample 35 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C  CH89D   CH89E
+0  571.0   24.0  246.0   49.0  1293.0
+L2 Error %: 0.56
+Cosine Similarity: 0.83
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C  CH89D   CH89E
+0  571.0   24.0  246.0   49.0  1293.0
+L2 Error %: 0.56
+Cosine Similarity: 0.83
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+                    ################ Sample 36 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   22.0  246.0  230.0   26.0  544.0
+L2 Error %: 0.24
+Cosine Similarity: 0.97
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   22.0  246.0  230.0   26.0  544.0
+L2 Error %: 0.24
+Cosine Similarity: 0.97
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+                    ################ Sample 37 #################
+############################# Initial Composition ####################################
+   CH89A   CH89B  CH89D  CH89E
+0  113.0  1762.0   32.0   25.0
+L2 Error %: 0.19
+Cosine Similarity: 0.98
+############################## Composition After Initial Remove ###############################
+   CH89A   CH89B  CH89D  CH89E
+0  113.0  1762.0   32.0   25.0
+L2 Error %: 0.19
+Cosine Similarity: 0.98
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89B']
+L2 Error % 0.2
+Cosine Similarity 0.98
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89B']
+L2 Error % 0.2
+Cosine Similarity 0.98
+
+#################### Final Composition #################################
+['CH89B']
+L2 Error % 0.2
+Cosine Similarity 0.98
+####################################### Composition After Add-Remove #######################################
+    CH89B
+0  1932.0
+L2 Error %: 0.2
+Cosine Similarity: 0.98
+
+
+
+
+
+                    ################ Sample 38 #################
+############################# Initial Composition ####################################
+   CH89A   CH89B  CH89C
+0   75.0  2004.0  470.0
+L2 Error %: 0.22
+Cosine Similarity: 0.98
+############################## Composition After Initial Remove ###############################
+   CH89A   CH89B  CH89C
+0   75.0  2004.0  470.0
+L2 Error %: 0.22
+Cosine Similarity: 0.98
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89B', 'CH89C']
+L2 Error % 0.22
+Cosine Similarity 0.98
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89B', 'CH89C']
+L2 Error % 0.22
+Cosine Similarity 0.98
+
+#################### Final Composition #################################
+['CH89B', 'CH89C']
+L2 Error % 0.22
+Cosine Similarity 0.98
+####################################### Composition After Add-Remove #######################################
+    CH89B  CH89C
+0  2053.0  496.0
+L2 Error %: 0.22
+Cosine Similarity: 0.98
+
+
+
+
+
+                    ################ Sample 39 #################
+############################# Initial Composition ####################################
+   CH89A   CH89B  CH89C  CH89D  CH89E
+0   21.0  1271.0  106.0   48.0  429.0
+L2 Error %: 0.17
+Cosine Similarity: 0.99
+############################## Composition After Initial Remove ###############################
+   CH89A   CH89B  CH89C  CH89D  CH89E
+0   21.0  1271.0  106.0   48.0  429.0
+L2 Error %: 0.17
+Cosine Similarity: 0.99
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+                    ################ Sample 40 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   17.0  130.0  267.0  116.0  131.0
+L2 Error %: 0.41
+Cosine Similarity: 0.91
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   17.0  130.0  267.0  116.0  131.0
+L2 Error %: 0.41
+Cosine Similarity: 0.91
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+                    ################ Sample 41 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   86.0   49.0  131.0   22.0  355.0
+L2 Error %: 0.31
+Cosine Similarity: 0.95
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   86.0   49.0  131.0   22.0  355.0
+L2 Error %: 0.31
+Cosine Similarity: 0.95
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+                    ################ Sample 42 #################
+############################# Initial Composition ####################################
+   CH89B  CH89C  CH89D  CH89E
+0   37.0  130.0   27.0   67.0
+L2 Error %: 0.47
+Cosine Similarity: 0.88
+############################## Composition After Initial Remove ###############################
+   CH89B  CH89C  CH89D  CH89E
+0   37.0  130.0   27.0   67.0
+L2 Error %: 0.47
+Cosine Similarity: 0.88
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89B', 'CH89C', 'CH89D', 'CH89E']
+L2 Error % 0.47
+Cosine Similarity 0.88
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89B', 'CH89C', 'CH89D', 'CH89E']
+L2 Error % 0.47
+Cosine Similarity 0.88
+
+#################### Final Composition #################################
+['CH89B', 'CH89C', 'CH89D', 'CH89E']
+L2 Error % 0.47
+Cosine Similarity 0.88
+####################################### Composition After Add-Remove #######################################
+   CH89B  CH89C  CH89D  CH89E
+0   37.0  130.0   27.0   67.0
+L2 Error %: 0.47
+Cosine Similarity: 0.88
+
+
+
+
+
+                    ################ Sample 43 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   17.0   21.0   52.0    1.0   68.0
+L2 Error %: 0.58
+Cosine Similarity: 0.81
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   17.0   21.0   52.0    1.0   68.0
+L2 Error %: 0.58
+Cosine Similarity: 0.81
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+                    ################ Sample 44 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   31.0  134.0  235.0   85.0  306.0
+L2 Error %: 0.36
+Cosine Similarity: 0.93
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   31.0  134.0  235.0   85.0  306.0
+L2 Error %: 0.36
+Cosine Similarity: 0.93
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+                    ################ Sample 45 #################
+############################# Initial Composition ####################################
+   CH89B  CH89C
+0   52.0  603.0
+L2 Error %: 0.35
+Cosine Similarity: 0.94
+############################## Composition After Initial Remove ###############################
+   CH89B  CH89C
+0   52.0  603.0
+L2 Error %: 0.35
+Cosine Similarity: 0.94
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89B', 'CH89C']
+L2 Error % 0.35
+Cosine Similarity 0.94
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89B', 'CH89C']
+L2 Error % 0.35
+Cosine Similarity 0.94
+
+#################### Final Composition #################################
+['CH89B', 'CH89C']
+L2 Error % 0.35
+Cosine Similarity 0.94
+####################################### Composition After Add-Remove #######################################
+   CH89B  CH89C
+0   52.0  603.0
+L2 Error %: 0.35
+Cosine Similarity: 0.94
+
+
+
+
+
+                    ################ Sample 46 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0    9.0   16.0  113.0   30.0   13.0
+L2 Error %: 0.53
+Cosine Similarity: 0.85
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0    9.0   16.0  113.0   30.0   13.0
+L2 Error %: 0.53
+Cosine Similarity: 0.85
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+                    ################ Sample 47 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   10.0   27.0  321.0   15.0   34.0
+L2 Error %: 0.45
+Cosine Similarity: 0.9
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   10.0   27.0  321.0   15.0   34.0
+L2 Error %: 0.45
+Cosine Similarity: 0.9
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+                    ################ Sample 48 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C  CH89E
+0   24.0   49.0  266.0   58.0
+L2 Error %: 0.26
+Cosine Similarity: 0.97
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C  CH89E
+0   24.0   49.0  266.0   58.0
+L2 Error %: 0.26
+Cosine Similarity: 0.97
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89A', 'CH89B', 'CH89C', 'CH89E']
+L2 Error % 0.26
+Cosine Similarity 0.97
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89A', 'CH89B', 'CH89C', 'CH89E']
+L2 Error % 0.26
+Cosine Similarity 0.97
+
+#################### Final Composition #################################
+['CH89A', 'CH89B', 'CH89C', 'CH89E']
+L2 Error % 0.26
+Cosine Similarity 0.97
+####################################### Composition After Add-Remove #######################################
+   CH89A  CH89B  CH89C  CH89E
+0   24.0   49.0  266.0   58.0
+L2 Error %: 0.26
+Cosine Similarity: 0.97
+
+
+
+
+
+                    ################ Sample 49 #################
+############################# Initial Composition ####################################
+     CH89A  CH89C  CH89D
+0  88332.0  552.0   46.0
+L2 Error %: 0.07
+Cosine Similarity: 1.0
+############################## Composition After Initial Remove ###############################
+     CH89A  CH89C  CH89D
+0  88332.0  552.0   46.0
+L2 Error %: 0.07
+Cosine Similarity: 1.0
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89A']
+L2 Error % 0.07
+Cosine Similarity 1.0
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition ['CH89A']
+L2 Error % 0.07
+Cosine Similarity 1.0
+
+#################### Final Composition #################################
+['CH89A']
+L2 Error % 0.07
+Cosine Similarity 1.0
+####################################### Composition After Add-Remove #######################################
+     CH89A
+0  88930.0
+L2 Error %: 0.07
+Cosine Similarity: 1.0
+
+
+
+
+
+                    ################ Sample 50 #################
+############################# Initial Composition ####################################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   11.0  354.0  394.0   63.0   56.0
+L2 Error %: 0.43
+Cosine Similarity: 0.9
+############################## Composition After Initial Remove ###############################
+   CH89A  CH89B  CH89C  CH89D  CH89E
+0   11.0  354.0  394.0   63.0   56.0
+L2 Error %: 0.43
+Cosine Similarity: 0.9
+
+############################## Performing Add-Remove Step ##############################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!

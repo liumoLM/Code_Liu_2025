@@ -1,0 +1,115 @@
+############################ Signature Decomposition Details ################################
+
+
+Context Type: 89
+Genome Build: GRCh37
+The following signatures are excluded: 
+
+
+
+######################## Decomposing SBS89A ########################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition [0]
+L2 Error % 0.0
+Cosine Similarity 1.0
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition [0]
+L2 Error % 0.0
+Cosine Similarity 1.0
+
+#################### Final Composition #################################
+[0]
+L2 Error % 0.0
+Cosine Similarity 1.0
+
+
+
+
+######################## Decomposing SBS89B ########################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition [1]
+L2 Error % 0.0
+Cosine Similarity 1.0
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition [1]
+L2 Error % 0.0
+Cosine Similarity 1.0
+
+#################### Final Composition #################################
+[1]
+L2 Error % 0.0
+Cosine Similarity 1.0
+
+
+
+
+######################## Decomposing SBS89C ########################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition [2]
+L2 Error % 0.0
+Cosine Similarity 1.0
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition [2]
+L2 Error % 0.0
+Cosine Similarity 1.0
+
+#################### Final Composition #################################
+[2]
+L2 Error % 0.0
+Cosine Similarity 1.0
+
+
+
+
+######################## Decomposing SBS89D ########################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition [3]
+L2 Error % 0.0
+Cosine Similarity 1.0
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition [3]
+L2 Error % 0.0
+Cosine Similarity 1.0
+
+#################### Final Composition #################################
+[3]
+L2 Error % 0.0
+Cosine Similarity 1.0
+
+
+
+
+######################## Decomposing SBS89E ########################
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 0 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition [4]
+L2 Error % 0.0
+Cosine Similarity 1.0
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!! LAYER: 1 !!!!!!!!!!!!!!!!!!!!!!!!!
+Best Signature Composition [4]
+L2 Error % 0.0
+Cosine Similarity 1.0
+
+#################### Final Composition #################################
+[4]
+L2 Error % 0.0
+Cosine Similarity 1.0
