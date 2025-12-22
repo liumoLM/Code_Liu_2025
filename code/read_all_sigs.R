@@ -54,3 +54,17 @@ type476_our_sigs = read.csv(
 )
 all(rownames(type476_our_sigs) == rownames(type476_spectra))
 rm(s13)
+
+koh_s10 = read.csv(
+  file.path(data_dir, "koh_s10_consensus_sigs.csv"),
+)
+rownames(koh_s10) = koh_s10[, 1]
+write.table(
+  koh_s10[, -1],
+  file.path(data_dir, "type89_koh_sigs.tsv"),
+  sep = '\t'
+)
+type89_koh_sigs = read.csv(
+  file.path(data_dir, "type89_koh_sigs.tsv"),
+  sep = '\t'
+)
