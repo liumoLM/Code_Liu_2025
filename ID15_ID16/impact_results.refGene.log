@@ -1,0 +1,13 @@
+ANNOVAR Version:
+	$Date: 2025-03-02 22:37:01 -0500 (Sun,  2 Mar 2025) $
+ANNOVAR Information:
+	For questions, comments, documentation, bug reports and program update, please visit http://www.openbioinformatics.org/annovar/
+ANNOVAR Command:
+	./annotate_variation.pl -geneanno -buildver hg19 -dbtype refGene -outfile /home/steve/github/Code_Liu_2025/ID15_ID16/impact_results.refGene -exonsort -nofirstcodondel /home/steve/github/Code_Liu_2025/ID15_ID16/my_results.avinput humandb/
+ANNOVAR Started:
+	Tue Dec 23 17:26:35 2025
+NOTICE: Output files are written to /home/steve/github/Code_Liu_2025/ID15_ID16/impact_results.refGene.variant_function, /home/steve/github/Code_Liu_2025/ID15_ID16/impact_results.refGene.exonic_variant_function
+NOTICE: Reading gene annotation from humandb/hg19_refGene.txt ... Done with 78239 transcripts (including 18578 without coding sequence annotation) for 28293 unique genes
+NOTICE: Processing next batch with 6 unique variants in 6 input lines
+NOTICE: Reading FASTA sequences from humandb/hg19_refGeneMrna.fa ... Done with 37 sequences
+WARNING: A total of 465 sequences will be ignored due to lack of correct ORF annotation

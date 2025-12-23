@@ -1,0 +1,12 @@
+ANNOVAR Version:
+	$Date: 2025-03-02 22:37:01 -0500 (Sun,  2 Mar 2025) $
+ANNOVAR Information:
+	For questions, comments, documentation, bug reports and program update, please visit http://www.openbioinformatics.org/annovar/
+ANNOVAR Command:
+	./annotate_variation.pl -filter -dbtype dbnsfp42c -buildver hg19 -outfile /home/steve/github/Code_Liu_2025/ID15_ID16/impact_results /home/steve/github/Code_Liu_2025/ID15_ID16/my_results.avinput humandb/ -otherinfo
+ANNOVAR Started:
+	Tue Dec 23 17:26:37 2025
+NOTICE: Output file with variants matching filtering criteria is written to /home/steve/github/Code_Liu_2025/ID15_ID16/impact_results.hg19_dbnsfp42c_dropped, and output file with other variants is written to /home/steve/github/Code_Liu_2025/ID15_ID16/impact_results.hg19_dbnsfp42c_filtered
+NOTICE: Processing next batch with 6 unique variants in 6 input lines
+NOTICE: Database index loaded. Total number of bins is 553468 and the number of bins to be scanned is 6
+NOTICE: Scanning filter database humandb/hg19_dbnsfp42c.txt...Done
