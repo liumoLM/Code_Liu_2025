@@ -79,8 +79,13 @@ idlist = c(
 
 cats476 = lapply(X = idlist, make476catalog)
 names(cats476) = idlist
+c476 = do.call(cbind, cats476)
+write.table(c476, file = "ID15_I16_476.tsv", sep = '\t', row.names = TRUE)
+
 cats89 = lapply(X = idlist, make89catalog)
 names(cats89) = idlist
+c89 = do.call(cbind, cats89)
+write.table(c89, file = "ID15_I16_89.tsv", sep = '\t', row.names = TRUE)
 
 source("~/github/Code_Liu_2025/code/Koh89_Koh476_Plotting_Functions.R")
 library(PCAWG7)
@@ -92,6 +97,7 @@ colnames(cats83) = stringi::stri_replace(
   replacement = ""
 )
 cats83 = cats83[, idlist]
+write.table(cats83, file = "ID15_I16_83.tsv", sep = '\t', row.names = TRUE)
 
 sbs = PCAWG7::spectra$TCGA$SBS96
 colnames(sbs) = stringi::stri_replace(
