@@ -226,3 +226,17 @@ pqs = function(csv_vcf) {
 }
 
 uu = pqs("TCGA-13-0889-01A-01W-0420-08_indels_categorized_vcf.csv")
+
+create_tab_vcf = function(tcgaid) {
+  zzz = read.csv(paste0(tcgaid, "_indels_categorized_vcf.csv"))
+  zzz = zzz[, -1]
+  colnames(zzz)[1] = '#CHROM'
+  write.table(
+    zzz,
+    paste0(tcgaid, "_indels_categorized.vcf"),
+    sep = "\t",
+    row.names = FALSE
+  )
+}
+
+lapply(idlist, create_tab_vcf)
