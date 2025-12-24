@@ -86,6 +86,8 @@ cats89 = lapply(X = idlist, make89catalog)
 names(cats89) = idlist
 c89 = do.call(cbind, cats89)
 write.table(c89, file = "ID15_I16_89.tsv", sep = '\t', row.names = TRUE)
+colnames(c89)
+
 
 source("~/github/Code_Liu_2025/code/Koh89_Koh476_Plotting_Functions.R")
 library(PCAWG7)
@@ -246,3 +248,9 @@ create_tab_vcf = function(tcgaid) {
 }
 
 lapply(idlist, create_tab_vcf)
+
+plotall = function(tcgaid) {
+  zzz = read.csv(paste0(tcgaid, "_indels_categorized_vcf.csv"))
+  plot_pos_distances(zzz, bins = 10, max_dist = 1000)
+}
+lapply(idlist, plotall)
