@@ -29,6 +29,12 @@ us_v_koh_89 = best_matches89(
   "89_us_v_koh",
   "data/type89_our_sigs.tsv",
   "data/type89_koh_sigs.tsv"
+) |>
+  dplyr::arrange(desc(cosine))
+write.csv(
+  us_v_koh_89,
+  "signature_comparisons/us_v_koh_89.csv",
+  row.names = FALSE
 )
 
 koh_v_us_89 =
@@ -36,7 +42,13 @@ koh_v_us_89 =
     "89_koh_v_us",
     "data/type89_koh_sigs.tsv",
     "data/type89_our_sigs.tsv"
-  )
+  ) |>
+  dplyr::arrange(desc(cosine))
+write.csv(
+  koh_v_us_89,
+  "signature_comparisons/koh_v_us_89.csv",
+  row.names = FALSE
+)
 
 IndelType = c(
   # Single base deletions - C
