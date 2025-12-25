@@ -81,3 +81,4 @@ us_vs_all <- dplyr::full_join(
   ) |>
   dplyr::relocate(max_cosine_id, max_cosine, .after = signature) |>
   dplyr::arrange(dplyr::desc(max_cosine))
+write.csv(us_vs_all, "signature_comparisons/us_vs_all_83.csv")
