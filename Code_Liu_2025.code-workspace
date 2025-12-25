@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../ICAMS"
+		}
+	],
+	"settings": {
+		"workbench.sash.hoverDelay": 3000
+	}
+}
