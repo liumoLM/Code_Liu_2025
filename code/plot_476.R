@@ -146,7 +146,7 @@ plot_476 <- function(
     ggplot2::aes(x = x_pos, y = freq, fill = Indel)
   ) +
     ggplot2::geom_bar(stat = "identity", position = "dodge", width = 0.7) +
-    ggplot2::xlab("Indel Types") +
+    ggplot2::xlab("Indel Type") +
     ggplot2::ylab(ylabel) +
     ggplot2::scale_x_continuous(
       breaks = x_breaks,
@@ -175,8 +175,8 @@ plot_476 <- function(
       },
       axis.text.y = ggplot2::element_text(size = 10, colour = "black"),
       legend.position = "none",
-      axis.title.x = ggplot2::element_text(size = 15),
-      axis.title.y = ggplot2::element_text(size = 15),
+      axis.title.x = ggplot2::element_text(size = 10),
+      axis.title.y = ggplot2::element_text(size = 10),
       plot.margin = margin(t = 10, r = 10, b = 80, l = 10)
     ) +
     ggplot2::scale_colour_manual(
