@@ -30,7 +30,8 @@ best_matches83 <- function(out_dir, ...) {
     catalog <- matrix(vec, ncol = 1)
     rownames(catalog) <- rnames
     colnames(catalog) <- title
-    catalog <- ICAMS::as.catalog(catalog, catalog.type = "counts.signature")
+    cattype = ifelse(sum(vec) <= 1.1, "counts.signature", "counts")
+    catalog <- ICAMS::as.catalog(catalog, catalog.type = cattype)
     wrap_ICAMS_plot_catalog(catalog, title)
   }
 
@@ -42,7 +43,7 @@ best_matches83 <- function(out_dir, ...) {
 }
 
 us_v_cosmic_83 = best_matches83(
-  "83_us_v_cosmic",
+  "signature_comparisons/test_83_us_v_cosmic",
   "data/type83_our_sigs.tsv",
   "data/COSMIC_v3.5_ID_GRCh37.txt"
 )
@@ -82,3 +83,9 @@ us_vs_all <- dplyr::full_join(
   dplyr::relocate(max_cosine_id, max_cosine, .after = signature) |>
   dplyr::arrange(dplyr::desc(max_cosine))
 write.csv(us_vs_all, "signature_comparisons/us_vs_all_83.csv")
+
+us_v_spectra = best_matches83(
+  "signature_comparisons/83_us_v_spectra",
+  "data/type83_our_sigs.tsv",
+  "data/type83_spectra.tsv"
+)
