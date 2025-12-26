@@ -11,6 +11,7 @@ library(ggrepel)
 #' @param num_x_labels Number of top peaks to label per block (NULL = none)
 #' @param label_size Size of peak labels
 #' @param threshold_denominator Denominator for minimum threshold calculation (default = 7)
+#' @param vline_labels Character vector of IndelType labels at which to draw vertical lines
 #' @return A 476-channel indel profile plot
 #' @export
 plot_476_v3 <- function(
@@ -19,7 +20,8 @@ plot_476_v3 <- function(
   plot_title = "test",
   num_x_labels = 3,
   label_size = 2,
-  threshold_denominator = 7
+  threshold_denominator = 7,
+  vline_labels = c() # c("A[Del(C):R1]A", "G[Del(C):R1]A")
 ) {
   # Load Koh476_indeltype if not already in environment
   if (!exists("Koh476_indeltype")) {
@@ -197,8 +199,9 @@ plot_476_v3 <- function(
   flanking_blocks$y <- -max(muts_basis_melt$freq) * 0.17
 
   # Find positions for vertical lines
-  pos_a_del_c <- which(Koh476_indeltype$IndelType == "A[Del(C):R1]A")
-  pos_g_del_c <- which(Koh476_indeltype$IndelType == "G[Del(C):R1]A")
+  vline_positions <- unlist(lapply(vline_labels, function(label) {
+    which(Koh476_indeltype$IndelType == label)
+  }))
 
   p <- ggplot2::ggplot(
     data = muts_basis_melt,
@@ -206,12 +209,7 @@ plot_476_v3 <- function(
   ) +
     ggplot2::geom_bar(stat = "identity", position = "dodge", width = 0.7) +
     ggplot2::geom_vline(
-      xintercept = pos_a_del_c,
-      linetype = "dashed",
-      color = "gray50"
-    ) +
-    ggplot2::geom_vline(
-      xintercept = pos_g_del_c,
+      xintercept = vline_positions,
       linetype = "dashed",
       color = "gray50"
     ) +
