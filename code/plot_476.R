@@ -12,7 +12,7 @@ library(ggrepel)
 #' @param x_axis_label_skip Show every Nth x-axis label (NULL = no labels)
 #' @return A 476-channel indel profile plot
 #' @export
-newPlotKoh476Catalog <- function(
+plot_476 <- function(
   Koh476.catalog,
   text_size = 3,
   plot_title = "test",
@@ -156,7 +156,7 @@ newPlotKoh476Catalog <- function(
     ggplot2::ggtitle(plot_title) +
     ggplot2::scale_fill_manual(values = indel_mypalette_fill_all) +
     ggplot2::coord_cartesian(
-      ylim = c(0, max(blocks$ymax)) * 1.5,
+      ylim = c(0, max(blocks$ymax)) * 1.0, # 1.5,
       clip = "off"
     ) +
     ggplot2::theme_classic() +
