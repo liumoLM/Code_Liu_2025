@@ -43,13 +43,9 @@ best_match_one_column <- function(A, M, plotit) {
       M_col <- as.numeric(M[, j])
 
       # Normalize columns for comparison
-      if (measure_name %in% c("cosine", "hellinger", "jaccard")) {
-        A_use <- A_norm
-        M_use <- M_col / sum(M_col)
-      } else {
-        A_use <- A_vec
-        M_use <- M_col
-      }
+
+      A_use <- A_norm
+      M_use <- M_col / sum(M_col)
 
       # philentropy::distance expects a matrix with rows as distributions
       dist_mat <- rbind(A_use, M_use)
