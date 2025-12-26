@@ -166,12 +166,12 @@ plot_476_v2 <- function(
   flanking_labels <- c(
     "⎢A...",
     "⎢G...",
-    "T...",
-    "A...",
-    "G...",
-    "T...",
-    "C...",
-    "C..."
+    "⎢T...",
+    "⎢A...",
+    "⎢G...",
+    "⎢T...",
+    "⎢C...",
+    "⎢C..."
   )
 
   # Find runs of each pattern
@@ -204,11 +204,25 @@ plot_476_v2 <- function(
   # Position flanking blocks below the x-axis
   flanking_blocks$y <- -max(muts_basis_melt$freq) * 0.17 # 0.08
 
+  # Find positions for vertical lines
+  pos_a_del_c <- which(Koh476_indeltype$IndelType == "A[Del(C):R1]A")
+  pos_g_del_c <- which(Koh476_indeltype$IndelType == "G[Del(C):R1]A")
+
   p <- ggplot2::ggplot(
     data = muts_basis_melt,
     ggplot2::aes(x = x_pos, y = freq, fill = Indel)
   ) +
     ggplot2::geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+    ggplot2::geom_vline(
+      xintercept = pos_a_del_c,
+      linetype = "dashed",
+      color = "gray50"
+    ) +
+    ggplot2::geom_vline(
+      xintercept = pos_g_del_c,
+      linetype = "dashed",
+      color = "gray50"
+    ) +
     ggplot2::xlab("Indel Type") +
     ggplot2::ylab(ylabel) +
     ggplot2::scale_x_continuous(
@@ -275,7 +289,7 @@ plot_476_v2 <- function(
     ggplot2::geom_text(
       data = flanking_blocks,
       ggplot2::aes(
-        x = xmin + 7,
+        x = xmin + 6, # manually ajusted to go in the right place
         y = y,
         label = label
       ),
