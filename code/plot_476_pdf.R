@@ -4,14 +4,18 @@ library(Cairo)
 plot_476_pdf <- function(
   Koh476_catalog,
   filename,
-  num_x_labels = 10
+  num_labels = 4,
+  simplify_labels = FALSE,
+  label_threshold_denominator = 7
 ) {
   plot_list <- lapply(1:ncol(Koh476_catalog), function(i) {
     plot_476_v3(
       Koh476.catalog = Koh476_catalog[, i],
       text_size = 3,
       plot_title = colnames(Koh476_catalog)[i],
-      num_x_labels = num_x_labels
+      num_labels = num_labels,
+      simplify_labels = simplify_labels,
+      label_threshold_denominator = label_threshold_denominator
     )
   })
   plots_per_page <- 5
