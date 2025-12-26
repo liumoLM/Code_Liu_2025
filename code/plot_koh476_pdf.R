@@ -7,12 +7,11 @@ plot_476_pdf <- function(
   num_x_labels = 10
 ) {
   plot_list <- lapply(1:ncol(Koh476_catalog), function(i) {
-    plot_476(
+    plot_476_v3(
       Koh476.catalog = Koh476_catalog[, i],
       text_size = 3,
       plot_title = colnames(Koh476_catalog)[i],
-      num_x_labels = num_x_labels,
-      x_axis_label_skip = NULL
+      num_x_labels = num_x_labels
     )
   })
   plots_per_page <- 5
