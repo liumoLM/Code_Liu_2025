@@ -150,16 +150,20 @@ IndelType = c(
   "Complex"
 )
 
-uu = rownames(yy)
-aa = gsub(
-  "R\\(5,9",
-  "R\\(5,",
-  gsub("R\\(3,9", "R\\(3,", gsub("R\\(8,9", "R\\(8,", uu))
-)
-bb = gsub("R\\(7,9", "R\\(7,", aa)
-rownames(yy) = bb
-dim(yy)
-yy2 = yy[IndelType, ]
-write.table(yy2, "data/type89_koh_sigs2.tsv", sep = '\t')
-zz = read.delim("data/type89_our_sigs.tsv")
-rownames(zz) == IndelType
+if (FALSE) {
+  # This code updated the rownames from 89-type koh sig data
+  yy = NULL # Was the old table
+  uu = rownames(yy)
+  aa = gsub(
+    "R\\(5,9",
+    "R\\(5,",
+    gsub("R\\(3,9", "R\\(3,", gsub("R\\(8,9", "R\\(8,", uu))
+  )
+  bb = gsub("R\\(7,9", "R\\(7,", aa)
+  rownames(yy) = bb
+  dim(yy)
+  yy2 = yy[IndelType, ]
+  write.table(yy2, "data/type89_koh_sigs2.tsv", sep = '\t')
+  zz = read.delim("data/type89_our_sigs.tsv")
+  rownames(zz) == IndelType
+}
