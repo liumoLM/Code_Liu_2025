@@ -10,7 +10,6 @@ library(ggrepel)
 #' @param plot_title Title of the plot
 #' @param num_x_labels Number of top peaks to label per block (NULL = none)
 #' @param label_size Size of peak labels
-#' @param x_axis_label_skip Show every Nth x-axis label (NULL = no labels)
 #' @param threshold_denominator Denominator for minimum threshold calculation (default = 7)
 #' @return A 476-channel indel profile plot
 #' @export
@@ -20,7 +19,6 @@ plot_476_v3 <- function(
   plot_title = "test",
   num_x_labels = 3,
   label_size = 2,
-  x_axis_label_skip = NULL,
   threshold_denominator = 7
 ) {
   # Load Koh476_indeltype if not already in environment
@@ -78,21 +76,6 @@ plot_476_v3 <- function(
   )
 
   indel_positions <- Koh476_indeltype$IndelType
-  indel_positions_labels <- Koh476_indeltype$Figlabel
-
-  # Create x-axis labels and breaks based on x_axis_label_skip
-  if (!is.null(x_axis_label_skip) && x_axis_label_skip > 0) {
-    label_indices <- seq(
-      x_axis_label_skip,
-      length(indel_positions),
-      by = x_axis_label_skip
-    )
-    x_breaks <- label_indices
-    x_labels <- indel_positions_labels[label_indices]
-  } else {
-    x_breaks <- NULL
-    x_labels <- NULL
-  }
 
   entry <- table(Koh476_indeltype$Indel)
   order_entry <- c(
@@ -235,8 +218,8 @@ plot_476_v3 <- function(
     ggplot2::xlab("Indel Type") +
     ggplot2::ylab(ylabel) +
     ggplot2::scale_x_continuous(
-      breaks = x_breaks,
-      labels = x_labels,
+      breaks = NULL,
+      labels = NULL,
       limits = c(0.5, length(indel_positions) + 0.5)
     ) +
     ggplot2::ggtitle(plot_title) +
@@ -244,22 +227,8 @@ plot_476_v3 <- function(
     ggplot2::coord_cartesian(ylim = c(0, max(blocks$ymax)), clip = "off") +
     ggplot2::theme_classic() +
     ggplot2::theme(
-      axis.text.x = if (!is.null(x_axis_label_skip)) {
-        ggplot2::element_text(
-          angle = 90,
-          vjust = 0.5,
-          size = 5,
-          colour = "black",
-          hjust = 1
-        )
-      } else {
-        ggplot2::element_blank()
-      },
-      axis.ticks.x = if (!is.null(x_axis_label_skip)) {
-        ggplot2::element_line()
-      } else {
-        ggplot2::element_blank()
-      },
+      axis.text.x = ggplot2::element_blank(),
+      axis.ticks.x = ggplot2::element_blank(),
       axis.text.y = ggplot2::element_text(size = 10, colour = "black"),
       legend.position = "none",
       axis.title.x = ggplot2::element_text(size = 10, margin = margin(t = 10)),
