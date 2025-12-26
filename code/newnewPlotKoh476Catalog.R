@@ -18,7 +18,7 @@ newPlotKoh476Catalog <- function(
   plot_title = "test",
   num_x_labels = 10,
   label_size = 2,
-  x_axis_label_skip = NULL
+  x_axis_label_skip = 10
 ) {
   # Load Koh476_indeltype if not already in environment
   if (!exists("Koh476_indeltype")) {
@@ -29,6 +29,9 @@ newPlotKoh476Catalog <- function(
   if (is.data.frame(Koh476.catalog) || is.matrix(Koh476.catalog)) {
     Koh476.catalog <- as.numeric(Koh476.catalog[, 1])
   }
+
+  # Determine y-axis label based on sum
+  ylabel <- if (sum(Koh476.catalog) < 1.1) "Proportion" else "Count"
 
   my_vector <- Koh476_indeltype$IndelType
   muts_basis <- data.frame(Sample = Koh476.catalog, IndelType = my_vector)
@@ -104,7 +107,6 @@ newPlotKoh476Catalog <- function(
   )
   entry <- entry[order_entry]
 
-  # Move blocks higher (was 1.08/1.2, now 1.35/1.47)
   blocks <- data.frame(
     Type = unique(Koh476_indeltype$Indel),
     fill = indel_mypalette_fill,
@@ -114,50 +116,18 @@ newPlotKoh476Catalog <- function(
   blocks$ymin <- max(muts_basis_melt$freq) * 1.35
   blocks$ymax <- max(muts_basis_melt$freq) * 1.47
   blocks$labels <- c(
-    "1bp C",
-    "1bp T",
-    "1bp C",
-    "1bp T",
-    ">=2bp",
-    ">=2bp",
+    "Del 1bp C",
+    "Del 1bp T",
+    "Ins 1bp C",
+    "Ins 1bp T",
+    "Del >=2bp",
+    "Ins >=2bp",
     "Mh",
     "X"
   )
-  blocks$cl <- c(
-    "black",
-    "black",
-    "black",
-    "black",
-    "white",
-    "white",
-    "white",
-    "white"
-  )
-
-  indel_mypalette_fill3 <- c("#000000", "#888888", "#DDDDDD")
-  entry3 <- table(Koh476_indeltype$Indel3)
-  order_entry3 <- c("Del1", "Ins1", "Del2", "Ins2", "DelMH", "Complex")
-  entry3 <- entry3[order_entry3]
-
-  # Move blocks3 higher (was 1.2/1.32, now 1.47/1.59)
-  blocks3 <- data.frame(
-    Type = unique(Koh476_indeltype$Indel3),
-    fill = indel_mypalette_fill3,
-    xmin = c(0, cumsum(entry3)[-length(entry3)]) + 0.5,
-    xmax = cumsum(entry3) + 0.5
-  )
-  blocks3$ymin <- max(muts_basis_melt$freq) * 1.47
-  blocks3$ymax <- max(muts_basis_melt$freq) * 1.59
-  blocks3$labels <- c("Deletion", "Insertion", "Del", "Ins", "DelMH", "X")
-  blocks3$cl <- c("black", "black", "white", "white", "white", "white")
+  blocks$cl <- "black"
 
   indel_mypalette_fill_all <- c(
-    "Del1" = "#fe9f38",
-    "Ins1" = "#73bf5d",
-    "Del2" = "#f14432",
-    "Ins2" = "#4a98c9",
-    "DelMH" = "#61409b",
-    "X" = "black",
     "Del(2,):M(1,)" = "#61409b",
     "Del(2,):R(1,9)" = "#f14432",
     "Del(C)" = "#fdbe6f",
@@ -174,7 +144,7 @@ newPlotKoh476Catalog <- function(
   ) +
     ggplot2::geom_bar(stat = "identity", position = "dodge", width = 0.7) +
     ggplot2::xlab("Indel Types") +
-    ggplot2::ylab("Count") +
+    ggplot2::ylab(ylabel) +
     ggplot2::scale_x_continuous(
       breaks = seq_along(indel_positions),
       labels = x_labels,
@@ -182,7 +152,10 @@ newPlotKoh476Catalog <- function(
     ) +
     ggplot2::ggtitle(plot_title) +
     ggplot2::scale_fill_manual(values = indel_mypalette_fill_all) +
-    ggplot2::coord_cartesian(ylim = c(0, max(blocks3$ymax)), clip = "off") +
+    ggplot2::coord_cartesian(
+      ylim = c(0, max(blocks$ymax)) * 1.5,
+      clip = "off"
+    ) +
     ggplot2::theme_classic() +
     ggplot2::theme(
       axis.text.x = ggplot2::element_text(
@@ -202,30 +175,6 @@ newPlotKoh476Catalog <- function(
       axis.title.x = ggplot2::element_text(size = 15),
       axis.title.y = ggplot2::element_text(size = 15),
       plot.margin = margin(t = 10, r = 10, b = 80, l = 10)
-    ) +
-    ggplot2::geom_rect(
-      data = blocks3,
-      ggplot2::aes(
-        xmin = xmin,
-        ymin = ymin,
-        xmax = xmax,
-        ymax = ymax,
-        fill = Type,
-        colour = "white"
-      ),
-      inherit.aes = FALSE
-    ) +
-    ggplot2::geom_text(
-      data = blocks3,
-      ggplot2::aes(
-        x = (xmax + xmin) / 2,
-        y = (ymax + ymin) / 2,
-        label = labels,
-        colour = cl
-      ),
-      size = text_size,
-      fontface = "bold",
-      inherit.aes = FALSE
     ) +
     ggplot2::scale_colour_manual(
       values = c("black" = "black", "white" = "white")
