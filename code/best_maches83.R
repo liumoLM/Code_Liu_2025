@@ -15,9 +15,13 @@ best_matches83 <- function(out_dir, ...) {
     stop("At least 2 file paths required: our_sigs and at least one reference")
   }
 
+  our_sigs_file = paths[[1]]
+
   # Read row names from first file (our_sigs)
+  # We don't use our_sigs after we get the
+  # row names.
   our_sigs <- read.table(
-    "data/type83_our_sigs.tsv",
+    our_sigs_file,
     header = TRUE,
     sep = "\t",
     row.names = 1
@@ -85,7 +89,9 @@ us_vs_all <- dplyr::full_join(
 write.csv(us_vs_all, "signature_comparisons/us_vs_all_83.csv")
 
 us_v_spectra = best_matches83(
-  "signature_comparisons/83_us_v_spectra",
-  "data/type83_our_sigs.tsv",
+  out_dir = "signature_comparisons/xx83_us_v_spectra",
+  "data/type83_liu_et_al_sigs.tsv",
   "data/type83_spectra.tsv"
 )
+
+write.table(us_v_spectra, file = "data/us_v_spectra_83.tsv", sep = '\t')

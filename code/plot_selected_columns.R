@@ -1,8 +1,8 @@
 library(ICAMS)
 library(gridExtra)
+library(mSigPlot)
 
 source("code/wrap_ICAMS_plot_catalog.R")
-source("code/Koh89_Koh476_Plotting_Functions.R")
 
 #' Plot selected columns from a signature file to PDF
 #' @param input_file_path Path to tab-separated input file
@@ -45,11 +45,11 @@ plot_selected_columns <- function(
     }
   } else if (n_rows == 89) {
     plot_fn <- function(vec, title) {
-      PlotKoh89Catalog(vec, plot_title = title)
+      plot_89(vec, plot_title = title)
     }
   } else if (n_rows == 476) {
     plot_fn <- function(vec, title) {
-      PlotKoh476Catalog(vec, plot_title = title)
+      plot_476(vec, plot_title = title)
     }
   } else {
     stop(sprintf(
