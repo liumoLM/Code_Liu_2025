@@ -14,10 +14,12 @@ library(data.table)
 library(ICAMS)
 library(mSigPlot)
 library(data.table)
+library(ggplot2)
 data_dir = "../Manuscript_data/"
 plot476_base_size = 18
 plto476_simplify_labels = FALSE
-plot476_height = unit(5, "in")
+plot476_height = unit(4, "in")
+plot89_height = unit(3, "in")
 
 print(getwd())
 ID89_ID83_connection_example <- fread(file.path(
@@ -84,7 +86,7 @@ to.plot.all.ID89.catalogs <- to.plot.all.ID89.catalogs[, -1]
 ID89.mSigAct.assignment <- read.delim(
   file.path(
     data_dir,
-    "type89_signature_assignments.tsv"
+    "Liu_et_al_signature_assignments.tsv"
   ),
   check.names = FALSE # Prevents e.g. foo::SP9999 -> foo..SP9999
 )
@@ -109,7 +111,7 @@ to.plot.all.ID476.catalogs <- to.plot.all.ID476.catalogs[, -1]
 
 
 
-```{r,fig.width=19,fig.height=3, echo=FALSE, results="asis", warning = FALSE }
+```{r,fig.width=19,fig.height=4, echo=FALSE, results="asis", warning = FALSE }
 par(mfrow = c(1, 2)) # Set layout to 2x2
 
 for (i in c(1:nrow(ID89_ID83_connection_example))) {
@@ -148,7 +150,7 @@ for (i in c(1:nrow(ID89_ID83_connection_example))) {
         cosine1
       )
     )
-    grid.arrange(p1, p2, nrow = 1, ncol = 2)
+    grid.arrange(p1, p2, nrow = 1, ncol = 2, heights = plot89_height)
     p5 <- plot_476(
       final.Koh476.signatures[, ID89signature],
       text_size = 3,
@@ -282,9 +284,9 @@ for (i in c(1:nrow(ID89_ID83_connection_example))) {
       )
     )
 
-    grid.arrange(p1, p2, nrow = 1, ncol = 2)
+    grid.arrange(p1, p2, nrow = 1, ncol = 2, heights = plot89_height)
 
-    grid.arrange(p3, p4, nrow = 1, ncol = 2)
+    grid.arrange(p3, p4, nrow = 1, ncol = 2, heights = plot89_height)
     if (ID89signature %in% colnames(final.Koh476.signatures)) {
       p5 <- plot_476(
         final.Koh476.signatures[, ID89signature],
