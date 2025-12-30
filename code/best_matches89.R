@@ -51,9 +51,16 @@ write.csv(
 )
 
 us_v_spectra89 = best_matches89(
-  "data/us_v_spectra89.tsv",
+  "data/us_v_spectra89",
   "data/type89_liu_et_al_sigs.tsv",
   "data/type89_spectra.tsv"
 )
+write.table(us_v_spectra89, file = "data/us_v_spectra_80.tsv", sep = '\t')
 
+
+koh_v_spectra89 = best_matches89(
+  out_dir = "koh_v_spectra89",
+  "../Manusript_data/type89_liu_et_al_sigs.tsv",
+  "data/type89_spectra.tsv"
+)
 write.table(us_v_spectra89, file = "data/us_v_spectra_80.tsv", sep = '\t')
