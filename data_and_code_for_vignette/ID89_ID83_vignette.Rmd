@@ -1,0 +1,165 @@
+---
+title: "ID89 and ID83 vignette"
+output:
+  html_document: default
+  pdf_document: default
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+library(magrittr)
+library(indelsig.tools.lib)
+library(gridExtra)
+library(data.table)
+library(ICAMS)
+source("./Koh89_Koh476_Plotting_Functions.R")
+ID89_ID83_connection_example <- data.table::fread("/transfer/LiuMo_data/Working/DBS_Indel_Signature/ID89_ID83_connection_example.txt")
+colnames(ID89_ID83_connection_example) <- c("ID89_signature","example_catalog","ID83_signature")
+to.plot.WGS_PCAWG_HMF_indels.catalog <- data.table::fread("/transfer/LiuMo_data/Working/DBS_Indel_Signature/For_manuscript_reference/justified.HMF.PCAWG.COSMIC83catalog.txt")
+to.plot.WGS_PCAWG_HMF_indels.catalog <- ICAMS::as.catalog(to.plot.WGS_PCAWG_HMF_indels.catalog[,-1],infer.rownames = T)
+to.plot.WGS_PCAWG_HMF_indels.catalog.no.polyT <- to.plot.WGS_PCAWG_HMF_indels.catalog
+to.plot.WGS_PCAWG_HMF_indels.catalog.no.polyT[c(12,24),] <- 0
+to.plot.all.signatures.final <- as.data.frame(data.table::fread("/transfer/LiuMo_data/Working/DBS_Indel_Signature/For_manuscript_reference/PCAWG.HMF.ID83.signature.txt"))
+to.plot.all.signatures.final <- to.plot.all.signatures.final[,-1]
+to.plot.all.signatures.final <- ICAMS::as.catalog(to.plot.all.signatures.final,infer.rownames = T,catalog.type = "counts.signature")
+
+to.plot.all.ID89.signatures.final <- as.data.frame(data.table::fread("/transfer/LiuMo_data/Working/DBS_Indel_Signature/For_manuscript_reference/final.Koh89.signatures.txt"))
+row.names(to.plot.all.ID89.signatures.final)<- to.plot.all.ID89.signatures.final[,1]  # Use the first column as row names
+
+# Optionally, remove the first column from the data table
+to.plot.all.ID89.signatures.final <- to.plot.all.ID89.signatures.final[, -1]
+
+to.plot.all.ID89.catalogs <- as.data.frame(data.table::fread("/transfer/LiuMo_data/Working/DBS_Indel_Signature/For_manuscript_reference/justified.HMF.PCAWG.Koh89catalog.txt"))
+row.names(to.plot.all.ID89.catalogs)<- to.plot.all.ID89.catalogs[,1]  # Use the first column as row names
+
+# Optionally, remove the first column from the data table
+to.plot.all.ID89.catalogs <- to.plot.all.ID89.catalogs[, -1]
+
+ID89.mSigAct.assignment <- readRDS("/transfer/LiuMo_data/Working/DBS_Indel_Signature/ID89.mSigAct.assignment.rds")
+
+final.Koh476.signatures <- as.data.frame(data.table::fread("./For_manuscript_reference/final.Koh476.signatures.txt"))
+row.names(final.Koh476.signatures)<- final.Koh476.signatures[,1]  # Use the first column as row names
+
+# Optionally, remove the first column from the data table
+final.Koh476.signatures <- final.Koh476.signatures[, -1]
+
+to.plot.all.ID476.catalogs <- as.data.frame(data.table::fread("/transfer/LiuMo_data/Working/DBS_Indel_Signature/For_manuscript_reference/justified.HMF.PCAWG.Koh476catalog.txt"))
+row.names(to.plot.all.ID476.catalogs)<- to.plot.all.ID476.catalogs[,1]  # Use the first column as row names
+
+# Optionally, remove the first column from the data table
+to.plot.all.ID476.catalogs <- to.plot.all.ID476.catalogs[, -1]
+
+```
+
+
+
+```{r,fig.width=19,fig.height=3, echo=FALSE, results="asis", warning = FALSE }
+par(mfrow = c(1, 2))  # Set layout to 2x2
+
+for (i in c(1:nrow(ID89_ID83_connection_example))) {
+  
+  # Get the current signature and catalog
+  ID89signature <- ID89_ID83_connection_example$ID89_signature[i]
+  catalog <- ID89_ID83_connection_example$example_catalog[i]
+  ID83signature <- ID89_ID83_connection_example$ID83_signature[i]
+  
+  # Print a header for each iteration
+  
+  if(ID89signature %in% c("InsDel15","InsDel16")){
+    cat(paste0("\n\n### ", ID89signature, " \n\n  83-Type Signature: ", 
+               ID83signature,
+               " \n\n  The signature contribute all mutations of the example spectrum: ", catalog, "\n\n"))
+    p1 <- PlotKoh89Catalog(to.plot.all.ID89.signatures.final[,ID89signature,drop=F],text_size = 3,plot_title = ID89signature,ylabel="Props")
+    p2 <- PlotKoh89Catalog(to.plot.all.ID89.catalogs[,catalog,drop=F],
+                           text_size = 3,
+                           plot_title = paste0("Spectrum A: Mutational spectrum of ",
+                                               catalog,
+                                               " \n Cosine Similarity to ",
+                                               ID89signature, " = ", cosine1))
+    grid.arrange(p1, p2,nrow = 1, ncol = 2)
+    p5 <- PlotKoh476Catalog(final.Koh476.signatures[,ID89signature],text_size = 3,plot_title = paste0("476-Type Representation of ",ID89signature,sep=""),top.types.to.show = 5)
+    grid.arrange(p5,nrow = 1, ncol = 1)
+    ICAMS::PlotCatalog(to.plot.all.signatures.final[,ID89_ID83_connection_example$ID83_signature[i],drop=F])
+    
+    ICAMS::PlotCatalog(to.plot.WGS_PCAWG_HMF_indels.catalog[,ID89_ID83_connection_example$example_catalog[i],drop=F])
+    
+  }else{
+    if(ID83signature %in% c("C_ID7","ID_J","C_ID10","ID_N","ID_O")){
+      cat(paste0("\n\n### ", ID89signature, " \n\n  83-Type Signature: ", 
+                 ID83signature,
+                 " \n\n  Supporting spectrum (deletion and insertions in long poly T tracts were removed from the Indel83 spectrum): ", catalog, "\n\n"))
+    }else{
+      cat(paste0("\n\n### ", ID89signature, " \n\n  83-Type Signature: ", 
+                 ID83signature," \n\n  Supporting spectrum: ", catalog, "\n\n"))
+    }
+    if(ID89signature == "InsDel_N"){
+      cat(paste0("\n\n### InsDel_N is identifical to InsDel_J in 89-Type representation, but different in 476-Type representation"))
+    }
+    
+    
+    ID89.assignment.this.catalog <- ID89.mSigAct.assignment[,catalog,drop=F]
+    
+    ID89.assignment.this.catalog.other.signatures <- ID89.mSigAct.assignment[,catalog,drop=F]
+    
+    ID89.assignment.this.catalog.other.signatures[which(row.names(ID89.mSigAct.assignment)==ID89signature),] <- 0
+    
+    reconstructed.ID89.catalog <- as.matrix(to.plot.all.ID89.signatures.final[,c(1:44,46)]) %*% as.matrix(ID89.assignment.this.catalog.other.signatures)
+    
+    diff.catalog <- to.plot.all.ID89.catalogs[,catalog,drop=F] - reconstructed.ID89.catalog
+    
+    diff.catalog[diff.catalog<0] <- 0
+    
+    cosine1 <- round(lsa::cosine(as.numeric(to.plot.all.ID89.signatures.final[,ID89signature]),as.numeric(to.plot.all.ID89.catalogs[,catalog])),3)
+    cosine2 <- round(lsa::cosine(as.numeric(to.plot.all.ID89.signatures.final[,ID89signature]),as.numeric(as.matrix(diff.catalog))),3)
+    
+    
+    p1 <- PlotKoh89Catalog(to.plot.all.ID89.signatures.final[,ID89signature,drop=F],text_size = 3,plot_title = ID89signature,ylabel="Props")
+    p2 <- PlotKoh89Catalog(to.plot.all.ID89.catalogs[,catalog,drop=F],
+                           text_size = 3,
+                           plot_title = paste0("Spectrum A: Mutational spectrum of ",
+                                               catalog,
+                                               " | Cosine Similarity to ",
+                                               ID89signature, " = ", cosine1))
+    
+    p3 <- PlotKoh89Catalog(reconstructed.ID89.catalog,text_size = 3,
+                           plot_title = paste0("Spectrum B: Partial mutational spectrum of ",
+                                               catalog, " not using ",ID89signature),
+                           setyaxis = max(diff.catalog))
+    
+    p4 <- PlotKoh89Catalog(diff.catalog,text_size = 3,plot_title = paste0("Mutations due to ", ID89signature, " (A minus B)| Cosine similarity to ", ID89signature, " = :", cosine2))
+    
+    
+    
+    grid.arrange(p1, p2,nrow = 1, ncol = 2)
+    
+    grid.arrange(p3,p4,nrow = 1, ncol = 2)
+    if(ID89signature %in% colnames(final.Koh476.signatures)){
+      p5 <- PlotKoh476Catalog(final.Koh476.signatures[,ID89signature],text_size = 3,plot_title = paste0("476-Type Representation of ",ID89signature,sep=""),top.types.to.show = 5)
+      grid.arrange(p5,nrow = 1, ncol = 1)
+    }else{
+      cat(paste0("\n\n 476-Type ",ID89signature, " was not found in De Novo extraction. Here shows the 476-Type Spectrum of ",catalog))
+      
+      
+      p5 <- PlotKoh476Catalog(to.plot.all.ID476.catalogs[,catalog],text_size = 3,plot_title = paste0("476-Type Representation of the Supporting Genome ",catalog,sep=""),top.types.to.show = 5)
+      grid.arrange(p5,nrow = 1, ncol = 1)
+    }
+    
+    
+    
+    
+    ICAMS::PlotCatalog(to.plot.all.signatures.final[,ID89_ID83_connection_example$ID83_signature[i],drop=F])
+    if(ID83signature %in% c("C_ID7","ID_J","C_ID10","ID_N","ID_O")){
+      ICAMS::PlotCatalog(to.plot.WGS_PCAWG_HMF_indels.catalog.no.polyT[,ID89_ID83_connection_example$example_catalog[i],drop=F])
+    }else{
+      ICAMS::PlotCatalog(to.plot.WGS_PCAWG_HMF_indels.catalog[,ID89_ID83_connection_example$example_catalog[i],drop=F])
+    }
+  }
+}
+
+
+
+
+
+```
+
+
