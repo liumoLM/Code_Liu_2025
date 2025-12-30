@@ -1,4 +1,4 @@
-"","signature","max_cosine_id","max_cosine","ID.x","cosine.x","euclidean.x","ID.y","cosine.y","euclidean.y"
+"","signature","max_cosine_id","max_cosine","cosmicID","cosine_v_cosmic","euclidean.x","jinID","cosine_v_jin","euclidean.y"
 "1","C_ID1","ID1",0.998997225097456,"ID1",0.998997225097456,0.135525787238422,"jinID1",0.998577618923022,0.186039763963678
 "2","C_ID2","jinID2",0.998910219060755,"ID2",0.997328276273132,0.0700282636589477,"jinID2",0.998910219060755,0.056157432559582
 "3","C_ID11","jinID11a",0.998558317961486,"ID11",0.964904999195456,0.110899476915999,"jinID11a",0.998558317961486,0.0229483641579186
