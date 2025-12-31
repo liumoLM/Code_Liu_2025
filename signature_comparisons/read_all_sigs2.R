@@ -169,12 +169,12 @@ plot_row = function(row) {
     row$cosmicID,
     paste(row$cosmicID, "cosine vs ours = ", row$cosine_v_cosmic)
   )
-  # pz = plot1(
-  #  sigjin,
-  #  row$jinID,
-  #  paste(row$jinID, "cosine vs ours = ", row$cosine_v_jin)
-  # )
-  grid.arrange(px, py, nrow = 4, ncol = 1)
+  pz = plot1(
+    sigjin,
+    row$jinID,
+    paste(row$jinID, "cosine vs ours = ", row$cosine_v_jin)
+  )
+  grid.arrange(px, py, pz, nrow = 4, ncol = 1)
 
   p0 = plot1(
     sig89,
@@ -286,3 +286,29 @@ debug(plot_row)
 plot_row(zz[18, ])
 
 foo = lapply(1:nrow(zz), \(row) plot_row(zz[row, ]))
+
+prop_ins_t_476 = function(catalog) {
+  # browser()
+  rows = grep("Ins(T)", rownames(catalog), fixed = TRUE)
+  allsums = colSums(catalog)
+  tsums = colSums(catalog[rows, ])
+  tsums / allsums
+}
+
+prop_ins_t_83 = function(catalog) {
+  rows = grep("INS:C:1", rownames(catalog), fixed = TRUE)
+  allsums = colSums(catalog)
+  tsums = colSums(catalog[rows, ])
+  tsums / allsums
+}
+
+prop_ins_t_476(sig89[, rep("InsDel9", 2)])
+
+prop_ins_t_476(sig476[, rep("InsDel9", 2)])
+
+prop_ins_t_476(sigkoh[, rep("InD9b", 2)])
+prop_ins_t_476(sigkoh[, rep("InD9a", 2)])
+
+prop_ins_t_83(sigcosmic[, rep("ID9", 2)])
+prop_ins_t_83(sig83[, rep("C_ID9", 2)])
+prop_ins_t_83(sigjin[, rep("jinID9", 2)])
