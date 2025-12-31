@@ -36,10 +36,16 @@ if (FALSE) {
   write.csv(us_v_spectra476, "us_v_spectra476.csv")
 }
 
+
+# linktable = read.delim(
+# "linktable.tsv",
+#  sep = '\t'
+# )
+
 linktable = read.delim(
-  "linktable.tsv",
-  sep = '\t'
+  file.path(data_dir, "89type_to_83type_connection.tsv")
 )
+colnames(linktable) = c("type89", "exemplar", "type83")
 
 us_v_all83 = read.csv(
   "us_vs_all_83.csv"
@@ -91,23 +97,23 @@ link_and_83_and_89 = dplyr::full_join(
   rename(KohID = ID, cosine_v_koh = cosine)
 
 
-link_and_83_and_89_and_spectra83 = dplyr::full_join(
+link_and_83_and_89_and_spectra83 = full_join(
   link_and_83_and_89,
   us_v_spectra83,
   join_by(type83 == signature)
 )
 
 
-link_and_83_and_89_and_spectra83_and_spectra89 = dplyr::full_join(
+link_and_83_and_89_and_spectra83_and_spectra89 = full_join(
   link_and_83_and_89_and_spectra83,
   us_v_spectra89,
   join_by(type89 == signature)
 )
-
-link_and_83_and_89_and_all_type_spectra = dplyr::full_join(
+### This will not work because of the problem with InsDel_J/N
+link_and_83_and_89_and_all_type_spectra = left_join(
   link_and_83_and_89_and_spectra83_and_spectra89,
   us_v_spectra476,
-  join_by(type476 == signature)
+  join_by(type89 == signature & type83 = )
 )
 
 moremore = full_join(
