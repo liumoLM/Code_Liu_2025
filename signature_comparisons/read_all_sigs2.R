@@ -4,6 +4,9 @@ data_dir = "../Manuscript_data"
 
 library(tidyr)
 library(dplyr)
+library(ggplot2)
+library(gridExtra)
+library(mSigPlot)
 
 sigfiles = dir(data_dir, pattern = "signatures")
 
@@ -111,13 +114,10 @@ j5 = full_join(j4, us_v_spectra476, join_by(type476 == signature))
 jall = full_join(j5, koh_v_spectra89, join_by(KohID == signature))
 
 View(jall)
-zz = jall
 
 ## To do, best_matches476; similar to best_matches89
 
 ## To do, plot everything
-
-source("../code/wrap_ICAMS_plot_catalog.R")
 
 plot_row = function(row) {
   # browser()
@@ -156,7 +156,7 @@ plot_row = function(row) {
         plot_title = title
       )
     } else if (nrow(catalog) == 83) {
-      px = wrap_ICAMS_plot_catalog(thing, title = title)
+      px = plot_83(thing, plot_title = title)
     } else {
       stop("oops")
     }
@@ -280,10 +280,11 @@ plot_row = function(row) {
 }
 
 
-plot_row(zz[1, ])
+plot_row(jall[18, ])
 
-debug(plot_row)
-plot_row(zz[18, ])
+for (i in c(13, 14, 17)) {
+  plot_row(jall[i, ])
+}
 
 foo = lapply(1:nrow(zz), \(row) plot_row(zz[row, ]))
 
