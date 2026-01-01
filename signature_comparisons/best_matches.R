@@ -1,8 +1,7 @@
-library(ICAMS)
 library(gridGraphics)
 library(gridExtra)
 
-source("code/best_match_one_column.R")
+source("best_match_one_column.R")
 
 #' Find best matches for signatures against reference signatures
 #' Compares each column of our_sigs against combined reference signatures

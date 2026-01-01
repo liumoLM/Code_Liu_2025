@@ -1,10 +1,9 @@
-library(ICAMS)
+library(mSigPlot)
 library(gridGraphics)
 library(gridExtra)
 
-source("code/wrap_ICAMS_plot_catalog.R")
-source("code/best_matches.R")
-
+source("best_matches.R")
+data_dir = "../Manuscript_data"
 
 #' Run best_matches for ID83 signatures against COSMIC and Jin 2024 references
 #' @param out_dir Output directory for PDF files
@@ -34,9 +33,7 @@ best_matches83 <- function(out_dir, ...) {
     catalog <- matrix(vec, ncol = 1)
     rownames(catalog) <- rnames
     colnames(catalog) <- title
-    cattype = ifelse(sum(vec) <= 1.1, "counts.signature", "counts")
-    catalog <- ICAMS::as.catalog(catalog, catalog.type = cattype)
-    wrap_ICAMS_plot_catalog(catalog, title)
+    plot_83(vec)
   }
 
   best_matches(
@@ -95,3 +92,11 @@ us_v_spectra = best_matches83(
 )
 
 write.table(us_v_spectra, file = "data/us_v_spectra_83.tsv", sep = '\t')
+
+
+cosmic_v_spectra = best_matches83(
+  out_dir = "signature_comparisons/cosmic_v_spectra",
+  file.path(data_dir, "COSMIC_v3.5_ID_GRCh37_signatures.tsv"),
+  file.path(data_dir, "Liu_et_al_final_83_type_signatures.tsv")
+)
+write.table(cosmic_v_spectra, file = "cosmic_v_spectra.tsv", sep = '\t')

@@ -286,7 +286,7 @@ for (i in c(13, 14, 17)) {
   plot_row(jall[i, ])
 }
 
-foo = lapply(1:nrow(zz), \(row) plot_row(zz[row, ]))
+foo = lapply(1:nrow(jall), \(row) plot_row(jall[row, ]))
 
 prop_ins_t_476 = function(catalog) {
   # browser()
