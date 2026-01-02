@@ -119,174 +119,18 @@ View(jall)
 
 ## To do, plot everything
 
-plot_row = function(row) {
-  # browser()
-
-  if (is.na(row$type89)) {
-    return()
-  }
-  if (row$type89 %in% c("InsDel15", "InsDel16")) {
-    return()
-  }
-
-  uniqueid = paste0(row$type89, "_", row$type83)
-  message(uniqueid)
-  cairo_pdf(
-    filename = paste0("plots/", uniqueid, ".pdf"),
-    onefile = TRUE,
-    height = 10,
-    width = 7.5
-  )
-  par(mfrow = c(5, 1))
-  # browser()
-
-  sigs476 = sigs[["t476"]]
-
-  plot1 = function(catalog, column, title = column) {
-    if (!column %in% colnames(catalog)) {
-      stop(column, " not in colnames(catalog)")
-    }
-    thing = catalog[, column, drop = FALSE]
-    if (nrow(catalog) == 89) {
-      px = plot_89(thing, plot_title = title)
-    } else if (nrow(catalog) == 476) {
-      px = plot_476(
-        thing,
-        simplify_labels = FALSE,
-        plot_title = title
-      )
-    } else if (nrow(catalog) == 83) {
-      px = plot_83(thing, plot_title = title)
-    } else {
-      stop("oops")
-    }
-    return(px)
-  }
-
-  px = plot1(sig83, row$type83)
-  py = plot1(
-    sigcosmic,
-    row$cosmicID,
-    paste(row$cosmicID, "cosine vs ours = ", row$cosine_v_cosmic)
-  )
-  pz = plot1(
-    sigjin,
-    row$jinID,
-    paste(row$jinID, "cosine vs ours = ", row$cosine_v_jin)
-  )
-  grid.arrange(px, py, pz, nrow = 4, ncol = 1)
-
-  p0 = plot1(
-    sig89,
-    row$type89,
-    title = paste("Extracted 89-type signature", row$type89)
-  )
-  # toplot = sig89[, row$type89, drop = FALSE]
-  # p0 = plot_89(toplot, plot_title = paste("Extracted signature", row$type89))
-
-  toplot = spec89[, row$exemplar, drop = FALSE]
-  p1 = plot_89(toplot, plot_title = paste("Original exemplar", row$exemplar))
-
-  toplot = spec89[, row$exemplar89, drop = FALSE]
-  p2 = plot_89(
-    toplot,
-    plot_title = paste(
-      "Current exemplar",
-      row$exemplar89,
-      "cosine to sig =",
-      row$cosine_v_exemplar89
-    )
-  )
-
-  toplot = sigkoh[, row$KohID, drop = FALSE]
-  p3 = plot_89(
-    toplot,
-    plot_title = paste(
-      "Koh ID",
-      row$KohID,
-      paste("cosine to extracted =", row$cosine_v_koh)
-    )
-  )
-
-  toplot = spec89[, row$exemplar_koh, drop = FALSE]
-  p4 = plot_89(
-    toplot,
-    plot_title = paste(
-      row$exemplar_koh,
-      "cosine to Koh =",
-      row$cosine_koh_v_exemplar_koh
-    )
-  )
-
-  grid.arrange(p0, p1, p2, p3, p4, nrow = 5, ncol = 1)
-
-  toplot = spec476[, row$exemplar89, drop = FALSE]
-  p5 = plot_476(
-    toplot,
-    simplify_labels = FALSE,
-    plot_title = paste(row$exemplar89, "(our type-89 exemplar))")
-  )
-
-  toplot = spec476[, row$exemplar_koh, drop = FALSE]
-  p6 = plot_476(
-    toplot,
-    simplify_labels = FALSE,
-    plot_title = paste(row$exemplar_koh, "(Koh type-89 exemplar))")
-  )
-
-  toplot = spec476[, row$exemplar, drop = FALSE]
-  p7 = plot_476(
-    toplot,
-    simplify_labels = FALSE,
-    plot_title = paste(row$exemplar, "(our original type-89 exemplar)")
-  )
-
-  sigxx = row$type476
-  if (sigxx != "") {
-    newid = sub("_476", "", sigxx)
-    if (!newid %in% colnames(sigs476)) {
-      message(newid, " not found in type 476 signatures, skipping")
-      return()
-    }
-    toplot = sigs476[, newid, drop = FALSE]
-    p8 = plot_476(
-      toplot,
-      simplify_labels = FALSE,
-      plot_title = paste("Extracted 476-type sig", sigxx)
-    )
-
-    if (is.na(row$exemplar476)) {
-      message("No type-476 exemplar for", uniqueid, "skipping")
-      return()
-    }
-    toplot = spec476[, row$exemplar476, drop = FALSE]
-    p9 = plot_476(
-      toplot,
-      simplify_labels = FALSE,
-      plot_title = paste(
-        row$exemplar476,
-        "cosine to our 476 extracted = ",
-        row$cosine_v_exemplar476
-      )
-    )
-
-    grid.arrange(p5, p6, p7, nrow = 3, ncol = 1)
-    grid.arrange(p8, p9, nrow = 3, ncol = 1)
-  } else {
-    grid.arrange(p5, p6, nrow = 2, ncol = 1)
-  }
-  # Put more code here
-  dev.off()
+source("plot_comparison_row.R")
+plot_comparison_row(jall[18, ], sigs = sigs, spectra = spectra)
+plot_row = function(xx) {
+  plot_comparison_row(xx, sigs = sigs, spectra = spectra)
 }
-
-
-plot_row(jall[18, ])
+plot_row(jall[4, ])
 
 for (i in c(13, 14, 17)) {
   plot_row(jall[i, ])
 }
 
-foo = lapply(1:nrow(jall), \(row) plot_row(jall[row, ]))
+save = lapply(1:nrow(jall), \(row) plot_row(jall[row, ]))
 
 prop_ins_t_476 = function(catalog) {
   # browser()

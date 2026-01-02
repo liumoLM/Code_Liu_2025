@@ -31,14 +31,7 @@ test_best_match83 <- function() {
   # Define plotit function using ICAMS wrapper
   plotit <- function(vec, title) {
     # Create a single-column catalog
-    catalog <- matrix(vec, ncol = 1)
-    rownames(catalog) <- rownames(our_sigs)
-    colnames(catalog) <- title
-
-    # Convert to ICAMS catalog
-    catalog <- ICAMS::as.catalog(catalog, catalog.type = "counts.signature")
-
-    wrap_ICAMS_plot_catalog(catalog, title)
+    plot_83(vec, plot_title = title)
   }
 
   # Process each column of our_sigs

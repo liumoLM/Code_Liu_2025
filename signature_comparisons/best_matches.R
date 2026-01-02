@@ -9,7 +9,13 @@ source("best_match_one_column.R")
 #' @param plotit A function that takes (vector, title) and returns a grob
 #' @param our_sigs_path Path to the file containing signatures to match
 #' @param ... One or more paths to reference signature files (will be cbind'd)
-best_matches <- function(plotit, out_dir, our_sigs_path, ...) {
+best_matches <- function(
+  plotit,
+  out_dir,
+  min_num_mutations = 50,
+  our_sigs_path,
+  ...
+) {
   ref_paths <- list(...)
 
   dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
@@ -52,7 +58,12 @@ best_matches <- function(plotit, out_dir, our_sigs_path, ...) {
     pdf_name <- sprintf("%s/%s_best_match.pdf", out_dir, col_name)
     cairo_pdf(pdf_name, width = 14, height = 12)
 
-    result <- best_match_one_column(A, other_sigs_mat, plotit)
+    result <- best_match_one_column(
+      A,
+      other_sigs_mat,
+      min_num_mutations = min_num_mutations,
+      plotit = plotit
+    )
 
     dev.off()
 

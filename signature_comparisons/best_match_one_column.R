@@ -8,7 +8,13 @@ library(philentropy)
 #' @param M A matrix with columns to compare against
 #' @param plotit A function that takes (vector, title) and returns a ggplot
 #' @return A list with best matches and combined plot
-best_match_one_column <- function(A, M, plotit) {
+best_match_one_column <- function(
+  A,
+  M,
+  plotit,
+  do_euclidean = FALSE,
+  min_num_mutations = 50
+) {
   # Ensure A is a numeric vector
   A_vec <- as.numeric(A)
   A_name <- if (!is.null(colnames(A))) {
@@ -22,17 +28,20 @@ best_match_one_column <- function(A, M, plotit) {
 
   # Define similarity measures and whether higher is better
   measures <- list(
-    cosine = list(method = "cosine", higher_better = TRUE),
-    euclidean = list(method = "euclidean", higher_better = FALSE)
+    cosine = list(method = "cosine", higher_better = TRUE)
+    # euclidean = list(method = "euclidean", higher_better = FALSE)
     # hellinger = list(method = "hellinger", higher_better = FALSE),
     # jaccard = list(method = "jaccard", higher_better = FALSE)
   )
+  if (do_euclidean) {
+    measures(euclidean = list(method = "euclidean", higher_better = FALSE))
+  }
 
   results <- list()
   plots <- list()
 
   # Plot A first
-  plots[[1]] <- plotit(A_vec, A_name)
+  plots[[1]] <- plotit(A, A_name)
 
   for (measure_name in names(measures)) {
     measure <- measures[[measure_name]]
@@ -43,7 +52,9 @@ best_match_one_column <- function(A, M, plotit) {
       M_col <- as.numeric(M[, j])
 
       # Normalize columns for comparison
-
+      if (sum(M_col) < min_num_mutations) {
+        next
+      }
       A_use <- A_norm
       M_use <- M_col / sum(M_col)
 
@@ -70,7 +81,7 @@ best_match_one_column <- function(A, M, plotit) {
           best_idx <- j
         }
       }
-    }
+    } # end for (j ...)
 
     results[[measure_name]] <- list(
       index = best_idx,
@@ -79,7 +90,7 @@ best_match_one_column <- function(A, M, plotit) {
     )
 
     # Create plot for this match
-    M_best <- as.numeric(M[, best_idx])
+    M_best <- M[, best_idx, drop = FALSE]
     title <- sprintf(
       "%s (%s: %.4f)",
       colnames(M)[best_idx],

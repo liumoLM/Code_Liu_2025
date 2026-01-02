@@ -27,8 +27,8 @@ best_matches89 <- function(out_dir, ...) {
 
 us_v_koh_89 = best_matches89(
   "89_us_v_koh",
-  "data/type89_our_sigs.tsv",
-  "data/type89_koh_sigs.tsv"
+  "../Manuscript_data/Liu_et_al_final_89_type_signatures.tsv",
+  "../Manuscript_data/Koh_signatures.tsv"
 ) |>
   dplyr::arrange(desc(cosine))
 write.csv(
