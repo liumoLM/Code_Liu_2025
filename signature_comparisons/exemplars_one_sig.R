@@ -195,3 +195,22 @@ exemplars_one_sig(
   out_pdf = "exemplars_for_C_ID10.pdf",
   min_mutations = 50
 )
+
+
+exemplars_one_sig(
+  "../Manuscript_data/Liu_et_al_final_83_type_signatures.tsv",
+  "C_ID7",
+  "../Manuscript_data/Liu_et_al_83_type_spectra.tsv",
+  cosine_cutoff = 0.5,
+  out_pdf = "exemplars_for_C_ID7_min_50.pdf",
+  min_mutations = 50
+)
+
+exemplars_one_sig(
+  "../Manuscript_data/COSMIC_v3.5_ID_GRCh37_signatures.tsv",
+  "ID7",
+  "../Manuscript_data/Liu_et_al_83_type_spectra.tsv",
+  cosine_cutoff = 0.5,
+  out_pdf = "exemplars_for_ID7_min_50.pdf",
+  min_mutations = 50
+)
