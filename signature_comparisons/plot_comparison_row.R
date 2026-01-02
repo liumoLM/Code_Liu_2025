@@ -34,9 +34,6 @@ plot_comparison_row = function(row, sigs, spectra) {
   if (is.na(row$type89)) {
     return()
   }
-  if (row$type89 %in% c("InsDel15", "InsDel16")) {
-    return()
-  }
 
   uniqueid = paste0(row$type89, "_", row$type83)
   message(uniqueid)
@@ -66,6 +63,22 @@ plot_comparison_row = function(row, sigs, spectra) {
   plots83 <- list()
   plots89 = list()
   plots476 = list()
+
+  if (row$type89 %in% c("InsDel15", "InsDel16")) {
+    plot15or16 = plot1(
+      spec89,
+      row$exemplar,
+      title = paste("Exemplar for", row$type89, row$exemplar)
+    )
+    ggsave(
+      paste0("plots/", uniqueid, ".pdf"),
+      plot15or16,
+      height = 3,
+      width = 7.5,
+      units = "in"
+    )
+    return()
+  }
 
   # Page 1: 83-type signatures
   plots83$px <- plot1(sig83, row$type83)
