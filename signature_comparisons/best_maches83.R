@@ -14,26 +14,9 @@ best_matches83 <- function(out_dir, ...) {
     stop("At least 2 file paths required: our_sigs and at least one reference")
   }
 
-  our_sigs_file = paths[[1]]
-
-  # Read row names from first file (our_sigs)
-  # We don't use our_sigs after we get the
-  # row names.
-  our_sigs <- read.table(
-    our_sigs_file,
-    header = TRUE,
-    sep = "\t",
-    row.names = 1
-  )
-  rnames <- rownames(our_sigs)
-  rm(our_sigs)
-
   # Define plotit function using ICAMS wrapper for ID83
   plotit <- function(vec, title) {
-    catalog <- matrix(vec, ncol = 1)
-    rownames(catalog) <- rnames
-    colnames(catalog) <- title
-    plot_83(vec)
+    plot_83(vec, plot_title = title)
   }
 
   best_matches(
@@ -95,8 +78,8 @@ write.table(us_v_spectra, file = "data/us_v_spectra_83.tsv", sep = '\t')
 
 
 cosmic_v_spectra = best_matches83(
-  out_dir = "signature_comparisons/cosmic_v_spectra",
+  out_dir = "cosmic_v_spectra",
   file.path(data_dir, "COSMIC_v3.5_ID_GRCh37_signatures.tsv"),
-  file.path(data_dir, "Liu_et_al_final_83_type_signatures.tsv")
+  file.path(data_dir, "Liu_et_al_83_type_spectra.tsv")
 )
 write.table(cosmic_v_spectra, file = "cosmic_v_spectra.tsv", sep = '\t')
