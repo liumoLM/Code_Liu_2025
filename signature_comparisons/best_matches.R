@@ -3,6 +3,18 @@ library(gridExtra)
 
 source("best_match_one_column.R")
 
+guess_plotit = function(our_sigs_path) {
+  our_sigs <- read.table(
+    our_sigs_path,
+    header = TRUE,
+    sep = "\t",
+    row.names = 1
+  )
+  if (nrow(our_sigs) == 89) {
+    mSigPlot::plot_89
+  }
+}
+
 #' Find best matches for signatures against reference signatures
 #' Compares each column of our_sigs against combined reference signatures
 #' Creates a PDF for each signature with the best matches
@@ -10,7 +22,7 @@ source("best_match_one_column.R")
 #' @param our_sigs_path Path to the file containing signatures to match
 #' @param ... One or more paths to reference signature files (will be cbind'd)
 best_matches <- function(
-  plotit,
+  plotit = guess_plotit(our_sigs_path),
   out_dir,
   min_num_mutations = 50,
   our_sigs_path,
