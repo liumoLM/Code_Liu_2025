@@ -6,7 +6,7 @@ source("code/best_matches.R")
 #' Run best_matches for ID89 signatures
 #' @param out_dir Output directory for PDF files
 #' @param ... At least 2 file paths: first is our_sigs, rest are reference sigs
-best_matches89 <- function(out_dir, ...) {
+best_matches89 <- function(out_dir, min_num_mutations, ...) {
   paths <- list(...)
   if (length(paths) < 2) {
     stop("At least 2 file paths required: our_sigs and at least one reference")
@@ -19,7 +19,8 @@ best_matches89 <- function(out_dir, ...) {
 
   best_matches(
     plotit,
-    out_dir,
+    out_dir = out_dir,
+    min_num_mutations = min_num_mutations,
     ...
   )
 }
@@ -50,12 +51,17 @@ write.csv(
   row.names = FALSE
 )
 
-us_v_spectra89 = best_matches89(
-  "data/us_v_spectra89",
-  "data/type89_liu_et_al_sigs.tsv",
-  "data/type89_spectra.tsv"
+us_v_spectra89_min_100 = best_matches89(
+  out_dir = "us_v_spectra89_min_100",
+  min_num_mutations = 100,
+  "../Manuscript_data/Liu_et_al_final_89_type_signatures.tsv",
+  "../Manuscript_data/Liu_et_al_89_type_spectra.tsv"
 )
-write.table(us_v_spectra89, file = "data/us_v_spectra_80.tsv", sep = '\t')
+write.table(
+  us_v_spectra89_min_100,
+  file = "us_v_spectra_89_min_100.tsv",
+  sep = '\t'
+)
 
 
 koh_v_spectra89 = best_matches89(
