@@ -1,0 +1,118 @@
+---
+title: "Check Exemplars"
+format: html
+---
+
+```{r setup}
+library(dplyr)
+library(mSigPlot)
+library(lsa)
+
+source("check_exemplars.R")
+```
+
+```{r load-data}
+result <- check_exemplars()
+
+signatures <- read.delim(
+  "../Manuscript_data/Liu_et_al_final_89_type_signatures.tsv",
+  sep = "\t",
+  row.names = 1,
+  stringsAsFactors = FALSE
+)
+
+spectra <- read.delim(
+  "../Manuscript_data/Liu_et_al_89_type_spectra.tsv",
+  sep = "\t",
+  row.names = 1,
+  stringsAsFactors = FALSE
+)
+
+signatures_476 <- read.delim(
+  "../Manuscript_data/Liu_et_al_final_476_type_signatures.tsv",
+  sep = "\t",
+  row.names = 1,
+  stringsAsFactors = FALSE
+)
+
+spectra_476 <- read.delim(
+  "../Manuscript_data/Liu_et_al_476_type_spectra.tsv",
+  sep = "\t",
+  row.names = 1,
+  stringsAsFactors = FALSE
+)
+```
+
+```{r plot-comparisons, results='asis', fig.width=10, fig.height=4}
+for (i in seq_len(nrow(result))) {
+  row <- result[i, ]
+  sig_name <- row$signature
+  exemplar_id <- row$Exemplar
+  id_min_100 <- row$ID_min_100
+  id_no_min <- row$ID_no_min
+  cosine_min_100 <- row$cosine_min_100
+  cosine_no_min <- row$cosine_no_min
+
+  # Convert :: to .. for spectra column lookup
+  exemplar_col <- gsub("::", "..", exemplar_id, fixed = TRUE)
+  min_100_col <- gsub("::", "..", id_min_100, fixed = TRUE)
+  no_min_col <- gsub("::", "..", id_no_min, fixed = TRUE)
+
+  sig_vec <- as.numeric(signatures[[sig_name]])
+  exemplar_vec <- as.numeric(spectra[[exemplar_col]])
+
+  cosine_exemplar <- as.numeric(cosine(sig_vec, exemplar_vec))
+
+  cat("\n\n## ", sig_name, "\n\n")
+
+  cat("### Signature\n\n")
+  sig_cat <- as.matrix(signatures[, sig_name, drop = FALSE])
+  print(mSigPlot::plot_89(sig_cat, plot_title = sig_name))
+
+  cat("\n\n### Exemplar: ", exemplar_id, "\n\n")
+  cat("Cosine similarity to signature: ", round(cosine_exemplar, 6), "\n\n")
+  exemplar_cat <- as.matrix(spectra[, exemplar_col, drop = FALSE])
+  print(mSigPlot::plot_89(exemplar_cat, plot_title = exemplar_id))
+
+  cat("\n\n### ID_min_100: ", id_min_100, "\n\n")
+  cat("Cosine similarity (from file): ", round(cosine_min_100, 6), "\n\n")
+  min_100_cat <- as.matrix(spectra[, min_100_col, drop = FALSE])
+  print(mSigPlot::plot_89(min_100_cat, plot_title = id_min_100))
+
+  cat("\n\n### ID_no_min: ", id_no_min, "\n\n")
+  cat("Cosine similarity (from file): ", round(cosine_no_min, 6), "\n\n")
+  no_min_cat <- as.matrix(spectra[, no_min_col, drop = FALSE])
+  print(mSigPlot::plot_89(no_min_cat, plot_title = id_no_min))
+
+  # 476-type plots if signature exists
+  if (sig_name %in% colnames(signatures_476)) {
+    cat("\n\n### 476-type Signature\n\n")
+    sig_476_vec <- as.numeric(signatures_476[[sig_name]])
+    sig_476_cat <- as.matrix(signatures_476[, sig_name, drop = FALSE])
+    print(mSigPlot::plot_476(sig_476_cat, plot_title = paste0(sig_name, " (476-type)")))
+
+    exemplar_476_vec <- as.numeric(spectra_476[[exemplar_col]])
+    min_100_476_vec <- as.numeric(spectra_476[[min_100_col]])
+    no_min_476_vec <- as.numeric(spectra_476[[no_min_col]])
+
+    cosine_exemplar_476 <- as.numeric(cosine(sig_476_vec, exemplar_476_vec))
+    cosine_min_100_476 <- as.numeric(cosine(sig_476_vec, min_100_476_vec))
+    cosine_no_min_476 <- as.numeric(cosine(sig_476_vec, no_min_476_vec))
+
+    cat("\n\n### 476-type Exemplar: ", exemplar_id, "\n\n")
+    cat("Cosine similarity to 476 signature: ", round(cosine_exemplar_476, 6), "\n\n")
+    exemplar_476_cat <- as.matrix(spectra_476[, exemplar_col, drop = FALSE])
+    print(mSigPlot::plot_476(exemplar_476_cat, plot_title = exemplar_id))
+
+    cat("\n\n### 476-type ID_min_100: ", id_min_100, "\n\n")
+    cat("Cosine similarity to 476 signature: ", round(cosine_min_100_476, 6), "\n\n")
+    min_100_476_cat <- as.matrix(spectra_476[, min_100_col, drop = FALSE])
+    print(mSigPlot::plot_476(min_100_476_cat, plot_title = id_min_100))
+
+    cat("\n\n### 476-type ID_no_min: ", id_no_min, "\n\n")
+    cat("Cosine similarity to 476 signature: ", round(cosine_no_min_476, 6), "\n\n")
+    no_min_476_cat <- as.matrix(spectra_476[, no_min_col, drop = FALSE])
+    print(mSigPlot::plot_476(no_min_476_cat, plot_title = id_no_min))
+  }
+}
+```
