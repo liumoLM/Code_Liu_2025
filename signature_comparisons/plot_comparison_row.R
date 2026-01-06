@@ -1,5 +1,8 @@
 # lintr::lint("plot_comparison_row.R", linters = source("../.lintr.R")$value)
 
+library(mSigPlot)
+library(ggplot2)
+
 #' Compute cosine similarity between two column matrices
 #' @param a A column matrix or vector
 #' @param b A column matrix or vector
