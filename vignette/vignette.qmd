@@ -3,7 +3,9 @@ title: "ID89 and ID83 vignette"
 format:
   html:
     toc: true
+    toc-location: left
     toc-depth: 3
+    toc-title: "Signatures"
     code-fold: true
     self-contained: true
 date: today
@@ -31,9 +33,9 @@ library(ggplot2)
 #| label: other-globals
 
 data_dir <- "../Manuscript_data/"
-plot476_base_size <- 18
+plot476_base_size <- 20
 plto476_simplify_labels <- FALSE
-plot476_height <- unit(4, "in")
+plot476_height <- unit(5, "in")
 plot89_height <- unit(3, "in")
 
 print(getwd())
@@ -150,21 +152,24 @@ source("vignette_helpers.R")
 # APPROACH 3: Pre-compute all signature data before rendering
 # This separates computation from plotting, making debugging easier
 
-all_signature_data <- lapply(seq_len(nrow(ID89_ID83_connection_example)), function(i) {
-  compute_signature_data(
-    ID89signature = ID89_ID83_connection_example$ID89_signature[i],
-    catalog = ID89_ID83_connection_example$example_catalog[i],
-    ID83signature = ID89_ID83_connection_example$ID83_signature[i],
-    ID89_signatures = to.plot.all.ID89.signatures.final,
-    ID89_catalogs = to.plot.all.ID89.catalogs,
-    ID83_signatures = to.plot.all.signatures.final,
-    ID83_catalogs = to.plot.WGS_PCAWG_HMF_indels.catalog,
-    ID83_catalogs_no_polyT = to.plot.WGS_PCAWG_HMF_indels.catalog.no.polyT,
-    ID476_signatures = final.Koh476.signatures,
-    ID476_catalogs = to.plot.all.ID476.catalogs,
-    assignment_matrix = ID89.mSigAct.assignment
-  )
-})
+all_signature_data <- lapply(
+  seq_len(nrow(ID89_ID83_connection_example)),
+  function(i) {
+    compute_signature_data(
+      ID89signature = ID89_ID83_connection_example$ID89_signature[i],
+      catalog = ID89_ID83_connection_example$example_catalog[i],
+      ID83signature = ID89_ID83_connection_example$ID83_signature[i],
+      ID89_signatures = to.plot.all.ID89.signatures.final,
+      ID89_catalogs = to.plot.all.ID89.catalogs,
+      ID83_signatures = to.plot.all.signatures.final,
+      ID83_catalogs = to.plot.WGS_PCAWG_HMF_indels.catalog,
+      ID83_catalogs_no_polyT = to.plot.WGS_PCAWG_HMF_indels.catalog.no.polyT,
+      ID476_signatures = final.Koh476.signatures,
+      ID476_catalogs = to.plot.all.ID476.catalogs,
+      assignment_matrix = ID89.mSigAct.assignment
+    )
+  }
+)
 
 # Name the list for easier debugging
 names(all_signature_data) <- ID89_ID83_connection_example$ID89_signature
