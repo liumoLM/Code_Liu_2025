@@ -1,0 +1,97 @@
+/* Custom styles for ID89/ID83 vignette */
+
+/* Signature section header - white text on gray bar */
+.signature-header {
+  background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+  color: white;
+  padding: 12px 20px;
+  margin: 40px 0 20px 0;
+  border-radius: 6px;
+  font-size: 1.5em;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.signature-header .signature-name {
+  font-size: 1.2em;
+  font-weight: 700;
+}
+
+/* Subtitle info below the main header */
+.signature-subtitle {
+  background-color: #edf2f7;
+  border-left: 4px solid #4a5568;
+  padding: 10px 15px;
+  margin: 0 0 20px 0;
+  color: #2d3748;
+  font-size: 0.95em;
+}
+
+.signature-subtitle strong {
+  color: #1a202c;
+}
+
+/* Special note styling (e.g., for InsDel_N) */
+.signature-note {
+  background-color: #fefcbf;
+  border-left: 4px solid #d69e2e;
+  padding: 10px 15px;
+  margin: 10px 0;
+  color: #744210;
+  font-style: italic;
+}
+
+/* Cosine similarity summary box */
+.cosine-summary {
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
+  border-radius: 6px;
+  padding: 15px 20px;
+  margin: 20px 0 30px 0;
+  border: 1px solid #a0aec0;
+}
+
+.cosine-summary h4 {
+  margin: 0 0 10px 0;
+  color: #2d3748;
+  font-size: 1.1em;
+}
+
+.cosine-summary ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.cosine-summary li {
+  color: #4a5568;
+  margin: 5px 0;
+}
+
+/* Section divider */
+.section-divider {
+  border: 0;
+  height: 2px;
+  background: linear-gradient(to right, transparent, #cbd5e0, transparent);
+  margin: 40px 0;
+}
+
+/* Subsection headers (e.g., "corresponds to 83-type signature") */
+.subsection-header {
+  background-color: #edf2f7;
+  color: #2d3748;
+  padding: 8px 15px;
+  margin: 25px 0 15px 0;
+  border-radius: 4px;
+  font-size: 1.1em;
+  font-weight: 500;
+  border-left: 4px solid #718096;
+}
+
+/* Cosine inline display */
+.cosine-value {
+  display: inline-block;
+  background-color: #e2e8f0;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-family: monospace;
+  color: #2d3748;
+}
