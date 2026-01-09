@@ -1,0 +1,148 @@
+
+```{r}
+#| echo: false
+#| output: asis
+
+# This child template expects the following variables in the environment:
+# - sig_data: List from compute_signature_data()
+# - All the data frames/catalogs needed for plotting
+
+cat(generate_section_header(sig_data))
+```
+
+```{r}
+#| echo: false
+#| fig-width: 19
+#| fig-height: 3
+
+# ID89 plots: signature and catalog
+id89_plots <- create_id89_plots(
+  sig_data,
+  to.plot.all.ID89.signatures.final,
+  to.plot.all.ID89.catalogs,
+  plot89_height
+)
+
+gridExtra::grid.arrange(
+  id89_plots$p1, id89_plots$p2,
+  nrow = 1, ncol = 2, heights = plot89_height
+)
+```
+
+```{r}
+#| echo: false
+#| fig-width: 19
+#| fig-height: 3
+#| eval: !expr '!sig_data$is_insdel15_16'
+
+# Decomposition plots (only for non-InsDel15/16)
+if (!is.null(id89_plots$p3)) {
+  gridExtra::grid.arrange(
+    id89_plots$p3, id89_plots$p4,
+    nrow = 1, ncol = 2, heights = plot89_height
+  )
+}
+```
+
+```{r}
+#| echo: false
+#| output: asis
+
+# 476-type section header
+if (sig_data$has_476_signature) {
+  cat(paste0(
+    '\n\n<p><strong>Cosine similarity of 476-Type Signature vs Exemplar:</strong> ',
+    '<span class="cosine-value">', sig_data$cosine476, '</span></p>\n\n'
+  ))
+} else {
+  cat(paste0(
+    '\n\n<div class="signature-note">',
+    '476-Type ', sig_data$ID89signature,
+    ' was not found by de novo extraction. ',
+    'This is the 476-Type spectrum of ', sig_data$catalog,
+    '</div>\n\n'
+  ))
+}
+```
+
+```{r}
+#| echo: false
+#| fig-width: 19
+#| fig-height: 4
+
+# ID476 plots
+id476_plots <- create_id476_plots(
+  sig_data,
+  final.Koh476.signatures,
+  to.plot.all.ID476.catalogs,
+  plot476_base_size,
+  plto476_simplify_labels
+)
+
+if (!is.null(id476_plots$p5)) {
+  gridExtra::grid.arrange(id476_plots$p5, nrow = 1, ncol = 1, heights = plot476_height)
+}
+```
+
+```{r}
+#| echo: false
+#| fig-width: 19
+#| fig-height: 4
+#| eval: !expr 'sig_data$has_476_signature'
+
+# Second 476 plot (catalog) - only if signature exists
+if (!is.null(id476_plots$p6)) {
+  gridExtra::grid.arrange(id476_plots$p6, nrow = 1, ncol = 1, heights = plot476_height)
+}
+```
+
+```{r}
+#| echo: false
+#| output: asis
+
+cat(paste0(
+  '\n\n<div class="subsection-header">',
+  sig_data$ID89signature,
+  ' corresponds to the 83-type signature <strong>', sig_data$ID83signature, '</strong>',
+  '</div>\n\n'
+))
+```
+
+```{r}
+#| echo: false
+#| fig-width: 10
+#| fig-height: 4
+
+# ID83 signature plot
+ICAMS::PlotCatalog(to.plot.all.signatures.final[, sig_data$ID83signature, drop = FALSE])
+```
+
+```{r}
+#| echo: false
+#| output: asis
+
+cat(paste0(
+  '\n\n<p><strong>Cosine similarity of 83-Type Signature vs Exemplar:</strong> ',
+  '<span class="cosine-value">', sig_data$cosine83, '</span></p>\n\n'
+))
+```
+
+```{r}
+#| echo: false
+#| fig-width: 10
+#| fig-height: 4
+
+# ID83 catalog plot
+if (sig_data$is_polyT_removed) {
+  ICAMS::PlotCatalog(to.plot.WGS_PCAWG_HMF_indels.catalog.no.polyT[, sig_data$catalog, drop = FALSE])
+} else {
+  ICAMS::PlotCatalog(to.plot.WGS_PCAWG_HMF_indels.catalog[, sig_data$catalog, drop = FALSE])
+}
+```
+
+```{r}
+#| echo: false
+#| output: asis
+
+cat(generate_section_footer(sig_data))
+```

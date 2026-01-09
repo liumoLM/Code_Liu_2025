@@ -132,301 +132,66 @@ to.plot.all.ID476.catalogs <- to.plot.all.ID476.catalogs[, -1]
 ```
 
 
-```{r loop, fig.width=19,fig.height=4, echo=FALSE, results="asis", warning = FALSE }
-par(mfrow = c(1, 2)) # Set layout to 2x2
+```{r load-helpers}
+# Load helper functions for modular processing
+source("vignette_helpers.R")
+```
 
-for (i in c(1:nrow(ID89_ID83_connection_example))) {
-  # Get the current signature and catalog
-  ID89signature <- ID89_ID83_connection_example$ID89_signature[i]
-  catalog <- ID89_ID83_connection_example$example_catalog[i]
-  ID83signature <- ID89_ID83_connection_example$ID83_signature[i]
+```{r precompute-all-data}
+# APPROACH 3: Pre-compute all signature data before rendering
+# This separates computation from plotting, making debugging easier
 
-  # Print a header for each iteration
+all_signature_data <- lapply(seq_len(nrow(ID89_ID83_connection_example)), function(i) {
+  compute_signature_data(
+    ID89signature = ID89_ID83_connection_example$ID89_signature[i],
+    catalog = ID89_ID83_connection_example$example_catalog[i],
+    ID83signature = ID89_ID83_connection_example$ID83_signature[i],
+    ID89_signatures = to.plot.all.ID89.signatures.final,
+    ID89_catalogs = to.plot.all.ID89.catalogs,
+    ID83_signatures = to.plot.all.signatures.final,
+    ID83_catalogs = to.plot.WGS_PCAWG_HMF_indels.catalog,
+    ID83_catalogs_no_polyT = to.plot.WGS_PCAWG_HMF_indels.catalog.no.polyT,
+    ID476_signatures = final.Koh476.signatures,
+    ID476_catalogs = to.plot.all.ID476.catalogs,
+    assignment_matrix = ID89.mSigAct.assignment
+  )
+})
 
-  if (ID89signature %in% c("InsDel15", "InsDel16")) {
-    cat(paste0(
-      "\n\n### ",
-      ID89signature,
-      " \n\n  83-Type Signature: ",
-      ID83signature,
-      " \n\n  The signature contribute all mutations of the example spectrum: ",
-      catalog,
-      "\n\n"
-    ))
-    p1 <- plot_89(
-      to.plot.all.ID89.signatures.final[, ID89signature, drop = F],
-      text_size = 3,
-      plot_title = ID89signature,
-      ylabel = "Props"
-    )
-    p2 <- plot_89(
-      to.plot.all.ID89.catalogs[, catalog, drop = F],
-      text_size = 3,
-      plot_title = paste0(
-        "Spectrum A: Mutational spectrum of ",
-        catalog,
-        " \n Cosine Similarity to ",
-        ID89signature,
-        " = ",
-        cosine1
-      )
-    )
-    grid.arrange(p1, p2, nrow = 1, ncol = 2, heights = plot89_height)
-    p5 <- plot_476(
-      final.Koh476.signatures[, ID89signature],
-      text_size = 3,
-      plot_title = paste0(
-        "476-Type Representation of ",
-        ID89signature,
-        sep = ""
-      ),
-      num_labels = 5,
-      base_size = plot476_base_size,
-      simplify_labels = plto476_simplify_labels
-    )
-    grid.arrange(p5, nrow = 1, ncol = 1, heights = plot476_height)
+# Name the list for easier debugging
+names(all_signature_data) <- ID89_ID83_connection_example$ID89_signature
+```
 
-    ICAMS::PlotCatalog(
-      to.plot.all.signatures.final[,
-        ID89_ID83_connection_example$ID83_signature[i],
-        drop = F
-      ]
-    )
-
-    ICAMS::PlotCatalog(
-      to.plot.WGS_PCAWG_HMF_indels.catalog[,
-        ID89_ID83_connection_example$example_catalog[i],
-        drop = F
-      ]
-    )
-  } else {
-    cat(paste0(
-      "\n\n### ",
-      ID89signature,
-      "\n"
-    ))
-    if (ID83signature %in% c("C_ID7", "ID_J", "C_ID10", "ID_N", "ID_O")) {
-      cat(paste0(
-        " \n\n####  Supporting spectrum (deletion and insertions in long poly T tracts were removed from the Indel83 spectrum): ",
-        catalog,
-        "\n\n"
-      ))
-    } else {
-      cat(paste0(
-        "\n\n### ",
-        ID89signature,
-        " \n\n  83-Type Signature: ",
-        ID83signature,
-        " \n\n  Supporting spectrum: ",
-        catalog,
-        "\n\n"
-      ))
-    }
-    if (ID89signature == "InsDel_N") {
-      cat(paste0(
-        "\n\n### InsDel_N is identifical to InsDel_J in 89-Type representation, but different in 476-Type representation"
-      ))
-    }
-
-    ID89.assignment.this.catalog <- ID89.mSigAct.assignment[, catalog, drop = F]
-
-    ID89.assignment.this.catalog.other.signatures <- ID89.mSigAct.assignment[,
-      catalog,
-      drop = F
-    ]
-
-    ID89.assignment.this.catalog.other.signatures[
-      which(row.names(ID89.mSigAct.assignment) == ID89signature),
-    ] <- 0
-
-    reconstructed.ID89.catalog <- as.matrix(to.plot.all.ID89.signatures.final[, c(
-      1:44,
-      46
-    )]) %*%
-      as.matrix(ID89.assignment.this.catalog.other.signatures)
-
-    diff.catalog <- to.plot.all.ID89.catalogs[, catalog, drop = F] -
-      reconstructed.ID89.catalog
-
-    diff.catalog[diff.catalog < 0] <- 0
-
-    cosine1 <- round(
-      lsa::cosine(
-        as.numeric(to.plot.all.ID89.signatures.final[, ID89signature]),
-        as.numeric(to.plot.all.ID89.catalogs[, catalog])
-      ),
-      3
-    )
-    cosine2 <- round(
-      lsa::cosine(
-        as.numeric(to.plot.all.ID89.signatures.final[, ID89signature]),
-        as.numeric(as.matrix(diff.catalog))
-      ),
-      3
-    )
-
-    p1 <- plot_89(
-      to.plot.all.ID89.signatures.final[, ID89signature, drop = F],
-      text_size = 3,
-      plot_title = ID89signature,
-      ylabel = "Props"
-    )
-    p2 <- plot_89(
-      to.plot.all.ID89.catalogs[, catalog, drop = F],
-      text_size = 3,
-      plot_title = paste0(
-        "Spectrum A: Mutational spectrum of ",
-        catalog,
-        " | Cosine Similarity to ",
-        ID89signature,
-        " = ",
-        cosine1
-      )
-    )
-
-    p3 <- plot_89(
-      reconstructed.ID89.catalog,
-      text_size = 3,
-      plot_title = paste0(
-        "Spectrum B: Partial mutational spectrum of ",
-        catalog,
-        " not using ",
-        ID89signature
-      ),
-      setyaxis = max(diff.catalog)
-    )
-
-    p4 <- plot_89(
-      diff.catalog,
-      text_size = 3,
-      plot_title = paste0(
-        "Mutations due to ",
-        ID89signature,
-        " (A minus B)| Cosine similarity to ",
-        ID89signature,
-        " = :",
-        cosine2
-      )
-    )
-
-    grid.arrange(p1, p2, nrow = 1, ncol = 2, heights = plot89_height)
-
-    grid.arrange(p3, p4, nrow = 1, ncol = 2, heights = plot89_height)
-    if (ID89signature %in% colnames(final.Koh476.signatures)) {
-      cosine476 <- round(
-        lsa::cosine(
-          as.numeric(final.Koh476.signatures[, ID89signature]),
-          as.numeric(to.plot.all.ID476.catalogs[, catalog])
-        ),
-        3
-      )
-      cat(paste0(
-        "\n\n Cosine similarity of 476-Type Signature vs Examplar: ",
-        cosine476,
-        "\n\n"
-      ))
-
-      p5 <- plot_476(
-        final.Koh476.signatures[, ID89signature],
-        text_size = 3,
-        plot_title = paste0(
-          "476-Type Representation of ",
-          ID89signature,
-          sep = ""
-        ),
-        num_labels = 5,
-        base_size = plot476_base_size,
-        simplify_labels = plto476_simplify_labels
-      )
-      grid.arrange(p5, nrow = 1, ncol = 1, heights = plot476_height)
-      grid.arrange(p6, nrow = 1, ncol = 1, heights = plot476_height)
-    } else {
-      cat(paste0(
-        "\n\n 476-Type ",
-        ID89signature,
-        " was not found by de novo extraction. This is the 476-Type spectrum of ",
-        catalog
-      ))
-
-      p5 <- plot_476(
-        to.plot.all.ID476.catalogs[, catalog],
-        text_size = 3,
-        plot_title = paste0(
-          "476-Type Representation of the Supporting Genome ",
-          catalog,
-          sep = ""
-        ),
-        num_labels = 5,
-        base_size = plot476_base_size,
-        simplify_labels = plto476_simplify_labels
-      )
-
-      grid.arrange(p5, nrow = 1, ncol = 1, heights = plot476_height)
-    }
-
-    cat(paste0(
-      "\n\n##### ",
-      ID89signature,
-      " corresponds to the 83-type signature ",
-      ID83signature
-    ))
-    ICAMS::PlotCatalog(to.plot.all.signatures.final[,
-      ID89_ID83_connection_example$ID83_signature[i],
-      drop = F
-    ])
-    if (ID83signature %in% c("C_ID7", "ID_J", "C_ID10", "ID_N", "ID_O")) {
-      cosine83 <- round(
-        lsa::cosine(
-          as.numeric(to.plot.all.signatures.final[, ID89_ID83_connection_example$ID83_signature[
-            i
-          ]]),
-          as.numeric(to.plot.WGS_PCAWG_HMF_indels.catalog.no.polyT[, catalog])
-        ),
-        3
-      )
-      cat(paste0(
-        "\n\n Cosine similarity of 83-Type Signature vs Examplar: ",
-        cosine83,
-        "\n\n"
-      ))
-
-      ICAMS::PlotCatalog(to.plot.WGS_PCAWG_HMF_indels.catalog.no.polyT[,
-        ID89_ID83_connection_example$example_catalog[i],
-        drop = F
-      ])
-    } else {
-      cosine83 <- round(
-        lsa::cosine(
-          as.numeric(to.plot.all.signatures.final[, ID89_ID83_connection_example$ID83_signature[
-            i
-          ]]),
-          as.numeric(to.plot.WGS_PCAWG_HMF_indels.catalog[, catalog])
-        ),
-        3
-      )
-      cat(paste0(
-        "\n\n Cosine similarity of 83-Type Signature vs Examplar: ",
-        cosine83,
-        "\n\n"
-      ))
-
-      ICAMS::PlotCatalog(to.plot.WGS_PCAWG_HMF_indels.catalog[,
-        ID89_ID83_connection_example$example_catalog[i],
-        drop = F
-      ])
-    }
+```{r validate-precomputed-data}
+# Optional: Validate all data was computed correctly before rendering
+# This catches computation errors before they appear in plot rendering
+for (i in seq_along(all_signature_data)) {
+  sig <- all_signature_data[[i]]
+  if (is.na(sig$cosine89)) {
+    warning(paste("Missing cosine89 for:", sig$ID89signature))
   }
-  cat(paste0(
-    "\n\n### 83-type: ",
-    cosine83,
-    ", 89-type: ",
-    cosine1,
-    ", 476-type:",
-    cosine476,
-    "\n\n"
-  ))
+  if (is.na(sig$cosine83)) {
+    warning(paste("Missing cosine83 for:", sig$ID89signature))
+  }
 }
+```
 
+```{r render-all-sections, fig.width=19, fig.height=4, echo=FALSE, results="asis", warning=FALSE}
+# APPROACH 2: Use knit_child with a template for each signature section
+# Each iteration uses the child template, isolating errors to specific sections
+
+for (i in seq_along(all_signature_data)) {
+  # Set sig_data in the environment for the child template
+  sig_data <- all_signature_data[[i]]
+
+  # Render the child template for this signature
+  # Errors will reference _signature_section.Rmd with specific line numbers
+  res <- knitr::knit_child(
+    "_signature_section.Rmd",
+    envir = environment(),
+    quiet = TRUE
+  )
+  cat(res, sep = "\n")
+}
 ```
 
 
