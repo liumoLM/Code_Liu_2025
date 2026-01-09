@@ -1,5 +1,31 @@
 /* Custom styles for ID89/ID83 vignette */
 
+/* Narrower left TOC sidebar */
+.sidebar {
+  width: 180px !important;
+  min-width: 180px !important;
+  max-width: 180px !important;
+}
+
+.sidebar nav[role="doc-toc"] {
+  padding: 5px;
+}
+
+.sidebar .toc-actions,
+.sidebar #toc-title {
+  font-size: 0.9em;
+}
+
+.sidebar nav[role="doc-toc"] ul li a {
+  font-size: 0.85em;
+  padding: 3px 5px;
+}
+
+/* Ensure main content uses available space */
+.content {
+  max-width: none !important;
+}
+
 /* Hide the markdown heading text (it's shown in the styled div below)
    but keep the anchor for TOC navigation.
    Target only the h3 element, not the section wrapper */
