@@ -1,6 +1,18 @@
 # Helper functions for vignette.Rmd
 # These functions separate computation from plotting for easier debugging
 
+#' Format signature name with Greek letters
+#'
+#' Replaces _alpha with α and _beta with β in signature names
+#'
+#' @param name Character: the signature name
+#' @return Character: formatted name with Greek letters
+format_signature_name <- function(name) {
+  name <- gsub("_alpha", "α", name)
+  name <- gsub("_beta", "β", name)
+  name
+}
+
 #' Compute cosine similarities for a signature-catalog pair
 #'
 #' @param ID89signature Character: the ID89 signature name
@@ -28,6 +40,7 @@ compute_signature_data <- function(
   ID476_catalogs,
   assignment_matrix
 ) {
+  message("ID89signature = ", ID89signature)
   result <- list(
     ID89signature = ID89signature,
     catalog = catalog,
@@ -140,7 +153,7 @@ create_id89_plots <- function(
   # Plot 1: The signature itself
   plots$p1 <- plot_89(
     ID89_signatures[, sig_data$ID89signature, drop = FALSE],
-    text_size = 3,
+    text_size = 5,
     plot_title = sig_data$ID89signature,
     ylabel = "Props"
   )
@@ -148,7 +161,7 @@ create_id89_plots <- function(
   # Plot 2: The catalog spectrum
   plots$p2 <- plot_89(
     ID89_catalogs[, sig_data$catalog, drop = FALSE],
-    text_size = 3,
+    text_size = 5,
     plot_title = paste0(
       "Spectrum A: Mutational spectrum of ",
       sig_data$catalog,
@@ -163,7 +176,7 @@ create_id89_plots <- function(
   if (!sig_data$is_insdel15_16 && !is.null(sig_data$reconstructed_catalog)) {
     plots$p3 <- plot_89(
       sig_data$reconstructed_catalog,
-      text_size = 3,
+      text_size = 5,
       plot_title = paste0(
         "Spectrum B: Partial mutational spectrum of ",
         sig_data$catalog,
@@ -175,7 +188,7 @@ create_id89_plots <- function(
 
     plots$p4 <- plot_89(
       sig_data$diff_catalog,
-      text_size = 3,
+      text_size = 5,
       plot_title = paste0(
         "Mutations due to ",
         sig_data$ID89signature,
@@ -211,11 +224,12 @@ create_id476_plots <- function(
   if (sig_data$has_476_signature) {
     plots$p5 <- plot_476(
       ID476_signatures[, sig_data$ID89signature],
-      text_size = 3,
+      text_size = 5,
       plot_title = paste0(
         "476-Type Representation of ",
         sig_data$ID89signature
       ),
+      label_size = 2.5
       num_labels = 5,
       base_size = plot476_base_size,
       simplify_labels = plot476_simplify_labels
@@ -223,7 +237,7 @@ create_id476_plots <- function(
 
     plots$p6 <- plot_476(
       ID476_catalogs[, sig_data$catalog],
-      text_size = 3,
+      text_size = 5,
       plot_title = paste0(
         "476-Type Spectrum of ",
         sig_data$catalog
@@ -236,7 +250,7 @@ create_id476_plots <- function(
     # No extracted 476 signature, show catalog only
     plots$p5 <- plot_476(
       ID476_catalogs[, sig_data$catalog],
-      text_size = 3,
+      text_size = 5,
       plot_title = paste0(
         "476-Type Representation of the Supporting Genome ",
         sig_data$catalog
@@ -258,14 +272,19 @@ create_id476_plots <- function(
 #' @param use_html Logical: use HTML styling (for Quarto) or plain markdown
 #' @return Character string with markdown/HTML text
 generate_section_header <- function(sig_data, use_html = TRUE) {
+  # Format signature name with Greek letters
+  display_name <- format_signature_name(sig_data$ID89signature)
+
   if (use_html) {
     # Markdown heading for TOC entry, followed by styled content
     # The heading gets picked up by TOC, then we add styled div
     header <- paste0(
-      '\n\n### ', sig_data$ID89signature, ' {.signature-section}\n\n',
+      '\n\n### ',
+      display_name,
+      ' {.signature-section}\n\n',
       '<div class="signature-header">',
       '<span class="signature-name">',
-      sig_data$ID89signature,
+      display_name,
       '</span>',
       '</div>\n\n'
     )
@@ -314,7 +333,7 @@ generate_section_header <- function(sig_data, use_html = TRUE) {
     }
   } else {
     # Plain markdown fallback
-    header <- paste0("\n\n### ", sig_data$ID89signature, "\n")
+    header <- paste0("\n\n### ", display_name, "\n")
 
     if (sig_data$is_insdel15_16) {
       header <- paste0(
@@ -396,135 +415,4 @@ generate_section_footer <- function(sig_data, use_html = TRUE) {
       "\n\n---\n"
     )
   }
-}
-
-
-#' Render a complete signature section
-#'
-#' @param sig_data List returned from compute_signature_data
-#' @param ID89_signatures Data frame of ID89 signatures
-#' @param ID89_catalogs Data frame of ID89 catalogs
-#' @param ID83_signatures ICAMS catalog of ID83 signatures
-#' @param ID83_catalogs ICAMS catalog of ID83 catalogs
-#' @param ID83_catalogs_no_polyT ICAMS catalog with polyT removed
-#' @param ID476_signatures Data frame of ID476 signatures
-#' @param ID476_catalogs Data frame of ID476 catalogs
-#' @param plot89_height Unit for 89-type plot height
-#' @param plot476_height Unit for 476-type plot height
-#' @param plot476_base_size Base font size for 476 plots
-#' @param plot476_simplify_labels Logical for label simplification
-render_signature_section <- function(
-  sig_data,
-  ID89_signatures,
-  ID89_catalogs,
-  ID83_signatures,
-  ID83_catalogs,
-  ID83_catalogs_no_polyT,
-  ID476_signatures,
-  ID476_catalogs,
-  plot89_height,
-  plot476_height,
-  plot476_base_size,
-  plot476_simplify_labels
-) {
-  # Output header
-
-  cat(generate_section_header(sig_data))
-
-  # Create and display ID89 plots
-  id89_plots <- create_id89_plots(
-    sig_data,
-    ID89_signatures,
-    ID89_catalogs,
-    plot89_height
-  )
-
-  gridExtra::grid.arrange(
-    id89_plots$p1,
-    id89_plots$p2,
-    nrow = 1,
-    ncol = 2,
-    heights = plot89_height
-  )
-
-  # For non-InsDel15/16, show decomposition plots
-
-  if (!sig_data$is_insdel15_16 && !is.null(id89_plots$p3)) {
-    gridExtra::grid.arrange(
-      id89_plots$p3,
-      id89_plots$p4,
-      nrow = 1,
-      ncol = 2,
-      heights = plot89_height
-    )
-  }
-
-  # Create and display ID476 plots
-  id476_plots <- create_id476_plots(
-    sig_data,
-    ID476_signatures,
-    ID476_catalogs,
-    plot476_base_size,
-    plot476_simplify_labels
-  )
-
-  if (!is.null(id476_plots$p5)) {
-    if (sig_data$has_476_signature) {
-      cat(paste0(
-        "\n\nCosine similarity between 476-type signature and the exemplar: ",
-        sig_data$cosine476,
-        "\n\n"
-      ))
-    } else {
-      cat(paste0(
-        "\n\n476-Type ",
-        sig_data$ID89signature,
-        " was not found by de novo extraction. ",
-        "This is the 476-Type spectrum of ",
-        sig_data$catalog,
-        "\n\n"
-      ))
-    }
-    gridExtra::grid.arrange(
-      id476_plots$p5,
-      nrow = 1,
-      ncol = 1,
-      heights = plot476_height
-    )
-  }
-
-  if (!is.null(id476_plots$p6)) {
-    gridExtra::grid.arrange(
-      id476_plots$p6,
-      nrow = 1,
-      ncol = 1,
-      heights = plot476_height
-    )
-  }
-
-  # ID83 signature and catalog plots
-  cat(paste0(
-    "\n\n#### ",
-    sig_data$ID89signature,
-    " corresponds to the 83-type signature ",
-    sig_data$ID83signature,
-    "\n\n"
-  ))
-
-  ICAMS::PlotCatalog(ID83_signatures[, sig_data$ID83signature, drop = FALSE])
-
-  cat(paste0(
-    "\n\nCosine similarity of 83-Type Signature vs Exemplar: ",
-    sig_data$cosine83,
-    "\n\n"
-  ))
-
-  if (sig_data$is_polyT_removed) {
-    ICAMS::PlotCatalog(ID83_catalogs_no_polyT[, sig_data$catalog, drop = FALSE])
-  } else {
-    ICAMS::PlotCatalog(ID83_catalogs[, sig_data$catalog, drop = FALSE])
-  }
-
-  # Output footer with summary
-  cat(generate_section_footer(sig_data))
 }

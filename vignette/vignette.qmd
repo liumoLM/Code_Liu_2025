@@ -33,7 +33,7 @@ library(ggplot2)
 #| label: other-globals
 
 data_dir <- "../Manuscript_data/"
-plot476_base_size <- 20
+plot476_base_size <- 25
 plto476_simplify_labels <- FALSE
 plot476_height <- unit(5, "in")
 plot89_height <- unit(3, "in")
@@ -149,7 +149,7 @@ source("vignette_helpers.R")
 ```{r}
 #| label: precompute-all-data
 
-# APPROACH 3: Pre-compute all signature data before rendering
+# Pre-compute all signature data before rendering
 # This separates computation from plotting, making debugging easier
 
 all_signature_data <- lapply(
