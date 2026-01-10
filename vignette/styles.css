@@ -1,12 +1,6 @@
 /* Custom styles for ID89/ID83 vignette */
 
-/* Narrower left TOC sidebar */
-.sidebar {
-  width: 180px !important;
-  min-width: 180px !important;
-  max-width: 180px !important;
-}
-
+/* TOC sidebar styling (width controlled by YAML grid settings) */
 .sidebar nav[role="doc-toc"] {
   padding: 5px;
 }
@@ -43,19 +37,19 @@ h3.signature-section {
 
 /* Signature section header - white text on gray bar */
 .signature-header {
-  background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+  background: linear-gradient(135deg, #5a6778 0%, #4a5568 100%);
   color: white;
-  padding: 12px 20px;
+  padding: 10px 16px;
   margin: 40px 0 20px 0;
   border-radius: 6px;
-  font-size: 1.5em;
+  font-size: 1em;
   font-weight: 600;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 .signature-header .signature-name {
-  font-size: 1.2em;
-  font-weight: 700;
+  font-size: 1em;
+  font-weight: 600;
 }
 
 /* Subtitle info below the main header */
