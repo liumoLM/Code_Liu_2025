@@ -1,6 +1,5 @@
 ---
 title: "ID89 and ID83 vignette"
-date: today
 format:
   html:
     toc: true
@@ -9,15 +8,11 @@ format:
     toc-title: "Signatures"
     code-fold: true
     self-contained: true
-    css: styles.css
-    grid:
-      sidebar-width: 130px
-      body-width: 900px
-      gutter-width: 1rem
-      margin-width: 200px
+date: today
 execute:
   warning: false
   message: false
+css: styles.css
 ---
 
 ```{r}
@@ -32,8 +27,6 @@ library(ICAMS)
 library(mSigPlot)
 library(data.table)
 library(ggplot2)
-library(future)
-library(furrr)
 ```
 
 ```{r}
@@ -204,45 +197,17 @@ for (i in seq_along(all_signature_data)) {
 ```
 
 ```{r}
-#| label: generate-plots-parallel
-#| include: false
-
-# Generate all plots in parallel (10 workers)
-# This is the main performance optimization - plotting is done once upfront
-# Use local directory so plots persist for pandoc
-plot_dir <- "figure/parallel_plots"
-
-all_plot_paths <- generate_all_plots_parallel(
-  all_signature_data = all_signature_data,
-  ID89_signatures = to.plot.all.ID89.signatures.final,
-  ID89_catalogs = to.plot.all.ID89.catalogs,
-  ID83_signatures = to.plot.all.signatures.final,
-  ID83_catalogs = to.plot.WGS_PCAWG_HMF_indels.catalog,
-  ID83_catalogs_no_polyT = to.plot.WGS_PCAWG_HMF_indels.catalog.no.polyT,
-  ID476_signatures = final.Koh476.signatures,
-  ID476_catalogs = to.plot.all.ID476.catalogs,
-  plot_dir = plot_dir,
-  plot476_base_size = plot476_base_size,
-  plot476_label_size = plot476_label_size,
-  plot476_simplify_labels = plto476_simplify_labels,
-  n_workers = 10
-)
-
-message("All plots generated in: ", plot_dir)
-```
-
-```{r}
 #| label: render-all-sections
 #| output: asis
+#| fig-width: 19
+#| fig-height: 4
 #| echo: false
 
 # Each iteration uses the child template, isolating errors to specific sections
-# Plots are pre-generated, so this loop just inserts images (fast)
 
 for (i in seq_along(all_signature_data)) {
-  # Set sig_data and plot_paths in the environment for the child template
+  # Set sig_data in the environment for the child template
   sig_data <- all_signature_data[[i]]
-  plot_paths <- all_plot_paths[[i]]
 
   # Render the child template for this signature
   # Errors will reference _signature_section.qmd with specific line numbers
