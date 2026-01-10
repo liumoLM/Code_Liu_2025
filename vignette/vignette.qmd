@@ -1,5 +1,5 @@
 ---
-title: "ID89 and ID83 vignette"
+title: "Insertion and deletion mutational signatures"
 date: today
 format:
   html:
@@ -34,6 +34,7 @@ library(data.table)
 library(ggplot2)
 library(future)
 library(furrr)
+
 ```
 
 ```{r}
@@ -41,11 +42,20 @@ library(furrr)
 #| include: false
 
 data_dir <- "../Manuscript_data/"
-plot476_base_size <- 20
+plot476_base_size <- 25
 plot476_label_size <- 3
 plto476_simplify_labels <- FALSE
-plot476_height <- unit(5.5, "in")
-plot89_height <- unit(3, "in")
+
+ppar <- list(w476 = 19, h476 = 6, w89 = 24, h89 = 6, basesize89 = 17)
+
+getp <- function(parname) {
+  ppar[[parname]]
+}
+
+testfoo = "100%"
+
+# Scale factor for 476-type plots (1.0 = default, 1.4 = 40% bigger)
+plot476_scale <- 1.2
 ```
 
 ```{r}
@@ -74,7 +84,8 @@ to.plot.WGS_PCAWG_HMF_indels.catalog <- ICAMS::as.catalog(
   to.plot.WGS_PCAWG_HMF_indels.catalog[, -1],
   infer.rownames = TRUE
 )
-to.plot.WGS_PCAWG_HMF_indels.catalog.no.polyT <- to.plot.WGS_PCAWG_HMF_indels.catalog
+to.plot.WGS_PCAWG_HMF_indels.catalog.no.polyT <-
+  to.plot.WGS_PCAWG_HMF_indels.catalog
 to.plot.WGS_PCAWG_HMF_indels.catalog.no.polyT[c(12, 24), ] <- 0
 ```
 

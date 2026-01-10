@@ -1,4 +1,5 @@
-linters_with_defaults(
+lintr::linters_with_defaults(
   assignment_linter = NULL,
-  return_linter = NULL
+  return_linter = NULL,
+  object_name_linter = NULL
 )
