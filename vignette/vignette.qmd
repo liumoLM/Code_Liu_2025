@@ -46,7 +46,16 @@ plot476_base_size <- 25
 plot476_label_size <- 3
 plto476_simplify_labels <- FALSE
 
-ppar <- list(w476 = 19, h476 = 6, w89 = 24, h89 = 6, basesize89 = 17)
+ppar <- list(
+  w476 = 19,
+  h476 = 6,
+  w89 = 24,
+  h89 = 6,
+  basesize89 = 17,
+  w83 = 19,
+  h83 = 6,
+  basesize83 = 20
+)
 
 getp <- function(parname) {
   ppar[[parname]]

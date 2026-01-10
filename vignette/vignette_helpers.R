@@ -609,33 +609,37 @@ generate_plots_to_files <- function(
   }
 
   # ID83 signature (only if exists)
-  if (sig_data$has_83_signature) {
-    save_base_plot(
-      ICAMS::PlotCatalog(ID83_signatures[,
-        sig_data$ID83signature,
-        drop = FALSE
-      ]),
-      paths$id83_sig
+
+  p83 <- function(catalog, plot_title = NULL) {
+    mSigPlot::plot_83(
+      catalog,
+      plot_title = plot_title,
+      text_size = 5,
+      base_size = getp('basesize83')
     )
+  }
+  save83 = function(myplot, path) {
+    save_ggplot(myplot, path, width = getp('w83'), height = getp('h83'))
+  }
+
+  if (sig_data$has_83_signature) {
+    ptmp = p83(ID83_signatures[,
+      sig_data$ID83signature,
+      drop = FALSE
+    ])
+    save83(ptmp, paths$id83_sig)
   } else {
     paths$id83_sig <- NULL
   }
 
-  # ID83 catalog (always shown)
+  # ID83 spectrum catalog, always shown
   if (sig_data$is_polyT_removed) {
-    save_base_plot(
-      ICAMS::PlotCatalog(ID83_catalogs_no_polyT[,
-        sig_data$catalog,
-        drop = FALSE
-      ]),
-      paths$id83_catalog
-    )
+    cat83touse = ID83_catalogs_no_polyT
   } else {
-    save_base_plot(
-      ICAMS::PlotCatalog(ID83_catalogs[, sig_data$catalog, drop = FALSE]),
-      paths$id83_catalog
-    )
+    cat83touse = ID83_catalogs
   }
+  ptmp <- p83(cat83touse[, sig_data$catalog, drop = FALSE])
+  save83(ptmp, paths$id83_catalog)
 
   return(paths)
 }
