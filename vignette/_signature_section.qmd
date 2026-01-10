@@ -11,24 +11,20 @@ cat(generate_section_header(sig_data))
 
 ```{r}
 #| echo: false
+
+displayplot = function(mypath) {
+  cat(paste0("<ing src=\"", mypath, "\" style=\"width: ", getp('hw'), ";\" />"))
+}
+```
+
+```{r}
+#| echo: false
 #| output: asis
 
 # ID89 plots: signature and catalog (side by side)
 cat('<div style="display: flex; gap: 3px; margin-bottom: 6px;">\n')
-cat(paste0(
-  '<img src="',
-  plot_paths$id89_sig,
-  '" style="width: ',
-  testfoo,
-  ';" />\n'
-))
-cat(paste0(
-  '<img src="',
-  plot_paths$id89_catalog,
-  '" style="width: ',
-  testfoo,
-  ';" />\n'
-))
+displayplot(plot_paths$id89_sig)
+displayplot(plot_paths$id89_catalog)
 cat('</div>\n')
 ```
 
