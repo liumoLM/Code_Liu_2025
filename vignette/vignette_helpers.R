@@ -387,6 +387,7 @@ generate_section_header <- function(sig_data, use_html = TRUE) {
 #' @param use_html Logical: use HTML styling (for Quarto) or plain markdown
 #' @return Character string with markdown/HTML text
 generate_section_footer <- function(sig_data, use_html = TRUE) {
+
   cosine476_text <- if (is.na(sig_data$cosine476)) "N/A" else sig_data$cosine476
 
   if (use_html) {
@@ -419,4 +420,244 @@ generate_section_footer <- function(sig_data, use_html = TRUE) {
       "\n\n---\n"
     )
   }
+}
+
+
+#' Generate all plots for a signature and save to files
+#'
+#' @param sig_data List returned from compute_signature_data
+#' @param ID89_signatures Data frame of ID89 signatures
+#' @param ID89_catalogs Data frame of ID89 catalogs
+#' @param ID83_signatures ICAMS catalog of ID83 signatures
+#' @param ID83_catalogs ICAMS catalog of ID83 catalogs
+#' @param ID83_catalogs_no_polyT ICAMS catalog with polyT removed
+#' @param ID476_signatures Data frame of ID476 signatures
+#' @param ID476_catalogs Data frame of ID476 catalogs
+#' @param plot_dir Directory to save plots
+#' @param plot476_base_size Base font size for 476 plots
+#' @param plot476_label_size Label size for 476 plots
+#' @param plot476_simplify_labels Whether to simplify labels
+#' @return List with paths to all generated plot files
+generate_plots_to_files <- function(
+    sig_data,
+    ID89_signatures,
+    ID89_catalogs,
+    ID83_signatures,
+    ID83_catalogs,
+    ID83_catalogs_no_polyT,
+    ID476_signatures,
+    ID476_catalogs,
+    plot_dir,
+    plot476_base_size = 20,
+    plot476_label_size = 3,
+    plot476_simplify_labels = FALSE
+) {
+  # Create safe filename prefix from signature name
+  safe_name <- gsub("[^a-zA-Z0-9_]", "_", sig_data$ID89signature)
+
+  paths <- list(
+    id89_sig = file.path(plot_dir, paste0(safe_name, "_id89_sig.png")),
+    id89_catalog = file.path(plot_dir, paste0(safe_name, "_id89_catalog.png")),
+    id89_reconstructed = file.path(plot_dir, paste0(safe_name, "_id89_reconstructed.png")),
+    id89_diff = file.path(plot_dir, paste0(safe_name, "_id89_diff.png")),
+    id476_sig = file.path(plot_dir, paste0(safe_name, "_id476_sig.png")),
+    id476_catalog = file.path(plot_dir, paste0(safe_name, "_id476_catalog.png")),
+    id83_sig = file.path(plot_dir, paste0(safe_name, "_id83_sig.png")),
+    id83_catalog = file.path(plot_dir, paste0(safe_name, "_id83_catalog.png"))
+  )
+
+  # Helper to save ggplot
+  save_ggplot <- function(p, path, width = 19, height = 3) {
+    ggplot2::ggsave(path, p, width = width, height = height, dpi = 150, bg = "white")
+  }
+
+  # Helper to save base R plot (for ICAMS)
+  save_base_plot <- function(expr, path, width = 10, height = 4) {
+    png(path, width = width, height = height, units = "in", res = 150, bg = "white")
+    tryCatch({
+      force(expr)
+    }, finally = {
+      dev.off()
+    })
+  }
+
+  # ID89 Plot 1: Signature
+  p1 <- plot_89(
+    ID89_signatures[, sig_data$ID89signature, drop = FALSE],
+    text_size = 5,
+    plot_title = sig_data$ID89signature,
+    ylabel = "Props"
+  )
+  save_ggplot(p1, paths$id89_sig)
+
+  # ID89 Plot 2: Catalog
+  p2 <- plot_89(
+    ID89_catalogs[, sig_data$catalog, drop = FALSE],
+    text_size = 5,
+    plot_title = paste0(
+      "Spectrum A: Mutational spectrum of ",
+      sig_data$catalog,
+      " | Cosine Similarity to ",
+      sig_data$ID89signature,
+      " = ",
+      sig_data$cosine89
+    )
+  )
+  save_ggplot(p2, paths$id89_catalog)
+
+  # ID89 Plots 3 & 4: Decomposition (only for non-InsDel15/16)
+  if (!sig_data$is_insdel15_16 && !is.null(sig_data$reconstructed_catalog)) {
+    p3 <- plot_89(
+      sig_data$reconstructed_catalog,
+      text_size = 5,
+      plot_title = paste0(
+        "Spectrum B: Partial mutational spectrum of ",
+        sig_data$catalog,
+        " not using ",
+        sig_data$ID89signature
+      ),
+      setyaxis = max(sig_data$diff_catalog)
+    )
+    save_ggplot(p3, paths$id89_reconstructed)
+
+    p4 <- plot_89(
+      sig_data$diff_catalog,
+      text_size = 5,
+      plot_title = paste0(
+        "Mutations due to ",
+        sig_data$ID89signature,
+        " (A minus B) | Cosine similarity to ",
+        sig_data$ID89signature,
+        " = ",
+        sig_data$cosine89_diff
+      )
+    )
+    save_ggplot(p4, paths$id89_diff)
+  } else {
+    paths$id89_reconstructed <- NULL
+    paths$id89_diff <- NULL
+  }
+
+  # ID476 plots
+  p476 <- function(catalog, plot_title) {
+    plot_476(
+      catalog,
+      plot_title = plot_title,
+      text_size = 5,
+      label_size = plot476_label_size,
+      num_labels = 5,
+      base_size = plot476_base_size,
+      simplify_labels = plot476_simplify_labels
+    )
+  }
+
+  if (sig_data$has_476_signature) {
+    p5 <- p476(
+      ID476_signatures[, sig_data$ID89signature],
+      plot_title = paste0("476-Type Representation of ", sig_data$ID89signature)
+    )
+    save_ggplot(p5, paths$id476_sig, width = 19, height = 4)
+
+    p6 <- p476(
+      ID476_catalogs[, sig_data$catalog],
+      plot_title = paste0("476-Type Spectrum of ", sig_data$catalog)
+    )
+    save_ggplot(p6, paths$id476_catalog, width = 19, height = 4)
+  } else {
+    p5 <- p476(
+      ID476_catalogs[, sig_data$catalog],
+      plot_title = paste0(
+        "476-Type Representation of the Supporting Genome ",
+        sig_data$catalog
+      )
+    )
+    save_ggplot(p5, paths$id476_sig, width = 19, height = 4)
+    paths$id476_catalog <- NULL
+  }
+
+  # ID83 signature (only if exists)
+  if (sig_data$has_83_signature) {
+    save_base_plot(
+      ICAMS::PlotCatalog(ID83_signatures[, sig_data$ID83signature, drop = FALSE]),
+      paths$id83_sig
+    )
+  } else {
+    paths$id83_sig <- NULL
+  }
+
+  # ID83 catalog (always shown)
+  if (sig_data$is_polyT_removed) {
+    save_base_plot(
+      ICAMS::PlotCatalog(ID83_catalogs_no_polyT[, sig_data$catalog, drop = FALSE]),
+      paths$id83_catalog
+    )
+  } else {
+    save_base_plot(
+      ICAMS::PlotCatalog(ID83_catalogs[, sig_data$catalog, drop = FALSE]),
+      paths$id83_catalog
+    )
+  }
+
+  return(paths)
+}
+
+
+#' Generate all plots in parallel
+#'
+#' @param all_signature_data List of signature data from compute_signature_data
+#' @param ... Additional arguments passed to generate_plots_to_files
+#' @param n_workers Number of parallel workers (default 10)
+#' @return List of plot paths for each signature
+generate_all_plots_parallel <- function(
+    all_signature_data,
+    ID89_signatures,
+    ID89_catalogs,
+    ID83_signatures,
+    ID83_catalogs,
+    ID83_catalogs_no_polyT,
+    ID476_signatures,
+    ID476_catalogs,
+    plot_dir,
+    plot476_base_size = 20,
+    plot476_label_size = 3,
+    plot476_simplify_labels = FALSE,
+    n_workers = 10
+) {
+  # Create plot directory
+  dir.create(plot_dir, showWarnings = FALSE, recursive = TRUE)
+
+  # Set up parallel backend
+  future::plan(future::multisession, workers = n_workers)
+
+  # Generate plots in parallel
+  all_paths <- furrr::future_map(
+    all_signature_data,
+    function(sig_data) {
+      generate_plots_to_files(
+        sig_data = sig_data,
+        ID89_signatures = ID89_signatures,
+        ID89_catalogs = ID89_catalogs,
+        ID83_signatures = ID83_signatures,
+        ID83_catalogs = ID83_catalogs,
+        ID83_catalogs_no_polyT = ID83_catalogs_no_polyT,
+        ID476_signatures = ID476_signatures,
+        ID476_catalogs = ID476_catalogs,
+        plot_dir = plot_dir,
+        plot476_base_size = plot476_base_size,
+        plot476_label_size = plot476_label_size,
+        plot476_simplify_labels = plot476_simplify_labels
+      )
+    },
+    .options = furrr::furrr_options(
+      seed = TRUE,
+      packages = c("ggplot2", "ICAMS", "mSigPlot", "indelsig.tools.lib")
+    ),
+    .progress = TRUE
+  )
+
+  # Reset to sequential
+  future::plan(future::sequential)
+
+  names(all_paths) <- names(all_signature_data)
+  return(all_paths)
 }
