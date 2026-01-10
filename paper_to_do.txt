@@ -1,0 +1,80 @@
+﻿# Friday Evening
+
+Review table 1 column E --> need to write something about every entry
+
+# Steve before Friday evening
+
+Review the file correspondence_476_to_89_and_note.xlsx
+
+Check vignette RMD / HTML
+
+# Mo to do
+
+Drop Fig 9, draft a table with the information just 89-type
+
+Email willie about wild type 293t cell data
+
+
+# Steve to do
+
+
+Wait for fastqs from 293t cells to get to rozenlab, then upload to SRA
+
+Re-diff vignette .rmd / spelling examplar -> exe... / suppress x axis labels (use new mSigPlot code)
+
+Review ID10/C_ID10 -- our extraction got big green T/polyT insertion peak; ID10 has none, or 89/476 has some
+
+Add to vignette
+
+* Insdel4b The 89 type and 476 type extractions detect co-occurence of T insertions in long poly-T. This is a theme ....
+
+* Insdel5b <same text as 4b>
+
+
+
+# Waiting
+
+# Lower priority presentation issues
+
+Fig 6, legend and figure text
+
+Fig 3. get rid of all top colored bars in thumbnails
+
+Fig 2, get rid of top colored bars in thumbnails
+
+Fig 8 label highest peaks in panel A left side (83-type signatures)
+
+# Below here not organized
+
+drive shiny and vignettes off of same underlying data repository
+
+in vignette indicate where 476 was extracted; when extracted, do auto-conversion
+
+
+update the shiny – have function to generate plots before running
+
+STEVE MOVE ON TO NOVEL SIGS
+
+ID9 
+
+ID_C/C_ID13 … ATA → AA / ATTA → AA
+
+ID10/C_ID10 – need to discuss w/ Make this a note
+
+ID17 – see text – Mo check the hartwig samples pcawg extracted 17 from 2 stomach exomes, need to revist the top2a paper
+
+476 assignments? Would need to do some kind of subtraction to get the 476 signatures that we did not uses.
+
+
+476 → 89 and check correspondence? Mo to get the pseudo-89 signatures (signatures compressed from 476 to 89)
+
+Discordant exemplars for 89
+
+e.g. 1c, 1d
+
+fix decimal points in 89 plots, get rid of top bar by default
+
+
+
+
+
