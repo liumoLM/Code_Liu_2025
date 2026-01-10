@@ -134,9 +134,6 @@ if (sig_data$has_83_signature) {
     '\n\n<div class="signature-note">',
     'No corresponding 83-type signature found for ',
     sig_data$ID89signature,
-    ' (ID83signature: ',
-    sig_data$ID83signature,
-    ')',
     '</div>\n\n'
   ))
 }
@@ -170,11 +167,22 @@ cat(paste0(
 
 ```{r}
 #| echo: false
+#| output: asis
+
+# Header for exemplar 83-type spectrum
+cat(paste0(
+  '\n\n<p><strong>83-type spectrum of the exemplar ',
+  sig_data$catalog,
+  ':</strong></p>\n\n'
+))
+```
+
+```{r}
+#| echo: false
 #| fig-width: 10
 #| fig-height: 4
-#| eval: !expr 'sig_data$has_83_signature'
 
-# ID83 catalog plot (only if signature exists)
+# ID83 exemplar spectrum (always shown)
 if (sig_data$is_polyT_removed) {
   ICAMS::PlotCatalog(to.plot.WGS_PCAWG_HMF_indels.catalog.no.polyT[,
     sig_data$catalog,
