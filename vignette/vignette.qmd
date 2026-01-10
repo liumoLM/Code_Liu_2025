@@ -54,7 +54,10 @@ ppar <- list(
   basesize89 = 17,
   w83 = 19,
   h83 = 6,
-  basesize83 = 20
+  basesize83 = 20,
+
+  # Plot dimenskon for the html output
+  hw = "100%"
 )
 
 getp <- function(parname) {
