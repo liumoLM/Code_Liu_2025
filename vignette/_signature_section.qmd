@@ -120,22 +120,33 @@ if (!is.null(id476_plots$p6)) {
 #| echo: false
 #| output: asis
 
-cat(paste0(
-  '\n\n<div class="subsection-header">',
-  sig_data$ID89signature,
-  ' corresponds to the 83-type signature <strong>',
-  sig_data$ID83signature,
-  '</strong>',
-  '</div>\n\n'
-))
+if (sig_data$has_83_signature) {
+  cat(paste0(
+    '\n\n<div class="subsection-header">',
+    sig_data$ID89signature,
+    ' corresponds to the 83-type signature <strong>',
+    sig_data$ID83signature,
+    '</strong>',
+    '</div>\n\n'
+  ))
+} else {
+  cat(paste0(
+    '\n\n<div class="signature-note">',
+    'No corresponding 83-type signature found for ',
+    sig_data$ID89signature,
+    ' (ID83signature: ', sig_data$ID83signature, ')',
+    '</div>\n\n'
+  ))
+}
 ```
 
 ```{r}
 #| echo: false
 #| fig-width: 10
 #| fig-height: 4
+#| eval: !expr 'sig_data$has_83_signature'
 
-# ID83 signature plot
+# ID83 signature plot (only if signature exists)
 ICAMS::PlotCatalog(to.plot.all.signatures.final[,
   sig_data$ID83signature,
   drop = FALSE
@@ -145,6 +156,7 @@ ICAMS::PlotCatalog(to.plot.all.signatures.final[,
 ```{r}
 #| echo: false
 #| output: asis
+#| eval: !expr 'sig_data$has_83_signature'
 
 cat(paste0(
   '\n\n<p><strong>Cosine similarity between the 83-type signature and the exemplar:</strong> ',
@@ -158,8 +170,9 @@ cat(paste0(
 #| echo: false
 #| fig-width: 10
 #| fig-height: 4
+#| eval: !expr 'sig_data$has_83_signature'
 
-# ID83 catalog plot
+# ID83 catalog plot (only if signature exists)
 if (sig_data$is_polyT_removed) {
   ICAMS::PlotCatalog(to.plot.WGS_PCAWG_HMF_indels.catalog.no.polyT[,
     sig_data$catalog,

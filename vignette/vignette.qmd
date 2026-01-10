@@ -33,9 +33,10 @@ library(ggplot2)
 #| label: other-globals
 
 data_dir <- "../Manuscript_data/"
-plot476_base_size <- 25
+plot476_base_size <- 20
+plot476_label_size <- 3
 plto476_simplify_labels <- FALSE
-plot476_height <- unit(5, "in")
+plot476_height <- unit(5.5, "in")
 plot89_height <- unit(3, "in")
 
 print(getwd())
@@ -43,6 +44,7 @@ print(getwd())
 
 ```{r}
 #| label: get-data-1
+#| include: false
 
 ID89_ID83_connection_example <- fread(file.path(
   data_dir,
@@ -198,7 +200,6 @@ for (i in seq_along(all_signature_data)) {
 #| fig-height: 4
 #| echo: false
 
-# APPROACH 2: Use knitr::knit_child with a template for each signature section
 # Each iteration uses the child template, isolating errors to specific sections
 
 for (i in seq_along(all_signature_data)) {

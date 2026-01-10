@@ -48,7 +48,8 @@ compute_signature_data <- function(
     is_insdel15_16 = ID89signature %in% c("InsDel15", "InsDel16"),
     is_polyT_removed = ID83signature %in%
       c("C_ID7", "ID_J", "C_ID10", "ID_N", "ID_O"),
-    has_476_signature = ID89signature %in% colnames(ID476_signatures)
+    has_476_signature = ID89signature %in% colnames(ID476_signatures),
+    has_83_signature = ID83signature %in% colnames(ID83_signatures)
   )
 
   # Compute cosine89 (raw catalog vs signature)
@@ -122,13 +123,17 @@ compute_signature_data <- function(
       3
     )
   } else {
-    result$cosine83 <- round(
-      lsa::cosine(
-        as.numeric(ID83_signatures[, ID83signature]),
-        as.numeric(ID83_catalogs[, catalog])
-      ),
-      3
-    )
+    if (ID83signature %in% colnames(ID83_signatures)) {
+      result$cosine83 <- round(
+        lsa::cosine(
+          as.numeric(ID83_signatures[, ID83signature]),
+          as.numeric(ID83_catalogs[, catalog])
+        ),
+        3
+      )
+    } else {
+      result$cosine83 <- 0
+    }
   }
 
   return(result)
@@ -219,45 +224,44 @@ create_id476_plots <- function(
   plot476_base_size,
   plot476_simplify_labels
 ) {
+  p476 = function(catalog, plot_title) {
+    plot_476(
+      catalog,
+      plot_title = plot_title,
+      text_size = 5,
+      label_size = plot476_label_size,
+      num_labels = 5,
+      base_size = plot476_base_size,
+      simplify_labels = plot476_simplify_labels
+    )
+  }
+
   plots <- list()
 
   if (sig_data$has_476_signature) {
-    plots$p5 <- plot_476(
+    plots$p5 <- p476(
       ID476_signatures[, sig_data$ID89signature],
-      text_size = 5,
       plot_title = paste0(
         "476-Type Representation of ",
         sig_data$ID89signature
-      ),
-      label_size = 2.5
-      num_labels = 5,
-      base_size = plot476_base_size,
-      simplify_labels = plot476_simplify_labels
+      )
     )
 
-    plots$p6 <- plot_476(
+    plots$p6 <- p476(
       ID476_catalogs[, sig_data$catalog],
-      text_size = 5,
       plot_title = paste0(
         "476-Type Spectrum of ",
         sig_data$catalog
-      ),
-      num_labels = 5,
-      base_size = plot476_base_size,
-      simplify_labels = plot476_simplify_labels
+      )
     )
   } else {
     # No extracted 476 signature, show catalog only
-    plots$p5 <- plot_476(
+    plots$p5 <- p476(
       ID476_catalogs[, sig_data$catalog],
-      text_size = 5,
       plot_title = paste0(
         "476-Type Representation of the Supporting Genome ",
         sig_data$catalog
-      ),
-      num_labels = 5,
-      base_size = plot476_base_size,
-      simplify_labels = plot476_simplify_labels
+      )
     )
     plots$p6 <- NULL
   }
@@ -313,7 +317,7 @@ generate_section_header <- function(sig_data, use_html = TRUE) {
         header <- paste0(
           header,
           '<div class="signature-subtitle">',
-          '<strong>83-Type Signature:</strong> ',
+          '<strong>83-type signature:</strong> ',
           sig_data$ID83signature,
           '<br><strong>Supporting spectrum:</strong> ',
           sig_data$catalog,
@@ -338,7 +342,7 @@ generate_section_header <- function(sig_data, use_html = TRUE) {
     if (sig_data$is_insdel15_16) {
       header <- paste0(
         header,
-        "\n83-Type Signature: ",
+        "\n83-type signature: ",
         sig_data$ID83signature,
         "\n\nThe signature contributes all mutations of the example spectrum: ",
         sig_data$catalog,
@@ -355,7 +359,7 @@ generate_section_header <- function(sig_data, use_html = TRUE) {
       } else {
         header <- paste0(
           header,
-          "\n83-Type Signature: ",
+          "\n83-type signature: ",
           sig_data$ID83signature,
           "\n\nSupporting spectrum: ",
           sig_data$catalog,
@@ -366,8 +370,8 @@ generate_section_header <- function(sig_data, use_html = TRUE) {
       if (sig_data$ID89signature == "InsDel_N") {
         header <- paste0(
           header,
-          "\nInsDel_N is identical to InsDel_J in 89-Type representation, ",
-          "but different in 476-Type representation\n"
+          "\nInsDel_N is identical to InsDel_J in 89-type representation, ",
+          "but different in 476-type representation\n"
         )
       }
     }
