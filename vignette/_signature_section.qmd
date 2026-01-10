@@ -52,7 +52,7 @@ if (!is.null(id89_plots$p3)) {
 
 ```{r}
 #| echo: false
-#| #| output: asis
+#| output: asis
 
 # 476-type section header
 if (sig_data$has_476_signature) {
@@ -134,7 +134,9 @@ if (sig_data$has_83_signature) {
     '\n\n<div class="signature-note">',
     'No corresponding 83-type signature found for ',
     sig_data$ID89signature,
-    ' (ID83signature: ', sig_data$ID83signature, ')',
+    ' (ID83signature: ',
+    sig_data$ID83signature,
+    ')',
     '</div>\n\n'
   ))
 }

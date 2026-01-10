@@ -31,6 +31,7 @@ library(ggplot2)
 
 ```{r}
 #| label: other-globals
+#| include: false
 
 data_dir <- "../Manuscript_data/"
 plot476_base_size <- 20
@@ -38,8 +39,6 @@ plot476_label_size <- 3
 plto476_simplify_labels <- FALSE
 plot476_height <- unit(5.5, "in")
 plot89_height <- unit(3, "in")
-
-print(getwd())
 ```
 
 ```{r}
@@ -124,6 +123,7 @@ ID89.mSigAct.assignment <- read.delim(
 
 ```{r}
 #| label: setup5
+#| include: false
 
 final.Koh476.signatures <- as.data.frame(data.table::fread(
   file.path(
@@ -143,6 +143,7 @@ to.plot.all.ID476.catalogs <- to.plot.all.ID476.catalogs[, -1]
 
 ```{r}
 #| label: load-helpers
+#| include: false
 
 # Load helper functions for modular processing
 source("vignette_helpers.R")
@@ -150,6 +151,7 @@ source("vignette_helpers.R")
 
 ```{r}
 #| label: precompute-all-data
+#| include: false
 
 # Pre-compute all signature data before rendering
 # This separates computation from plotting, making debugging easier
@@ -179,6 +181,7 @@ names(all_signature_data) <- ID89_ID83_connection_example$ID89_signature
 
 ```{r}
 #| label: validate-precomputed-data
+#| include: false
 
 # Validate all data was computed correctly before rendering
 # This catches computation errors before they appear in plot rendering
