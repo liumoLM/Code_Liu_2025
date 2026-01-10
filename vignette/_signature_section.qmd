@@ -5,32 +5,48 @@
 
 # This child template expects the following variables in the environment:
 # - sig_data: List from compute_signature_data()
-# - plot_paths: List of paths to pre-generated plot files
+# - All the data frames/catalogs needed for plotting
 
 cat(generate_section_header(sig_data))
 ```
 
 ```{r}
 #| echo: false
-#| output: asis
+#| fig-width: 19
+#| fig-height: 3
 
-# ID89 plots: signature and catalog (side by side)
-cat('<div style="display: flex; gap: 3px; margin-bottom: 6px;">\n')
-cat(paste0('<img src="', plot_paths$id89_sig, '" style="width: 50%;" />\n'))
-cat(paste0('<img src="', plot_paths$id89_catalog, '" style="width: 50%;" />\n'))
-cat('</div>\n')
+# ID89 plots: signature and catalog
+id89_plots <- create_id89_plots(
+  sig_data,
+  to.plot.all.ID89.signatures.final,
+  to.plot.all.ID89.catalogs,
+  plot89_height
+)
+
+gridExtra::grid.arrange(
+  id89_plots$p1,
+  id89_plots$p2,
+  nrow = 1,
+  ncol = 2,
+  heights = plot89_height
+)
 ```
 
 ```{r}
 #| echo: false
-#| output: asis
+#| fig-width: 19
+#| fig-height: 3
+#| eval: !expr '!sig_data$is_insdel15_16'
 
 # Decomposition plots (only for non-InsDel15/16)
-if (!is.null(plot_paths$id89_reconstructed) && !is.null(plot_paths$id89_diff)) {
-  cat('<div style="display: flex; gap: 3px; margin-bottom: 6px;">\n')
-  cat(paste0('<img src="', plot_paths$id89_reconstructed, '" style="width: 50%;" />\n'))
-  cat(paste0('<img src="', plot_paths$id89_diff, '" style="width: 50%;" />\n'))
-  cat('</div>\n')
+if (!is.null(id89_plots$p3)) {
+  gridExtra::grid.arrange(
+    id89_plots$p3,
+    id89_plots$p4,
+    nrow = 1,
+    ncol = 2,
+    heights = plot89_height
+  )
 }
 ```
 
@@ -61,19 +77,42 @@ if (sig_data$has_476_signature) {
 
 ```{r}
 #| echo: false
-#| output: asis
+#| fig-width: 19
+#| fig-height: 4
 
-# ID476 signature plot
-cat(paste0('<img src="', plot_paths$id476_sig, '" style="width: 100%; margin-bottom: 6px;" />\n'))
+# ID476 plots
+id476_plots <- create_id476_plots(
+  sig_data,
+  final.Koh476.signatures,
+  to.plot.all.ID476.catalogs,
+  plot476_base_size,
+  plto476_simplify_labels
+)
+
+if (!is.null(id476_plots$p5)) {
+  gridExtra::grid.arrange(
+    id476_plots$p5,
+    nrow = 1,
+    ncol = 1,
+    heights = plot476_height
+  )
+}
 ```
 
 ```{r}
 #| echo: false
-#| output: asis
+#| fig-width: 19
+#| fig-height: 4
+#| eval: !expr 'sig_data$has_476_signature'
 
-# ID476 catalog plot (only if signature exists)
-if (!is.null(plot_paths$id476_catalog)) {
-  cat(paste0('<img src="', plot_paths$id476_catalog, '" style="width: 100%; margin-bottom: 6px;" />\n'))
+# Second 476 plot (catalog) - only if signature exists
+if (!is.null(id476_plots$p6)) {
+  gridExtra::grid.arrange(
+    id476_plots$p6,
+    nrow = 1,
+    ncol = 1,
+    heights = plot476_height
+  )
 }
 ```
 
@@ -102,27 +141,28 @@ if (sig_data$has_83_signature) {
 
 ```{r}
 #| echo: false
-#| output: asis
+#| fig-width: 10
+#| fig-height: 4
+#| eval: !expr 'sig_data$has_83_signature'
 
 # ID83 signature plot (only if signature exists)
-if (!is.null(plot_paths$id83_sig)) {
-  cat(paste0('<img src="', plot_paths$id83_sig, '" style="width: 60%; margin-bottom: 6px;" />\n'))
-}
+ICAMS::PlotCatalog(to.plot.all.signatures.final[,
+  sig_data$ID83signature,
+  drop = FALSE
+])
 ```
 
 ```{r}
 #| echo: false
 #| output: asis
+#| eval: !expr 'sig_data$has_83_signature'
 
-# Cosine similarity text (only if signature exists)
-if (sig_data$has_83_signature) {
-  cat(paste0(
-    '\n\n<p><strong>Cosine similarity between the 83-type signature and the exemplar:</strong> ',
-    '<span class="cosine-value">',
-    sig_data$cosine83,
-    '</span></p>\n\n'
-  ))
-}
+cat(paste0(
+  '\n\n<p><strong>Cosine similarity between the 83-type signature and the exemplar:</strong> ',
+  '<span class="cosine-value">',
+  sig_data$cosine83,
+  '</span></p>\n\n'
+))
 ```
 
 ```{r}
@@ -139,10 +179,21 @@ cat(paste0(
 
 ```{r}
 #| echo: false
-#| output: asis
+#| fig-width: 10
+#| fig-height: 4
 
 # ID83 exemplar spectrum (always shown)
-cat(paste0('<img src="', plot_paths$id83_catalog, '" style="width: 60%; margin-bottom: 6px;" />\n'))
+if (sig_data$is_polyT_removed) {
+  ICAMS::PlotCatalog(to.plot.WGS_PCAWG_HMF_indels.catalog.no.polyT[,
+    sig_data$catalog,
+    drop = FALSE
+  ])
+} else {
+  ICAMS::PlotCatalog(to.plot.WGS_PCAWG_HMF_indels.catalog[,
+    sig_data$catalog,
+    drop = FALSE
+  ])
+}
 ```
 
 ```{r}
