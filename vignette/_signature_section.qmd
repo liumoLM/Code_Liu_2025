@@ -1,4 +1,3 @@
-
 ```{r}
 #| echo: false
 #| output: asis
@@ -16,8 +15,20 @@ cat(generate_section_header(sig_data))
 
 # ID89 plots: signature and catalog (side by side)
 cat('<div style="display: flex; gap: 3px; margin-bottom: 6px;">\n')
-cat(paste0('<img src="', plot_paths$id89_sig, '" style="width: 50%;" />\n'))
-cat(paste0('<img src="', plot_paths$id89_catalog, '" style="width: 50%;" />\n'))
+cat(paste0(
+  '<img src="',
+  plot_paths$id89_sig,
+  '" style="width: ',
+  testfoo,
+  ';" />\n'
+))
+cat(paste0(
+  '<img src="',
+  plot_paths$id89_catalog,
+  '" style="width: ',
+  testfoo,
+  ';" />\n'
+))
 cat('</div>\n')
 ```
 
@@ -28,8 +39,20 @@ cat('</div>\n')
 # Decomposition plots (only for non-InsDel15/16)
 if (!is.null(plot_paths$id89_reconstructed) && !is.null(plot_paths$id89_diff)) {
   cat('<div style="display: flex; gap: 3px; margin-bottom: 6px;">\n')
-  cat(paste0('<img src="', plot_paths$id89_reconstructed, '" style="width: 50%;" />\n'))
-  cat(paste0('<img src="', plot_paths$id89_diff, '" style="width: 50%;" />\n'))
+  cat(paste0(
+    '<img src="',
+    plot_paths$id89_reconstructed,
+    '" style="width: ',
+    testfoo,
+    ';" />\n'
+  ))
+  cat(paste0(
+    '<img src="',
+    plot_paths$id89_diff,
+    '" style="width: ',
+    testfoo,
+    ';" />\n'
+  ))
   cat('</div>\n')
 }
 ```
@@ -64,7 +87,11 @@ if (sig_data$has_476_signature) {
 #| output: asis
 
 # ID476 signature plot
-cat(paste0('<img src="', plot_paths$id476_sig, '" style="width: 100%; margin-bottom: 6px;" />\n'))
+cat(paste0(
+  '<img src="',
+  plot_paths$id476_sig,
+  '" style="width: 100%; margin-bottom: 6px;" />\n'
+))
 ```
 
 ```{r}
@@ -73,7 +100,11 @@ cat(paste0('<img src="', plot_paths$id476_sig, '" style="width: 100%; margin-bot
 
 # ID476 catalog plot (only if signature exists)
 if (!is.null(plot_paths$id476_catalog)) {
-  cat(paste0('<img src="', plot_paths$id476_catalog, '" style="width: 100%; margin-bottom: 6px;" />\n'))
+  cat(paste0(
+    '<img src="',
+    plot_paths$id476_catalog,
+    '" style="width: 100%; margin-bottom: 6px;" />\n'
+  ))
 }
 ```
 
@@ -106,7 +137,11 @@ if (sig_data$has_83_signature) {
 
 # ID83 signature plot (only if signature exists)
 if (!is.null(plot_paths$id83_sig)) {
-  cat(paste0('<img src="', plot_paths$id83_sig, '" style="width: 60%; margin-bottom: 6px;" />\n'))
+  cat(paste0(
+    '<img src="',
+    plot_paths$id83_sig,
+    '" style="width: 60%; margin-bottom: 6px;" />\n'
+  ))
 }
 ```
 
@@ -142,7 +177,11 @@ cat(paste0(
 #| output: asis
 
 # ID83 exemplar spectrum (always shown)
-cat(paste0('<img src="', plot_paths$id83_catalog, '" style="width: 60%; margin-bottom: 6px;" />\n'))
+cat(paste0(
+  '<img src="',
+  plot_paths$id83_catalog,
+  '" style="width: 60%; margin-bottom: 6px;" />\n'
+))
 ```
 
 ```{r}
