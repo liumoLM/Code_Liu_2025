@@ -91,40 +91,64 @@ compute_signature_data <- function(
       as.numeric(ID89_catalogs[, exemplar_id])
     )
 
+  # Assert that all signatures in assignment matrix exist in signature matrix
+  missing_sigs <- setdiff(
+    row.names(assignment_matrix),
+    colnames(ID89_signatures)
+  )
+  if (length(missing_sigs) > 0) {
+    stop(
+      "dim assignment matrix ",
+      dim(assignment_matrix),
+      "Assignment matrix has signatures not in signature matrix: ",
+      paste(missing_sigs, collapse = ", ")
+    )
+  }
+
   # For non-InsDel15/16, compute the decomposition
   if (!result$is_insdel15_16) {
-    # Get assignment for this catalog
-    assignment <- assignment_matrix[, exemplar_id, drop = FALSE]
+    # Find signatures present in both the signature matrix and assignment matrix
+    common_sigs <- intersect(
+      colnames(ID89_signatures),
+      row.names(assignment_matrix)
+    )
+
+    # Get assignment for this catalog, filtered to common signatures
+    assignment <- assignment_matrix[common_sigs, exemplar_id, drop = FALSE]
 
     # Zero out the current signature to get "other signatures" contribution
     assignment_others <- assignment
-    assignment_others[
-      which(row.names(assignment_matrix) == ID89signature),
-    ] <- 0
+    if (ID89signature %in% common_sigs) {
+      assignment_others[ID89signature, ] <- 0
+    }
 
     # Reconstruct catalog without this signature
-    # Using columns 1:44 and 46 (excluding column 45)
-    result$reconstructed_catalog <- as.matrix(ID89_signatures[, c(
-      1:44,
-      46
-    )]) %*%
+    # Use common signature names to ensure alignment
+    result$residual_spectrum <- as.matrix(
+      ID89_signatures[, common_sigs]
+    ) %*%
       as.matrix(assignment_others)
 
     # Difference = mutations attributed to this signature
-    result$diff_catalog <- ID89_catalogs[, exemplar_id, drop = FALSE] -
-      result$reconstructed_catalog
-    result$diff_catalog[result$diff_catalog < 0] <- 0
+    result$target_sig_partial_spectrum <- ID89_catalogs[,
+      exemplar_id,
+      drop = FALSE
+    ] -
+      result$residual_spectrum
+    result$target_sig_partial_spectrum[
+      result$target_sig_partial_spectrum < 0
+    ] <- 0
 
     # Cosine of diff vs signature
     result$cosine89_diff <-
       lsa::cosine(
         as.numeric(ID89_signatures[, ID89signature]),
-        as.numeric(as.matrix(result$diff_catalog))
+        as.numeric(as.matrix(result$target_sig_partial_spectrum))
       )
   } else {
     result$cosine89_diff <- NA
-    result$reconstructed_catalog <- NULL
-    result$diff_catalog <- NULL
+    result$residual_spectrum <- NULL
+    result$target_sig_partial_spectrum <- NULL
   }
 
   # Compute cosine476
@@ -316,11 +340,14 @@ generate_plots_to_files <- function(
   paths <- list(
     id89_sig = file.path(plot_dir, paste0(safe_name, "_id89_sig.png")),
     id89_catalog = file.path(plot_dir, paste0(safe_name, "_id89_catalog.png")),
-    id89_reconstructed = file.path(
+    id89_residual = file.path(
       plot_dir,
-      paste0(safe_name, "_id89_reconstructed.png")
+      paste0(safe_name, "_id89_residual.png")
     ),
-    id89_diff = file.path(plot_dir, paste0(safe_name, "_id89_diff.png")),
+    id89_target_sig_partial_spectrum = file.path(
+      plot_dir,
+      paste0(safe_name, "_id89_target_sig_partial_spectrum.png")
+    ),
     id476_sig = file.path(plot_dir, paste0(safe_name, "_id476_sig.png")),
     id476_catalog = file.path(
       plot_dir,
@@ -370,48 +397,52 @@ generate_plots_to_files <- function(
     catalogtoplot,
     plot_title = paste0(
       "Spectrum A: Mutational spectrum of ",
-      sig_data$catalog,
-      " | Cosine Similarity to ",
-      sig_data$ID89signature,
-      " = ",
-      sig_data$cosine89
+      sig_data$catalog
     ),
+    # " | Cosine Similarity to ",
+    # sig_data$ID89signature,
+    # " = ",
+    # sig_data$cosine89
     setyaxis = ymax
   )
   save89(p2, paths$id89_catalog)
 
   # ID89 Plots 3 & 4: Decomposition (only for non-InsDel15/16)
-  if (!sig_data$is_insdel15_16 && !is.null(sig_data$reconstructed_catalog)) {
+  if (!sig_data$is_insdel15_16 && !is.null(sig_data$residual_spectrum)) {
+    target_sig_title <- paste0(
+      "Spectrum B: Partial mutational spectrum of ",
+      sig_data$catalog,
+      " due to ",
+      sig_data$ID89signature
+    )
+
+    residual_title <- paste0(
+      "Remaining mutations in ",
+      sig_data$catalog,
+      " not due to ",
+      sig_data$ID89signature,
+      " (A minus B) | Cosine similarity to ",
+      sig_data$ID89signature,
+      " = ",
+      sig_data$cosine89_diff
+    )
+
     p3 <- p89(
-      sig_data$reconstructed_catalog,
-      plot_title = paste0(
-        "Spectrum B: Partial mutational spectrum of ",
-        sig_data$catalog,
-        " due to ",
-        sig_data$ID89signature
-      ),
+      sig_data$residual_spectrum,
+      plot_title = residual_title,
       setyaxis = ymax
     )
-    save89(p3, paths$id89_reconstructed)
+    save89(p3, paths$id89_residual)
 
     p4 <- p89(
-      sig_data$diff_catalog,
-      plot_title = paste0(
-        "Remaining mutations in ",
-        sig_data$catalog,
-        " not due to ",
-        sig_data$ID89signature,
-        " (A minus B) | Cosine similarity to ",
-        sig_data$ID89signature,
-        " = ",
-        sig_data$cosine89_diff
-      ),
+      sig_data$target_sig_partial_spectrum,
+      plot_title = target_sig_title,
       setyaxis = ymax
     )
-    save89(p4, paths$id89_diff)
+    save89(p4, paths$id89_target_sig_partial_spectrum)
   } else {
-    paths$id89_reconstructed <- NULL
-    paths$id89_diff <- NULL
+    paths$id89_residual <- NULL
+    paths$id89_target_sig_partial_spectrum <- NULL
   }
 
   # ID476 plots
@@ -652,11 +683,14 @@ reconstruct_plot_paths <- function(signature_names, plot_dir) {
         plot_dir,
         paste0(safe_name, "_id89_catalog.png")
       ),
-      id89_reconstructed = file.path(
+      id89_residual = file.path(
         plot_dir,
-        paste0(safe_name, "_id89_reconstructed.png")
+        paste0(safe_name, "_id89_residual.png")
       ),
-      id89_diff = file.path(plot_dir, paste0(safe_name, "_id89_diff.png")),
+      id89_target_sig_partial_spectrum = file.path(
+        plot_dir,
+        paste0(safe_name, "_id89_target_sig_partial_spectrum.png")
+      ),
       id476_sig = file.path(plot_dir, paste0(safe_name, "_id476_sig.png")),
       id476_catalog = file.path(
         plot_dir,

@@ -54,14 +54,12 @@ cat('</div>\n')
 #| output: asis
 
 # Decomposition plots (only for non-InsDel15/16)
-if (!is.null(plot_paths$id89_reconstructed) && !is.null(plot_paths$id89_diff)) {
-  cat('<div style="display: gap: 3px; margin-bottom: 6px;">\n')
-  displayplot(plot_paths$id89_reconstructed, getp("hw89"))
-  # cat("</div>\n")
-
-  # cat('<div style="display: flex; gap: 3px; margin-bottom: 6px;">\n')
-  displayplot(plot_paths$id89_diff, getp("hw89"))
-  cat('</div>\n')
+if (
+  !is.null(plot_paths$id89_residual) &&
+    !is.null(plot_paths$id89_target_sig_partial_spectrum)
+) {
+  displayplot(plot_paths$id89_target_sig_partial_spectrum, getp("hw89"))
+  displayplot(plot_paths$id89_residual, getp("hw89"))
 }
 ```
 
