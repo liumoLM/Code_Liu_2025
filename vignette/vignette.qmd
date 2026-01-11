@@ -63,7 +63,9 @@ ppar <- list(
   # Plot scaling for the html output
   hw = "100%", # Default
   hw89 = "80%",
-  hw83 = "80%"
+  hw83 = "80%",
+
+  extra89y = 1.1
 )
 
 getp <- function(parname) {
