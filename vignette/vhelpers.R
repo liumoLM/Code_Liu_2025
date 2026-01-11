@@ -200,24 +200,13 @@ generate_section_header <- function(sig_data, use_html = TRUE) {
         '</div>\n\n'
       )
     } else {
-      if (sig_data$is_polyT_removed) {
-        header <- paste0(
-          header,
-          '<div class="signature-subtitle">',
-          firsttext,
-          sig_data$catalog,
-          '<br><em>(Deletions and insertions in long poly T tracts were removed from the Indel83 spectrum)</em>',
-          '</div>\n\n'
-        )
-      } else {
-        header <- paste0(
-          header,
-          '<div class="signature-subtitle">',
-          firsttext,
-          sig_data$ID83signature,
-          '</div>\n\n'
-        )
-      }
+      header <- paste0(
+        header,
+        '<div class="signature-subtitle">',
+        firsttext,
+        sig_data$ID83signature,
+        '</div>\n\n'
+      )
 
       if (sig_data$ID89signature == "InsDel_N") {
         header <- paste0(
@@ -243,23 +232,14 @@ generate_section_header <- function(sig_data, use_html = TRUE) {
         "\n\n"
       )
     } else {
-      if (sig_data$is_polyT_removed) {
-        header <- paste0(
-          header,
-          "\n\n#### Supporting spectrum (deletions and insertions in long poly T tracts were removed from the Indel83 spectrum): ",
-          sig_data$catalog,
-          "\n\n"
-        )
-      } else {
-        header <- paste0(
-          header,
-          "\n83-type signature: ",
-          sig_data$ID83signature,
-          "\n\nSupporting spectrum: ",
-          sig_data$catalog,
-          "\n\n"
-        )
-      }
+      header <- paste0(
+        header,
+        "\n83-type signature: ",
+        sig_data$ID83signature,
+        "\n\nSupporting spectrum: ",
+        sig_data$catalog,
+        "\n\n"
+      )
 
       if (sig_data$ID89signature == "InsDel_N") {
         header <- paste0(
