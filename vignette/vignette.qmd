@@ -188,7 +188,7 @@ to.plot.all.ID476.catalogs <- to.plot.all.ID476.catalogs[, -1]
 #| include: false
 
 # Load helper functions for modular processing
-source("vignette_helpers.R")
+source("vhelpers.R")
 ```
 
 ```{r}

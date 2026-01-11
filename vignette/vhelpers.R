@@ -13,6 +13,15 @@ format_signature_name <- function(name) {
   name
 }
 
+#' Create a fenced div with a style class
+#'
+#' @param txt Character: the text content for the div
+#' @param style Character: the CSS class for the div (default ".callout-note")
+#' @return Character string with fenced div markdown
+fenced_div <- function(txt, style = ".callout-note") {
+  paste0('\n\n::: {', style, '}\n', txt, '\n:::\n\n')
+}
+
 #' Compute cosine similarities for a signature-catalog pair
 #'
 #' @param ID89signature Character: the ID89 signature name
@@ -196,10 +205,10 @@ generate_section_header <- function(sig_data, use_html = TRUE) {
       if (sig_data$ID89signature == "InsDel_N") {
         header <- paste0(
           header,
-          '<div class="signature-note">',
-          'InsDel_N is identical to InsDel_J in 89-Type representation, ',
-          'but different in 476-Type representation.',
-          '</div>\n\n'
+          fenced_div(
+            'InsDel_N is identical to InsDel_J in 89-Type representation, but different in 476-Type representation.',
+            style = ".callout-note"
+          )
         )
       }
     }
