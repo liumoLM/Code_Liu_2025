@@ -6,13 +6,7 @@
 # - sig_data: List from compute_signature_data()
 # - plot_paths: List of paths to pre-generated plot files
 
-cat('\n\n# ', format_signature_name(sig_data$ID89signature), ' {.signature-section}\n\n',
-    '<div class="signature-header">',
-    '<span class="signature-name">',
-    format_signature_name(sig_data$ID89signature),
-    '</span>',
-    '</div>\n\n',
-    sep = '')
+cat('\n\n# ', format_signature_name(sig_data$ID89signature), ' {.signature-section}\n\n', sep = '')
 cat(generate_section_header(sig_data))
 ```
 

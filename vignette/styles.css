@@ -25,23 +25,8 @@ p {
   max-width: none !important;
 }
 
-/* Hide the markdown heading text (it's shown in the styled div below)
-   but keep the anchor for TOC navigation.
-   Target only the h1 element, not the section wrapper */
-h1.signature-section {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
 /* Signature section header - white text on gray bar */
-.signature-header {
+h1.signature-section {
   background: linear-gradient(135deg, #5a6778 0%, #4a5568 100%);
   color: white;
   padding: 10px 16px;
@@ -50,11 +35,6 @@ h1.signature-section {
   font-size: 1em;
   font-weight: 600;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-}
-
-.signature-header .signature-name {
-  font-size: 1em;
-  font-weight: 600;
 }
 
 /* Subtitle info below the main header */
