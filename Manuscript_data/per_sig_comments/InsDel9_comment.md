@@ -1,4 +1,0 @@
-We believe that the signature C_ID9 that we extracted corresponds to COSMIC signature ID9, even though the two signature differ in several respects.  Most prominently, C_ID9 has a large proportion of deletions of single thymines from poly-T tracts longer than 5 bases, which ID9 lacks (Figure S1). 
-
-**** However Koh, Nanda, et al.'s extraction from 89-type spectra and our extraction from type-476 spectra indicate > 3% of indels are insertions of single thymines. <change to single thymines in 6+> There are analogous patterns for insertions and deletions of longer sequences which are present in C_ID9 and in extractions from 89-type and 476-type spectra, which would seem to support C_ID9 versus ID9. 
-Possible ABPOBEC assocation XCT -> XT deletions
