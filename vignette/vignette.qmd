@@ -46,7 +46,7 @@ data_dir <- "../Manuscript_data/"
 # Set to TRUE to force regeneration, otherwise the code
 # will use check_plot_cache to see if the cache is still
 # up-to-date and update if necessary (see below)
-REGENERATE_PLOTS <- FALSE
+REGENERATE_PLOTS <- TRUE # FALSE
 
 plot476_base_size <- 25
 plot476_label_size <- 3
