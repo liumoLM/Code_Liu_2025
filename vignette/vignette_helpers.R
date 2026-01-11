@@ -386,7 +386,11 @@ generate_section_header <- function(sig_data, use_html = TRUE) {
 #' @param use_html Logical: use HTML styling (for Quarto) or plain markdown
 #' @return Character string with markdown/HTML text
 generate_section_footer <- function(sig_data, use_html = TRUE) {
-  cosine476_text <- if (is.na(sig_data$cosine476)) "N/A" else as.character(sig_data$cosine476)
+  cosine476_text <- if (is.na(sig_data$cosine476)) {
+    "N/A"
+  } else {
+    as.character(sig_data$cosine476)
+  }
 
   df <- data.frame(
     `83-type` = sig_data$cosine83,
@@ -537,7 +541,7 @@ generate_plots_to_files <- function(
       plot_title = paste0(
         "Spectrum B: Partial mutational spectrum of ",
         sig_data$catalog,
-        " not using ",
+        " due to ",
         sig_data$ID89signature
       )
     )
@@ -546,7 +550,9 @@ generate_plots_to_files <- function(
     p4 <- p89(
       sig_data$diff_catalog,
       plot_title = paste0(
-        "Mutations due to ",
+        "Remaining mutations in ",
+        sig_data$catalog,
+        "not due to ",
         sig_data$ID89signature,
         " (A minus B) | Cosine similarity to ",
         sig_data$ID89signature,
@@ -554,7 +560,7 @@ generate_plots_to_files <- function(
         sig_data$cosine89_diff
       )
     )
-    save89(p4, paths$id89_diff)
+    save89(p4, paths$id89_diff)\
   } else {
     paths$id89_reconstructed <- NULL
     paths$id89_diff <- NULL
@@ -562,7 +568,7 @@ generate_plots_to_files <- function(
 
   # ID476 plots
   p476 <- function(catalog, plot_title) {
-    plot_476(
+    mSigPlot::plot_476(
       catalog,
       plot_title = plot_title,
       text_size = 5,
@@ -708,7 +714,11 @@ generate_all_plots_parallel <- function(
 #' @param plot_dir Directory where plots are stored
 #' @param cache_file Name of the cache hash file
 #' @return Logical: TRUE if cache is valid, FALSE if regeneration needed
-check_plot_cache <- function(data_dir, plot_dir, cache_file = "plot_cache_hash.rds") {
+check_plot_cache <- function(
+  data_dir,
+  plot_dir,
+  cache_file = "plot_cache_hash.rds"
+) {
   cache_path <- file.path(plot_dir, cache_file)
 
   # Source files that plots depend on
@@ -754,7 +764,11 @@ check_plot_cache <- function(data_dir, plot_dir, cache_file = "plot_cache_hash.r
 #' @param data_dir Directory containing source data files
 #' @param plot_dir Directory where plots are stored
 #' @param cache_file Name of the cache hash file
-save_plot_cache <- function(data_dir, plot_dir, cache_file = "plot_cache_hash.rds") {
+save_plot_cache <- function(
+  data_dir,
+  plot_dir,
+  cache_file = "plot_cache_hash.rds"
+) {
   source_files <- c(
     "Liu_et_al_final_89_type_signatures.tsv",
     "Liu_et_al_89_type_spectra.tsv",
@@ -786,14 +800,20 @@ reconstruct_plot_paths <- function(signature_names, plot_dir) {
 
     paths <- list(
       id89_sig = file.path(plot_dir, paste0(safe_name, "_id89_sig.png")),
-      id89_catalog = file.path(plot_dir, paste0(safe_name, "_id89_catalog.png")),
+      id89_catalog = file.path(
+        plot_dir,
+        paste0(safe_name, "_id89_catalog.png")
+      ),
       id89_reconstructed = file.path(
         plot_dir,
         paste0(safe_name, "_id89_reconstructed.png")
       ),
       id89_diff = file.path(plot_dir, paste0(safe_name, "_id89_diff.png")),
       id476_sig = file.path(plot_dir, paste0(safe_name, "_id476_sig.png")),
-      id476_catalog = file.path(plot_dir, paste0(safe_name, "_id476_catalog.png")),
+      id476_catalog = file.path(
+        plot_dir,
+        paste0(safe_name, "_id476_catalog.png")
+      ),
       id83_sig = file.path(plot_dir, paste0(safe_name, "_id83_sig.png")),
       id83_catalog = file.path(plot_dir, paste0(safe_name, "_id83_catalog.png"))
     )
