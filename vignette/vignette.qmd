@@ -44,7 +44,7 @@ library(furrr)
 data_dir <- "../Manuscript_data/"
 
 # Set to TRUE to force regeneration, otherwise we will use check_plot_cache to see if the cache is still up-to-date (see below)
-REGENERATE_PLOTS <- TRUE # FALSE
+REGENERATE_PLOTS <- FALSE
 
 plot476_base_size <- 25
 plot476_label_size <- 3
