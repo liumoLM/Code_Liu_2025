@@ -426,7 +426,7 @@ generate_plots_to_files <- function(
       plot_title = paste0(
         "Remaining mutations in ",
         sig_data$catalog,
-        "not due to ",
+        " not due to ",
         sig_data$ID89signature,
         " (A minus B) | Cosine similarity to ",
         sig_data$ID89signature,
