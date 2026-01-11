@@ -23,8 +23,10 @@ if (!is.null(note0)) {
   catfdiv(note0, style = style0)
 }
 
+if (!is.null(sig_data$ID83signature) && sig_data$ID83signature != "") {
+  cat("(corresponds to 83-type signature ", sig_data$ID83signature, ')\n\n')
+}
 
-cat(generate_section_header(sig_data))
 ```
 
 ```{r}
@@ -40,13 +42,10 @@ displayplot = function(mypath, wid = getp('hw')) {
 #| output: asis
 
 # ID89 plots: signature and catalog (stacked vertically)
-cat('<div style="margin-bottom: 10px;">\n')
-displayplot(plot_paths$id89_sig, getp("hw89"))
-cat('</div>\n')
 
-cat('<div style="margin-bottom: 10px;">\n')
+displayplot(plot_paths$id89_sig, getp("hw89"))
 displayplot(plot_paths$id89_catalog, getp("hw89"))
-cat('</div>\n')
+
 ```
 
 ```{r}
@@ -122,16 +121,6 @@ if (!is.null(plot_paths$id476_catalog)) {
 #| output: asis
 
 if (sig_data$has_83_signature) {
-  # HERE
-  if (FALSE) {
-    cat(paste0(
-      '\n\n<div class="signature-subtitle">',
-      sig_data$ID83signature,
-      " is the 83-type signature corresponding to ",
-      sig_data$ID89signature,
-      '</div>\n\n'
-    ))
-  }
   cat(
     "##",
     sig_data$ID83signature,

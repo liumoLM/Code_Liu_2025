@@ -1,0 +1,1 @@
+The spectrum of the tumor  WES::TCGA-13-0889-01A-01W-0420-08 is taken as signature InsDel16.  
