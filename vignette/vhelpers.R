@@ -132,35 +132,29 @@ compute_signature_data <- function(
 
   # Compute cosine476
   if (result$has_476_signature) {
-    result$cosine476 <- round(
+    result$cosine476 <-
       lsa::cosine(
         as.numeric(ID476_signatures[, ID89signature]),
         as.numeric(ID476_catalogs[, exemplar_id])
-      ),
-      3
-    )
+      )
   } else {
     result$cosine476 <- NA
   }
 
   # Compute cosine83
   if (result$is_polyT_removed) {
-    result$cosine83 <- round(
+    result$cosine83 <-
       lsa::cosine(
         as.numeric(ID83_signatures[, ID83signature]),
         as.numeric(ID83_catalogs_no_polyT[, exemplar_id])
-      ),
-      3
-    )
+      )
   } else {
     if (ID83signature %in% colnames(ID83_signatures)) {
-      result$cosine83 <- round(
+      result$cosine83 <-
         lsa::cosine(
           as.numeric(ID83_signatures[, ID83signature]),
           as.numeric(ID83_catalogs[, exemplar_id])
-        ),
-        3
-      )
+        )
     } else {
       result$cosine83 <- 0
     }
