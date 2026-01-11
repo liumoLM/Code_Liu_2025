@@ -6,6 +6,7 @@ Review table 1 column E --> need to write something about every entry (see writt
 
 Redo signature similarity matrices and signature clustering
 
+indel_O is backward in the last 2 type 89 plots
 
 # Mo to do
 
