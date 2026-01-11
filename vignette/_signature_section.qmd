@@ -153,9 +153,9 @@ if (sig_data$has_83_signature) {
 
 # Header for exemplar 83-type spectrum
 cat(paste0(
-  '\n\n<p><strong>83-type spectrum of the exemplar ',
+  '\n\n<p>83-type spectrum of the supporting tumor ',
   sig_data$catalog,
-  ':</strong></p>\n\n'
+  '</p>\n\n'
 ))
 ```
 
