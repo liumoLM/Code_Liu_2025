@@ -1,5 +1,5 @@
 ---
-title: "Signatures of insertion and deletion mutationals (indels)"
+title: "Signatures of insertion and deletion mutations (indels)"
 date: today
 format:
   html:
