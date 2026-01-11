@@ -27,8 +27,8 @@ p {
 
 /* Hide the markdown heading text (it's shown in the styled div below)
    but keep the anchor for TOC navigation.
-   Target only the h3 element, not the section wrapper */
-h3.signature-section {
+   Target only the h1 element, not the section wrapper */
+h1.signature-section {
   position: absolute;
   width: 1px;
   height: 1px;

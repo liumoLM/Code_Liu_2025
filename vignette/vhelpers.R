@@ -184,16 +184,21 @@ generate_section_header <- function(sig_data, use_html = TRUE) {
   if (use_html) {
     # Markdown heading for TOC entry, followed by styled content
     # The heading gets picked up by TOC, then we add styled div
-    header <- paste0(
-      '\n\n### ',
-      display_name,
-      ' {.signature-section}\n\n',
-      '<div class="signature-header">',
-      '<span class="signature-name">',
-      display_name,
-      '</span>',
-      '</div>\n\n'
-    )
+
+    if (FALSE) {
+      header <- paste0(
+        '\n\n# ',
+        display_name,
+        ' {.signature-section}\n\n',
+        '<div class="signature-header">',
+        '<span class="signature-name">',
+        display_name,
+        '</span>',
+        '</div>\n\n'
+      )
+    }
+
+    header = ""
 
     if (sig_data$is_insdel15_16) {
       header <- paste0(
