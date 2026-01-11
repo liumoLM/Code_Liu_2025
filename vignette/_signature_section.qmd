@@ -12,8 +12,8 @@ cat(generate_section_header(sig_data))
 ```{r}
 #| echo: false
 
-displayplot = function(mypath) {
-  cat(paste0("<ing src=\"", mypath, "\" style=\"width: ", getp('hw'), ";\" />"))
+displayplot = function(mypath, wid = getp('hw')) {
+  cat(paste0("<img src=\"", mypath, "\" style=\"width: ", wid, ";\" />"))
 }
 ```
 
@@ -21,10 +21,13 @@ displayplot = function(mypath) {
 #| echo: false
 #| output: asis
 
-# ID89 plots: signature and catalog (side by side)
-cat('<div style="display: flex; gap: 3px; margin-bottom: 6px;">\n')
-displayplot(plot_paths$id89_sig)
-displayplot(plot_paths$id89_catalog)
+# ID89 plots: signature and catalog (stacked vertically)
+cat('<div style="margin-bottom: 10px;">\n')
+displayplot(plot_paths$id89_sig, getp("hw89"))
+cat('</div>\n')
+
+cat('<div style="margin-bottom: 10px;">\n')
+displayplot(plot_paths$id89_catalog, getp("hw89"))
 cat('</div>\n')
 ```
 
@@ -34,21 +37,12 @@ cat('</div>\n')
 
 # Decomposition plots (only for non-InsDel15/16)
 if (!is.null(plot_paths$id89_reconstructed) && !is.null(plot_paths$id89_diff)) {
-  cat('<div style="display: flex; gap: 3px; margin-bottom: 6px;">\n')
-  cat(paste0(
-    '<img src="',
-    plot_paths$id89_reconstructed,
-    '" style="width: ',
-    testfoo,
-    ';" />\n'
-  ))
-  cat(paste0(
-    '<img src="',
-    plot_paths$id89_diff,
-    '" style="width: ',
-    testfoo,
-    ';" />\n'
-  ))
+  cat('<div style="display: gap: 3px; margin-bottom: 6px;">\n')
+  displayplot(plot_paths$id89_reconstructed, getp("hw89"))
+  # cat("</div>\n")
+
+  # cat('<div style="display: flex; gap: 3px; margin-bottom: 6px;">\n')
+  displayplot(plot_paths$id89_diff, getp("hw89"))
   cat('</div>\n')
 }
 ```
@@ -60,7 +54,13 @@ if (!is.null(plot_paths$id89_reconstructed) && !is.null(plot_paths$id89_diff)) {
 # 476-type section header
 if (sig_data$has_476_signature) {
   cat(paste0(
-    '\n\n<p><strong>Cosine similarity between 476-type signature and the exemplar:</strong> ',
+    '<div class="signature-subtitle">',
+    "476-type representation corresponding to ",
+    sig_data$ID89signature,
+    '</div>\n\n'
+  ))
+  cat(paste0(
+    '\n\n<p>Cosine similarity between 476-type signature and the spectrum of the supporting tumor: ',
     '<span class="cosine-value">',
     sig_data$cosine476,
     '</span></p>\n\n'
@@ -83,11 +83,9 @@ if (sig_data$has_476_signature) {
 #| output: asis
 
 # ID476 signature plot
-cat(paste0(
-  '<img src="',
-  plot_paths$id476_sig,
-  '" style="width: 100%; margin-bottom: 6px;" />\n'
-))
+if (!is.null(plot_paths$id476_sig)) {
+  displayplot(plot_paths$id476_sig)
+}
 ```
 
 ```{r}
@@ -96,11 +94,7 @@ cat(paste0(
 
 # ID476 catalog plot (only if signature exists)
 if (!is.null(plot_paths$id476_catalog)) {
-  cat(paste0(
-    '<img src="',
-    plot_paths$id476_catalog,
-    '" style="width: 100%; margin-bottom: 6px;" />\n'
-  ))
+  displayplot(plot_paths$id476_catalog)
 }
 ```
 
@@ -110,9 +104,10 @@ if (!is.null(plot_paths$id476_catalog)) {
 
 if (sig_data$has_83_signature) {
   cat(paste0(
-    '\n\n<div class="subsection-header">',
+    '\n\n<div class="signature-subtitle">',
+    "83-type signature corresponding to ",
     sig_data$ID89signature,
-    ' corresponds to the 83-type signature <strong>',
+    " is ",
     sig_data$ID83signature,
     '</strong>',
     '</div>\n\n'
@@ -133,11 +128,7 @@ if (sig_data$has_83_signature) {
 
 # ID83 signature plot (only if signature exists)
 if (!is.null(plot_paths$id83_sig)) {
-  cat(paste0(
-    '<img src="',
-    plot_paths$id83_sig,
-    '" style="width: 60%; margin-bottom: 6px;" />\n'
-  ))
+  displayplot(plot_paths$id83_sig, getp("hw89"))
 }
 ```
 
@@ -148,7 +139,7 @@ if (!is.null(plot_paths$id83_sig)) {
 # Cosine similarity text (only if signature exists)
 if (sig_data$has_83_signature) {
   cat(paste0(
-    '\n\n<p><strong>Cosine similarity between the 83-type signature and the exemplar:</strong> ',
+    '\n\n<p>Cosine similarity between the 83-type signature and the spectrum of the supporting tumor: ',
     '<span class="cosine-value">',
     sig_data$cosine83,
     '</span></p>\n\n'
@@ -173,11 +164,7 @@ cat(paste0(
 #| output: asis
 
 # ID83 exemplar spectrum (always shown)
-cat(paste0(
-  '<img src="',
-  plot_paths$id83_catalog,
-  '" style="width: 60%; margin-bottom: 6px;" />\n'
-))
+displayplot(plot_paths$id83_catalog, getp("hw83"))
 ```
 
 ```{r}

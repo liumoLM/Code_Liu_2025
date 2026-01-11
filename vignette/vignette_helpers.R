@@ -278,6 +278,7 @@ create_id476_plots <- function(
 generate_section_header <- function(sig_data, use_html = TRUE) {
   # Format signature name with Greek letters
   display_name <- format_signature_name(sig_data$ID89signature)
+  firsttext = "corresponds to 83-type signature "
 
   if (use_html) {
     # Markdown heading for TOC entry, followed by styled content
@@ -297,7 +298,7 @@ generate_section_header <- function(sig_data, use_html = TRUE) {
       header <- paste0(
         header,
         '<div class="signature-subtitle">',
-        '<strong>83-Type Signature:</strong> ',
+        '<strong>83-type signature:</strong> ',
         sig_data$ID83signature,
         '<br><strong>Note:</strong> The signature contributes all mutations of the example spectrum: ',
         sig_data$catalog,
@@ -308,7 +309,7 @@ generate_section_header <- function(sig_data, use_html = TRUE) {
         header <- paste0(
           header,
           '<div class="signature-subtitle">',
-          '<strong>Supporting spectrum:</strong> ',
+          firsttext,
           sig_data$catalog,
           '<br><em>(Deletions and insertions in long poly T tracts were removed from the Indel83 spectrum)</em>',
           '</div>\n\n'
@@ -317,10 +318,8 @@ generate_section_header <- function(sig_data, use_html = TRUE) {
         header <- paste0(
           header,
           '<div class="signature-subtitle">',
-          '<strong>83-type signature:</strong> ',
+          firsttext,
           sig_data$ID83signature,
-          '<br><strong>Supporting spectrum:</strong> ',
-          sig_data$catalog,
           '</div>\n\n'
         )
       }
@@ -702,5 +701,117 @@ generate_all_plots_parallel <- function(
   future::plan(future::sequential)
 
   names(all_paths) <- names(all_signature_data)
+  return(all_paths)
+}
+
+
+#' Check if plot cache is valid
+#'
+#' Compares hash of source data files against stored hash.
+#' Returns TRUE if cache is valid (no regeneration needed).
+#'
+#' @param data_dir Directory containing source data files
+#' @param plot_dir Directory where plots are stored
+#' @param cache_file Name of the cache hash file
+#' @return Logical: TRUE if cache is valid, FALSE if regeneration needed
+check_plot_cache <- function(data_dir, plot_dir, cache_file = "plot_cache_hash.rds") {
+  cache_path <- file.path(plot_dir, cache_file)
+
+  # Source files that plots depend on
+  source_files <- c(
+    "Liu_et_al_final_89_type_signatures.tsv",
+    "Liu_et_al_89_type_spectra.tsv",
+    "Liu_et_al_final_83_type_signatures.tsv",
+    "Liu_et_al_83_type_spectra.tsv",
+    "Liu_et_al_final_476_type_signatures.tsv",
+    "Liu_et_al_476_type_spectra.tsv",
+    "89type_to_83type_connection.tsv"
+  )
+
+  # Check if plot directory exists
+  if (!dir.exists(plot_dir)) {
+    return(FALSE)
+  }
+
+  # Compute current hash from file modification times
+  file_paths <- file.path(data_dir, source_files)
+  if (!all(file.exists(file_paths))) {
+    return(FALSE)
+  }
+
+  current_hash <- digest::digest(
+    sapply(file_paths, file.mtime)
+  )
+
+  # Check if cache exists and matches
+  if (file.exists(cache_path)) {
+    stored_hash <- readRDS(cache_path)
+    if (identical(stored_hash, current_hash)) {
+      return(TRUE) # Cache is valid
+    }
+  }
+
+  return(FALSE) # Cache invalid or missing
+}
+
+
+#' Save cache hash after generating plots
+#'
+#' @param data_dir Directory containing source data files
+#' @param plot_dir Directory where plots are stored
+#' @param cache_file Name of the cache hash file
+save_plot_cache <- function(data_dir, plot_dir, cache_file = "plot_cache_hash.rds") {
+  source_files <- c(
+    "Liu_et_al_final_89_type_signatures.tsv",
+    "Liu_et_al_89_type_spectra.tsv",
+    "Liu_et_al_final_83_type_signatures.tsv",
+    "Liu_et_al_83_type_spectra.tsv",
+    "Liu_et_al_final_476_type_signatures.tsv",
+    "Liu_et_al_476_type_spectra.tsv",
+    "89type_to_83type_connection.tsv"
+  )
+
+  current_hash <- digest::digest(
+    sapply(file.path(data_dir, source_files), file.mtime)
+  )
+
+  saveRDS(current_hash, file.path(plot_dir, cache_file))
+}
+
+
+#' Reconstruct plot paths from existing files
+#'
+#' Used when cache is valid to get paths without regenerating plots.
+#'
+#' @param signature_names Vector of signature names
+#' @param plot_dir Directory where plots are stored
+#' @return List of plot paths organized by signature name
+reconstruct_plot_paths <- function(signature_names, plot_dir) {
+  all_paths <- lapply(signature_names, function(sig_name) {
+    safe_name <- gsub("[^a-zA-Z0-9_]", "_", sig_name)
+
+    paths <- list(
+      id89_sig = file.path(plot_dir, paste0(safe_name, "_id89_sig.png")),
+      id89_catalog = file.path(plot_dir, paste0(safe_name, "_id89_catalog.png")),
+      id89_reconstructed = file.path(
+        plot_dir,
+        paste0(safe_name, "_id89_reconstructed.png")
+      ),
+      id89_diff = file.path(plot_dir, paste0(safe_name, "_id89_diff.png")),
+      id476_sig = file.path(plot_dir, paste0(safe_name, "_id476_sig.png")),
+      id476_catalog = file.path(plot_dir, paste0(safe_name, "_id476_catalog.png")),
+      id83_sig = file.path(plot_dir, paste0(safe_name, "_id83_sig.png")),
+      id83_catalog = file.path(plot_dir, paste0(safe_name, "_id83_catalog.png"))
+    )
+
+    # Set to NULL if file doesn't exist
+    paths <- lapply(paths, function(p) {
+      if (file.exists(p)) p else NULL
+    })
+
+    return(paths)
+  })
+
+  names(all_paths) <- signature_names
   return(all_paths)
 }

@@ -1,5 +1,10 @@
 /* Custom styles for ID89/ID83 vignette */
 
+/* Global paragraph text size */
+p {
+  font-size: 0.9em;
+}
+
 /* TOC sidebar styling (width controlled by YAML grid settings) */
 .sidebar nav[role="doc-toc"] {
   padding: 5px;
@@ -59,7 +64,7 @@ h3.signature-section {
   padding: 10px 15px;
   margin: 0 0 20px 0;
   color: #2d3748;
-  font-size: 0.95em;
+  font-size: 0.85em;
 }
 
 .signature-subtitle strong {
@@ -74,6 +79,7 @@ h3.signature-section {
   margin: 10px 0;
   color: #744210;
   font-style: italic;
+  font-size: 0.85em;
 }
 
 /* Cosine similarity summary box */
