@@ -6,8 +6,6 @@ Review table 1 column E --> need to write something about every entry (see writt
 
 Redo signature similarity matrices and signature clustering
 
-** Important: plot Spectrum A, B, and A - B on same Y axis / need to add y axis param to plot_89
-
 
 # Mo to do
 
