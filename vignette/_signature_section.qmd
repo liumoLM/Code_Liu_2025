@@ -66,14 +66,15 @@ if (sig_data$has_476_signature) {
     '</span></p>\n\n'
   ))
 } else {
-  cat(paste0(
-    '\n\n::: {.signature-note}\n',
-    '476-Type ',
-    sig_data$ID89signature,
-    ' was not found by de novo extraction. ',
-    'This is the 476-Type spectrum of ',
-    sig_data$catalog,
-    '\n:::\n\n'
+  cat(fenced_div(
+    paste0(
+      '476-Type ',
+      sig_data$ID89signature,
+      ' was not found by de novo extraction. ',
+      'This is the 476-Type spectrum of ',
+      sig_data$catalog
+    ),
+    style = ".callout-note"
   ))
 }
 ```
@@ -113,11 +114,9 @@ if (sig_data$has_83_signature) {
     '</div>\n\n'
   ))
 } else {
-  cat(paste0(
-    '\n\n<div class="signature-note">',
-    'No corresponding 83-type signature found for ',
-    sig_data$ID89signature,
-    '</div>\n\n'
+  cat(fenced_div(
+    paste0('No corresponding 83-type signature found for ', sig_data$ID89signature),
+    style = ".callout-note"
   ))
 }
 ```
