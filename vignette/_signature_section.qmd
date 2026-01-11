@@ -6,6 +6,13 @@
 # - sig_data: List from compute_signature_data()
 # - plot_paths: List of paths to pre-generated plot files
 
+cat('\n\n# ', format_signature_name(sig_data$ID89signature), ' {.signature-section}\n\n',
+    '<div class="signature-header">',
+    '<span class="signature-name">',
+    format_signature_name(sig_data$ID89signature),
+    '</span>',
+    '</div>\n\n',
+    sep = '')
 cat(generate_section_header(sig_data))
 ```
 
@@ -118,7 +125,8 @@ if (sig_data$has_83_signature) {
     "##",
     sig_data$ID83signature,
     "is the 83-type signature corresponding to",
-    sig_data$ID89signature
+    sig_data$ID89signature,
+    "\n\n"
   )
   note83 = find_sig_txt(sig_data$ID83signature)
   if (!is.null(note83)) {
