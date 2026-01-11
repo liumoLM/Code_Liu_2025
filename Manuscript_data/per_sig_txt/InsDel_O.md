@@ -1,1 +1,1 @@
-Important: There is a problem with InsDel_O. The 89-type plots spectrum B and the residual are reversed.
+Important: There is a problem with InsDel_O. The 89-type plots for spectrum B and the residual are reversed.
