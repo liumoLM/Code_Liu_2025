@@ -203,7 +203,7 @@ all_signature_data <- lapply(
   function(i) {
     compute_signature_data(
       ID89signature = ID89_ID83_connection_example$ID89_signature[i],
-      catalog = ID89_ID83_connection_example$example_catalog[i],
+      exemplar_id = ID89_ID83_connection_example$example_catalog[i],
       ID83signature = ID89_ID83_connection_example$ID83_signature[i],
       ID89_signatures = to.plot.all.ID89.signatures.final,
       ID89_catalogs = to.plot.all.ID89.catalogs,

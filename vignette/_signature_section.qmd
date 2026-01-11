@@ -12,6 +12,18 @@ cat(
   ' {.signature-section}\n\n',
   sep = ''
 )
+
+note0 <- find_sig_txt(sig_data$ID89signature)
+if (!is.null(note0)) {
+  style0 <- ifelse(
+    grepl("^Important", note0),
+    ".callout-important",
+    ".callout-note"
+  )
+  catfdiv(note0, style = style0)
+}
+
+
 cat(generate_section_header(sig_data))
 ```
 

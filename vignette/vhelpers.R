@@ -48,7 +48,7 @@ find_sig_txt <- function(sig_id) {
 #' Compute cosine similarities for a signature-catalog pair
 #'
 #' @param ID89signature Character: the ID89 signature name
-#' @param catalog Character: the catalog/sample name
+#' @param exemplar_id Character: the identifier of the supporting tumor
 #' @param ID89_signatures Data frame of ID89 signatures
 #' @param ID89_catalogs Data frame of ID89 catalogs
 #' @param ID83_signatures ICAMS catalog of ID83 signatures
@@ -61,7 +61,7 @@ find_sig_txt <- function(sig_id) {
 #' @return List with cosine similarities and intermediate data
 compute_signature_data <- function(
   ID89signature,
-  catalog,
+  exemplar_id,
   ID83signature,
   ID89_signatures,
   ID89_catalogs,
@@ -75,7 +75,7 @@ compute_signature_data <- function(
   message("ID89signature = ", ID89signature)
   result <- list(
     ID89signature = ID89signature,
-    catalog = catalog,
+    catalog = exemplar_id,
     ID83signature = ID83signature,
     is_insdel15_16 = ID89signature %in% c("InsDel15", "InsDel16"),
     is_polyT_removed = ID83signature %in%
@@ -88,7 +88,7 @@ compute_signature_data <- function(
   result$cosine89 <- round(
     lsa::cosine(
       as.numeric(ID89_signatures[, ID89signature]),
-      as.numeric(ID89_catalogs[, catalog])
+      as.numeric(ID89_catalogs[, exemplar_id])
     ),
     3
   )
@@ -97,7 +97,7 @@ compute_signature_data <- function(
 
   if (!result$is_insdel15_16) {
     # Get assignment for this catalog
-    assignment <- assignment_matrix[, catalog, drop = FALSE]
+    assignment <- assignment_matrix[, exemplar_id, drop = FALSE]
 
     # Zero out the current signature to get "other signatures" contribution
     assignment_others <- assignment
@@ -114,18 +114,16 @@ compute_signature_data <- function(
       as.matrix(assignment_others)
 
     # Difference = mutations attributed to this signature
-    result$diff_catalog <- ID89_catalogs[, catalog, drop = FALSE] -
+    result$diff_catalog <- ID89_catalogs[, exemplar_id, drop = FALSE] -
       result$reconstructed_catalog
     result$diff_catalog[result$diff_catalog < 0] <- 0
 
     # Cosine of diff vs signature
-    result$cosine89_diff <- round(
+    result$cosine89_diff <-
       lsa::cosine(
         as.numeric(ID89_signatures[, ID89signature]),
         as.numeric(as.matrix(result$diff_catalog))
-      ),
-      3
-    )
+      )
   } else {
     result$cosine89_diff <- NA
     result$reconstructed_catalog <- NULL
@@ -137,7 +135,7 @@ compute_signature_data <- function(
     result$cosine476 <- round(
       lsa::cosine(
         as.numeric(ID476_signatures[, ID89signature]),
-        as.numeric(ID476_catalogs[, catalog])
+        as.numeric(ID476_catalogs[, exemplar_id])
       ),
       3
     )
@@ -150,7 +148,7 @@ compute_signature_data <- function(
     result$cosine83 <- round(
       lsa::cosine(
         as.numeric(ID83_signatures[, ID83signature]),
-        as.numeric(ID83_catalogs_no_polyT[, catalog])
+        as.numeric(ID83_catalogs_no_polyT[, exemplar_id])
       ),
       3
     )
@@ -159,7 +157,7 @@ compute_signature_data <- function(
       result$cosine83 <- round(
         lsa::cosine(
           as.numeric(ID83_signatures[, ID83signature]),
-          as.numeric(ID83_catalogs[, catalog])
+          as.numeric(ID83_catalogs[, exemplar_id])
         ),
         3
       )
