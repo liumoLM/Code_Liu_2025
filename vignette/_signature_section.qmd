@@ -6,7 +6,12 @@
 # - sig_data: List from compute_signature_data()
 # - plot_paths: List of paths to pre-generated plot files
 
-cat('\n\n# ', format_signature_name(sig_data$ID89signature), ' {.signature-section}\n\n', sep = '')
+cat(
+  '\n\n# ',
+  format_signature_name(sig_data$ID89signature),
+  ' {.signature-section}\n\n',
+  sep = ''
+)
 cat(generate_section_header(sig_data))
 ```
 
@@ -54,18 +59,11 @@ if (!is.null(plot_paths$id89_reconstructed) && !is.null(plot_paths$id89_diff)) {
 
 # 476-type section header
 if (sig_data$has_476_signature) {
-  cat(paste0(
-    '<div class="signature-subtitle">',
-    "476-type representation corresponding to ",
+  cat(
+    "## 476-type representation corresponding to ",
     sig_data$ID89signature,
-    '</div>\n\n'
-  ))
-  cat(paste0(
-    '\n\n<p>Cosine similarity between 476-type signature and the spectrum of the supporting tumor: ',
-    '<span class="cosine-value">',
-    sig_data$cosine476,
-    '</span></p>\n\n'
-  ))
+    "\n\n"
+  )
 } else {
   catfdiv(
     paste0(
@@ -96,6 +94,15 @@ if (!is.null(plot_paths$id476_sig)) {
 
 # ID476 catalog plot (only if signature exists)
 if (!is.null(plot_paths$id476_catalog)) {
+  cat(
+    '\n\n476-type spectrum of the supporting tumor ',
+    sig_data$catalog,
+    "; cosine similarity to signature is ",
+    sig_data$cosine476,
+    '\n\n',
+    sep = ""
+  )
+
   displayplot(plot_paths$id476_catalog)
 }
 ```

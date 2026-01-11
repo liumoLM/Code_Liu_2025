@@ -38,7 +38,8 @@ h1.signature-section {
 }
 
 /* Subtitle info below the main header */
-.signature-subtitle {
+.signature-subtitle,
+h2 {
   background-color: #edf2f7;
   border-left: 4px solid #4a5568;
   padding: 10px 15px;
