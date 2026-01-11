@@ -5,5 +5,8 @@
         "indel",
         "indels",
         "Nanda"
-    ]
+    ],
+    "cSpell.enabledFileTypes": {
+        "markdown": true
+    }
 }
