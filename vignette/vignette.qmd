@@ -46,7 +46,7 @@ data_dir <- "../Manuscript_data/"
 # Set to TRUE to force regeneration, otherwise the code
 # will use check_plot_cache to see if the cache is still
 # up-to-date and update if necessary (see below)
-REGENERATE_PLOTS <- TRUE # FALSE
+REGENERATE_PLOTS <- FALSE
 
 plot476_base_size <- 25
 plot476_label_size <- 3
@@ -68,7 +68,8 @@ ppar <- list(
   hw89 = "80%",
   hw83 = "80%",
 
-  extra89y = 1.1
+  extra89y = 1.1,
+  cosine_digits = 4
 )
 
 getp <- function(parname) {
