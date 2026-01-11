@@ -10,9 +10,9 @@ indel_O is backward in the last 2 type 89 plots
 
 # Mo to do
 
-Drop Fig 9, draft a table with the information just 89-type
+Drop Fig 9, draft a table with the information just 89-type -- remove Fig 9 and a relevent sup figure 10. highlighted the relevant part in the manuscript for Steve to decide if to remove or not.
 
-Email willie about wild type 293t cell data
+Email willie about wild type 293t cell data  -- done
 
 # Steve to do
 
