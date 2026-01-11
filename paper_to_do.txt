@@ -1,12 +1,13 @@
-﻿# Friday Evening
+﻿# Steve, sunday
 
-Review table 1 column E --> need to write something about every entry
+Ask mo -- intent on cosine sim in 89-type sections of vignette
 
-# Steve before Friday evening
+Review table 1 column E --> need to write something about every entry (see written notes)
 
-Review the file correspondence_476_to_89_and_note.xlsx
+Redo signature similarity matrices and signature clustering
 
-Check vignette RMD / HTML
+** Important: plot Spectrum A, B, and A - B on same Y axis / need to add y axis param to plot_89
+
 
 # Mo to do
 
@@ -14,9 +15,7 @@ Drop Fig 9, draft a table with the information just 89-type
 
 Email willie about wild type 293t cell data
 
-
 # Steve to do
-
 
 Wait for fastqs from 293t cells to get to rozenlab, then upload to SRA
 
@@ -26,7 +25,7 @@ Review ID10/C_ID10 -- our extraction got big green T/polyT insertion peak; ID10 
 
 Add to vignette
 
-* Insdel4b The 89 type and 476 type extractions detect co-occurence of T insertions in long poly-T. This is a theme ....
+* Insdel4b The 89 type and 476 type extractions detect co-occurence of T insertions in long poly-T along with . This is a theme ....
 
 * Insdel5b <same text as 4b>
 
