@@ -85,16 +85,13 @@ compute_signature_data <- function(
   )
 
   # Compute cosine89 (raw catalog vs signature)
-  result$cosine89 <- round(
+  result$cosine89 <-
     lsa::cosine(
       as.numeric(ID89_signatures[, ID89signature]),
       as.numeric(ID89_catalogs[, exemplar_id])
-    ),
-    3
-  )
+    )
 
   # For non-InsDel15/16, compute the decomposition
-
   if (!result$is_insdel15_16) {
     # Get assignment for this catalog
     assignment <- assignment_matrix[, exemplar_id, drop = FALSE]
@@ -379,7 +376,7 @@ generate_plots_to_files <- function(
   }
 
   # Helper to save base R plot (for ICAMS)
-  save_base_plot <- function(expr, path, width = 10, height = 4) {
+  DEAD_CODE_save_base_plot <- function(expr, path, width = 10, height = 4) {
     png(
       path,
       width = width,
