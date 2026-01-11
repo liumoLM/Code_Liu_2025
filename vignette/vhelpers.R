@@ -174,19 +174,6 @@ generate_section_header <- function(sig_data, use_html = TRUE) {
     # Markdown heading for TOC entry, followed by styled content
     # The heading gets picked up by TOC, then we add styled div
 
-    if (FALSE) {
-      header <- paste0(
-        '\n\n# ',
-        display_name,
-        ' {.signature-section}\n\n',
-        '<div class="signature-header">',
-        '<span class="signature-name">',
-        display_name,
-        '</span>',
-        '</div>\n\n'
-      )
-    }
-
     header = ""
 
     if (sig_data$is_insdel15_16) {
@@ -355,31 +342,11 @@ generate_plots_to_files <- function(
     )
   }
 
-  # Helper to save base R plot (for ICAMS)
-  DEAD_CODE_save_base_plot <- function(expr, path, width = 10, height = 4) {
-    png(
-      path,
-      width = width,
-      height = height,
-      units = "in",
-      res = 150,
-      bg = "white"
-    )
-    tryCatch(
-      {
-        force(expr)
-      },
-      finally = {
-        dev.off()
-      }
-    )
-  }
-
   p89 <- function(catalog, plot_title, setyaxis = NULL) {
     mSigPlot::plot_89(
       catalog,
       plot_title = plot_title,
-      text_size = 5,
+      text_size = getp('textsize89'),
       base_size = getp('basesize89'),
       setyaxis = setyaxis
     )
