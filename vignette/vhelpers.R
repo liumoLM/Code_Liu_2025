@@ -396,13 +396,13 @@ generate_plots_to_files <- function(
   p2 <- p89(
     catalogtoplot,
     plot_title = paste0(
-      "Spectrum A: Mutational spectrum of ",
-      sig_data$catalog
+      "Spectrum A, from ",
+      sig_data$catalog,
+      " | cosine similarity to ",
+      sig_data$ID89signature,
+      " = ",
+      format(sig_data$cosine89, digits = getp("cosine_digits"))
     ),
-    # " | Cosine Similarity to ",
-    # sig_data$ID89signature,
-    # " = ",
-    # sig_data$cosine89
     setyaxis = ymax
   )
   save89(p2, paths$id89_catalog)
@@ -410,7 +410,7 @@ generate_plots_to_files <- function(
   # ID89 Plots 3 & 4: Decomposition (only for non-InsDel15/16)
   if (!sig_data$is_insdel15_16 && !is.null(sig_data$residual_spectrum)) {
     target_sig_title <- paste0(
-      "Spectrum B: Partial mutational spectrum of ",
+      "Spectrum B: partial mutational spectrum of ",
       sig_data$catalog,
       " due to ",
       sig_data$ID89signature
@@ -421,10 +421,10 @@ generate_plots_to_files <- function(
       sig_data$catalog,
       " not due to ",
       sig_data$ID89signature,
-      " (A minus B) | Cosine similarity to ",
-      sig_data$ID89signature,
-      " = ",
-      sig_data$cosine89_diff
+      " (A minus B) " #| Cosine similarity to ",
+      # sig_data$ID89signature,
+      # " = ",
+      # format(sig_data$cosine89_diff, digits = 4)
     )
 
     p3 <- p89(
