@@ -1,0 +1,1 @@
+InsDel_J and InsDel_N cannot be distinguished in the 89-type representation, but can be distinguished in the 476-type and 83-type representations.
