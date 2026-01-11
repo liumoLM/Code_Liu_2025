@@ -386,38 +386,32 @@ generate_section_header <- function(sig_data, use_html = TRUE) {
 #' @param use_html Logical: use HTML styling (for Quarto) or plain markdown
 #' @return Character string with markdown/HTML text
 generate_section_footer <- function(sig_data, use_html = TRUE) {
-  cosine476_text <- if (is.na(sig_data$cosine476)) "N/A" else sig_data$cosine476
+  cosine476_text <- if (is.na(sig_data$cosine476)) "N/A" else as.character(sig_data$cosine476)
+
+  df <- data.frame(
+    `83-type` = sig_data$cosine83,
+    `476-type` = cosine476_text,
+    `89-type` = sig_data$cosine89,
+    check.names = FALSE
+  )
 
   if (use_html) {
-    paste0(
-      '\n\n<div class="cosine-summary">',
-      '<h4>Cosine Similarities Summary</h4>',
-      '<ul>',
-      '<li><strong>83-type:</strong> <span class="cosine-value">',
-      sig_data$cosine83,
-      '</span></li>',
-      '<li><strong>89-type:</strong> <span class="cosine-value">',
-      sig_data$cosine89,
-      '</span></li>',
-      '<li><strong>476-type:</strong> <span class="cosine-value">',
-      cosine476_text,
-      '</span></li>',
-      '</ul>',
-      '</div>\n\n',
-      '<hr class="section-divider">\n\n'
+    table_html <- knitr::kable(df, format = "html")
+    # Add styling with internal gridlines and larger text
+    table_output <- gsub(
+      "<table>",
+      '<table style="font-size: 0.75em; border-collapse: collapse; border: 1px solid black;"><style>table th, table td { border: 1px solid black; padding: 4px 8px; }</style>',
+      table_html
     )
   } else {
-    paste0(
-      "\n\n#### Cosine Similarities Summary\n",
-      "- 83-type: ",
-      sig_data$cosine83,
-      "\n- 89-type: ",
-      sig_data$cosine89,
-      "\n- 476-type: ",
-      cosine476_text,
-      "\n\n---\n"
-    )
+    table_output <- knitr::kable(df, format = "markdown")
   }
+
+  paste0(
+    "\n\n",
+    paste(table_output, collapse = "\n"),
+    "\n\n---\n"
+  )
 }
 
 
