@@ -116,11 +116,17 @@ compute_signature_data <- function(
     # Get assignment for this catalog, filtered to common signatures
     assignment <- assignment_matrix[common_sigs, exemplar_id, drop = FALSE]
 
-    # Zero out the current signature to get "other signatures" contribution
-    assignment_others <- assignment
-    if (ID89signature %in% common_sigs) {
-      assignment_others[ID89signature, ] <- 0
+    # There is no assignment for InsDel_N because it is identical to
+    # InsDel_J
+    sigid = ID89signature
+    if (sigid == "InsDel_N") {
+      sigid <- "InsDel_J"
     }
+    # Zero out the current signature to get contribution by other signatures
+    assignment_others <- assignment
+    stopifnot(sigid %in% common_sigs)
+    assignment_others[sigid, ] <- 0
+    rm(sigid)
 
     # Reconstruct catalog without this signature
     # Use common signature names to ensure alignment
