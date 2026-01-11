@@ -22,6 +22,29 @@ fenced_div <- function(txt, style = ".callout-note") {
   paste0('\n\n::: {', style, '}\n', txt, '\n:::\n\n')
 }
 
+#' Output a fenced div to the document
+#'
+#' Convenience wrapper that combines cat() and fenced_div()
+#'
+#' @param txt Character: the text content for the div
+#' @param style Character: the CSS class for the div (default ".callout-note")
+#' @return NULL (called for side effect of outputting to document)
+catfdiv <- function(txt, style = ".callout-note") {
+  cat(fenced_div(txt, style))
+}
+
+#' Find signature-specific text file
+#'
+#' @param sig_id Character: the signature identifier
+#' @return Character string with file contents, or NULL if file doesn't exist
+find_sig_txt <- function(sig_id) {
+  file_path <- file.path(data_dir, "per_sig_txt", glue::glue("{sig_id}.md"))
+  if (!file.exists(file_path)) {
+    return(NULL)
+  }
+  readLines(file_path, warn = FALSE) |> paste(collapse = "\n")
+}
+
 #' Compute cosine similarities for a signature-catalog pair
 #'
 #' @param ID89signature Character: the ID89 signature name

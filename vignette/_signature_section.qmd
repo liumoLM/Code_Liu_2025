@@ -66,7 +66,7 @@ if (sig_data$has_476_signature) {
     '</span></p>\n\n'
   ))
 } else {
-  cat(fenced_div(
+  catfdiv(
     paste0(
       '476-Type ',
       sig_data$ID89signature,
@@ -75,7 +75,7 @@ if (sig_data$has_476_signature) {
       sig_data$catalog
     ),
     style = ".callout-note"
-  ))
+  )
 }
 ```
 
@@ -104,20 +104,34 @@ if (!is.null(plot_paths$id476_catalog)) {
 #| output: asis
 
 if (sig_data$has_83_signature) {
-  cat(paste0(
-    '\n\n<div class="signature-subtitle">',
-    "83-type signature corresponding to ",
-    sig_data$ID89signature,
-    " is ",
+  # HERE
+  if (FALSE) {
+    cat(paste0(
+      '\n\n<div class="signature-subtitle">',
+      sig_data$ID83signature,
+      " is the 83-type signature corresponding to ",
+      sig_data$ID89signature,
+      '</div>\n\n'
+    ))
+  }
+  cat(
+    "##",
     sig_data$ID83signature,
-    '</strong>',
-    '</div>\n\n'
-  ))
+    "is the 83-type signature corresponding to",
+    sig_data$ID89signature
+  )
+  note83 = find_sig_txt(sig_data$ID83signature)
+  if (!is.null(note83)) {
+    catfdiv(note83, style = ".callout-note")
+  }
 } else {
-  cat(fenced_div(
-    paste0('No corresponding 83-type signature found for ', sig_data$ID89signature),
+  catfdiv(
+    paste0(
+      'No corresponding 83-type signature found for ',
+      sig_data$ID89signature
+    ),
     style = ".callout-note"
-  ))
+  )
 }
 ```
 
