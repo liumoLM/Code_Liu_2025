@@ -139,7 +139,6 @@ compute_signature_data <- function(
   return(result)
 }
 
-
 #' Create plots for ID89 signature visualization
 #'
 #' @param sig_data List returned from compute_signature_data
@@ -147,7 +146,7 @@ compute_signature_data <- function(
 #' @param ID89_catalogs Data frame of ID89 catalogs
 #' @param plot89_height Unit for plot height
 #' @return List of ggplot objects
-create_id89_plots <- function(
+DEAD_CODE_create_id89_plots <- function(
   sig_data,
   ID89_signatures,
   ID89_catalogs,
@@ -156,52 +155,64 @@ create_id89_plots <- function(
   plots <- list()
 
   # Plot 1: The signature itself
-  plots$p1 <- plot_89(
+  plots$p1 <- mSigPlot::plot_89(
     ID89_signatures[, sig_data$ID89signature, drop = FALSE],
     text_size = 5,
     plot_title = sig_data$ID89signature,
     ylabel = "Props"
   )
-
+  stop("is this running?")
   # Plot 2: The catalog spectrum
-  plots$p2 <- plot_89(
-    ID89_catalogs[, sig_data$catalog, drop = FALSE],
+  toplot <- D89_catalogs[, sig_data$catalog, drop = FALSE]
+  maxy = max(toplot) #  * getp("extra89y")
+  message("maxy is ", maxy)
+  plots$p2 <- mSigPlot::plot_89(
+    toplot,
     text_size = 5,
     plot_title = paste0(
-      "Spectrum A: Mutational spectrum of ",
+      "maxy",
+      maxy,
+      "XXSpectrum A: Mutational spectrum of ",
       sig_data$catalog,
       " | Cosine Similarity to ",
       sig_data$ID89signature,
       " = ",
       sig_data$cosine89
-    )
+    ),
+    setyaxis = maxy
   )
 
   # For non-InsDel15/16, add decomposition plots
   if (!sig_data$is_insdel15_16 && !is.null(sig_data$reconstructed_catalog)) {
-    plots$p3 <- plot_89(
+    plots$p3 <- mSigPlot::plot_89(
       sig_data$reconstructed_catalog,
       text_size = 5,
       plot_title = paste0(
-        "Spectrum B: Partial mutational spectrum of ",
+        "maxy ",
+        maxy,
+        "XXSpectrum B: Partial mutational spectrum of ",
         sig_data$catalog,
         " not using ",
         sig_data$ID89signature
       ),
-      setyaxis = max(sig_data$diff_catalog)
+      setyaxis = maxy
     )
 
-    plots$p4 <- plot_89(
+    plots$p4 <- mSigPlot::plot_89(
       sig_data$diff_catalog,
       text_size = 5,
       plot_title = paste0(
-        "Mutations due to ",
-        sig_data$ID89signature,
-        " (A minus B) | Cosine similarity to ",
-        sig_data$ID89signature,
-        " = ",
-        sig_data$cosine89_diff
-      )
+        "maxy ",
+        maxy
+      ),
+      #,
+      #"XXMutations due to ",
+      #sig_data$ID89signature,
+      #" (A minus B) | Cosine similarity to ",
+      #sig_data$ID89signature,
+      #" = ",
+      #sig_data$cosine89_diff
+      setyaxis = maxy
     )
   }
 
@@ -242,7 +253,7 @@ create_id476_plots <- function(
     plots$p5 <- p476(
       ID476_signatures[, sig_data$ID89signature],
       plot_title = paste0(
-        "476-Type Representation of ",
+        "XX476-Type Representation of ",
         sig_data$ID89signature
       )
     )
@@ -500,12 +511,13 @@ generate_plots_to_files <- function(
     )
   }
 
-  p89 <- function(catalog, plot_title) {
+  p89 <- function(catalog, plot_title, setyaxis = NULL) {
     plot_89(
       catalog,
       plot_title = plot_title,
       text_size = 5,
-      base_size = getp('basesize89')
+      base_size = getp('basesize89'),
+      setyaxis = setyaxis
     )
   }
 
@@ -521,8 +533,10 @@ generate_plots_to_files <- function(
   save89(p1, paths$id89_sig)
 
   # ID89 Plot 2: Catalog
+  catalogtoplot = ID89_catalogs[, sig_data$catalog, drop = FALSE]
+  ymax = max(catalogtoplot)
   p2 <- p89(
-    ID89_catalogs[, sig_data$catalog, drop = FALSE],
+    catalogtoplot,
     plot_title = paste0(
       "Spectrum A: Mutational spectrum of ",
       sig_data$catalog,
@@ -530,7 +544,8 @@ generate_plots_to_files <- function(
       sig_data$ID89signature,
       " = ",
       sig_data$cosine89
-    )
+    ),
+    setyaxis = ymax
   )
   save89(p2, paths$id89_catalog)
 
@@ -543,7 +558,8 @@ generate_plots_to_files <- function(
         sig_data$catalog,
         " due to ",
         sig_data$ID89signature
-      )
+      ),
+      setyaxis = ymax
     )
     save89(p3, paths$id89_reconstructed)
 
@@ -558,9 +574,10 @@ generate_plots_to_files <- function(
         sig_data$ID89signature,
         " = ",
         sig_data$cosine89_diff
-      )
+      ),
+      setyaxis = ymax
     )
-    save89(p4, paths$id89_diff)\
+    save89(p4, paths$id89_diff)
   } else {
     paths$id89_reconstructed <- NULL
     paths$id89_diff <- NULL
