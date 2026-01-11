@@ -1,5 +1,5 @@
 ---
-title: "Insertion and deletion mutational signatures"
+title: "Signatures of insertion and deletion mutationals (indels)"
 date: today
 format:
   html:
@@ -42,6 +42,10 @@ library(furrr)
 #| include: false
 
 data_dir <- "../Manuscript_data/"
+
+# Set to TRUE to force regeneration, otherwise we will use check_plot_cache to see if the cache is still up-to-date (see below)
+REGENERATE_PLOTS <- FALSE
+
 plot476_base_size <- 25
 plot476_label_size <- 3
 plto476_simplify_labels <- FALSE
@@ -50,18 +54,24 @@ ppar <- list(
   w476 = 19,
   h476 = 6,
   w89 = 24,
-  h89 = 6,
-  basesize89 = 17,
+  h89 = 7,
+  basesize89 = 30,
   w83 = 19,
   h83 = 6,
   basesize83 = 20,
 
-  # Plot dimenskon for the html output
-  hw = "100%"
+  # Plot scaling for the html output
+  hw = "100%", # Default
+  hw89 = "80%",
+  hw83 = "80%"
 )
 
 getp <- function(parname) {
-  ppar[[parname]]
+  ret = ppar[[parname]]
+  if (is.null(ret)) {
+    stop("unknown paraeter: ", parname)
+  }
+  return(ret)
 }
 
 testfoo = "100%"
@@ -230,28 +240,38 @@ for (i in seq_along(all_signature_data)) {
 #| label: generate-plots-parallel
 #| include: false
 
-# Generate all plots in parallel (10 workers)
-# This is the main performance optimization - plotting is done once upfront
-# Use local directory so plots persist for pandoc
+# Plot caching: only regenerate if source data has changed
+# To force regeneration: delete figure/parallel_plots/ or set REGENERATE_PLOTS <- TRUE
 plot_dir <- "figure/parallel_plots"
 
-all_plot_paths <- generate_all_plots_parallel(
-  all_signature_data = all_signature_data,
-  ID89_signatures = to.plot.all.ID89.signatures.final,
-  ID89_catalogs = to.plot.all.ID89.catalogs,
-  ID83_signatures = to.plot.all.signatures.final,
-  ID83_catalogs = to.plot.WGS_PCAWG_HMF_indels.catalog,
-  ID83_catalogs_no_polyT = to.plot.WGS_PCAWG_HMF_indels.catalog.no.polyT,
-  ID476_signatures = final.Koh476.signatures,
-  ID476_catalogs = to.plot.all.ID476.catalogs,
-  plot_dir = plot_dir,
-  plot476_base_size = plot476_base_size,
-  plot476_label_size = plot476_label_size,
-  plot476_simplify_labels = plto476_simplify_labels,
-  n_workers = 10
-)
+cache_valid <- check_plot_cache(data_dir, plot_dir) && !REGENERATE_PLOTS
 
-message("All plots generated in: ", plot_dir)
+if (cache_valid) {
+  message("Using cached plots from: ", plot_dir)
+  all_plot_paths <- reconstruct_plot_paths(
+    names(all_signature_data),
+    plot_dir
+  )
+} else {
+  message("Generating plots (cache invalid or forced regeneration)...")
+  all_plot_paths <- generate_all_plots_parallel(
+    all_signature_data = all_signature_data,
+    ID89_signatures = to.plot.all.ID89.signatures.final,
+    ID89_catalogs = to.plot.all.ID89.catalogs,
+    ID83_signatures = to.plot.all.signatures.final,
+    ID83_catalogs = to.plot.WGS_PCAWG_HMF_indels.catalog,
+    ID83_catalogs_no_polyT = to.plot.WGS_PCAWG_HMF_indels.catalog.no.polyT,
+    ID476_signatures = final.Koh476.signatures,
+    ID476_catalogs = to.plot.all.ID476.catalogs,
+    plot_dir = plot_dir,
+    plot476_base_size = plot476_base_size,
+    plot476_label_size = plot476_label_size,
+    plot476_simplify_labels = plto476_simplify_labels,
+    n_workers = 10
+  )
+  save_plot_cache(data_dir, plot_dir)
+  message("Plots generated and cache saved in: ", plot_dir)
+}
 ```
 
 ```{r}
