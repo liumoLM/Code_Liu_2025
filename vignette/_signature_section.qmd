@@ -160,10 +160,9 @@ if (!is.null(plot_paths$id83_sig)) {
 # Cosine similarity text (only if signature exists)
 if (sig_data$has_83_signature) {
   cat(paste0(
-    '\n\n<p>Cosine similarity between the 83-type signature and the spectrum of the supporting tumor: ',
-    '<span class="cosine-value">',
+    '\n\nCosine similarity between the 83-type signature and the spectrum of the supporting tumor: ',
     sig_data$cosine83,
-    '</span></p>\n\n'
+    '\n\n'
   ))
 }
 ```
@@ -174,9 +173,9 @@ if (sig_data$has_83_signature) {
 
 # Header for exemplar 83-type spectrum
 cat(paste0(
-  '\n\n<p>83-type spectrum of the supporting tumor ',
+  '\n\n83-type spectrum of the supporting tumor ',
   sig_data$catalog,
-  '</p>\n\n'
+  '\n\n'
 ))
 ```
 
