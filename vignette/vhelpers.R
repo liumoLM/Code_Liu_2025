@@ -208,7 +208,7 @@ generate_section_footer <- function(sig_data) {
     check.names = FALSE
   )
 
-  table_output <- knitr::kable(df, format = "markdown")
+  table_output <- knitr::kable(df)
 
   paste0(
     "\n\n",
