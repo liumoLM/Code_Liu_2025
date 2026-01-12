@@ -11,12 +11,12 @@
 \definecolor{noteyellow}{HTML}{fefcbf}
 \definecolor{noteborder}{HTML}{d69e2e}
 
-% Section headers - gray bar with white text
+% Section headers - gray bar with white text, with page break before
 \titleformat{\section}
   {\normalfont\large\bfseries\color{white}}
   {}
   {0pt}
-  {\colorbox{headerblue}{\parbox{\dimexpr\textwidth-2\fboxsep}{\strut#1\strut}}}
+  {\clearpage\colorbox{headerblue}{\parbox{\dimexpr\textwidth-2\fboxsep}{\strut#1\strut}}}
 \titlespacing*{\section}{0pt}{20pt}{10pt}
 
 % Subsection headers - light gray with left border

@@ -67,6 +67,7 @@ if (
 #| output: asis
 
 # 476-type section header
+if (knitr::is_latex_output()) cat("\\newpage\n\n")
 if (sig_data$has_476_signature) {
   cat(
     "## 476-type representation corresponding to ",
@@ -120,6 +121,7 @@ if (!is.null(plot_paths$id476_catalog)) {
 #| echo: false
 #| output: asis
 
+if (knitr::is_latex_output()) cat("\\newpage\n\n")
 if (sig_data$has_83_signature) {
   cat(
     "##",
