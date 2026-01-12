@@ -15,6 +15,15 @@ format:
       body-width: 900px
       gutter-width: 1rem
       margin-width: 200px
+  pdf:
+    toc: true
+    toc-depth: 1
+    documentclass: article
+    latex-max-runs: 3
+    geometry:
+      - margin=1in
+    include-in-header:
+      - preamble.tex
 execute:
   warning: false
   message: false
@@ -46,7 +55,7 @@ data_dir <- "../Manuscript_data/"
 # Set to TRUE to force regeneration, otherwise the code
 # will use check_plot_cache to see if the cache is still
 # up-to-date and update if necessary (see below)
-REGENERATE_PLOTS <- TRUE # FALSE
+REGENERATE_PLOTS <- FALSE
 
 plot476_base_size <- 25
 plot476_label_size <- 3

@@ -33,7 +33,7 @@ if (!is.null(sig_data$ID83signature) && sig_data$ID83signature != "") {
 #| echo: false
 
 displayplot = function(mypath, wid = getp('hw')) {
-  cat(paste0("![](", mypath, "){width=", wid, "}"))
+  cat(paste0("\n\n![](", mypath, "){width=", wid, "}\n\n"))
 }
 ```
 
