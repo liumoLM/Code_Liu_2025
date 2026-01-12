@@ -193,9 +193,8 @@ compute_signature_data <- function(
 #' Generate markdown footer text with cosine summary
 #'
 #' @param sig_data List returned from compute_signature_data
-#' @param use_html Logical: use HTML styling (for Quarto) or plain markdown
-#' @return Character string with markdown/HTML text
-generate_section_footer <- function(sig_data, use_html = TRUE) {
+#' @return Character string with markdown text
+generate_section_footer <- function(sig_data) {
   cosine476_text <- if (is.na(sig_data$cosine476)) {
     "N/A"
   } else {
@@ -209,17 +208,7 @@ generate_section_footer <- function(sig_data, use_html = TRUE) {
     check.names = FALSE
   )
 
-  if (use_html) {
-    table_html <- knitr::kable(df, format = "html")
-    # Add styling with internal gridlines and larger text
-    table_output <- gsub(
-      "<table>",
-      '<table style="font-size: 0.75em; border-collapse: collapse; border: 1px solid black;"><style>table th, table td { border: 1px solid black; padding: 4px 8px; }</style>',
-      table_html
-    )
-  } else {
-    table_output <- knitr::kable(df, format = "markdown")
-  }
+  table_output <- knitr::kable(df, format = "markdown")
 
   paste0(
     "\n\n",
