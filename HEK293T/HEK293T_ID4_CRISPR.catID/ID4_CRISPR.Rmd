@@ -1,0 +1,22 @@
+---
+title: "test"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r scripts, echo=F,message=F,warning=F}
+library(ICAMS)
+
+files<-list.files()
+files<-files[grep(".vcf",files)]
+
+for(file in c("INDEL")){
+  cat<-VCFsToCatalogsAndPlotToPdf(files[grep(file,files)],ref.genome = "GRCh38",region="genome",trans.ranges = trans.ranges.GRCh38,variant.caller = "strelka",output.dir = ".",base.filename = "HEK293T_ID4_CRISPR",return.annotated.vcfs = T)
+}
+
+tmp<-cat$catID
+tmp[grepl(":4$|:5\\+$",rownames(tmp)),]<-0
+PlotCatalogToPdf(tmp,file="HEK293T_ID4_CRISPR.catID_filtered.pdf")
+
+```
