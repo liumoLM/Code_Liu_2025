@@ -41,9 +41,15 @@ displayplot = function(mypath, wid = getp('hw')) {
 #| echo: false
 #| output: asis
 
-# ID89 plots: signature and catalog (stacked vertically)
+# ID89 plots: signature, mapped signature, and catalog (stacked vertically)
 
 displayplot(plot_paths$id89_sig, getp("hw89"))
+
+# Mapped signature from 476-type (if available)
+if (!is.null(plot_paths$id89_mapped)) {
+  displayplot(plot_paths$id89_mapped, getp("hw89"))
+}
+
 displayplot(plot_paths$id89_catalog, getp("hw89"))
 
 ```
@@ -152,6 +158,16 @@ if (sig_data$has_83_signature) {
 # ID83 signature plot (only if signature exists)
 if (!is.null(plot_paths$id83_sig)) {
   displayplot(plot_paths$id83_sig, getp("hw89"))
+}
+```
+
+```{r}
+#| echo: false
+#| output: asis
+
+# ID83 mapped signature from 476-type (if available)
+if (!is.null(plot_paths$id83_mapped)) {
+  displayplot(plot_paths$id83_mapped, getp("hw83"))
 }
 ```
 
