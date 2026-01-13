@@ -470,3 +470,8 @@ Ins4:U1:R2	Ins(2,):R(2,4)	INS:repeats:4:0
 Ins4:U1:R1	Ins(2,4):R1	INS:repeats:4:0
 Ins4:U1:R4	Ins(2,):R(2,4)	INS:repeats:4:1
 Ins4:U1:R0	Ins(2,4):R0	INS:repeats:4:0
+Complex(0,1)	Complex	unmapped
+Complex(2,5)	Complex	unmapped
+Complex(6,10)	Complex	unmapped
+Complex(11,20)	Complex	unmapped
+Complex(21,)	Complex	unmapped
