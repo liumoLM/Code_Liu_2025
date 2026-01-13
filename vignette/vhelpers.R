@@ -494,11 +494,7 @@ generate_plots_to_files <- function(
     }
     ptmp <- p83(
       ID83_mapped_signatures[, mapped_col_name, drop = FALSE],
-      plot_title = paste0(
-        sig_data$ID89signature,
-        " converted from 476-type signature",
-        cosine_text
-      )
+      plot_title = ""
     )
     save83(ptmp, paths$id83_mapped)
   } else {
