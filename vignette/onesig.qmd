@@ -73,7 +73,9 @@ if (
 #| output: asis
 
 # 476-type section header
-if (knitr::is_latex_output()) cat("\\newpage\n\n")
+if (knitr::is_latex_output()) {
+  cat("\\newpage\n\n")
+}
 if (sig_data$has_476_signature) {
   cat(
     "## 476-type representation corresponding to ",
@@ -114,7 +116,7 @@ if (!is.null(plot_paths$id476_catalog)) {
     '\n\n476-type spectrum of the supporting tumor ',
     sig_data$catalog,
     "; cosine similarity to signature is ",
-    sig_data$cosine476,
+    format(sig_data$cosine476, digits = getp("cosine_digits")),
     '\n\n',
     sep = ""
   )
@@ -127,7 +129,9 @@ if (!is.null(plot_paths$id476_catalog)) {
 #| echo: false
 #| output: asis
 
-if (knitr::is_latex_output()) cat("\\newpage\n\n")
+if (knitr::is_latex_output()) {
+  cat("\\newpage\n\n")
+}
 if (sig_data$has_83_signature) {
   cat(
     "##",
@@ -167,21 +171,28 @@ if (!is.null(plot_paths$id83_sig)) {
 
 # ID83 mapped signature from 476-type (if available)
 if (!is.null(plot_paths$id83_mapped)) {
+  # Caption for the mapped signature
+  cosine_text <- if (
+    !is.null(sig_data$cosine83_mapped) && !is.na(sig_data$cosine83_mapped)
+  ) {
+    paste0(
+      " | cosine similarity to ",
+      sig_data$ID83signature,
+      ": ",
+      format(sig_data$cosine83_mapped, digits = getp("cosine_digits"))
+    )
+  } else {
+    ""
+  }
+  cat(
+    "\n\n",
+    "83-type signature converted from 476-type signature corresponding to ",
+    sig_data$ID89signature,
+    cosine_text,
+    "\n\n",
+    sep = ""
+  )
   displayplot(plot_paths$id83_mapped, getp("hw83"))
-}
-```
-
-```{r}
-#| echo: false
-#| output: asis
-
-# Cosine similarity text (only if signature exists)
-if (sig_data$has_83_signature) {
-  cat(paste0(
-    '\n\nCosine similarity between the 83-type signature and the spectrum of the supporting tumor: ',
-    sig_data$cosine83,
-    '\n\n'
-  ))
 }
 ```
 
@@ -193,6 +204,11 @@ if (sig_data$has_83_signature) {
 cat(paste0(
   '\n\n83-type spectrum of the supporting tumor ',
   sig_data$catalog,
+  " | cosine similariy to ",
+  sig_data$ID83signature,
+  ": ",
+  format(sig_data$cosine83, digits = getp("cosine_digits")),
+
   '\n\n'
 ))
 ```
