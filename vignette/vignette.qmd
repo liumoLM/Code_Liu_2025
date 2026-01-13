@@ -302,7 +302,7 @@ for (i in seq_along(all_signature_data)) {
   # Render the child template for this signature
   # Errors will reference _signature_section.qmd with specific line numbers
   res <- knitr::knit_child(
-    "_signature_section.qmd",
+    "onesig.qmd",
     envir = environment(),
     quiet = TRUE
   )
