@@ -21,7 +21,6 @@ testit = function() {
     sep = '\t'
   )
 
-  browser()
   simlist = list()
   for (cname in colnames(yy)) {
     cplus = paste0(cname, "_converted")
