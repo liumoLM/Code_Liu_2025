@@ -30,6 +30,17 @@ execute:
 ---
 
 ```{r}
+#| label: key-params
+#| include: false
+
+# Set to TRUE to force regeneration, otherwise the code
+# will use check_plot_cache to see if the cache is still
+# up-to-date and update if necessary (see below)
+REGENERATE_PLOTS <- FALSE
+data_dir <- "../Manuscript_data/"
+```
+
+```{r}
 #| label: libraries
 #| include: false
 
@@ -50,46 +61,8 @@ library(furrr)
 #| label: other-globals
 #| include: false
 
-data_dir <- "../Manuscript_data/"
-
-# Set to TRUE to force regeneration, otherwise the code
-# will use check_plot_cache to see if the cache is still
-# up-to-date and update if necessary (see below)
-REGENERATE_PLOTS <- FALSE
-
-plot476_base_size <- 25
-plot476_label_size <- 3
-plto476_simplify_labels <- FALSE
-
-ppar <- list(
-  w476 = 19,
-  h476 = 6,
-  w89 = 24,
-  h89 = 7,
-  basesize89 = 30,
-  textsize89 = 5,
-  w83 = 19,
-  h83 = 6,
-  basesize83 = 20,
-
-  # Plot scaling for the html output
-  hw = "100%", # Default
-  hw89 = "80%",
-  hw83 = "80%",
-
-  extra89y = 1.1,
-  cosine_digits = 4
-)
-
-getp <- function(parname) {
-  ret = ppar[[parname]]
-  if (is.null(ret)) {
-    stop("unknown paraeter: ", parname)
-  }
-  return(ret)
-}
-
-testfoo = "100%"
+# Load plotting parameters from separate file (changes trigger plot regeneration)
+source("ppar.R")
 
 # Scale factor for 476-type plots (1.0 = default, 1.4 = 40% bigger)
 plot476_scale <- 1.2
@@ -198,6 +171,25 @@ to.plot.all.ID476.catalogs <- to.plot.all.ID476.catalogs[, -1]
 ```
 
 ```{r}
+#| label: setup6-mapped-signatures
+#| include: false
+
+# Load 89-type signatures mapped from 476-type
+ID89_mapped_from_476 <- as.data.frame(data.table::fread(
+  "89_mapped_from_476.tsv"
+))
+row.names(ID89_mapped_from_476) <- ID89_mapped_from_476[, 1]
+ID89_mapped_from_476 <- ID89_mapped_from_476[, -1]
+
+# Load 83-type signatures mapped from 476-type
+ID83_mapped_from_476 <- as.data.frame(data.table::fread(
+  "83_mapped_from_476.tsv"
+))
+row.names(ID83_mapped_from_476) <- ID83_mapped_from_476[, 1]
+ID83_mapped_from_476 <- ID83_mapped_from_476[, -1]
+```
+
+```{r}
 #| label: load-helpers
 #| include: false
 
@@ -226,7 +218,9 @@ all_signature_data <- lapply(
       ID83_catalogs_no_polyT = to.plot.WGS_PCAWG_HMF_indels.catalog.no.polyT,
       ID476_signatures = final.Koh476.signatures,
       ID476_catalogs = to.plot.all.ID476.catalogs,
-      assignment_matrix = ID89.mSigAct.assignment
+      assignment_matrix = ID89.mSigAct.assignment,
+      ID89_mapped_signatures = ID89_mapped_from_476,
+      ID83_mapped_signatures = ID83_mapped_from_476
     )
   }
 )
@@ -283,6 +277,8 @@ if (cache_valid) {
     plot476_base_size = plot476_base_size,
     plot476_label_size = plot476_label_size,
     plot476_simplify_labels = plto476_simplify_labels,
+    ID89_mapped_signatures = ID89_mapped_from_476,
+    ID83_mapped_signatures = ID83_mapped_from_476,
     n_workers = 10
   )
   save_plot_cache(data_dir, plot_dir)

@@ -70,9 +70,23 @@ compute_signature_data <- function(
   ID83_catalogs_no_polyT,
   ID476_signatures,
   ID476_catalogs,
-  assignment_matrix
+  assignment_matrix,
+  ID89_mapped_signatures = NULL,
+  ID83_mapped_signatures = NULL
 ) {
   message("ID89signature = ", ID89signature)
+  # Check if mapped 89-type signature exists (column name is {signature}_converted)
+  mapped_col_name <- paste0(ID89signature, "_converted")
+  has_mapped_sig <- !is.null(ID89_mapped_signatures) &&
+    mapped_col_name %in% colnames(ID89_mapped_signatures)
+
+  # Check if mapped 83-type signature exists
+  # Only consider it if a 476-type signature was extracted
+  has_476_sig <- ID89signature %in% colnames(ID476_signatures)
+  has_83_mapped_sig <- has_476_sig &&
+    !is.null(ID83_mapped_signatures) &&
+    mapped_col_name %in% colnames(ID83_mapped_signatures)
+
   result <- list(
     ID89signature = ID89signature,
     catalog = exemplar_id,
@@ -80,8 +94,10 @@ compute_signature_data <- function(
     is_insdel15_16 = ID89signature %in% c("InsDel15", "InsDel16"),
     is_polyT_removed = ID83signature %in%
       c("C_ID7", "ID_J", "C_ID10", "ID_N", "ID_O"),
-    has_476_signature = ID89signature %in% colnames(ID476_signatures),
-    has_83_signature = ID83signature %in% colnames(ID83_signatures)
+    has_476_signature = has_476_sig,
+    has_83_signature = ID83signature %in% colnames(ID83_signatures),
+    has_mapped_signature = has_mapped_sig,
+    has_83_mapped_signature = has_83_mapped_sig
   )
 
   # Compute cosine89 (raw catalog vs signature)
@@ -90,6 +106,17 @@ compute_signature_data <- function(
       as.numeric(ID89_signatures[, ID89signature]),
       as.numeric(ID89_catalogs[, exemplar_id])
     )
+
+  # Compute cosine similarity between main signature and mapped signature
+  if (has_mapped_sig) {
+    result$cosine89_mapped <-
+      lsa::cosine(
+        as.numeric(ID89_signatures[, ID89signature]),
+        as.numeric(ID89_mapped_signatures[, mapped_col_name])
+      )
+  } else {
+    result$cosine89_mapped <- NA
+  }
 
   # Assert that all signatures in assignment matrix exist in signature matrix
   missing_sigs <- setdiff(
@@ -187,6 +214,17 @@ compute_signature_data <- function(
     }
   }
 
+  # Compute cosine similarity between native 83-type and mapped 83-type signature
+  if (has_83_mapped_sig && result$has_83_signature) {
+    result$cosine83_mapped <-
+      lsa::cosine(
+        as.numeric(ID83_signatures[, ID83signature]),
+        as.numeric(ID83_mapped_signatures[, mapped_col_name])
+      )
+  } else {
+    result$cosine83_mapped <- NA
+  }
+
   return(result)
 }
 
@@ -245,13 +283,16 @@ generate_plots_to_files <- function(
   plot_dir,
   plot476_base_size = 20,
   plot476_label_size = 3,
-  plot476_simplify_labels = FALSE
+  plot476_simplify_labels = FALSE,
+  ID89_mapped_signatures = NULL,
+  ID83_mapped_signatures = NULL
 ) {
   # Create safe filename prefix from signature name
   safe_name <- gsub("[^a-zA-Z0-9_]", "_", sig_data$ID89signature)
 
   paths <- list(
     id89_sig = file.path(plot_dir, paste0(safe_name, "_id89_sig.png")),
+    id89_mapped = file.path(plot_dir, paste0(safe_name, "_id89_mapped.png")),
     id89_catalog = file.path(plot_dir, paste0(safe_name, "_id89_catalog.png")),
     id89_residual = file.path(
       plot_dir,
@@ -267,6 +308,7 @@ generate_plots_to_files <- function(
       paste0(safe_name, "_id476_catalog.png")
     ),
     id83_sig = file.path(plot_dir, paste0(safe_name, "_id83_sig.png")),
+    id83_mapped = file.path(plot_dir, paste0(safe_name, "_id83_mapped.png")),
     id83_catalog = file.path(plot_dir, paste0(safe_name, "_id83_catalog.png"))
   )
 
@@ -302,6 +344,22 @@ generate_plots_to_files <- function(
     plot_title = sig_data$ID89signature
   )
   save89(p1, paths$id89_sig)
+
+  # ID89 Plot 1b: Mapped signature (from 476-type)
+  if (sig_data$has_mapped_signature && !is.null(ID89_mapped_signatures)) {
+    mapped_col_name <- paste0(sig_data$ID89signature, "_converted")
+    p1b <- p89(
+      ID89_mapped_signatures[, mapped_col_name, drop = FALSE],
+      plot_title = paste0(
+        sig_data$ID89signature,
+        " converted from 476-type signature | cosine to main = ",
+        format(sig_data$cosine89_mapped, digits = getp("cosine_digits"))
+      )
+    )
+    save89(p1b, paths$id89_mapped)
+  } else {
+    paths$id89_mapped <- NULL
+  }
 
   # ID89 Plot 2: Catalog
   catalogtoplot = ID89_catalogs[, sig_data$catalog, drop = FALSE]
@@ -405,7 +463,7 @@ generate_plots_to_files <- function(
     mSigPlot::plot_83(
       catalog,
       plot_title = plot_title,
-      text_size = 5,
+      text_size = getp('textsize83'),
       base_size = getp('basesize83')
     )
   }
@@ -421,6 +479,30 @@ generate_plots_to_files <- function(
     save83(ptmp, paths$id83_sig)
   } else {
     paths$id83_sig <- NULL
+  }
+
+  # ID83 mapped signature (from 476-type)
+  if (sig_data$has_83_mapped_signature && !is.null(ID83_mapped_signatures)) {
+    mapped_col_name <- paste0(sig_data$ID89signature, "_converted")
+    cosine_text <- if (!is.na(sig_data$cosine83_mapped)) {
+      paste0(
+        " | cosine to native = ",
+        format(sig_data$cosine83_mapped, digits = getp("cosine_digits"))
+      )
+    } else {
+      ""
+    }
+    ptmp <- p83(
+      ID83_mapped_signatures[, mapped_col_name, drop = FALSE],
+      plot_title = paste0(
+        sig_data$ID89signature,
+        " converted from 476-type signature",
+        cosine_text
+      )
+    )
+    save83(ptmp, paths$id83_mapped)
+  } else {
+    paths$id83_mapped <- NULL
   }
 
   # ID83 spectrum catalog, always shown
@@ -455,6 +537,8 @@ generate_all_plots_parallel <- function(
   plot476_base_size = 20,
   plot476_label_size = 3,
   plot476_simplify_labels = FALSE,
+  ID89_mapped_signatures = NULL,
+  ID83_mapped_signatures = NULL,
   n_workers = 14
 ) {
   # Create plot directory
@@ -479,7 +563,9 @@ generate_all_plots_parallel <- function(
         plot_dir = plot_dir,
         plot476_base_size = plot476_base_size,
         plot476_label_size = plot476_label_size,
-        plot476_simplify_labels = plot476_simplify_labels
+        plot476_simplify_labels = plot476_simplify_labels,
+        ID89_mapped_signatures = ID89_mapped_signatures,
+        ID83_mapped_signatures = ID83_mapped_signatures
       )
     },
     .options = furrr::furrr_options(
@@ -513,8 +599,8 @@ check_plot_cache <- function(
 ) {
   cache_path <- file.path(plot_dir, cache_file)
 
-  # Source files that plots depend on
-  source_files <- c(
+  # Source files in data_dir that plots depend on
+  data_files <- c(
     "Liu_et_al_final_89_type_signatures.tsv",
     "Liu_et_al_89_type_spectra.tsv",
     "Liu_et_al_final_83_type_signatures.tsv",
@@ -524,19 +610,30 @@ check_plot_cache <- function(
     "89type_to_83type_connection.tsv"
   )
 
+  # Files in vignette directory that affect plotting
+  vignette_files <- c(
+    "ppar.R",
+    "89_mapped_from_476.tsv",
+    "83_mapped_from_476.tsv"
+  )
+
   # Check if plot directory exists
   if (!dir.exists(plot_dir)) {
     return(FALSE)
   }
 
   # Compute current hash from file modification times
-  file_paths <- file.path(data_dir, source_files)
-  if (!all(file.exists(file_paths))) {
+  data_paths <- file.path(data_dir, data_files)
+  if (!all(file.exists(data_paths))) {
     return(FALSE)
   }
 
+  # Check vignette files (optional - skip missing files)
+  vignette_paths <- vignette_files[file.exists(vignette_files)]
+
+  all_paths <- c(data_paths, vignette_paths)
   current_hash <- digest::digest(
-    sapply(file_paths, file.mtime)
+    sapply(all_paths, file.mtime)
   )
 
   # Check if cache exists and matches
@@ -561,7 +658,8 @@ save_plot_cache <- function(
   plot_dir,
   cache_file = "plot_cache_hash.rds"
 ) {
-  source_files <- c(
+  # Source files in data_dir
+  data_files <- c(
     "Liu_et_al_final_89_type_signatures.tsv",
     "Liu_et_al_89_type_spectra.tsv",
     "Liu_et_al_final_83_type_signatures.tsv",
@@ -571,8 +669,19 @@ save_plot_cache <- function(
     "89type_to_83type_connection.tsv"
   )
 
+  # Files in vignette directory that affect plotting
+  vignette_files <- c(
+    "ppar.R",
+    "89_mapped_from_476.tsv",
+    "83_mapped_from_476.tsv"
+  )
+
+  data_paths <- file.path(data_dir, data_files)
+  vignette_paths <- vignette_files[file.exists(vignette_files)]
+
+  all_paths <- c(data_paths, vignette_paths)
   current_hash <- digest::digest(
-    sapply(file.path(data_dir, source_files), file.mtime)
+    sapply(all_paths, file.mtime)
   )
 
   saveRDS(current_hash, file.path(plot_dir, cache_file))
@@ -592,6 +701,7 @@ reconstruct_plot_paths <- function(signature_names, plot_dir) {
 
     paths <- list(
       id89_sig = file.path(plot_dir, paste0(safe_name, "_id89_sig.png")),
+      id89_mapped = file.path(plot_dir, paste0(safe_name, "_id89_mapped.png")),
       id89_catalog = file.path(
         plot_dir,
         paste0(safe_name, "_id89_catalog.png")
@@ -610,6 +720,7 @@ reconstruct_plot_paths <- function(signature_names, plot_dir) {
         paste0(safe_name, "_id476_catalog.png")
       ),
       id83_sig = file.path(plot_dir, paste0(safe_name, "_id83_sig.png")),
+      id83_mapped = file.path(plot_dir, paste0(safe_name, "_id83_mapped.png")),
       id83_catalog = file.path(plot_dir, paste0(safe_name, "_id83_catalog.png"))
     )
 
