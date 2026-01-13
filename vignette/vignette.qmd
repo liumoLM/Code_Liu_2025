@@ -35,7 +35,12 @@ execute:
 
 # Set to TRUE to force regeneration, otherwise the code
 # will use check_plot_cache to see if the cache is still
-# up-to-date and update if necessary (see below)
+# up-to-date and update if necessary (see below).
+
+# ======================================================
+# IMPORTANT: for developers, changing plot titles will
+# not automatically trigger plot regeneration.
+# ======================================================
 REGENERATE_PLOTS <- TRUE # FALSE
 data_dir <- "../Manuscript_data/"
 ```
@@ -257,7 +262,7 @@ plot_dir <- "figure/parallel_plots"
 cache_valid <- check_plot_cache(data_dir, plot_dir) && !REGENERATE_PLOTS
 
 if (cache_valid) {
-  message("Using cached plots from: ", plot_dir)
+  warning("Using cached plots from: ", plot_dir)
   all_plot_paths <- reconstruct_plot_paths(
     names(all_signature_data),
     plot_dir

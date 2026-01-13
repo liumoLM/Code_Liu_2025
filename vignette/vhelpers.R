@@ -352,7 +352,9 @@ generate_plots_to_files <- function(
       ID89_mapped_signatures[, mapped_col_name, drop = FALSE],
       plot_title = paste0(
         sig_data$ID89signature,
-        " converted from 476-type signature | cosine to main = ",
+        " converted from 476-type signature | cosine similarity to ",
+        sig_data$ID89signature,
+        " = ",
         format(sig_data$cosine89_mapped, digits = getp("cosine_digits"))
       )
     )
@@ -436,20 +438,23 @@ generate_plots_to_files <- function(
   if (sig_data$has_476_signature) {
     p5 <- p476(
       ID476_signatures[, sig_data$ID89signature],
-      plot_title = paste0("476-Type Representation of ", sig_data$ID89signature)
+      plot_title = paste0(
+        "Extracted 476-type signature corresponding to ",
+        sig_data$ID89signature
+      )
     )
     save476(p5, paths$id476_sig)
 
     p6 <- p476(
       ID476_catalogs[, sig_data$catalog],
-      plot_title = paste0("476-Type Spectrum of ", sig_data$catalog)
+      plot_title = ""
     )
     save476(p6, paths$id476_catalog)
   } else {
     p5 <- p476(
       ID476_catalogs[, sig_data$catalog],
       plot_title = paste0(
-        "476-Type Representation of the Supporting Genome ",
+        "476-type spectrum of the supporting tumor ",
         sig_data$catalog
       )
     )
