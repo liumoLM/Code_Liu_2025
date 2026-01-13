@@ -41,7 +41,7 @@ best_match_one_column <- function(
   plots <- list()
 
   # Plot A first
-  plots[[1]] <- plotit(A, A_name)
+  plots[[1]] <- plotit(A, plot_title = A_name)
 
   for (measure_name in names(measures)) {
     measure <- measures[[measure_name]]
@@ -97,7 +97,12 @@ best_match_one_column <- function(
       measure_name,
       best_val
     )
-    plots[[length(plots) + 1]] <- plotit(M_best, title)
+    plots[[length(plots) + 1]] <- plotit(
+      M_best,
+      plot_title = title,
+      base_size = 20,
+      text_size = 5
+    )
   }
 
   # Combine plots
