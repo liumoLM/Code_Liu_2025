@@ -169,6 +169,16 @@ exemplars_one_sig <- function(
 }
 
 exemplars_one_sig(
+  sig_path = "../Manuscript_data/Liu_et_al_final_89_type_signatures.tsv",
+  "InsDel_P",
+  "../Manuscript_data/Liu_et_al_89_type_spectra.tsv",
+  cosine_cutoff = 0.9,
+  num_exemplars = 100,
+  out_pdf = "exemplars_for_IndDel_P.pdf",
+  min_mutations = 50
+)
+
+exemplars_one_sig(
   "../Manuscript_data/COSMIC_v3.5_ID_GRCh37_signatures.tsv",
   "ID10",
   "../Manuscript_data/Liu_et_al_83_type_spectra.tsv",
