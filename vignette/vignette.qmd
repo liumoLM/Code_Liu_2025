@@ -41,7 +41,7 @@ execute:
 # IMPORTANT: for developers, changing plot titles will
 # not automatically trigger plot regeneration.
 # ======================================================
-REGENERATE_PLOTS <- TRUE # FALSE
+REGENERATE_PLOTS <- FALSE
 data_dir <- "../Manuscript_data/"
 ```
 
