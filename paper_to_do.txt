@@ -54,6 +54,11 @@ A_alpha looks perfect
 
 19c looks pretty good:  C_ID19 has lost t ins and del in long p-t *** NEED TO WRITE NOTE ***
 
+19b ok C_ID19 has lost 5+ dels and t ins in long p-t *** NEED TO WRITE NOTE ***
+
+19a C_ID19 lost t ins in long p-t *** NEED TO WRITE NOTE ***
+
+18 looks very good, CID18 lost 7% t ins in olong poly-t
 
 
 
