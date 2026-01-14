@@ -5,6 +5,6 @@ ID_N has a larger proportion of 2-base deletions in the longest category of 2-ba
 2-base deletions in the longest category of 2-base repeats, and essentially lacks 3-base 
 and 4-base deletions.
 
-WARNING: The lossy compaction from 497 type to 83 type makes
-the wrong choice in the many-to-one mapping from 
-indel types in the 476 classification to types in the 83 classification.
+WARNING: The 83-type ID_N extraction excluded the large proportion of T deletions in long poly-T contexts
+that were detected in extractions in the 89-type and 476-type
+classifications.

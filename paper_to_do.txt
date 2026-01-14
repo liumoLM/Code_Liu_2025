@@ -1,4 +1,12 @@
-﻿# Steve
+﻿# Steve / Mo discussion
+
+Yes, drop HEK2
+
+Go for upload to preprint server prior to submission
+
+Discuss warnings for ID  Big picture, 83 type not useful - to discuss future we need a new classification
+
+# Steve
 
 *** URGENT -- proceed with upload of HEK cells
 
@@ -14,7 +22,40 @@ against long poly A / poly T?  Can we check this?
 
 InsDel_O Mo -- do you agree with ID_O.md? 
 
-ID_N Double check the "lossy compaction" hypothesis
+ID_N Check w/ Mo
+
+ID_M Check w/ Mo
+
+ID_L -- IMPORTANT discuss w/ Mo
+
+J Check w/ Mo
+
+I (no comments -- looks perfect)
+
+H *** Need to discuss w/ Mo -- don't understand the labeling in the figure ...
+
+G (no comments -- looks pretty good)
+
+F (no comments -- looks perfect -- do we want to add a note on rnash2b connection)
+
+E (no comments -- looks perfect)
+
+D (no comments -- looks perfect)
+
+C reverse Discuss w/ the value of ID_C
+
+B looks perfect
+
+A_beta looks good
+
+A_alpha looks perfect
+
+23 looks perfect
+
+19c looks pretty good:  C_ID19 has lost t ins and del in long p-t *** NEED TO WRITE NOTE ***
+
+
+
 
 
 
