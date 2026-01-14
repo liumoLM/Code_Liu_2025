@@ -329,6 +329,7 @@ generate_plots_to_files <- function(
       catalog,
       plot_title = plot_title,
       text_size = getp('textsize89'),
+      top_bar_text_size = getp('topbartextsize89'),
       base_size = getp('basesize89'),
       setyaxis = setyaxis
     )
