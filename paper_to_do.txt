@@ -1,12 +1,25 @@
-﻿# Steve, sunday
+﻿# Steve
 
-Ask mo -- intent on cosine sim in 89-type sections of vignette
+*** URGENT -- proceed with upload of HEK cells
 
 Review table 1 column E --> need to write something about every entry (see written notes)
 
 Redo signature similarity matrices and signature clustering
 
-indel_O is backward in the last 2 type 89 plots
+# Steve or Mo do on each signature (working backward)
+
+InsDel_P : there are many PCAWG tumors with spectra matching InsDel_P, 
+but few HMF -- is it possible that HMF variant calling is somehow prejudiced
+against long poly A / poly T?  Can we check this?
+
+InsDel_O Steve or Mo find the specifics of why the compression from 476 to 83 is bad for this.
+It is an artifcat of the many-to-one mapping from 476 types to 83 types, but for my
+own sanity a want to understand which one operated here.
+
+InsDel_N Describe the differenences between N and J in 83 and 476 in more detail
+
+
+
 
 # Mo to do
 
@@ -16,7 +29,6 @@ Email willie about wild type 293t cell data  -- done
 
 # Steve to do
 
-Wait for fastqs from 293t cells to get to rozenlab, then upload to SRA
 
 Re-diff vignette .rmd / spelling examplar -> exe... / suppress x axis labels (use new mSigPlot code)
 
