@@ -12,11 +12,10 @@ InsDel_P : there are many PCAWG tumors with spectra matching InsDel_P,
 but few HMF -- is it possible that HMF variant calling is somehow prejudiced
 against long poly A / poly T?  Can we check this?
 
-InsDel_O Steve or Mo find the specifics of why the compression from 476 to 83 is bad for this.
-It is an artifcat of the many-to-one mapping from 476 types to 83 types, but for my
-own sanity a want to understand which one operated here.
+InsDel_O Mo -- do you agree with ID_O.md? 
 
-InsDel_N Describe the differenences between N and J in 83 and 476 in more detail
+ID_N Double check the "lossy compaction" hypothesis
+
 
 
 
