@@ -20,6 +20,9 @@ format:
     toc-depth: 1
     documentclass: article
     latex-max-runs: 3
+    pdf-engine: xelatex
+    mainfont: "TeX Gyre Heros"
+    sansfont: "TeX Gyre Heros"
     geometry:
       - margin=1in
     include-in-header:
@@ -50,10 +53,8 @@ data_dir <- "../Manuscript_data/"
 #| include: false
 
 library(magrittr)
-library(indelsig.tools.lib)
 library(gridExtra)
 library(data.table)
-library(ICAMS)
 library(mSigPlot)
 library(data.table)
 library(ggplot2)
