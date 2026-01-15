@@ -8,3 +8,7 @@ and 4-base deletions.
 WARNING: The 83-type ID_N extraction excluded the large proportion of T deletions in long poly-T contexts
 that were detected in extractions in the 89-type and 476-type
 classifications.
+
+These single T deletions in long poly-T contexts are present in the 83-type signature collapsed from the 476-type InsDel_N 
+signature, which makes the deletions of 2 bases hard to see in the plot. 
+However, since we are collapsing from 476-categories that does not capture the differences between ID_J and ID_N very well, the differences between ID_J and ID_N are not visible. 
