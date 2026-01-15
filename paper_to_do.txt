@@ -96,6 +96,26 @@ also some discrepancies in the longer insertions; howwever 89 type extraction an
 
 3b perfect
 
+3a -- some 1b t in poly t insertions missed in C_ID13
+
+2c very good, some t ins -- worth mentioning? very different from 2a and 2b *** need some kind of note*
+
+2b more t insertions than in 83; compare to 2a skewed toward del t in longer poly t 
+and skewerd toward ins t in longer poly t
+
+2a some t insertion
+ 2c is closed to C_ID2
+
+1d perfect
+
+1c nearly perfect
+
+1b good -- some t del in poly 5 missed in C_ID1
+
+1a perfect
+
+
+
 
 
 
