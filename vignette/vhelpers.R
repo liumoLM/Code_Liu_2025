@@ -58,6 +58,7 @@ find_sig_txt <- function(sig_id) {
 #' @param ID476_catalogs Data frame of ID476 catalogs
 #' @param ID83signature Character: the corresponding ID83 signature name
 #' @param assignment_matrix Data frame of signature assignments
+#' @param cosmic_matches Named list of data frames with COSMIC signature matches
 #' @return List with cosine similarities and intermediate data
 compute_signature_data <- function(
   ID89signature,
@@ -72,7 +73,8 @@ compute_signature_data <- function(
   ID476_catalogs,
   assignment_matrix,
   ID89_mapped_signatures = NULL,
-  ID83_mapped_signatures = NULL
+  ID83_mapped_signatures = NULL,
+  cosmic_matches = NULL
 ) {
   message("ID89signature = ", ID89signature)
   # Check if mapped 89-type signature exists (column name is {signature}_converted)
@@ -87,6 +89,12 @@ compute_signature_data <- function(
     !is.null(ID83_mapped_signatures) &&
     mapped_col_name %in% colnames(ID83_mapped_signatures)
 
+  # Get COSMIC matches for this 83-type signature
+  cosmic_match_data <- NULL
+  if (!is.null(cosmic_matches) && ID83signature %in% names(cosmic_matches)) {
+    cosmic_match_data <- cosmic_matches[[ID83signature]]
+  }
+
   result <- list(
     ID89signature = ID89signature,
     catalog = exemplar_id,
@@ -97,7 +105,8 @@ compute_signature_data <- function(
     has_476_signature = has_476_sig,
     has_83_signature = ID83signature %in% colnames(ID83_signatures),
     has_mapped_signature = has_mapped_sig,
-    has_83_mapped_signature = has_83_mapped_sig
+    has_83_mapped_signature = has_83_mapped_sig,
+    cosmic_matches = cosmic_match_data
   )
 
   # Compute cosine89 (raw catalog vs signature)
@@ -270,6 +279,7 @@ generate_section_footer <- function(sig_data) {
 #' @param plot476_base_size Base font size for 476 plots
 #' @param plot476_label_size Label size for 476 plots
 #' @param plot476_simplify_labels Whether to simplify labels
+#' @param cosmic_signatures Data frame of COSMIC signatures for matching plots
 #' @return List with paths to all generated plot files
 generate_plots_to_files <- function(
   sig_data,
@@ -285,7 +295,8 @@ generate_plots_to_files <- function(
   plot476_label_size = 3,
   plot476_simplify_labels = FALSE,
   ID89_mapped_signatures = NULL,
-  ID83_mapped_signatures = NULL
+  ID83_mapped_signatures = NULL,
+  cosmic_signatures = NULL
 ) {
   # Create safe filename prefix from signature name
   safe_name <- gsub("[^a-zA-Z0-9_]", "_", sig_data$ID89signature)
@@ -516,6 +527,37 @@ generate_plots_to_files <- function(
   ptmp <- p83(cat83touse[, sig_data$catalog, drop = FALSE])
   save83(ptmp, paths$id83_catalog)
 
+  # COSMIC matching signatures
+  paths$cosmic_plots <- NULL
+  if (!is.null(sig_data$cosmic_matches) && !is.null(cosmic_signatures)) {
+    cosmic_plot_list <- list()
+    for (i in seq_len(nrow(sig_data$cosmic_matches))) {
+      cosmic_sig_name <- sig_data$cosmic_matches$cosmic_sig[i]
+      cosmic_cosine <- sig_data$cosmic_matches$cosine[i]
+
+      plot_path <- file.path(
+        plot_dir,
+        paste0(safe_name, "_cosmic_", cosmic_sig_name, ".png")
+      )
+
+      ptmp <- p83(
+        cosmic_signatures[, cosmic_sig_name, drop = FALSE],
+        plot_title = paste0(
+          "COSMIC ", cosmic_sig_name,
+          " | cosine to ", sig_data$ID83signature, ": ",
+          format(cosmic_cosine, digits = getp("cosine_digits"))
+        )
+      )
+      save83(ptmp, plot_path)
+
+      cosmic_plot_list[[cosmic_sig_name]] <- list(
+        path = plot_path,
+        cosine = cosmic_cosine
+      )
+    }
+    paths$cosmic_plots <- cosmic_plot_list
+  }
+
   return(paths)
 }
 
@@ -541,6 +583,7 @@ generate_all_plots_parallel <- function(
   plot476_simplify_labels = FALSE,
   ID89_mapped_signatures = NULL,
   ID83_mapped_signatures = NULL,
+  cosmic_signatures = NULL,
   n_workers = 14
 ) {
   # Create plot directory
@@ -567,7 +610,8 @@ generate_all_plots_parallel <- function(
         plot476_label_size = plot476_label_size,
         plot476_simplify_labels = plot476_simplify_labels,
         ID89_mapped_signatures = ID89_mapped_signatures,
-        ID83_mapped_signatures = ID83_mapped_signatures
+        ID83_mapped_signatures = ID83_mapped_signatures,
+        cosmic_signatures = cosmic_signatures
       )
     },
     .options = furrr::furrr_options(
@@ -609,7 +653,8 @@ check_plot_cache <- function(
     "Liu_et_al_83_type_spectra.tsv",
     "Liu_et_al_final_476_type_signatures.tsv",
     "Liu_et_al_476_type_spectra.tsv",
-    "89type_to_83type_connection.tsv"
+    "89type_to_83type_connection.tsv",
+    "COSMIC_v3.5_ID_GRCh37_signatures.tsv"
   )
 
   # Files in vignette directory that affect plotting
@@ -668,7 +713,8 @@ save_plot_cache <- function(
     "Liu_et_al_83_type_spectra.tsv",
     "Liu_et_al_final_476_type_signatures.tsv",
     "Liu_et_al_476_type_spectra.tsv",
-    "89type_to_83type_connection.tsv"
+    "89type_to_83type_connection.tsv",
+    "COSMIC_v3.5_ID_GRCh37_signatures.tsv"
   )
 
   # Files in vignette directory that affect plotting
@@ -730,6 +776,30 @@ reconstruct_plot_paths <- function(signature_names, plot_dir) {
     paths <- lapply(paths, function(p) {
       if (file.exists(p)) p else NULL
     })
+
+    # Find any COSMIC plots for this signature
+    cosmic_pattern <- paste0(safe_name, "_cosmic_*.png")
+    cosmic_files <- list.files(
+      plot_dir,
+      pattern = glob2rx(cosmic_pattern),
+      full.names = TRUE
+    )
+    if (length(cosmic_files) > 0) {
+      # Extract COSMIC signature names from filenames
+      cosmic_plot_list <- list()
+      for (cf in cosmic_files) {
+        # Extract cosmic sig name from filename like "InsDel1_cosmic_ID5.png"
+        basename_no_ext <- tools::file_path_sans_ext(basename(cf))
+        cosmic_sig_name <- sub(paste0(safe_name, "_cosmic_"), "", basename_no_ext)
+        cosmic_plot_list[[cosmic_sig_name]] <- list(
+          path = cf,
+          cosine = NA  # Cosine not available from cache
+        )
+      }
+      paths$cosmic_plots <- cosmic_plot_list
+    } else {
+      paths$cosmic_plots <- NULL
+    }
 
     return(paths)
   })
