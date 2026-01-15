@@ -123,7 +123,7 @@ if (sig_data$has_476_signature) {
       sig_data$ID89signature,
       ' was not found by de novo extraction. ',
       'This is the 476-Type spectrum of ',
-      sig_data$catalog
+      sig_data$exemplar_id
     ),
     style = ".callout-note"
   )
@@ -148,7 +148,7 @@ if (!is.null(plot_paths$id476_sig)) {
 if (!is.null(plot_paths$id476_catalog)) {
   cat(
     '\n\n476-type spectrum of the supporting tumor ',
-    sig_data$catalog,
+    sig_data$exemplar_id,
     "; cosine similarity to the extracted 476-type signature is ",
     format(sig_data$cosine476, digits = getp("cosine_digits")),
     '\n\n',
@@ -241,8 +241,8 @@ if (!is.null(plot_paths$id83_mapped)) {
 # Header for exemplar 83-type spectrum
 cat(paste0(
   '\n\n83-type spectrum of the supporting tumor ',
-  sig_data$catalog,
-  " | cosine similariy to ",
+  sig_data$exemplar_id,
+  " | cosine similarly to ",
   sig_data$ID83signature,
   ": ",
   format(sig_data$cosine83, digits = getp("cosine_digits")),

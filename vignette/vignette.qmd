@@ -388,7 +388,7 @@ source("vhelpers.R")
 # Pre-compute all signature data before rendering
 # This separates computation from plotting, making debugging easier
 
-all_signature_data <- lapply(
+all_sig_data <- lapply(
   seq_len(nrow(connect_89_to_83)),
   function(i) {
     compute_signature_data(
@@ -413,7 +413,7 @@ all_signature_data <- lapply(
 )
 
 # Name the list for easier debugging
-names(all_signature_data) <- connect_89_to_83$ID89_signature
+names(all_sig_data) <- connect_89_to_83$ID89_signature
 ```
 
 ```{r}
@@ -422,8 +422,8 @@ names(all_signature_data) <- connect_89_to_83$ID89_signature
 
 # Validate all data was computed correctly before rendering
 # This catches computation errors before they appear in plot rendering
-for (i in seq_along(all_signature_data)) {
-  sig <- all_signature_data[[i]]
+for (i in seq_along(all_sig_data)) {
+  sig <- all_sig_data[[i]]
   if (is.na(sig$cosine89)) {
     warning(paste("Missing cosine89 for:", sig$ID89signature))
   }
@@ -437,8 +437,8 @@ for (i in seq_along(all_signature_data)) {
 #| label: create-signature-table
 #| include: false
 
-# Transform all_signature_data to a tibble with nested columns
-signature_table <- all_signature_data %>%
+# Transform all_sig_data to a tibble with nested columns
+sig_table <- all_sig_data %>%
   enframe(name = "sig_name", value = "data") %>%
   unnest_wider(data)
 ```
@@ -456,13 +456,13 @@ cache_valid <- check_plot_cache(data_dir, plot_dir) && !REGENERATE_PLOTS
 if (cache_valid) {
   warning("Using cached plots from: ", plot_dir)
   all_plot_paths <- reconstruct_plot_paths(
-    names(all_signature_data),
+    names(all_sig_data),
     plot_dir
   )
 } else {
   message("Generating plots (cache invalid or forced regeneration)...")
   all_plot_paths <- generate_all_plots_parallel(
-    all_signature_data = all_signature_data,
+    all_sig_data = all_sig_data,
     ID89_signatures = type89_sigs,
     ID89_catalogs = to.plot.all.ID89.catalogs,
     ID83_signatures = type83_sigs,
@@ -494,9 +494,9 @@ if (cache_valid) {
 # Each iteration uses the child template, isolating errors to specific sections
 # Plots are pre-generated, so this loop just inserts images (fast)
 
-for (i in seq_along(all_signature_data)) {
+for (i in seq_along(all_sig_data)) {
   # Set sig_data and plot_paths in the environment for the child template
-  sig_data <- all_signature_data[[i]]
+  sig_data <- all_sig_data[[i]]
   plot_paths <- all_plot_paths[[i]]
 
   # Render the child template for this signature
