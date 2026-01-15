@@ -18,6 +18,7 @@ ppar <- list(
   topbartextsize89 = 4,
   extra89y = 1.1,
 
+  # For type-83 plots
   w83 = 19,
   h83 = 6,
   basesize83 = 25,

@@ -565,8 +565,11 @@ generate_plots_to_files <- function(
       ptmp <- p83(
         cosmic_signatures[, cosmic_sig_name, drop = FALSE],
         plot_title = paste0(
-          "COSMIC ", cosmic_sig_name,
-          " | cosine to ", sig_data$ID83signature, ": ",
+          "COSMIC ",
+          cosmic_sig_name,
+          " | cosine to ",
+          sig_data$ID83signature,
+          ": ",
           format(cosmic_cosine, digits = getp("cosine_digits"))
         )
       )
@@ -596,8 +599,11 @@ generate_plots_to_files <- function(
       ptmp <- p83(
         jin_signatures[, jin_sig_name, drop = FALSE],
         plot_title = paste0(
-          "Jin ", jin_sig_name,
-          " | cosine to ", sig_data$ID83signature, ": ",
+          "Jin ",
+          jin_sig_name,
+          " | cosine to ",
+          sig_data$ID83signature,
+          ": ",
           format(jin_cosine, digits = getp("cosine_digits"))
         )
       )
@@ -627,8 +633,11 @@ generate_plots_to_files <- function(
       ptmp <- p89(
         koh_signatures[, koh_sig_name, drop = FALSE],
         plot_title = paste0(
-          "Koh ", koh_sig_name,
-          " | cosine to ", sig_data$ID89signature, ": ",
+          "Similar signature from Koh et al., 2025 ",
+          koh_sig_name,
+          " | cosine to ",
+          sig_data$ID89signature,
+          ": ",
           format(koh_cosine, digits = getp("cosine_digits"))
         )
       )
@@ -882,10 +891,14 @@ reconstruct_plot_paths <- function(signature_names, plot_dir) {
       for (cf in cosmic_files) {
         # Extract cosmic sig name from filename like "InsDel1_cosmic_ID5.png"
         basename_no_ext <- tools::file_path_sans_ext(basename(cf))
-        cosmic_sig_name <- sub(paste0(safe_name, "_cosmic_"), "", basename_no_ext)
+        cosmic_sig_name <- sub(
+          paste0(safe_name, "_cosmic_"),
+          "",
+          basename_no_ext
+        )
         cosmic_plot_list[[cosmic_sig_name]] <- list(
           path = cf,
-          cosine = NA  # Cosine not available from cache
+          cosine = NA # Cosine not available from cache
         )
       }
       paths$cosmic_plots <- cosmic_plot_list
