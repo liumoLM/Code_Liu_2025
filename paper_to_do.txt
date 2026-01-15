@@ -8,11 +8,11 @@ Discuss warnings for ID  Big picture, 83 type not useful - to discuss future we 
 
 # Steve
 
-*** URGENT -- proceed with upload of HEK cells
+HOLD *** URGENT -- proceed with upload of HEK cells
 
-Review table 1 column E --> need to write something about every entry (see written notes)
+REVISIT Review table 1 column E --> need to write something about every entry (see written notes)
 
-Redo signature similarity matrices and signature clustering
+DO: Redo signature similarity matrices and signature clustering and make any necessary notes
 
 # Steve or Mo do on each signature (working backward)
 
@@ -118,18 +118,6 @@ and skewerd toward ins t in longer poly t
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 # Mo to do
 
 Drop Fig 9, draft a table with the information just 89-type -- remove Fig 9 and a relevent sup figure 10. highlighted the relevant part in the manuscript for Steve to decide if to remove or not.
@@ -138,16 +126,11 @@ Email willie about wild type 293t cell data  -- done
 
 # Steve to do
 
-
-Re-diff vignette .rmd / spelling examplar -> exe... / suppress x axis labels (use new mSigPlot code)
-
 Review ID10/C_ID10 -- our extraction got big green T/polyT insertion peak; ID10 has none, or 89/476 has some
 
-Add to vignette
+Add to vignette COSMIC and maybe koh
 
-* Insdel4b The 89 type and 476 type extractions detect co-occurence of T insertions in long poly-T along with . This is a theme ....
 
-* Insdel5b <same text as 4b>
 
 
 
