@@ -5,25 +5,6 @@ library(gridExtra)
 
 plot_output = "plot_output"
 
-#' Determine the appropriate plotting function based on number of rows
-#' Adapted from signature_comparisons/best_matches.R
-#' For 89-type or 476-type, prefers 476-type plotting if available
-#' @param n_rows Number of rows in the signature matrix
-#' @return A plotting function from mSigPlot
-guess_plotit <- function(n_rows) {
-  if (n_rows == 476) {
-    mSigPlot::plot_476
-  } else if (n_rows == 89) {
-    # For 89-type, prefer 476-type plotting if we later support conversion
-    # For now, use plot_89
-    mSigPlot::plot_89
-  } else if (n_rows == 83) {
-    mSigPlot::plot_83
-  } else {
-    stop("Unexpected number of rows: ", n_rows)
-  }
-}
-
 #' Compute cosine similarity between two vectors
 #' @param a A numeric vector
 #' @param b A numeric vector
@@ -206,7 +187,6 @@ all_pairwise_cosine <- function(
 
   # Additional pages: plot pairs with cosine similarity > 0.89
   high_sim_threshold <- 0.89
-  plotit <- guess_plotit(nrow(sigs))
 
   # Find all pairs in lower triangle with cosine > threshold
   high_pairs <- which(cos_mat_lower > high_sim_threshold, arr.ind = TRUE)
@@ -242,8 +222,8 @@ all_pairwise_cosine <- function(
       title1 <- sprintf("%s", sig1_name)
       title2 <- sprintf("%s (cosine = %.3f)", sig2_name, cos_val)
 
-      p1 <- plotit(catalog = sig1_vec, plot_title = title1)
-      p2 <- plotit(catalog = sig2_vec, plot_title = title2)
+      p1 <- mSigPlot::plot_guess(catalog = sig1_vec, plot_title = title1)
+      p2 <- mSigPlot::plot_guess(catalog = sig2_vec, plot_title = title2)
 
       # Arrange plots one over the other
       grid.arrange(p1, p2, nrow = 2)

@@ -138,9 +138,9 @@ Email willie about wild type 293t cell data  -- done
 
 Review ID10/C_ID10 -- our extraction got big green T/polyT insertion peak; ID10 has none, or 89/476 has some
 
-Add to vignette COSMIC and maybe koh
+shinylink live? https://share.google/aimode/HyNj7vq10fmiW7i1h
 
-
+see onetab -- zenodo + github pages + shinklink live?
 
 
 
