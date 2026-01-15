@@ -27,6 +27,14 @@
   {\tcbox[colback=lightgray,colframe=headerblue,boxrule=0pt,leftrule=4pt,arc=0pt,boxsep=5pt,left=10pt]{#1}}
 \titlespacing*{\subsection}{0pt}{15pt}{8pt}
 
+% Subsubsection headers - same background as subsection, but italic and not bold
+\titleformat{\subsubsection}
+  {\normalfont\normalsize\itshape\color{darktext}}
+  {}
+  {0pt}
+  {\tcbox[colback=lightgray,colframe=headerblue,boxrule=0pt,leftrule=4pt,arc=0pt,boxsep=5pt,left=10pt]{#1}}
+\titlespacing*{\subsubsection}{0pt}{15pt}{8pt}
+
 % Callout boxes for notes
 \newtcolorbox{callout-note}{
   colback=lightgray,
