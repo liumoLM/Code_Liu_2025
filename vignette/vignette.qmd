@@ -69,6 +69,8 @@ library(data.table)
 library(ggplot2)
 library(future)
 library(furrr)
+library(tidyr)
+library(tibble)
 
 ```
 
@@ -429,6 +431,16 @@ for (i in seq_along(all_signature_data)) {
     warning(paste("Missing cosine83 for:", sig$ID89signature))
   }
 }
+```
+
+```{r}
+#| label: create-signature-table
+#| include: false
+
+# Transform all_signature_data to a tibble with nested columns
+signature_table <- all_signature_data %>%
+  enframe(name = "sig_name", value = "data") %>%
+  unnest_wider(data)
 ```
 
 ```{r}
