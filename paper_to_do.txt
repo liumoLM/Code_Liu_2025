@@ -70,7 +70,9 @@ A_alpha looks perfect
 
 17 looks perfect
 
-16 *** ISSUE I DON'T understand *** IS THERE AN ERROR in the compaction code for insertions?
+16 *** ISSUE I DON'T understand *** IS THERE AN ERROR in the compaction code for insertions? 
+TODO Dell 16 and Del 11 very close in 89 type
+but completely different in 476 and (89?_)
 
 15 perfect
 
@@ -104,7 +106,7 @@ also some discrepancies in the longer insertions; however 89 type extraction and
 
 3b perfect
 
-3a -- some 1b t in poly t insertions missed in C_ID13
+3a -- some 1b t in poly t insertions missed in C_ID13 3a and 3b are different enough if if cossim = 0.907
 
 2c very good, some t ins -- worth mentioning? very different from 2a and 2b *** need some kind of note*
 
