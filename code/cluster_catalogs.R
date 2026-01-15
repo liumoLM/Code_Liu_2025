@@ -4,12 +4,15 @@ library(ggdendro)
 #' Hierarchical clustering of signature catalogs using cosine distance
 #'
 #' @param output_file Path to the output PDF file
+#' @param min_similarity_to_display Minimum cosine similarity to any other signature
+#'   required to display a label. Signatures with max similarity below this threshold
+#'   will have their labels suppressed.
 #' @param ... Named arguments where names are source labels and values are file paths
 #'   to TSV files containing signature data (features as rows, samples as columns)
 #'
 #' @examples
 #' # See code/run_cluster_catalogs.R for complete examples
-cluster_catalogs <- function(output_file, ...) {
+cluster_catalogs <- function(output_file, min_similarity_to_display = 0.85, ...) {
   file_args <- list(...)
 
   if (length(file_args) == 0) {
@@ -60,6 +63,18 @@ cluster_catalogs <- function(output_file, ...) {
   # Add source info to labels
   label_df <- dend_data$labels
   label_df$source <- source_vec[label_df$label]
+
+  # Suppress labels for signatures with max similarity to any other < threshold
+  # Set diagonal to 0 so we only consider other signatures
+  cosine_sim_other <- cosine_sim
+  diag(cosine_sim_other) <- 0
+  max_sim_to_other <- apply(cosine_sim_other, 1, max)
+  sigs_to_hide <- names(max_sim_to_other[max_sim_to_other < min_similarity_to_display])
+  label_df$label <- ifelse(
+    label_df$label %in% sigs_to_hide,
+    "",
+    as.character(label_df$label)
+  )
 
   # Color-blind friendly palette (Okabe-Ito extended)
   cb_colors <- c(
