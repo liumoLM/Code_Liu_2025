@@ -254,5 +254,34 @@ if (!is.null(plot_paths$cosmic_plots) && length(plot_paths$cosmic_plots) > 0) {
 #| echo: false
 #| output: asis
 
+# Jin matching signatures section
+if (!is.null(plot_paths$jin_plots) && length(plot_paths$jin_plots) > 0) {
+  cat("\n\n## Matching Jin signatures\n\n")
+
+  for (jin_name in names(plot_paths$jin_plots)) {
+    jin_info <- plot_paths$jin_plots[[jin_name]]
+
+    # Get cosine from sig_data if available, otherwise from plot_paths
+    cosine_val <- NA
+    if (!is.null(sig_data$jin_matches)) {
+      match_row <- which(sig_data$jin_matches$jin_sig == jin_name)
+      if (length(match_row) > 0) {
+        cosine_val <- sig_data$jin_matches$cosine[match_row]
+      }
+    }
+    if (is.na(cosine_val) && !is.null(jin_info$cosine)) {
+      cosine_val <- jin_info$cosine
+    }
+
+    # Display the plot
+    displayplot(jin_info$path, getp("hw83"))
+  }
+}
+```
+
+```{r}
+#| echo: false
+#| output: asis
+
 cat(generate_section_footer(sig_data))
 ```
