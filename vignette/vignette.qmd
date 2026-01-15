@@ -46,6 +46,9 @@ execute:
 # ======================================================
 REGENERATE_PLOTS <- FALSE
 data_dir <- "../Manuscript_data/"
+
+# Minimum cosine similarity to show matching COSMIC signatures
+COSMIC_min_cosine <- 0.9
 ```
 
 ```{r}
@@ -144,6 +147,53 @@ type83_sigs <- read.delim(
   check.names = FALSE
 )
 
+```
+
+```{r}
+#| label: get-data-cosmic
+#| include: false
+
+# Read COSMIC ID signatures
+cosmic_sigs <- read.delim(
+  file.path(data_dir, "COSMIC_v3.5_ID_GRCh37_signatures.tsv"),
+  sep = "\t",
+  row.names = 1,
+  check.names = FALSE
+)
+
+# Compute pairwise cosine similarities between type83_sigs and cosmic_sigs
+# Result: rows = type83_sigs columns, cols = cosmic_sigs columns
+cosmic_cosine_matrix <- matrix(
+ NA,
+ nrow = ncol(type83_sigs),
+ ncol = ncol(cosmic_sigs),
+ dimnames = list(colnames(type83_sigs), colnames(cosmic_sigs))
+)
+
+for (i in seq_len(ncol(type83_sigs))) {
+ for (j in seq_len(ncol(cosmic_sigs))) {
+   cosmic_cosine_matrix[i, j] <- lsa::cosine(
+     as.numeric(type83_sigs[, i]),
+     as.numeric(cosmic_sigs[, j])
+   )
+ }
+}
+
+# For each type83 signature, find COSMIC signatures with cosine > threshold
+cosmic_matches <- lapply(seq_len(nrow(cosmic_cosine_matrix)), function(i) {
+ sig_name <- rownames(cosmic_cosine_matrix)[i]
+ cosines <- cosmic_cosine_matrix[i, ]
+ matches <- which(cosines >= COSMIC_min_cosine)
+ if (length(matches) == 0) {
+   return(NULL)
+ }
+ data.frame(
+   cosmic_sig = names(matches),
+   cosine = cosines[matches],
+   stringsAsFactors = FALSE
+ )
+})
+names(cosmic_matches) <- rownames(cosmic_cosine_matrix)
 ```
 
 ```{r}
@@ -252,7 +302,8 @@ all_signature_data <- lapply(
       ID476_catalogs = to.plot.all.ID476.catalogs,
       assignment_matrix = ID89.mSigAct.assignment,
       ID89_mapped_signatures = ID89_mapped_from_476,
-      ID83_mapped_signatures = ID83_mapped_from_476
+      ID83_mapped_signatures = ID83_mapped_from_476,
+      cosmic_matches = cosmic_matches
     )
   }
 )
@@ -311,6 +362,7 @@ if (cache_valid) {
     plot476_simplify_labels = plto476_simplify_labels,
     ID89_mapped_signatures = ID89_mapped_from_476,
     ID83_mapped_signatures = ID83_mapped_from_476,
+    cosmic_signatures = cosmic_sigs,
     n_workers = 10
   )
   save_plot_cache(data_dir, plot_dir)
