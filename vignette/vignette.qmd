@@ -49,6 +49,9 @@ data_dir <- "../Manuscript_data/"
 
 # Minimum cosine similarity to show matching COSMIC signatures
 COSMIC_min_cosine <- 0.9
+
+# Minimum cosine similarity to show matching Jin signatures
+Jin_min_cosine <- 0.9
 ```
 
 ```{r}
@@ -197,6 +200,52 @@ names(cosmic_matches) <- rownames(cosmic_cosine_matrix)
 ```
 
 ```{r}
+#| label: get-data-jin
+#| include: false
+
+# Read Jin 2024 ID signatures
+jin_sigs <- read.delim(
+  file.path(data_dir, "jin_2024_sup_tab_1_signatures.tsv"),
+  sep = "\t",
+  row.names = 1,
+  check.names = FALSE
+)
+
+# Compute pairwise cosine similarities between type83_sigs and jin_sigs
+jin_cosine_matrix <- matrix(
+ NA,
+ nrow = ncol(type83_sigs),
+ ncol = ncol(jin_sigs),
+ dimnames = list(colnames(type83_sigs), colnames(jin_sigs))
+)
+
+for (i in seq_len(ncol(type83_sigs))) {
+ for (j in seq_len(ncol(jin_sigs))) {
+   jin_cosine_matrix[i, j] <- lsa::cosine(
+     as.numeric(type83_sigs[, i]),
+     as.numeric(jin_sigs[, j])
+   )
+ }
+}
+
+# For each type83 signature, find Jin signatures with cosine > threshold
+jin_matches <- lapply(seq_len(nrow(jin_cosine_matrix)), function(i) {
+ sig_name <- rownames(jin_cosine_matrix)[i]
+ cosines <- jin_cosine_matrix[i, ]
+ matches <- which(cosines >= Jin_min_cosine)
+ if (length(matches) == 0) {
+   return(NULL)
+ }
+ data.frame(
+   jin_sig = names(matches),
+   cosine = cosines[matches],
+   stringsAsFactors = FALSE
+ )
+})
+names(jin_matches) <- rownames(jin_cosine_matrix)
+```
+
+```{r}
 #| label: setup3
 #| include: false
 
@@ -303,7 +352,8 @@ all_signature_data <- lapply(
       assignment_matrix = ID89.mSigAct.assignment,
       ID89_mapped_signatures = ID89_mapped_from_476,
       ID83_mapped_signatures = ID83_mapped_from_476,
-      cosmic_matches = cosmic_matches
+      cosmic_matches = cosmic_matches,
+      jin_matches = jin_matches
     )
   }
 )
@@ -363,6 +413,7 @@ if (cache_valid) {
     ID89_mapped_signatures = ID89_mapped_from_476,
     ID83_mapped_signatures = ID83_mapped_from_476,
     cosmic_signatures = cosmic_sigs,
+    jin_signatures = jin_sigs,
     n_workers = 10
   )
   save_plot_cache(data_dir, plot_dir)

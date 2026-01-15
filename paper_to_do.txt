@@ -2,7 +2,11 @@
 
 Yes, drop HEK2
 
+Insdel O cannot figure out what is going on
+
 Go for upload to preprint server prior to submission
+
+use github pages archived on zenodo
 
 Discuss warnings for ID  Big picture, 83 type not useful - to discuss future we need a new classification
 
