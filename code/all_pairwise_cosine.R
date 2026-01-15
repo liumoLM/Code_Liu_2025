@@ -1,6 +1,28 @@
 library(ggplot2)
 library(philentropy)
 library(reshape2)
+library(gridExtra)
+
+plot_output = "plot_output"
+
+#' Determine the appropriate plotting function based on number of rows
+#' Adapted from signature_comparisons/best_matches.R
+#' For 89-type or 476-type, prefers 476-type plotting if available
+#' @param n_rows Number of rows in the signature matrix
+#' @return A plotting function from mSigPlot
+guess_plotit <- function(n_rows) {
+  if (n_rows == 476) {
+    mSigPlot::plot_476
+  } else if (n_rows == 89) {
+    # For 89-type, prefer 476-type plotting if we later support conversion
+    # For now, use plot_89
+    mSigPlot::plot_89
+  } else if (n_rows == 83) {
+    mSigPlot::plot_83
+  } else {
+    stop("Unexpected number of rows: ", n_rows)
+  }
+}
 
 #' Compute cosine similarity between two vectors
 #' @param a A numeric vector
@@ -16,12 +38,18 @@ cosine_sim_vec <- function(a, b) {
 }
 
 #' Create heatmap and dendrogram of pairwise cosine similarities
+#'
+#' Creates a multi-page PDF with:
+#' - Page 1: Heatmap of pairwise cosine similarities (lower triangle)
+#' - Page 2: Dendrogram from hierarchical clustering
+#' - Additional pages: Side-by-side plots for each pair with cosine > 0.89
+#'
 #' @param sig_path Path to .tsv file with signatures
 #' @param out_pdf Path to output PDF file (default: based on input filename)
-#' @param cosine_cutoff Cosine similarity threshold for dashed line (default: 0.9)
+#' @param cosine_cutoff Cosine similarity threshold for dashed line on dendrogram
 #' @return Invisibly returns the cosine similarity matrix
 #' @export
-all_pairwise_cos <- function(
+all_pairwise_cosine <- function(
   sig_path,
   out_pdf = NULL,
   cosine_cutoff = 0.9
@@ -176,6 +204,52 @@ all_pairwise_cos <- function(
     adj = 0
   )
 
+  # Additional pages: plot pairs with cosine similarity > 0.89
+  high_sim_threshold <- 0.89
+  plotit <- guess_plotit(nrow(sigs))
+
+  # Find all pairs in lower triangle with cosine > threshold
+  high_pairs <- which(cos_mat_lower > high_sim_threshold, arr.ind = TRUE)
+
+  # Signatures to skip when plotting pairs
+  skip_sigs <- c("ID_N", "ID_J", "InsDel_N", "InsDel_J")
+
+  if (nrow(high_pairs) > 0) {
+    for (k in seq_len(nrow(high_pairs))) {
+      i <- high_pairs[k, 1]
+      j <- high_pairs[k, 2]
+      sig1_name <- sig_names[i]
+      sig2_name <- sig_names[j]
+      cos_val <- cos_mat_lower[i, j]
+
+      # Skip if either signature is in the skip list
+      if (sig1_name %in% skip_sigs || sig2_name %in% skip_sigs) {
+        next
+      }
+
+      message(sprintf(
+        "Plotting %s vs %s (cosine = %.3f)",
+        sig1_name,
+        sig2_name,
+        cos_val
+      ))
+
+      # Get signature vectors
+      sig1_vec <- as.numeric(sigs[, sig1_name])
+      sig2_vec <- as.numeric(sigs[, sig2_name])
+
+      # Create plots using mSigPlot
+      title1 <- sprintf("%s", sig1_name)
+      title2 <- sprintf("%s (cosine = %.3f)", sig2_name, cos_val)
+
+      p1 <- plotit(catalog = sig1_vec, plot_title = title1)
+      p2 <- plotit(catalog = sig2_vec, plot_title = title2)
+
+      # Arrange plots one over the other
+      grid.arrange(p1, p2, nrow = 2)
+    }
+  }
+
   dev.off()
 
   message("Saved PDF to ", out_pdf)
@@ -184,12 +258,17 @@ all_pairwise_cos <- function(
 }
 
 # Example usage:
-all_pairwise_cos(
-  "../Manuscript_data/Liu_et_al_final_89_type_signatures.tsv",
-  "all_pairwise89.pdf"
+all_pairwise_cosine(
+  "Manuscript_data/Liu_et_al_final_89_type_signatures.tsv",
+  file.path(plot_output, "heatmap_89_type_signatures.pdf")
 )
 
-all_pairwise_cos(
-  "../Manuscript_data/Liu_et_al_final_476_type_signatures.tsv",
-  "all_pairwise476.pdf"
+all_pairwise_cosine(
+  "Manuscript_data/Liu_et_al_final_476_type_signatures.tsv",
+  file.path(plot_output, "heatmap_476_type_signatures.pdf")
+)
+
+all_pairwise_cosine(
+  "Manuscript_data/Liu_et_al_final_83_type_signatures.tsv",
+  file.path(plot_output, "heatmap_83_type_signatures.pdf")
 )
