@@ -60,6 +60,7 @@ find_sig_txt <- function(sig_id) {
 #' @param assignment_matrix Data frame of signature assignments
 #' @param cosmic_matches Named list of data frames with COSMIC signature matches
 #' @param jin_matches Named list of data frames with Jin signature matches
+#' @param koh_matches Named list of data frames with Koh signature matches
 #' @return List with cosine similarities and intermediate data
 compute_signature_data <- function(
   ID89signature,
@@ -76,7 +77,8 @@ compute_signature_data <- function(
   ID89_mapped_signatures = NULL,
   ID83_mapped_signatures = NULL,
   cosmic_matches = NULL,
-  jin_matches = NULL
+  jin_matches = NULL,
+  koh_matches = NULL
 ) {
   message("ID89signature = ", ID89signature)
   # Check if mapped 89-type signature exists (column name is {signature}_converted)
@@ -103,6 +105,12 @@ compute_signature_data <- function(
     jin_match_data <- jin_matches[[ID83signature]]
   }
 
+  # Get Koh matches for this 89-type signature
+  koh_match_data <- NULL
+  if (!is.null(koh_matches) && ID89signature %in% names(koh_matches)) {
+    koh_match_data <- koh_matches[[ID89signature]]
+  }
+
   result <- list(
     ID89signature = ID89signature,
     catalog = exemplar_id,
@@ -115,7 +123,8 @@ compute_signature_data <- function(
     has_mapped_signature = has_mapped_sig,
     has_83_mapped_signature = has_83_mapped_sig,
     cosmic_matches = cosmic_match_data,
-    jin_matches = jin_match_data
+    jin_matches = jin_match_data,
+    koh_matches = koh_match_data
   )
 
   # Compute cosine89 (raw catalog vs signature)
@@ -290,6 +299,7 @@ generate_section_footer <- function(sig_data) {
 #' @param plot476_simplify_labels Whether to simplify labels
 #' @param cosmic_signatures Data frame of COSMIC signatures for matching plots
 #' @param jin_signatures Data frame of Jin signatures for matching plots
+#' @param koh_signatures Data frame of Koh signatures for matching plots
 #' @return List with paths to all generated plot files
 generate_plots_to_files <- function(
   sig_data,
@@ -307,7 +317,8 @@ generate_plots_to_files <- function(
   ID89_mapped_signatures = NULL,
   ID83_mapped_signatures = NULL,
   cosmic_signatures = NULL,
-  jin_signatures = NULL
+  jin_signatures = NULL,
+  koh_signatures = NULL
 ) {
   # Create safe filename prefix from signature name
   safe_name <- gsub("[^a-zA-Z0-9_]", "_", sig_data$ID89signature)
@@ -600,6 +611,37 @@ generate_plots_to_files <- function(
     paths$jin_plots <- jin_plot_list
   }
 
+  # Koh matching signatures (89-type)
+  paths$koh_plots <- NULL
+  if (!is.null(sig_data$koh_matches) && !is.null(koh_signatures)) {
+    koh_plot_list <- list()
+    for (i in seq_len(nrow(sig_data$koh_matches))) {
+      koh_sig_name <- sig_data$koh_matches$koh_sig[i]
+      koh_cosine <- sig_data$koh_matches$cosine[i]
+
+      plot_path <- file.path(
+        plot_dir,
+        paste0(safe_name, "_koh_", koh_sig_name, ".png")
+      )
+
+      ptmp <- p89(
+        koh_signatures[, koh_sig_name, drop = FALSE],
+        plot_title = paste0(
+          "Koh ", koh_sig_name,
+          " | cosine to ", sig_data$ID89signature, ": ",
+          format(koh_cosine, digits = getp("cosine_digits"))
+        )
+      )
+      save89(ptmp, plot_path)
+
+      koh_plot_list[[koh_sig_name]] <- list(
+        path = plot_path,
+        cosine = koh_cosine
+      )
+    }
+    paths$koh_plots <- koh_plot_list
+  }
+
   return(paths)
 }
 
@@ -627,6 +669,7 @@ generate_all_plots_parallel <- function(
   ID83_mapped_signatures = NULL,
   cosmic_signatures = NULL,
   jin_signatures = NULL,
+  koh_signatures = NULL,
   n_workers = 14
 ) {
   # Create plot directory
@@ -655,7 +698,8 @@ generate_all_plots_parallel <- function(
         ID89_mapped_signatures = ID89_mapped_signatures,
         ID83_mapped_signatures = ID83_mapped_signatures,
         cosmic_signatures = cosmic_signatures,
-        jin_signatures = jin_signatures
+        jin_signatures = jin_signatures,
+        koh_signatures = koh_signatures
       )
     },
     .options = furrr::furrr_options(
@@ -699,7 +743,8 @@ check_plot_cache <- function(
     "Liu_et_al_476_type_spectra.tsv",
     "89type_to_83type_connection.tsv",
     "COSMIC_v3.5_ID_GRCh37_signatures.tsv",
-    "jin_2024_sup_tab_1_signatures.tsv"
+    "jin_2024_sup_tab_1_signatures.tsv",
+    "Koh_signatures.tsv"
   )
 
   # Files in vignette directory that affect plotting
@@ -760,7 +805,8 @@ save_plot_cache <- function(
     "Liu_et_al_476_type_spectra.tsv",
     "89type_to_83type_connection.tsv",
     "COSMIC_v3.5_ID_GRCh37_signatures.tsv",
-    "jin_2024_sup_tab_1_signatures.tsv"
+    "jin_2024_sup_tab_1_signatures.tsv",
+    "Koh_signatures.tsv"
   )
 
   # Files in vignette directory that affect plotting
@@ -867,6 +913,28 @@ reconstruct_plot_paths <- function(signature_names, plot_dir) {
       paths$jin_plots <- jin_plot_list
     } else {
       paths$jin_plots <- NULL
+    }
+
+    # Find any Koh plots for this signature
+    koh_pattern <- paste0(safe_name, "_koh_*.png")
+    koh_files <- list.files(
+      plot_dir,
+      pattern = glob2rx(koh_pattern),
+      full.names = TRUE
+    )
+    if (length(koh_files) > 0) {
+      koh_plot_list <- list()
+      for (kf in koh_files) {
+        basename_no_ext <- tools::file_path_sans_ext(basename(kf))
+        koh_sig_name <- sub(paste0(safe_name, "_koh_"), "", basename_no_ext)
+        koh_plot_list[[koh_sig_name]] <- list(
+          path = kf,
+          cosine = NA
+        )
+      }
+      paths$koh_plots <- koh_plot_list
+    } else {
+      paths$koh_plots <- NULL
     }
 
     return(paths)
