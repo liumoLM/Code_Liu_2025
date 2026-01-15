@@ -78,11 +78,14 @@ plot476_scale <- 1.2
 #| label: get-data-1
 #| include: false
 
-ID89_ID83_connection_example <- fread(file.path(
-  data_dir,
-  "89type_to_83type_connection.tsv"
-))
-colnames(ID89_ID83_connection_example) <- c(
+connect_89_to_83 <- read.delim(
+  file.path(
+    data_dir,
+    "89type_to_83type_connection.tsv"
+  ),
+  sep = "\t"
+)
+colnames(connect_89_to_83) <- c(
   "ID89_signature",
   "example_catalog",
   "ID83_signature",
@@ -211,12 +214,12 @@ source("vhelpers.R")
 # This separates computation from plotting, making debugging easier
 
 all_signature_data <- lapply(
-  seq_len(nrow(ID89_ID83_connection_example)),
+  seq_len(nrow(connect_89_to_83)),
   function(i) {
     compute_signature_data(
-      ID89signature = ID89_ID83_connection_example$ID89_signature[i],
-      exemplar_id = ID89_ID83_connection_example$example_catalog[i],
-      ID83signature = ID89_ID83_connection_example$ID83_signature[i],
+      ID89signature = connect_89_to_83$ID89_signature[i],
+      exemplar_id = connect_89_to_83$example_catalog[i],
+      ID83signature = connect_89_to_83$ID83_signature[i],
       ID89_signatures = to.plot.all.ID89.signatures.final,
       ID89_catalogs = to.plot.all.ID89.catalogs,
       ID83_signatures = type83_sigs,
@@ -232,7 +235,7 @@ all_signature_data <- lapply(
 )
 
 # Name the list for easier debugging
-names(all_signature_data) <- ID89_ID83_connection_example$ID89_signature
+names(all_signature_data) <- connect_89_to_83$ID89_signature
 ```
 
 ```{r}
