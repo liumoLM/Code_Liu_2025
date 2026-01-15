@@ -83,7 +83,7 @@ compute_signature_data <- function(
   message("ID89signature = ", ID89signature)
   # Check if mapped 89-type signature exists (column name is {signature}_converted)
   mapped_col_name <- paste0(ID89signature, "_converted")
-  has_mapped_sig <- !is.null(ID89_mapped_signatures) &&
+  has_mapped_476_sig <- !is.null(ID89_mapped_signatures) &&
     mapped_col_name %in% colnames(ID89_mapped_signatures)
 
   # Check if mapped 83-type signature exists
@@ -113,14 +113,14 @@ compute_signature_data <- function(
 
   result <- list(
     ID89signature = ID89signature,
-    catalog = exemplar_id,
+    examplar_id = exemplar_id,
     ID83signature = ID83signature,
     is_insdel15_16 = ID89signature %in% c("InsDel15", "InsDel16"),
     is_polyT_removed = ID83signature %in%
       c("C_ID7", "ID_J", "C_ID10", "ID_N", "ID_O"),
     has_476_signature = has_476_sig,
     has_83_signature = ID83signature %in% colnames(ID83_signatures),
-    has_mapped_signature = has_mapped_sig,
+    has_mapped_476_sig = has_mapped_476_sig,
     has_83_mapped_signature = has_83_mapped_sig,
     cosmic_matches = cosmic_match_data,
     jin_matches = jin_match_data,
@@ -135,7 +135,7 @@ compute_signature_data <- function(
     )
 
   # Compute cosine similarity between main signature and mapped signature
-  if (has_mapped_sig) {
+  if (has_mapped_476_sig) {
     result$cosine89_mapped <-
       lsa::cosine(
         as.numeric(ID89_signatures[, ID89signature]),
@@ -380,7 +380,7 @@ generate_plots_to_files <- function(
   save89(p1, paths$id89_sig)
 
   # ID89 Plot 1b: Mapped signature (from 476-type)
-  if (sig_data$has_mapped_signature && !is.null(ID89_mapped_signatures)) {
+  if (sig_data$has_mapped_476_sig && !is.null(ID89_mapped_signatures)) {
     mapped_col_name <- paste0(sig_data$ID89signature, "_converted")
     p1b <- p89(
       ID89_mapped_signatures[, mapped_col_name, drop = FALSE],
