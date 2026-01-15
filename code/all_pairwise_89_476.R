@@ -18,6 +18,89 @@ cosine_sim_vec <- function(a, b) {
   )
 }
 
+#' Create heatmap of pairwise cosine similarities
+#' @param cos_mat Cosine similarity matrix
+#' @param sig_names Signature names
+#' @param title Plot title
+#' @param cosine_cutoff Threshold for labeling cells and vertical lines
+#' @return ggplot object
+create_heatmap <- function(cos_mat, sig_names, title, cosine_cutoff = 0.9) {
+  # Create lower triangle matrix for heatmap
+  cos_mat_lower <- cos_mat
+  cos_mat_lower[upper.tri(cos_mat_lower, diag = TRUE)] <- NA
+
+  # Melt for ggplot
+  melted <- melt(cos_mat_lower, na.rm = TRUE)
+  colnames(melted) <- c("Sig1", "Sig2", "Cosine")
+
+  # Order factor levels to maintain original order
+  melted$Sig1 <- factor(melted$Sig1, levels = sig_names)
+  melted$Sig2 <- factor(melted$Sig2, levels = sig_names)
+
+  # Create label column: only show if cosine >= cutoff
+  melted$Label <- ifelse(
+    melted$Cosine >= cosine_cutoff,
+    sprintf("%.2f", melted$Cosine),
+    ""
+  )
+
+  # Filter cells with high similarity for vertical lines
+  high_sim <- melted[melted$Cosine >= cosine_cutoff, ]
+
+  # Create data for vertical line segments
+  # Lines go from the cell to the x-axis
+  if (nrow(high_sim) > 0) {
+    line_data <- data.frame(
+      x = as.numeric(high_sim$Sig2),
+      xend = as.numeric(high_sim$Sig2),
+      y = as.numeric(high_sim$Sig1) - 0.5,
+      yend = 0.5
+    )
+  } else {
+    line_data <- data.frame(
+      x = numeric(),
+      xend = numeric(),
+      y = numeric(),
+      yend = numeric()
+    )
+  }
+
+  # Create heatmap
+  p_heat <- ggplot(melted, aes(x = Sig2, y = Sig1, fill = Cosine)) +
+    geom_tile(color = "white") +
+    geom_text(aes(label = Label), size = 2.5) +
+    scale_fill_gradient(
+      low = "white",
+      high = "red",
+      limits = c(0, 1),
+      name = "Cosine\nSimilarity"
+    ) +
+    theme_minimal() +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
+      axis.text.y = element_text(size = 8),
+      axis.title = element_blank(),
+      panel.grid = element_blank()
+    ) +
+    coord_fixed(clip = "off") +
+    ggtitle(title)
+
+  # Add vertical lines for high-similarity cells
+  if (nrow(line_data) > 0) {
+    p_heat <- p_heat +
+      geom_segment(
+        data = line_data,
+        aes(x = x, xend = xend, y = y, yend = yend),
+        inherit.aes = FALSE,
+        color = "darkred",
+        linetype = "solid",
+        linewidth = 0.5
+      )
+  }
+
+  p_heat
+}
+
 #' Create dendrogram plot for signatures
 #' @param sigs Signature matrix (features x signatures)
 #' @param title Plot title
@@ -78,8 +161,10 @@ plot_dendrogram <- function(sigs, title, cosine_cutoff = 0.9) {
 #' Compare 89-type and 476-type signatures with combined visualization
 #'
 #' Creates a multi-page PDF with:
-#' - Page 1: Dendrogram for 89-type signatures
-#' - Page 2: Dendrogram for 476-type signatures
+#' - Page 1: Heatmap of pairwise cosine similarities (89-type)
+#' - Page 2: Heatmap of pairwise cosine similarities (476-type)
+#' - Page 3: Dendrogram for 89-type signatures
+#' - Page 4: Dendrogram for 476-type signatures
 #' - Additional pages: For each pair with cosine > 0.89, shows both 89-type
 #'   and both 476-type signatures on one page (4 plots total)
 #'
@@ -100,7 +185,16 @@ all_pairwise_89_476 <- function(
 
   # Verify signature names match
   if (!identical(colnames(sigs_89), colnames(sigs_476))) {
-    warning("Signature names do not match between 89-type and 476-type files")
+    in_89_not_476 <- setdiff(colnames(sigs_89), colnames(sigs_476))
+    in_476_not_89 <- setdiff(colnames(sigs_476), colnames(sigs_89))
+    msg <- "Signature names do not match between 89-type and 476-type files."
+    if (length(in_89_not_476) > 0) {
+      msg <- paste0(msg, " In 89-type only: ", paste(in_89_not_476, collapse = ", "), ".")
+    }
+    if (length(in_476_not_89) > 0) {
+      msg <- paste0(msg, " In 476-type only: ", paste(in_476_not_89, collapse = ", "), ".")
+    }
+    warning(msg)
   }
 
   sig_names <- colnames(sigs_89)
@@ -126,6 +220,15 @@ all_pairwise_89_476 <- function(
   cos_mat_lower <- cos_mat
   cos_mat_lower[upper.tri(cos_mat_lower, diag = TRUE)] <- NA
 
+  # Fill diagonal for complete matrix
+  cos_mat_full <- cos_mat
+  diag(cos_mat_full) <- 1
+  for (i in 2:n_sigs) {
+    for (j in 1:(i - 1)) {
+      cos_mat_full[i, j] <- cos_mat_full[j, i]
+    }
+  }
+
   # Save to PDF in landscape mode
   cairo_pdf(
     out_pdf,
@@ -134,14 +237,56 @@ all_pairwise_89_476 <- function(
     onefile = TRUE
   )
 
-  # Page 1: Dendrogram for 89-type
+  # Page 1: Heatmap for 89-type signatures
+  p_heat_89 <- create_heatmap(
+    cos_mat_full,
+    sig_names,
+    "Pairwise Cosine Similarities (89-type)",
+    cosine_cutoff
+  )
+  print(p_heat_89)
+
+  # Compute cosine similarity matrix for 476-type signatures
+  sig_names_476 <- colnames(sigs_476)
+  n_sigs_476 <- length(sig_names_476)
+  cos_mat_476 <- matrix(NA, nrow = n_sigs_476, ncol = n_sigs_476)
+  rownames(cos_mat_476) <- sig_names_476
+  colnames(cos_mat_476) <- sig_names_476
+
+  for (i in seq_len(n_sigs_476)) {
+    for (j in seq_len(n_sigs_476)) {
+      if (i != j) {
+        cos_mat_476[i, j] <- cosine_sim_vec(
+          as.numeric(sigs_476[, i]),
+          as.numeric(sigs_476[, j])
+        )
+      }
+    }
+  }
+  diag(cos_mat_476) <- 1
+  for (i in 2:n_sigs_476) {
+    for (j in 1:(i - 1)) {
+      cos_mat_476[i, j] <- cos_mat_476[j, i]
+    }
+  }
+
+  # Page 2: Heatmap for 476-type signatures
+  p_heat_476 <- create_heatmap(
+    cos_mat_476,
+    sig_names_476,
+    "Pairwise Cosine Similarities (476-type)",
+    cosine_cutoff
+  )
+  print(p_heat_476)
+
+  # Page 3: Dendrogram for 89-type
   result_89 <- plot_dendrogram(
     sigs_89,
     "Hierarchical Clustering of 89-type Signatures",
     cosine_cutoff
   )
 
-  # Page 2: Dendrogram for 476-type
+  # Page 4: Dendrogram for 476-type
   result_476 <- plot_dendrogram(
     sigs_476,
     "Hierarchical Clustering of 476-type Signatures",
