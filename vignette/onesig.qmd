@@ -153,6 +153,7 @@ if (sig_data$has_83_signature) {
     style = ".callout-note"
   )
 }
+cat('\n\n<details>\n<summary>Show 83-type plots</summary>\n\n')
 ```
 
 ```{r}
@@ -227,7 +228,7 @@ displayplot(plot_paths$id83_catalog, getp("hw83"))
 
 # COSMIC matching signatures section
 if (!is.null(plot_paths$cosmic_plots) && length(plot_paths$cosmic_plots) > 0) {
-  cat("\n\n## Matching COSMIC signatures\n\n")
+  cat("\n\n### Matching COSMIC signatures\n\n")
 
   for (cosmic_name in names(plot_paths$cosmic_plots)) {
     cosmic_info <- plot_paths$cosmic_plots[[cosmic_name]]
@@ -256,7 +257,7 @@ if (!is.null(plot_paths$cosmic_plots) && length(plot_paths$cosmic_plots) > 0) {
 
 # Jin matching signatures section
 if (!is.null(plot_paths$jin_plots) && length(plot_paths$jin_plots) > 0) {
-  cat("\n\n## Matching Jin signatures\n\n")
+  cat("\n\n### Matching Jin signatures\n\n")
 
   for (jin_name in names(plot_paths$jin_plots)) {
     jin_info <- plot_paths$jin_plots[[jin_name]]
@@ -277,6 +278,14 @@ if (!is.null(plot_paths$jin_plots) && length(plot_paths$jin_plots) > 0) {
     displayplot(jin_info$path, getp("hw83"))
   }
 }
+```
+
+```{r}
+#| echo: false
+#| output: asis
+
+# Close the details element for 83-type section
+cat("\n\n</details>\n\n")
 ```
 
 ```{r}
