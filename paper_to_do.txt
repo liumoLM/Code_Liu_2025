@@ -6,6 +6,8 @@ Go for upload to preprint server prior to submission
 
 Discuss warnings for ID  Big picture, 83 type not useful - to discuss future we need a new classification
 
+See note for C_ID9 -- it doesn't make sense for this sig; was it misplaced?
+
 # Steve
 
 HOLD *** URGENT -- proceed with upload of HEK cells
@@ -13,6 +15,8 @@ HOLD *** URGENT -- proceed with upload of HEK cells
 REVISIT Review table 1 column E --> need to write something about every entry (see written notes)
 
 DO: Redo signature similarity matrices and signature clustering and make any necessary notes
+
+Make 83-type plots more legible (font sizes)
 
 # Steve or Mo do on each signature (working backward)
 

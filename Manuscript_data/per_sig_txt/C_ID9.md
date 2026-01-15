@@ -1,4 +1,4 @@
-Note: C_ID seems to have extracted fewer single T insertions in poly T contexts compared to extractions from type-89 and type-476 classifications.
+THIS TEXT DOESNT MAKE SENSE IS IT ATTACHED TO WRONG SIGNATURE?
 
 We believe that the signature C_ID9 that we extracted corresponds to COSMIC signature ID9, even though C_ID9 has a large proportion of deletions of single thymines in long poly-T contexts, which ID9 completely lacks. 
 We believe this an instance of "over splitting" due to all such deletions being allocated to a single mutation type in the 83-type indel classification. 
