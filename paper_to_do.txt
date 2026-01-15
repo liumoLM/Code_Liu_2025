@@ -60,6 +60,50 @@ A_alpha looks perfect
 
 18 looks very good, CID18 lost 7% t ins in olong poly-t
 
+17 looks perfect
+
+16 *** ISSUE I DON'T understand *** IS THERE AN ERROR in the compaction code for insertions?
+
+15 perfect
+
+14 ok
+
+13 perfect added note comparing to Insdel_C
+
+
+12 Added warnings
+
+11 perfect
+
+10 OK
+
+9 perfect
+
+8 perfect
+
+7 poly T warnings
+
+6 perfect
+
+5b missed 5 del poly t in 83 type sig. Double check compression to 83 type
+
+5a perfect
+
+4b Discuss w. Mo several issues in addition to missed t in in poly t.  apparently missed short T deletions. 
+also some discrepancies in the longer insertions; howwever 89 type extraction and collapsed 476 to 89 extraction at 0.96
+
+4a nearly perfect
+
+3b perfect
+
+
+
+
+
+
+
+
+
 
 
 
