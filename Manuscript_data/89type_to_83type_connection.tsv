@@ -34,16 +34,16 @@ InsDel_A_beta	Breast::SP2293	ID_A	InsDel_A_beta_476	H,S
 InsDel_B	Liver::CPCT02020413T	ID_B	InsDel_B_476	H,S
 InsDel_C	Breast::CPCT02010772T	ID_C	InsDel_C_476	H
 InsDel_D	Colon::CPCT02340014T	ID_D	InsDel_D_476	H,S
-InsDel_E	Uterus::DRUP01340014T	ID_E	InsDel_E_476	H 
+InsDel_E	Uterus::DRUP01340014T	ID_E	InsDel_E_476	H
 InsDel_F	Head::DRUP01030028T	ID_F	InsDel_F_476	H,S
-InsDel_G	Other::DRUP01030015T	ID_G	InsDel_G_476	H 
+InsDel_G	Other::DRUP01030015T	ID_G	InsDel_G_476	H
 InsDel_H	Bone.SoftTissue::CPCT02010648T	ID_H	InsDel_H_476	H
 InsDel_I	CNS::SP107439	ID_I	InsDel_I_476	H
 InsDel_J	Colon::DRUP01230004T	ID_J	InsDel_J_476	H,S
 InsDel_K_alpha	Prostate::SP112817	ID_K	InsDel_K_alpha_476	H
-InsDel_K_beta	Colon::SP17905	ID_K	InsDel_K_beta_476	H 
+InsDel_K_beta	Colon::SP17905	ID_K	InsDel_K_beta_476	H
 InsDel_L	Pancreas::SP70106	ID_L		
 InsDel_M	Prostate::SP112777	ID_M	InsDel_M_476	H
 InsDel_N	Stomach::CPCT02030347T	ID_N	InsDel_N_476	H,S
 InsDel_O	CNS::CPCT02100101T	ID_O	InsDel_O_476	H,S
-InsDel_P	Lymphoid::SP59448		InsDel_P_476	H 
+InsDel_P	Lymphoid::SP59448		InsDel_P_476	H
