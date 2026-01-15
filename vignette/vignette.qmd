@@ -150,14 +150,14 @@ type83_sigs <- read.delim(
 #| label: setup3
 #| include: false
 
-to.plot.all.ID89.signatures.final <- as.data.frame(fread(file.path(
+type89_sigs <- as.data.frame(fread(file.path(
   data_dir,
   "Liu_et_al_final_89_type_signatures.tsv"
 )))
 row.names(
-  to.plot.all.ID89.signatures.final
-) <- to.plot.all.ID89.signatures.final[, 1]
-to.plot.all.ID89.signatures.final <- to.plot.all.ID89.signatures.final[, -1]
+  type89_sigs
+) <- type89_sigs[, 1]
+type89_sigs <- type89_sigs[, -1]
 
 
 to.plot.all.ID89.catalogs <- as.data.frame(data.table::fread(
@@ -243,7 +243,7 @@ all_signature_data <- lapply(
       ID89signature = connect_89_to_83$ID89_signature[i],
       exemplar_id = connect_89_to_83$example_catalog[i],
       ID83signature = connect_89_to_83$ID83_signature[i],
-      ID89_signatures = to.plot.all.ID89.signatures.final,
+      ID89_signatures = type89_sigs,
       ID89_catalogs = to.plot.all.ID89.catalogs,
       ID83_signatures = type83_sigs,
       ID83_catalogs = type83_spectra,
@@ -298,7 +298,7 @@ if (cache_valid) {
   message("Generating plots (cache invalid or forced regeneration)...")
   all_plot_paths <- generate_all_plots_parallel(
     all_signature_data = all_signature_data,
-    ID89_signatures = to.plot.all.ID89.signatures.final,
+    ID89_signatures = type89_sigs,
     ID89_catalogs = to.plot.all.ID89.catalogs,
     ID83_signatures = type83_sigs,
     ID83_catalogs = type83_spectra,
