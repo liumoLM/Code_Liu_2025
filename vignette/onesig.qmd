@@ -174,6 +174,10 @@ suppressed_t_details <-
   
 
   )"
+if (knitr::is_latex_output()) {
+  suppressed_t_details <-
+    "Corresponding plot with insertions and deletions of T in long poly-T suppressed"
+}
 if (sig_data$has_83_signature) {
   cat(
     "##",
@@ -193,7 +197,9 @@ if (sig_data$has_83_signature) {
     style = ".callout-note"
   )
 }
-cat('\n\n<details>\n<summary>Click here to show 83-type plots</summary>\n\n')
+if (!knitr::is_latex_output()) {
+  cat('\n\n<details>\n<summary>Click here to show 83-type plots</summary>\n\n')
+}
 ```
 
 ```{r}
@@ -371,7 +377,9 @@ if (!is.null(plot_paths$jin_plots) && length(plot_paths$jin_plots) > 0) {
 #| output: asis
 
 # Close the details element for 83-type section
-cat("\n\n</details>\n\n")
+if (!knitr::is_latex_output()) {
+  cat("\n\n</details>\n\n")
+}
 
 ```
 
@@ -379,5 +387,5 @@ cat("\n\n</details>\n\n")
 #| echo: false
 #| output: asis
 
-cat(generate_section_footer(sig_data))
+# cat(generate_section_footer(sig_data))
 ```
