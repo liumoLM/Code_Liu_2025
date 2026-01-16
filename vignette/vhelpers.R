@@ -113,7 +113,7 @@ compute_sig_data <- function(
 
   result <- list(
     type89_sig_id = type89_sig_id,
-    examplar_id = exemplar_id,
+    exemplar_id = exemplar_id,
     ID83signature = ID83signature,
     is_insdel15_16 = type89_sig_id %in% c("InsDel15", "InsDel16"),
     is_polyT_removed = ID83signature %in%
@@ -398,13 +398,13 @@ generate_plots_to_files <- function(
   }
 
   # ID89 Plot 2: Catalog
-  catalogtoplot = ID89_catalogs[, sig_data$catalog, drop = FALSE]
+  catalogtoplot = ID89_catalogs[, sig_data$exemplar_id, drop = FALSE]
   ymax = max(catalogtoplot)
   p2 <- p89(
     catalogtoplot,
     plot_title = paste0(
       "Spectrum A, from ",
-      sig_data$catalog,
+      sig_data$exemplar_id,
       " | cosine similarity to ",
       sig_data$type89_sig_id,
       " = ",
@@ -418,14 +418,14 @@ generate_plots_to_files <- function(
   if (!sig_data$is_insdel15_16 && !is.null(sig_data$residual_spectrum)) {
     target_sig_title <- paste0(
       "Spectrum B: partial mutational spectrum of ",
-      sig_data$catalog,
+      sig_data$exemplar_id,
       " due to ",
       sig_data$type89_sig_id
     )
 
     residual_title <- paste0(
       "Remaining mutations in ",
-      sig_data$catalog,
+      sig_data$exemplar_id,
       " not due to ",
       sig_data$type89_sig_id,
       " (A minus B) " #| Cosine similarity to ",
@@ -480,16 +480,16 @@ generate_plots_to_files <- function(
     save476(p5, paths$id476_sig)
 
     p6 <- p476(
-      ID476_catalogs[, sig_data$catalog],
+      ID476_catalogs[, sig_data$exemplar_id],
       plot_title = ""
     )
     save476(p6, paths$id476_catalog)
   } else {
     p5 <- p476(
-      ID476_catalogs[, sig_data$catalog],
+      ID476_catalogs[, sig_data$exemplar_id],
       plot_title = paste0(
         "476-type spectrum of the supporting tumor ",
-        sig_data$catalog
+        sig_data$exemplar_id
       )
     )
     save476(p5, paths$id476_sig)
@@ -546,7 +546,7 @@ generate_plots_to_files <- function(
   } else {
     cat83touse = ID83_catalogs
   }
-  ptmp <- p83(cat83touse[, sig_data$catalog, drop = FALSE])
+  ptmp <- p83(cat83touse[, sig_data$exemplar_id, drop = FALSE])
   save83(ptmp, paths$id83_catalog)
 
   # COSMIC matching signatures
@@ -721,7 +721,7 @@ generate_all_plots_parallel <- function(
   # Reset to sequential
   future::plan(future::sequential)
 
-  names(all_paths) <- names(all_signature_data)
+  names(all_paths) <- names(all_sig_data)
   return(all_paths)
 }
 
