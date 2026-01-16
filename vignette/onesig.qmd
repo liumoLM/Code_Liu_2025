@@ -145,7 +145,7 @@ if (!is.null(plot_paths$id476_sig)) {
 #| output: asis
 
 # ID476 catalog plot (only if signature exists)
-if (!is.null(plot_paths$id476_catalog)) {
+if (!is.null(plot_paths$id476_catalog) && !is.null(sig_data$cosine476)) {
   cat(
     '\n\n476-type spectrum of the supporting tumor ',
     sig_data$exemplar_id,
