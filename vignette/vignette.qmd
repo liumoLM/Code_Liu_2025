@@ -42,7 +42,9 @@ execute:
 
 # ======================================================
 # IMPORTANT: for developers, changing plot titles will
-# not automatically trigger plot regeneration.
+# not automatically trigger plot regeneration. In
+# general the detection of changes is not perfect.
+# When in doubt regenerate the plots.
 # ======================================================
 REGENERATE_PLOTS <- FALSE
 data_dir <- "../Manuscript_data/"
@@ -55,6 +57,9 @@ Jin_min_cosine <- 0.9
 
 # Minimum cosine similarity to show matching Koh signatures
 koh_min_cosine <- 0.9
+
+# Minimum threshold for polyT suppression in 83-type plots (proportion of total)
+min_ts_to_trigger <- 0.15
 ```
 
 ```{r}
@@ -125,25 +130,12 @@ type83_spectra <- read.delim(
 #| include: false
 type83_spectra.no.polyT <-
   type83_spectra
-type83_spectra.no.polyT[c(12, 24), ] <- 0
+type83_spectra.no.polyT[c("DEL:T:1:5+", "INS:T:1:5+"), ] <- 0
 ```
 
 ```{r}
 #| label: get-data-3
 #| include: false
-
-if (FALSE) {
-  type83_sigs <- as.data.frame(fread(file.path(
-    data_dir,
-    "Liu_et_al_final_83_type_signatures.tsv"
-  )))
-  type83_sigs <- type83_sigs[, -1]
-  type83_sigs <- ICAMS::as.catalog(
-    type83_sigs,
-    infer.rownames = TRUE,
-    catalog.type = "counts.signature"
-  )
-}
 
 type83_sigs <- read.delim(
   file.path(
@@ -532,6 +524,7 @@ if (cache_valid) {
     cosmic_signatures = cosmic_sigs,
     jin_signatures = jin_sigs,
     koh_signatures = koh_sigs,
+    min_ts_to_trigger = min_ts_to_trigger,
     n_workers = 10
   )
   save_plot_cache(data_dir, plot_dir)
