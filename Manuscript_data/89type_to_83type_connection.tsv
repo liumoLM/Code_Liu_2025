@@ -46,4 +46,4 @@ InsDel_L	Pancreas::SP70106	ID_L
 InsDel_M	Prostate::SP112777	ID_M	InsDel_M_476	H
 InsDel_N	Stomach::CPCT02030347T	ID_N	InsDel_N_476	H,S
 InsDel_O	CNS::CPCT02100101T	ID_O	InsDel_O_476	H,S
-InsDel_P	Lymphoid::SP59448		InsDel_P_476	H
+InsDel_P	Lymphoid::SP59448	ID_P	InsDel_P_476	H
