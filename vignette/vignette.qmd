@@ -533,6 +533,21 @@ if (cache_valid) {
 ```
 
 ```{r}
+#| label: save-rds-for-standalone
+#| include: false
+
+# Save computed data to RDS files for use by onesig_standalone.qmd
+# This enables generating separate HTML pages per signature
+rds_dir <- "figure/standalone_data"
+dir.create(rds_dir, showWarnings = FALSE, recursive = TRUE)
+
+saveRDS(all_sig_data, file.path(rds_dir, "all_sig_data.rds"))
+saveRDS(all_plot_paths, file.path(rds_dir, "all_plot_paths.rds"))
+
+message("Saved RDS files for standalone rendering to: ", rds_dir)
+```
+
+```{r}
 #| label: render-all-sections
 #| output: asis
 #| echo: false
