@@ -1,5 +1,3 @@
-Deletions and insertions of T in long poly-T contexts were removed from the 83-type spectrum.
-
 ID_J shows a higher proportion of 2bp deletions occurring within the longest class of 2bp simple tandem repeats (≥5 repeat units) compared with ID_N. 
 In contrast, ID_N is characterized by a greater frequency of 2bp deletions in 4‑unit tandem repeats, plus some 3bp and 4bp deletions.
 

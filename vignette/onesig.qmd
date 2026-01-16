@@ -166,6 +166,14 @@ if (!is.null(plot_paths$id476_catalog) && !is.null(sig_data$cosine476)) {
 if (knitr::is_latex_output()) {
   cat("\\newpage\n\n")
 }
+suppressed_t_details <-
+  r"(
+    
+  <details>
+  <summary>Click here to see with insertions and deletions of T in long poly-T suppressed</summary>
+  
+
+  )"
 if (sig_data$has_83_signature) {
   cat(
     "##",
@@ -185,7 +193,7 @@ if (sig_data$has_83_signature) {
     style = ".callout-note"
   )
 }
-cat('\n\n<details>\n<summary>Show 83-type plots</summary>\n\n')
+cat('\n\n<details>\n<summary>Click here to show 83-type plots</summary>\n\n')
 ```
 
 ```{r}
@@ -194,17 +202,6 @@ cat('\n\n<details>\n<summary>Show 83-type plots</summary>\n\n')
 
 # ID83 signature plot (only if signature exists)
 if (!is.null(plot_paths$id83_sig)) {
-  if (sig_data$is_polyT_removed) {
-    catfdiv(
-      "In the supporting tumor
-    mutations counts for insertions and deletions of T in
-    long-poly-T contexts were set to 0 in the plot and
-    when calculating cosine similarity between the supporting 
-    tumor and the signature, but the signature was not altered 
-    before computing the cosine similarity"
-    )
-  }
-
   note83 = find_sig_txt(sig_data$ID83signature)
   if (!is.null(note83)) {
     catfdiv(note83, style = ".callout-note")
@@ -212,9 +209,7 @@ if (!is.null(plot_paths$id83_sig)) {
 
   displayplot(plot_paths$id83_sig, getp("hw83"))
   if (!is.null(plot_paths$id83_sig_ablated)) {
-    cat(
-      '\n\n<details>\n<summary>Click to see with insertions and/or deletions in long poly-T suppressed</summary>\n\n'
-    )
+    cat(suppressed_t_details)
     displayplot(plot_paths$id83_sig_ablated, getp("hw83"))
     cat('\n\n</details>\n\n')
   }
@@ -250,9 +245,7 @@ if (!is.null(plot_paths$id83_mapped)) {
   )
   displayplot(plot_paths$id83_mapped, getp("hw83"))
   if (!is.null(plot_paths$id83_mapped_ablated)) {
-    cat(
-      '\n\n<details>\n<summary>Insertions and/or deletions in long poly-T suppressed</summary>\n\n'
-    )
+    cat(suppressed_t_details)
     displayplot(plot_paths$id83_mapped_ablated, getp("hw83"))
     cat('\n\n</details>\n\n')
   }
@@ -264,6 +257,20 @@ if (!is.null(plot_paths$id83_mapped)) {
 #| output: asis
 
 # Header for exemplar 83-type spectrum
+
+if (sig_data$is_polyT_removed) {
+  catfdiv(
+    "For the supporting tumor plot,
+    mutation counts for insertions and deletions of T in
+    long-poly-T contexts were set to 0.
+    They were also set to 0 when calculating cosine similarity with
+    the signature. The signature was not altered 
+    when computing the cosine similarity.",
+    style = ".callout-caution"
+  )
+}
+
+
 cat(paste0(
   '\n\n83-type spectrum of the supporting tumor ',
   sig_data$exemplar_id,
@@ -274,6 +281,8 @@ cat(paste0(
 
   '\n\n'
 ))
+
+
 ```
 
 ```{r}
@@ -283,9 +292,7 @@ cat(paste0(
 # ID83 exemplar spectrum (always shown)
 displayplot(plot_paths$id83_catalog, getp("hw83"))
 if (!is.null(plot_paths$id83_catalog_ablated)) {
-  cat(
-    '\n\n<details>\n<summary>Insertions and/or deletions in long poly-T suppressed</summary>\n\n'
-  )
+  cat(suppressed_t_details)
   displayplot(plot_paths$id83_catalog_ablated, getp("hw83"))
   cat('\n\n</details>\n\n')
 }
@@ -317,9 +324,7 @@ if (!is.null(plot_paths$cosmic_plots) && length(plot_paths$cosmic_plots) > 0) {
     # Display the plot
     displayplot(cosmic_info$path, getp("hw83"))
     if (!is.null(cosmic_info$path_ablated)) {
-      cat(
-        '\n\n<details>\n<summary>Insertions and/or deletions in long poly-T suppressed</summary>\n\n'
-      )
+      cat(suppressed_t_details)
       displayplot(cosmic_info$path_ablated, getp("hw83"))
       cat('\n\n</details>\n\n')
     }
@@ -353,9 +358,7 @@ if (!is.null(plot_paths$jin_plots) && length(plot_paths$jin_plots) > 0) {
     # Display the plot
     displayplot(jin_info$path, getp("hw83"))
     if (!is.null(jin_info$path_ablated)) {
-      cat(
-        '\n\n<details>\n<summary>Insertions and/or deletions in long poly-T suppressed</summary>\n\n'
-      )
+      cat(suppressed_t_details)
       displayplot(jin_info$path_ablated, getp("hw83"))
       cat('\n\n</details>\n\n')
     }

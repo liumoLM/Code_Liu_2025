@@ -1,6 +1,4 @@
-Deletions and insertions of T in long poly-T contexts were removed from the 83-type spectrum.
-
-ID_N is characterized by a greater frequency of 2bp deletions in 4‑unit tandem repeats, plus some 3bp and 4bp deletions compared to ID_J.
+ID_N has more 2bp deletions in 4‑unit tandem repeats, plus some 3bp and 4bp deletions compared to ID_J.
 
 WARNING: The 83-type ID_N extraction excluded the large proportion of T deletions in long poly-T contexts
 that were detected in extractions in the 89-type and 476-type
