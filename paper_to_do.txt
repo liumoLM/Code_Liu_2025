@@ -1,4 +1,7 @@
-﻿# Steve
+﻿#
+Mo added ID_P (83-type) in Manuscript_data/Liu_et_al_final_83_type_signatures.tsv -DONE
+
+# Steve
 
 Yes, drop HEK2 (Steve TODO alert shenli, szu-chi, arnoud)
 
@@ -33,14 +36,14 @@ against long poly A / poly T?  Can we check this?
 
 # Mo do on each signature (working backward)
 
-ID_N Check w/ Mo
+ID_N Check w/ Mo  -- Steve to re-check
 
-ID_M Check w/ Mo
+ID_M Check w/ Mo -- DONE
 
-J Check w/ Mo
+J Check w/ Mo  -- Steve to re-check
 
 F (no comments -- looks perfect -- todo MO: do we want to add a note on rnash2b connection)
-in Code_Liu_2025/Manuscript_data/per_sig_txt/InsDel_F.md
+in Code_Liu_2025/Manuscript_data/per_sig_txt/InsDel_F.md  -DONE
 
 Not sure what I mean here C reverse Discuss w/ the value of ID_C
 
