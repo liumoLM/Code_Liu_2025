@@ -44,7 +44,7 @@ execute:
 # IMPORTANT: for developers, changing plot titles will
 # not automatically trigger plot regeneration.
 # ======================================================
-REGENERATE_PLOTS <- T # FALSE
+REGENERATE_PLOTS <- FALSE
 data_dir <- "../Manuscript_data/"
 
 # Minimum cosine similarity to show matching COSMIC signatures
@@ -487,10 +487,12 @@ sig_table <- sig_table %>%
     cos_v_collapsed_476 = cosine89_mapped,
     best_match_koh,
     cosine_v_koh,
-    exemplar_id = examplar_id,
+    exemplar_id,
     cosine_89_exemplar = cosine89,
     .after = type89_sig_id
   )
+
+write.csv(sig_table, "prot_table_1.csv")
 
 ```
 
