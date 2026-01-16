@@ -9,6 +9,9 @@
 #' @param base_size Base size passed to plot_83.
 #' @param min_ts_to_trigger If >= 1.1, treated as an absolute count threshold.
 #'   If < 1.1, treated as a proportion of total mutations.
+#' @param ablate_both If TRUE, the if either the intertion or
+#' deletion over the min_ts_to_trigger then suppress both
+#' insertions and deletions.
 #'
 #' @return If no polyT rows exceed threshold, returns a
 #' a list with a single element `plots``.
@@ -24,7 +27,8 @@ plot_83_w_wout_t <- function(
   plot_title = NULL,
   text_size = NULL,
   base_size = NULL,
-  min_ts_to_trigger = 100
+  min_ts_to_trigger = .1,
+  ablate_both = TRUE
 ) {
   # Row names for polyT 5+ rows
   del_t_row <- "DEL:T:1:5+"
@@ -49,6 +53,10 @@ plot_83_w_wout_t <- function(
   # Check which rows are offending
   del_t_offending <- del_t_val >= min_ts_to_trigger
   ins_t_offending <- ins_t_val >= min_ts_to_trigger
+  if (ablate_both) {
+    del_t_offending <- del_t_offending || ins_t_offending
+    ins_t_offending <- del_t_offending || ins_t_offending
+  }
 
   # Build argument list for plot_83, excluding NULL values
   plot_args <- list(catalog = catalog)

@@ -29,7 +29,10 @@ fenced_div <- function(txt, style = ".callout-note") {
 #' Convenience wrapper that combines cat() and fenced_div()
 #'
 #' @param txt Character: the text content for the div
-#' @param style Character: the CSS class for the div (default ".callout-note")
+#' @param style Character: the CSS class for the div.
+#' Alternatives would be .callout-{tip (green),
+#' warning (yellow or oranage), caution (orange),
+#' important (red)}.
 #' @return NULL (called for side effect of outputting to document)
 catfdiv <- function(txt, style = ".callout-note") {
   cat(fenced_div(txt, style))
@@ -346,9 +349,18 @@ generate_plots_to_files <- function(
     id83_sig = file.path(plot_dir, paste0(safe_name, "_id83_sig.png")),
     id83_mapped = file.path(plot_dir, paste0(safe_name, "_id83_mapped.png")),
     id83_catalog = file.path(plot_dir, paste0(safe_name, "_id83_catalog.png")),
-    id83_sig_ablated = file.path(plot_dir, paste0(safe_name, "_id83_sig_ablated.png")),
-    id83_mapped_ablated = file.path(plot_dir, paste0(safe_name, "_id83_mapped_ablated.png")),
-    id83_catalog_ablated = file.path(plot_dir, paste0(safe_name, "_id83_catalog_ablated.png")),
+    id83_sig_ablated = file.path(
+      plot_dir,
+      paste0(safe_name, "_id83_sig_ablated.png")
+    ),
+    id83_mapped_ablated = file.path(
+      plot_dir,
+      paste0(safe_name, "_id83_mapped_ablated.png")
+    ),
+    id83_catalog_ablated = file.path(
+      plot_dir,
+      paste0(safe_name, "_id83_catalog_ablated.png")
+    ),
     id83_sig_ablated_catalog = NULL,
     id83_mapped_ablated_catalog = NULL,
     id83_catalog_ablated_catalog = NULL
@@ -565,7 +577,11 @@ generate_plots_to_files <- function(
       ID83_mapped_signatures[, mapped_col_name, drop = FALSE],
       plot_title = ""
     )
-    save_result <- save83_result(result, paths$id83_mapped, paths$id83_mapped_ablated)
+    save_result <- save83_result(
+      result,
+      paths$id83_mapped,
+      paths$id83_mapped_ablated
+    )
     if (!save_result$ablated) {
       paths$id83_mapped_ablated <- NULL
     }
@@ -583,7 +599,11 @@ generate_plots_to_files <- function(
     cat83touse = ID83_catalogs
   }
   result <- p83(cat83touse[, sig_data$exemplar_id, drop = FALSE])
-  save_result <- save83_result(result, paths$id83_catalog, paths$id83_catalog_ablated)
+  save_result <- save83_result(
+    result,
+    paths$id83_catalog,
+    paths$id83_catalog_ablated
+  )
   if (!save_result$ablated) {
     paths$id83_catalog_ablated <- NULL
   }
@@ -924,10 +944,22 @@ reconstruct_plot_paths <- function(signature_names, plot_dir) {
       ),
       id83_sig = file.path(plot_dir, paste0(safe_name, "_id83_sig.png")),
       id83_mapped = file.path(plot_dir, paste0(safe_name, "_id83_mapped.png")),
-      id83_catalog = file.path(plot_dir, paste0(safe_name, "_id83_catalog.png")),
-      id83_sig_ablated = file.path(plot_dir, paste0(safe_name, "_id83_sig_ablated.png")),
-      id83_mapped_ablated = file.path(plot_dir, paste0(safe_name, "_id83_mapped_ablated.png")),
-      id83_catalog_ablated = file.path(plot_dir, paste0(safe_name, "_id83_catalog_ablated.png")),
+      id83_catalog = file.path(
+        plot_dir,
+        paste0(safe_name, "_id83_catalog.png")
+      ),
+      id83_sig_ablated = file.path(
+        plot_dir,
+        paste0(safe_name, "_id83_sig_ablated.png")
+      ),
+      id83_mapped_ablated = file.path(
+        plot_dir,
+        paste0(safe_name, "_id83_mapped_ablated.png")
+      ),
+      id83_catalog_ablated = file.path(
+        plot_dir,
+        paste0(safe_name, "_id83_catalog_ablated.png")
+      ),
       id83_sig_ablated_catalog = NULL,
       id83_mapped_ablated_catalog = NULL,
       id83_catalog_ablated_catalog = NULL
@@ -937,16 +969,27 @@ reconstruct_plot_paths <- function(signature_names, plot_dir) {
     paths <- lapply(names(paths), function(nm) {
       p <- paths[[nm]]
       if (grepl("_ablated_catalog$", nm)) {
-        return(NULL)  # ablated_catalog is in-memory only, always NULL from cache
+        return(NULL) # ablated_catalog is in-memory only, always NULL from cache
       }
       if (is.null(p) || !file.exists(p)) NULL else p
     })
     names(paths) <- c(
-      "id89_sig", "id89_mapped", "id89_catalog", "id89_residual",
-      "id89_target_sig_partial_spectrum", "id476_sig", "id476_catalog",
-      "id83_sig", "id83_mapped", "id83_catalog",
-      "id83_sig_ablated", "id83_mapped_ablated", "id83_catalog_ablated",
-      "id83_sig_ablated_catalog", "id83_mapped_ablated_catalog", "id83_catalog_ablated_catalog"
+      "id89_sig",
+      "id89_mapped",
+      "id89_catalog",
+      "id89_residual",
+      "id89_target_sig_partial_spectrum",
+      "id476_sig",
+      "id476_catalog",
+      "id83_sig",
+      "id83_mapped",
+      "id83_catalog",
+      "id83_sig_ablated",
+      "id83_mapped_ablated",
+      "id83_catalog_ablated",
+      "id83_sig_ablated_catalog",
+      "id83_mapped_ablated_catalog",
+      "id83_catalog_ablated_catalog"
     )
 
     # Find any COSMIC plots for this signature
@@ -975,7 +1018,7 @@ reconstruct_plot_paths <- function(signature_names, plot_dir) {
           path = cf,
           path_ablated = if (file.exists(ablated_file)) ablated_file else NULL,
           cosine = NA,
-          ablated_catalog = NULL  # Not available from cache
+          ablated_catalog = NULL # Not available from cache
         )
       }
       paths$cosmic_plots <- cosmic_plot_list
@@ -1003,7 +1046,7 @@ reconstruct_plot_paths <- function(signature_names, plot_dir) {
           path = jf,
           path_ablated = if (file.exists(ablated_file)) ablated_file else NULL,
           cosine = NA,
-          ablated_catalog = NULL  # Not available from cache
+          ablated_catalog = NULL # Not available from cache
         )
       }
       paths$jin_plots <- jin_plot_list
