@@ -194,12 +194,30 @@ cat('\n\n<details>\n<summary>Show 83-type plots</summary>\n\n')
 
 # ID83 signature plot (only if signature exists)
 if (!is.null(plot_paths$id83_sig)) {
+  if (sig_data$is_polyT_removed) {
+    catfdiv(
+      "In the supporting tumor
+    mutations counts for insertions and deletions of T in
+    long-poly-T contexts were set to 0 in the plot and
+    when calculating cosine similarity between the supporting 
+    tumor and the signature, but the signature was not altered 
+    before computing the cosine similarity"
+    )
+  }
+
   note83 = find_sig_txt(sig_data$ID83signature)
   if (!is.null(note83)) {
     catfdiv(note83, style = ".callout-note")
   }
 
-  displayplot(plot_paths$id83_sig, getp("hw89"))
+  displayplot(plot_paths$id83_sig, getp("hw83"))
+  if (!is.null(plot_paths$id83_sig_ablated)) {
+    cat(
+      '\n\n<details>\n<summary>Click to see with insertions and/or deletions in long poly-T suppressed</summary>\n\n'
+    )
+    displayplot(plot_paths$id83_sig_ablated, getp("hw83"))
+    cat('\n\n</details>\n\n')
+  }
 }
 ```
 
@@ -231,6 +249,13 @@ if (!is.null(plot_paths$id83_mapped)) {
     sep = ""
   )
   displayplot(plot_paths$id83_mapped, getp("hw83"))
+  if (!is.null(plot_paths$id83_mapped_ablated)) {
+    cat(
+      '\n\n<details>\n<summary>Insertions and/or deletions in long poly-T suppressed</summary>\n\n'
+    )
+    displayplot(plot_paths$id83_mapped_ablated, getp("hw83"))
+    cat('\n\n</details>\n\n')
+  }
 }
 ```
 
@@ -257,6 +282,13 @@ cat(paste0(
 
 # ID83 exemplar spectrum (always shown)
 displayplot(plot_paths$id83_catalog, getp("hw83"))
+if (!is.null(plot_paths$id83_catalog_ablated)) {
+  cat(
+    '\n\n<details>\n<summary>Insertions and/or deletions in long poly-T suppressed</summary>\n\n'
+  )
+  displayplot(plot_paths$id83_catalog_ablated, getp("hw83"))
+  cat('\n\n</details>\n\n')
+}
 ```
 
 ```{r}
@@ -284,6 +316,13 @@ if (!is.null(plot_paths$cosmic_plots) && length(plot_paths$cosmic_plots) > 0) {
 
     # Display the plot
     displayplot(cosmic_info$path, getp("hw83"))
+    if (!is.null(cosmic_info$path_ablated)) {
+      cat(
+        '\n\n<details>\n<summary>Insertions and/or deletions in long poly-T suppressed</summary>\n\n'
+      )
+      displayplot(cosmic_info$path_ablated, getp("hw83"))
+      cat('\n\n</details>\n\n')
+    }
   }
 }
 ```
@@ -313,6 +352,13 @@ if (!is.null(plot_paths$jin_plots) && length(plot_paths$jin_plots) > 0) {
 
     # Display the plot
     displayplot(jin_info$path, getp("hw83"))
+    if (!is.null(jin_info$path_ablated)) {
+      cat(
+        '\n\n<details>\n<summary>Insertions and/or deletions in long poly-T suppressed</summary>\n\n'
+      )
+      displayplot(jin_info$path_ablated, getp("hw83"))
+      cat('\n\n</details>\n\n')
+    }
   }
 }
 ```

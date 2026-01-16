@@ -1,6 +1,8 @@
 # Helper functions for vignette.Rmd
 # These functions separate computation from plotting for easier debugging
 
+source("plot_83_w_wout_t.R")
+
 #" Format signature name with Greek letters
 #'
 #' Replaces _alpha with α and _beta with β in signature names
@@ -318,7 +320,8 @@ generate_plots_to_files <- function(
   ID83_mapped_signatures = NULL,
   cosmic_signatures = NULL,
   jin_signatures = NULL,
-  koh_signatures = NULL
+  koh_signatures = NULL,
+  min_ts_to_trigger = 0.15
 ) {
   # Create safe filename prefix from signature name
   safe_name <- gsub("[^a-zA-Z0-9_]", "_", sig_data$type89_sig_id)
@@ -342,7 +345,13 @@ generate_plots_to_files <- function(
     ),
     id83_sig = file.path(plot_dir, paste0(safe_name, "_id83_sig.png")),
     id83_mapped = file.path(plot_dir, paste0(safe_name, "_id83_mapped.png")),
-    id83_catalog = file.path(plot_dir, paste0(safe_name, "_id83_catalog.png"))
+    id83_catalog = file.path(plot_dir, paste0(safe_name, "_id83_catalog.png")),
+    id83_sig_ablated = file.path(plot_dir, paste0(safe_name, "_id83_sig_ablated.png")),
+    id83_mapped_ablated = file.path(plot_dir, paste0(safe_name, "_id83_mapped_ablated.png")),
+    id83_catalog_ablated = file.path(plot_dir, paste0(safe_name, "_id83_catalog_ablated.png")),
+    id83_sig_ablated_catalog = NULL,
+    id83_mapped_ablated_catalog = NULL,
+    id83_catalog_ablated_catalog = NULL
   )
 
   # Helper to save ggplot
@@ -498,26 +507,47 @@ generate_plots_to_files <- function(
 
   # ID83 signature (only if exists)
 
-  p83 <- function(catalog, plot_title = NULL) {
-    mSigPlot::plot_83(
+  p83 <- function(catalog, plot_title = NULL, min_ts = min_ts_to_trigger) {
+    plot_83_w_wout_t(
       catalog,
       plot_title = plot_title,
       text_size = getp('textsize83'),
-      base_size = getp('basesize83')
+      base_size = getp('basesize83'),
+      min_ts_to_trigger = min_ts
     )
   }
-  save83 = function(myplot, path) {
+  save83 <- function(myplot, path) {
     save_ggplot(myplot, path, width = getp('w83'), height = getp('h83'))
   }
 
+  # Helper to save p83 result and return ablation info
+  save83_result <- function(result, path_main, path_ablated = NULL) {
+    # Check if ablation occurred (ablated_catalog present means 2 plots)
+    if (!is.null(result$ablated_catalog)) {
+      # Two plots case - save both
+      save83(result$plots[[1]], path_main)
+      if (!is.null(path_ablated)) {
+        save83(result$plots[[2]], path_ablated)
+      }
+      return(list(ablated = TRUE, ablated_catalog = result$ablated_catalog))
+    } else {
+      # Single plot case
+      save83(result$plots, path_main)
+      return(list(ablated = FALSE, ablated_catalog = NULL))
+    }
+  }
+
   if (sig_data$has_83_signature) {
-    ptmp = p83(ID83_signatures[,
-      sig_data$ID83signature,
-      drop = FALSE
-    ])
-    save83(ptmp, paths$id83_sig)
+    result <- p83(ID83_signatures[, sig_data$ID83signature, drop = FALSE])
+    save_result <- save83_result(result, paths$id83_sig, paths$id83_sig_ablated)
+    if (!save_result$ablated) {
+      paths$id83_sig_ablated <- NULL
+    }
+    paths$id83_sig_ablated_catalog <- save_result$ablated_catalog
   } else {
     paths$id83_sig <- NULL
+    paths$id83_sig_ablated <- NULL
+    paths$id83_sig_ablated_catalog <- NULL
   }
 
   # ID83 mapped signature (from 476-type)
@@ -531,13 +561,19 @@ generate_plots_to_files <- function(
     } else {
       ""
     }
-    ptmp <- p83(
+    result <- p83(
       ID83_mapped_signatures[, mapped_col_name, drop = FALSE],
       plot_title = ""
     )
-    save83(ptmp, paths$id83_mapped)
+    save_result <- save83_result(result, paths$id83_mapped, paths$id83_mapped_ablated)
+    if (!save_result$ablated) {
+      paths$id83_mapped_ablated <- NULL
+    }
+    paths$id83_mapped_ablated_catalog <- save_result$ablated_catalog
   } else {
     paths$id83_mapped <- NULL
+    paths$id83_mapped_ablated <- NULL
+    paths$id83_mapped_ablated_catalog <- NULL
   }
 
   # ID83 spectrum catalog, always shown
@@ -546,8 +582,12 @@ generate_plots_to_files <- function(
   } else {
     cat83touse = ID83_catalogs
   }
-  ptmp <- p83(cat83touse[, sig_data$exemplar_id, drop = FALSE])
-  save83(ptmp, paths$id83_catalog)
+  result <- p83(cat83touse[, sig_data$exemplar_id, drop = FALSE])
+  save_result <- save83_result(result, paths$id83_catalog, paths$id83_catalog_ablated)
+  if (!save_result$ablated) {
+    paths$id83_catalog_ablated <- NULL
+  }
+  paths$id83_catalog_ablated_catalog <- save_result$ablated_catalog
 
   # COSMIC matching signatures
   paths$cosmic_plots <- NULL
@@ -561,8 +601,12 @@ generate_plots_to_files <- function(
         plot_dir,
         paste0(safe_name, "_cosmic_", cosmic_sig_name, ".png")
       )
+      ablated_path <- file.path(
+        plot_dir,
+        paste0(safe_name, "_cosmic_", cosmic_sig_name, "_ablated.png")
+      )
 
-      ptmp <- p83(
+      result <- p83(
         cosmic_signatures[, cosmic_sig_name, drop = FALSE],
         plot_title = paste0(
           "COSMIC ",
@@ -573,11 +617,13 @@ generate_plots_to_files <- function(
           format(cosmic_cosine, digits = getp("cosine_digits"))
         )
       )
-      save83(ptmp, plot_path)
+      save_result <- save83_result(result, plot_path, ablated_path)
 
       cosmic_plot_list[[cosmic_sig_name]] <- list(
         path = plot_path,
-        cosine = cosmic_cosine
+        path_ablated = if (save_result$ablated) ablated_path else NULL,
+        cosine = cosmic_cosine,
+        ablated_catalog = save_result$ablated_catalog
       )
     }
     paths$cosmic_plots <- cosmic_plot_list
@@ -595,8 +641,12 @@ generate_plots_to_files <- function(
         plot_dir,
         paste0(safe_name, "_jin_", jin_sig_name, ".png")
       )
+      ablated_path <- file.path(
+        plot_dir,
+        paste0(safe_name, "_jin_", jin_sig_name, "_ablated.png")
+      )
 
-      ptmp <- p83(
+      result <- p83(
         jin_signatures[, jin_sig_name, drop = FALSE],
         plot_title = paste0(
           "Jin ",
@@ -607,11 +657,13 @@ generate_plots_to_files <- function(
           format(jin_cosine, digits = getp("cosine_digits"))
         )
       )
-      save83(ptmp, plot_path)
+      save_result <- save83_result(result, plot_path, ablated_path)
 
       jin_plot_list[[jin_sig_name]] <- list(
         path = plot_path,
-        cosine = jin_cosine
+        path_ablated = if (save_result$ablated) ablated_path else NULL,
+        cosine = jin_cosine,
+        ablated_catalog = save_result$ablated_catalog
       )
     }
     paths$jin_plots <- jin_plot_list
@@ -679,6 +731,7 @@ generate_all_plots_parallel <- function(
   cosmic_signatures = NULL,
   jin_signatures = NULL,
   koh_signatures = NULL,
+  min_ts_to_trigger = 0.15,
   n_workers = 10
 ) {
   # Create plot directory
@@ -708,7 +761,8 @@ generate_all_plots_parallel <- function(
         ID83_mapped_signatures = ID83_mapped_signatures,
         cosmic_signatures = cosmic_signatures,
         jin_signatures = jin_signatures,
-        koh_signatures = koh_signatures
+        koh_signatures = koh_signatures,
+        min_ts_to_trigger = min_ts_to_trigger
       )
     },
     .options = furrr::furrr_options(
@@ -870,13 +924,30 @@ reconstruct_plot_paths <- function(signature_names, plot_dir) {
       ),
       id83_sig = file.path(plot_dir, paste0(safe_name, "_id83_sig.png")),
       id83_mapped = file.path(plot_dir, paste0(safe_name, "_id83_mapped.png")),
-      id83_catalog = file.path(plot_dir, paste0(safe_name, "_id83_catalog.png"))
+      id83_catalog = file.path(plot_dir, paste0(safe_name, "_id83_catalog.png")),
+      id83_sig_ablated = file.path(plot_dir, paste0(safe_name, "_id83_sig_ablated.png")),
+      id83_mapped_ablated = file.path(plot_dir, paste0(safe_name, "_id83_mapped_ablated.png")),
+      id83_catalog_ablated = file.path(plot_dir, paste0(safe_name, "_id83_catalog_ablated.png")),
+      id83_sig_ablated_catalog = NULL,
+      id83_mapped_ablated_catalog = NULL,
+      id83_catalog_ablated_catalog = NULL
     )
 
-    # Set to NULL if file doesn't exist
-    paths <- lapply(paths, function(p) {
-      if (file.exists(p)) p else NULL
+    # Set to NULL if file doesn't exist (skip the ablated_catalog entries which are always NULL)
+    paths <- lapply(names(paths), function(nm) {
+      p <- paths[[nm]]
+      if (grepl("_ablated_catalog$", nm)) {
+        return(NULL)  # ablated_catalog is in-memory only, always NULL from cache
+      }
+      if (is.null(p) || !file.exists(p)) NULL else p
     })
+    names(paths) <- c(
+      "id89_sig", "id89_mapped", "id89_catalog", "id89_residual",
+      "id89_target_sig_partial_spectrum", "id476_sig", "id476_catalog",
+      "id83_sig", "id83_mapped", "id83_catalog",
+      "id83_sig_ablated", "id83_mapped_ablated", "id83_catalog_ablated",
+      "id83_sig_ablated_catalog", "id83_mapped_ablated_catalog", "id83_catalog_ablated_catalog"
+    )
 
     # Find any COSMIC plots for this signature
     cosmic_pattern <- paste0(safe_name, "_cosmic_*.png")
@@ -887,8 +958,10 @@ reconstruct_plot_paths <- function(signature_names, plot_dir) {
     )
     if (length(cosmic_files) > 0) {
       # Extract COSMIC signature names from filenames
+      # Filter out ablated versions first, then pair them
+      main_files <- cosmic_files[!grepl("_ablated\\.png$", cosmic_files)]
       cosmic_plot_list <- list()
-      for (cf in cosmic_files) {
+      for (cf in main_files) {
         # Extract cosmic sig name from filename like "InsDel1_cosmic_ID5.png"
         basename_no_ext <- tools::file_path_sans_ext(basename(cf))
         cosmic_sig_name <- sub(
@@ -896,9 +969,13 @@ reconstruct_plot_paths <- function(signature_names, plot_dir) {
           "",
           basename_no_ext
         )
+        # Check for corresponding ablated file
+        ablated_file <- sub("\\.png$", "_ablated.png", cf)
         cosmic_plot_list[[cosmic_sig_name]] <- list(
           path = cf,
-          cosine = NA # Cosine not available from cache
+          path_ablated = if (file.exists(ablated_file)) ablated_file else NULL,
+          cosine = NA,
+          ablated_catalog = NULL  # Not available from cache
         )
       }
       paths$cosmic_plots <- cosmic_plot_list
@@ -914,13 +991,19 @@ reconstruct_plot_paths <- function(signature_names, plot_dir) {
       full.names = TRUE
     )
     if (length(jin_files) > 0) {
+      # Filter out ablated versions first, then pair them
+      main_files <- jin_files[!grepl("_ablated\\.png$", jin_files)]
       jin_plot_list <- list()
-      for (jf in jin_files) {
+      for (jf in main_files) {
         basename_no_ext <- tools::file_path_sans_ext(basename(jf))
         jin_sig_name <- sub(paste0(safe_name, "_jin_"), "", basename_no_ext)
+        # Check for corresponding ablated file
+        ablated_file <- sub("\\.png$", "_ablated.png", jf)
         jin_plot_list[[jin_sig_name]] <- list(
           path = jf,
-          cosine = NA
+          path_ablated = if (file.exists(ablated_file)) ablated_file else NULL,
+          cosine = NA,
+          ablated_catalog = NULL  # Not available from cache
         )
       }
       paths$jin_plots <- jin_plot_list
