@@ -1,6 +1,6 @@
-﻿# Steve / Mo discussion
+﻿# Steve
 
-Yes, drop HEK2
+Yes, drop HEK2 (Steve TODO alert shenli, szu-chi, arnoud)
 
 Insdel O cannot figure out what is going on
 
@@ -10,131 +10,11 @@ use github pages archived on zenodo
 
 Discuss warnings for ID  Big picture, 83 type not useful - to discuss future we need a new classification
 
+Consider including ludmil, figure out how to get us funding
+
 See note for C_ID9 -- it doesn't make sense for this sig; was it misplaced?
 
-# Steve
-
-HOLD *** URGENT -- proceed with upload of HEK cells
-
-REVISIT Review table 1 column E --> need to write something about every entry (see written notes)
-
-DO: Redo signature similarity matrices and signature clustering and make any necessary notes
-
 Make 83-type plots more legible (font sizes)
-
-# Steve or Mo do on each signature (working backward)
-
-InsDel_P : there are many PCAWG tumors with spectra matching InsDel_P, 
-but few HMF -- is it possible that HMF variant calling is somehow prejudiced
-against long poly A / poly T?  Can we check this?
-
-InsDel_O Mo -- do you agree with ID_O.md? 
-
-ID_N Check w/ Mo
-
-ID_M Check w/ Mo
-
-ID_L -- IMPORTANT discuss w/ Mo
-
-J Check w/ Mo
-
-I (no comments -- looks perfect)
-
-H *** Need to discuss w/ Mo -- don't understand the labeling in the figure ...
-
-G (no comments -- looks pretty good)
-
-F (no comments -- looks perfect -- do we want to add a note on rnash2b connection)
-
-E (no comments -- looks perfect)
-
-D (no comments -- looks perfect)
-
-C reverse Discuss w/ the value of ID_C
-
-B looks perfect
-
-A_beta looks good
-
-A_alpha looks perfect
-
-23 looks perfect
-
-19c looks pretty good:  C_ID19 has lost t ins and del in long p-t *** NEED TO WRITE NOTE ***
-
-19b ok C_ID19 has lost 5+ dels and t ins in long p-t *** NEED TO WRITE NOTE ***
-
-19a C_ID19 lost t ins in long p-t *** NEED TO WRITE NOTE ***
-
-18 looks very good, CID18 lost 7% t ins in olong poly-t
-
-17 looks perfect
-
-16 *** ISSUE I DON'T understand *** IS THERE AN ERROR in the compaction code for insertions? 
-TODO Dell 16 and Del 11 very close in 89 type
-but completely different in 476 and (89?_)
-
-15 perfect
-
-14 ok
-
-13 perfect added note comparing to Insdel_C
-
-
-12 Added warnings
-
-11 perfect
-
-10 OK
-
-9 perfect
-
-8 perfect
-
-7 poly T warnings
-
-6 perfect
-
-5b missed 5 del poly t in 83 type sig. Double check compression to 83 type
-
-5a perfect
-
-4b Discuss w. Mo several issues in addition to missed t in in poly t.  apparently missed short T deletions. 
-also some discrepancies in the longer insertions; however 89 type extraction and collapsed 476 to 89 extraction at 0.96
-
-4a nearly perfect
-
-3b perfect
-
-3a -- some 1b t in poly t insertions missed in C_ID13 3a and 3b are different enough if if cossim = 0.907
-
-2c very good, some t ins -- worth mentioning? very different from 2a and 2b *** need some kind of note*
-
-2b more t insertions than in 83; compare to 2a skewed toward del t in longer poly t 
-and skewerd toward ins t in longer poly t
-
-2a some t insertion
- 2c is closed to C_ID2
-
-1d perfect
-
-1c nearly perfect
-
-1b good -- some t del in poly 5 missed in C_ID1
-
-1a perfect
-
-
-
-
-
-# Mo to do
-
-Drop Fig 9, draft a table with the information just 89-type -- remove Fig 9 and a relevent sup figure 10. highlighted the relevant part in the manuscript for Steve to decide if to remove or not.
-
-Email willie about wild type 293t cell data  -- done
-
-# Steve to do
 
 Review ID10/C_ID10 -- our extraction got big green T/polyT insertion peak; ID10 has none, or 89/476 has some
 
@@ -143,6 +23,45 @@ shinylink live? https://share.google/aimode/HyNj7vq10fmiW7i1h
 see onetab -- zenodo + github pages + shinklink live?
 
 
+# Steve or Mo do later
+
+InsDel_P : there are many PCAWG tumors with spectra matching InsDel_P, 
+but few HMF -- is it possible that HMF variant calling is somehow prejudiced
+against long poly A / poly T?  Can we check this?
+
+16 *** ISSUE I DON'T understand *** IS THERE AN ERROR in the compaction code for insertions?  Steve to follow up later if possible
+
+# Mo do on each signature (working backward)
+
+ID_N Check w/ Mo
+
+ID_M Check w/ Mo
+
+J Check w/ Mo
+
+F (no comments -- looks perfect -- todo MO: do we want to add a note on rnash2b connection)
+in Code_Liu_2025/Manuscript_data/per_sig_txt/InsDel_F.md
+
+Not sure what I mean here C reverse Discuss w/ the value of ID_C
+
+4b Discuss w. Mo several issues in addition to missed t in in poly t.  apparently missed short T deletions. 
+also some discrepancies in the longer insertions; however 89 type extraction and collapsed 476 to 89 extraction at 0.96
+
+3a -- some 1b t in poly t insertions missed in C_ID13 3a and 3b are different enough if if cossim = 0.907
+
+2c very good, some t ins -- worth mentioning? very different from 2a and 2b *** need some kind of note*
+
+2b more t insertions than in 83; compare to 2a skewed toward del t in longer poly t 
+and skewed toward ins t in longer poly t
+
+2a some t insertion
+ 2c is closed to C_ID2
+
+1b good -- some t del in poly 5 missed in C_ID1
+
+# Mo to do
+
+Drop Fig 9, draft a table with the information just 89-type -- remove Fig 9 and a relevent sup figure 10. highlighted the relevant part in the manuscript for Steve to decide if to remove or not.
 
 # Waiting
 
@@ -160,12 +79,9 @@ Fig 8 label highest peaks in panel A left side (83-type signatures)
 
 drive shiny and vignettes off of same underlying data repository
 
-in vignette indicate where 476 was extracted; when extracted, do auto-conversion
-
-
 update the shiny – have function to generate plots before running
 
-STEVE MOVE ON TO NOVEL SIGS
+STEVE REVIEW THE FOLLOWING
 
 ID9 
 
@@ -185,8 +101,4 @@ Discordant exemplars for 89
 e.g. 1c, 1d
 
 fix decimal points in 89 plots, get rid of top bar by default
-
-
-
-
 
