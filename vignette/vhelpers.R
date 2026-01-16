@@ -679,7 +679,7 @@ generate_all_plots_parallel <- function(
   cosmic_signatures = NULL,
   jin_signatures = NULL,
   koh_signatures = NULL,
-  n_workers = 14
+  n_workers = 10
 ) {
   # Create plot directory
   dir.create(plot_dir, showWarnings = FALSE, recursive = TRUE)
