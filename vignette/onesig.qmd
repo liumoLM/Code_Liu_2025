@@ -8,12 +8,12 @@
 
 cat(
   '\n\n# ',
-  format_signature_name(sig_data$ID89signature),
+  format_signature_name(sig_data$type89_sig_id),
   ' {.signature-section}\n\n',
   sep = ''
 )
 
-note0 <- find_sig_txt(sig_data$ID89signature)
+note0 <- find_sig_txt(sig_data$type89_sig_id)
 if (!is.null(note0)) {
   style0 <- ifelse(
     grepl("^Important", note0),
@@ -113,14 +113,14 @@ if (knitr::is_latex_output()) {
 if (sig_data$has_476_signature) {
   cat(
     "## 476-type representations corresponding to ",
-    sig_data$ID89signature,
+    sig_data$type89_sig_id,
     "\n\n"
   )
 } else {
   catfdiv(
     paste0(
       '476-Type ',
-      sig_data$ID89signature,
+      sig_data$type89_sig_id,
       ' was not found by de novo extraction. ',
       'This is the 476-Type spectrum of ',
       sig_data$exemplar_id
@@ -170,7 +170,7 @@ if (sig_data$has_83_signature) {
   cat(
     "##",
     "83-type signature corresponding to",
-    sig_data$ID89signature,
+    sig_data$type89_sig_id,
     " (",
     sig_data$ID83signature,
     ")\n\n"
@@ -179,7 +179,7 @@ if (sig_data$has_83_signature) {
   catfdiv(
     paste0(
       'No 83-type signature corresponding to ',
-      sig_data$ID89signature,
+      sig_data$type89_sig_id,
       " was extracted"
     ),
     style = ".callout-note"
@@ -225,7 +225,7 @@ if (!is.null(plot_paths$id83_mapped)) {
   cat(
     "\n\n",
     "83-type signature converted from 476-type signature corresponding to ",
-    sig_data$ID89signature,
+    sig_data$type89_sig_id,
     cosine_text,
     "\n\n",
     sep = ""

@@ -47,7 +47,7 @@ find_sig_txt <- function(sig_id) {
 
 #' Compute cosine similarities for a signature-catalog pair
 #'
-#' @param ID89signature Character: the ID89 signature name
+#' @param type89_sig_id Character: the ID89 signature name
 #' @param exemplar_id Character: the identifier of the supporting tumor
 #' @param ID89_signatures Data frame of ID89 signatures
 #' @param ID89_catalogs Data frame of ID89 catalogs
@@ -62,8 +62,8 @@ find_sig_txt <- function(sig_id) {
 #' @param jin_matches Named list of data frames with Jin signature matches
 #' @param koh_matches Named list of data frames with Koh signature matches
 #' @return List with cosine similarities and intermediate data
-compute_signature_data <- function(
-  ID89signature,
+compute_sig_data <- function(
+  type89_sig_id,
   exemplar_id,
   ID83signature,
   ID89_signatures,
@@ -80,15 +80,15 @@ compute_signature_data <- function(
   jin_matches = NULL,
   koh_matches = NULL
 ) {
-  message("ID89signature = ", ID89signature)
+  message("type89_sig_id = ", type89_sig_id)
   # Check if mapped 89-type signature exists (column name is {signature}_converted)
-  mapped_col_name <- paste0(ID89signature, "_converted")
+  mapped_col_name <- paste0(type89_sig_id, "_converted")
   has_mapped_476_sig <- !is.null(ID89_mapped_signatures) &&
     mapped_col_name %in% colnames(ID89_mapped_signatures)
 
   # Check if mapped 83-type signature exists
   # Only consider it if a 476-type signature was extracted
-  has_476_sig <- ID89signature %in% colnames(ID476_signatures)
+  has_476_sig <- type89_sig_id %in% colnames(ID476_signatures)
   has_83_mapped_sig <- has_476_sig &&
     !is.null(ID83_mapped_signatures) &&
     mapped_col_name %in% colnames(ID83_mapped_signatures)
@@ -107,15 +107,15 @@ compute_signature_data <- function(
 
   # Get Koh matches for this 89-type signature
   koh_match_data <- NULL
-  if (!is.null(koh_matches) && ID89signature %in% names(koh_matches)) {
-    koh_match_data <- koh_matches[[ID89signature]]
+  if (!is.null(koh_matches) && type89_sig_id %in% names(koh_matches)) {
+    koh_match_data <- koh_matches[[type89_sig_id]]
   }
 
   result <- list(
-    ID89signature = ID89signature,
+    type89_sig_id = type89_sig_id,
     examplar_id = exemplar_id,
     ID83signature = ID83signature,
-    is_insdel15_16 = ID89signature %in% c("InsDel15", "InsDel16"),
+    is_insdel15_16 = type89_sig_id %in% c("InsDel15", "InsDel16"),
     is_polyT_removed = ID83signature %in%
       c("C_ID7", "ID_J", "C_ID10", "ID_N", "ID_O"),
     has_476_signature = has_476_sig,
@@ -130,7 +130,7 @@ compute_signature_data <- function(
   # Compute cosine89 (raw catalog vs signature)
   result$cosine89 <-
     lsa::cosine(
-      as.numeric(ID89_signatures[, ID89signature]),
+      as.numeric(ID89_signatures[, type89_sig_id]),
       as.numeric(ID89_catalogs[, exemplar_id])
     )
 
@@ -138,7 +138,7 @@ compute_signature_data <- function(
   if (has_mapped_476_sig) {
     result$cosine89_mapped <-
       lsa::cosine(
-        as.numeric(ID89_signatures[, ID89signature]),
+        as.numeric(ID89_signatures[, type89_sig_id]),
         as.numeric(ID89_mapped_signatures[, mapped_col_name])
       )
   } else {
@@ -172,7 +172,7 @@ compute_signature_data <- function(
 
     # There is no assignment for InsDel_N because it is identical to
     # InsDel_J
-    sigid = ID89signature
+    sigid = type89_sig_id
     if (sigid == "InsDel_N") {
       sigid <- "InsDel_J"
     }
@@ -202,7 +202,7 @@ compute_signature_data <- function(
     # Cosine of diff vs signature
     result$cosine89_diff <-
       lsa::cosine(
-        as.numeric(ID89_signatures[, ID89signature]),
+        as.numeric(ID89_signatures[, type89_sig_id]),
         as.numeric(as.matrix(result$target_sig_partial_spectrum))
       )
   } else {
@@ -215,7 +215,7 @@ compute_signature_data <- function(
   if (result$has_476_signature) {
     result$cosine476 <-
       lsa::cosine(
-        as.numeric(ID476_signatures[, ID89signature]),
+        as.numeric(ID476_signatures[, type89_sig_id]),
         as.numeric(ID476_catalogs[, exemplar_id])
       )
   } else {
@@ -257,7 +257,7 @@ compute_signature_data <- function(
 
 #' Generate markdown footer text with cosine summary
 #'
-#' @param sig_data List returned from compute_signature_data
+#' @param sig_data List returned from compute_sig_data
 #' @return Character string with markdown text
 generate_section_footer <- function(sig_data) {
   cosine476_text <- if (is.na(sig_data$cosine476)) {
@@ -285,7 +285,7 @@ generate_section_footer <- function(sig_data) {
 
 #' Generate all plots for a signature and save to files
 #'
-#' @param sig_data List returned from compute_signature_data
+#' @param sig_data List returned from compute_sig_data
 #' @param ID89_signatures Data frame of ID89 signatures
 #' @param ID89_catalogs Data frame of ID89 catalogs
 #' @param ID83_signatures ICAMS catalog of ID83 signatures
@@ -321,7 +321,7 @@ generate_plots_to_files <- function(
   koh_signatures = NULL
 ) {
   # Create safe filename prefix from signature name
-  safe_name <- gsub("[^a-zA-Z0-9_]", "_", sig_data$ID89signature)
+  safe_name <- gsub("[^a-zA-Z0-9_]", "_", sig_data$type89_sig_id)
 
   paths <- list(
     id89_sig = file.path(plot_dir, paste0(safe_name, "_id89_sig.png")),
@@ -374,20 +374,20 @@ generate_plots_to_files <- function(
 
   # ID89 Plot 1: Signature
   p1 <- p89(
-    ID89_signatures[, sig_data$ID89signature, drop = FALSE],
-    plot_title = sig_data$ID89signature
+    ID89_signatures[, sig_data$type89_sig_id, drop = FALSE],
+    plot_title = sig_data$type89_sig_id
   )
   save89(p1, paths$id89_sig)
 
   # ID89 Plot 1b: Mapped signature (from 476-type)
   if (sig_data$has_mapped_476_sig && !is.null(ID89_mapped_signatures)) {
-    mapped_col_name <- paste0(sig_data$ID89signature, "_converted")
+    mapped_col_name <- paste0(sig_data$type89_sig_id, "_converted")
     p1b <- p89(
       ID89_mapped_signatures[, mapped_col_name, drop = FALSE],
       plot_title = paste0(
-        sig_data$ID89signature,
+        sig_data$type89_sig_id,
         " converted from 476-type signature | cosine similarity to ",
-        sig_data$ID89signature,
+        sig_data$type89_sig_id,
         " = ",
         format(sig_data$cosine89_mapped, digits = getp("cosine_digits"))
       )
@@ -406,7 +406,7 @@ generate_plots_to_files <- function(
       "Spectrum A, from ",
       sig_data$catalog,
       " | cosine similarity to ",
-      sig_data$ID89signature,
+      sig_data$type89_sig_id,
       " = ",
       format(sig_data$cosine89, digits = getp("cosine_digits"))
     ),
@@ -420,16 +420,16 @@ generate_plots_to_files <- function(
       "Spectrum B: partial mutational spectrum of ",
       sig_data$catalog,
       " due to ",
-      sig_data$ID89signature
+      sig_data$type89_sig_id
     )
 
     residual_title <- paste0(
       "Remaining mutations in ",
       sig_data$catalog,
       " not due to ",
-      sig_data$ID89signature,
+      sig_data$type89_sig_id,
       " (A minus B) " #| Cosine similarity to ",
-      # sig_data$ID89signature,
+      # sig_data$type89_sig_id,
       # " = ",
       # format(sig_data$cosine89_diff, digits = 4)
     )
@@ -471,10 +471,10 @@ generate_plots_to_files <- function(
 
   if (sig_data$has_476_signature) {
     p5 <- p476(
-      ID476_signatures[, sig_data$ID89signature],
+      ID476_signatures[, sig_data$type89_sig_id],
       plot_title = paste0(
         "Extracted 476-type signature corresponding to ",
-        sig_data$ID89signature
+        sig_data$type89_sig_id
       )
     )
     save476(p5, paths$id476_sig)
@@ -522,7 +522,7 @@ generate_plots_to_files <- function(
 
   # ID83 mapped signature (from 476-type)
   if (sig_data$has_83_mapped_signature && !is.null(ID83_mapped_signatures)) {
-    mapped_col_name <- paste0(sig_data$ID89signature, "_converted")
+    mapped_col_name <- paste0(sig_data$type89_sig_id, "_converted")
     cosine_text <- if (!is.na(sig_data$cosine83_mapped)) {
       paste0(
         " | cosine to native = ",
@@ -636,7 +636,7 @@ generate_plots_to_files <- function(
           "Similar signature from Koh et al., 2025 ",
           koh_sig_name,
           " | cosine to ",
-          sig_data$ID89signature,
+          sig_data$type89_sig_id,
           ": ",
           format(koh_cosine, digits = getp("cosine_digits"))
         )
@@ -657,12 +657,12 @@ generate_plots_to_files <- function(
 
 #' Generate all plots in parallel
 #'
-#' @param all_signature_data List of signature data from compute_signature_data
+#' @param all_sig_data List of signature data from compute_sig_data
 #' @param ... Additional arguments passed to generate_plots_to_files
 #' @param n_workers Number of parallel workers (default 10)
 #' @return List of plot paths for each signature
 generate_all_plots_parallel <- function(
-  all_signature_data,
+  all_sig_data,
   ID89_signatures,
   ID89_catalogs,
   ID83_signatures,
@@ -689,7 +689,7 @@ generate_all_plots_parallel <- function(
 
   # Generate plots in parallel
   all_paths <- furrr::future_map(
-    all_signature_data,
+    all_sig_data,
     function(sig_data) {
       generate_plots_to_files(
         sig_data = sig_data,
