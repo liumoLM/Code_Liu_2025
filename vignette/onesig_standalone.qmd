@@ -1,5 +1,4 @@
 ---
-title: "Indel Signature"
 format:
   html:
     toc: false
@@ -70,7 +69,14 @@ if (sig_index < 1 || sig_index > length(all_sig_data)) {
 
 sig_data <- all_sig_data[[sig_index]]
 plot_paths <- all_plot_paths[[sig_index]]
+
+# Create dynamic title with signature identifier
+doc_title <- paste("Indel Signature", sig_data$type89_sig_id)
 ```
+
+---
+title: "`r doc_title`"
+---
 
 ```{r}
 #| label: render-signature
