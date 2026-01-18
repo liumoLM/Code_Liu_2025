@@ -41,6 +41,38 @@ displayplot = function(mypath, wid = getp('hw')) {
 #| echo: false
 #| output: asis
 
+# Hamburger plot: signature mutations by cancer type
+if (!is.null(plot_paths$hamburger)) {
+  cat("\n\n### Mutations by cancer type\n\n")
+  cat("Distribution of ", sig_data$type89_sig_id,
+      " mutations across cancer types (mutations per megabase, log scale). ",
+      "Each dot represents a sample; red dashed line shows the median.\n\n",
+      sep = "")
+  displayplot(plot_paths$hamburger, getp("hw_hamburger"))
+
+  # Display sample counts table if available
+
+  if (!is.null(plot_paths$hamburger_sample_counts)) {
+    sc <- plot_paths$hamburger_sample_counts
+    sc <- sc[order(-sc$nonzero_samples), ]  # Sort by nonzero count descending
+    sc$fraction <- paste0(
+      sc$nonzero_samples, "/", sc$total_samples,
+      " (", round(100 * sc$nonzero_samples / sc$total_samples, 1), "%)"
+    )
+    sc_display <- sc[, c("cancer_type", "fraction")]
+    colnames(sc_display) <- c("Cancer Type", "Samples with signature / Total")
+
+    cat("\n\n<details>\n<summary>Click to see sample counts by cancer type</summary>\n\n")
+    print(knitr::kable(sc_display, row.names = FALSE))
+    cat("\n\n</details>\n\n")
+  }
+}
+```
+
+```{r}
+#| echo: false
+#| output: asis
+
 # ID89 plots: signature, mapped signature, and catalog (stacked vertically)
 
 displayplot(plot_paths$id89_sig, getp("hw89"))

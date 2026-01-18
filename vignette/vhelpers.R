@@ -3,6 +3,231 @@
 
 source("plot_83_w_wout_t.R")
 
+#' Create hamburger/snake plot showing signature mutations across cancer types
+#'
+#' Creates a plot similar to maftools::tcgaCompare showing mutation burden
+#' for a specific signature across different cancer types. Each dot represents
+#' a sample, with a red line showing the median for each cancer type.
+#'
+#' @param signature_values Named numeric vector of mutation counts per sample.
+#'   Names should be in format "CancerType::SampleID".
+#' @param signature_name Character: name of the signature for the plot title.
+#' @param genome_size_mb Numeric: genome size in megabases for normalization.
+#'   Use 3000 for WGS, 35.8 for WXS/exome. If NULL, plots raw counts.
+#' @param min_samples Integer: minimum number of samples required to include
+#'   a cancer type in the plot (applied after zero filtering if exclude_zero=TRUE).
+#' @param log_scale Logical: whether to use log10 scale for y-axis.
+#' @param exclude_zero Logical: whether to exclude samples with zero mutations
+#'   from the plot (but they are still counted in sample_counts).
+#' @param order_by Character: how to order cancer types. One of "median"
+#'   (ascending median), "name" (alphabetical), or "count" (sample count).
+#' @param bg_colors Character vector of length 2 for alternating background.
+#' @param point_color Character: color for sample points.
+#' @param median_color Character: color for median lines.
+#' @param point_size Numeric: size of sample points.
+#' @param point_alpha Numeric: transparency of points (0-1).
+#' @param base_size Numeric: base font size for the plot.
+#' @return A list with components:
+#'   \item{plot}{A ggplot2 object (or NULL if no data after filtering)}
+#'   \item{sample_counts}{Data frame with columns: cancer_type, total_samples,
+#'     nonzero_samples (number of samples with non-zero signature mutations)}
+plot_signature_by_cancer_type <- function(
+    signature_values,
+    signature_name = "Signature",
+    genome_size_mb = NULL,
+    min_samples = 1,
+    log_scale = TRUE,
+    exclude_zero = TRUE,
+    order_by = c("median", "name", "count"),
+    bg_colors = c("#EDF8B1", "#2C7FB8"),
+    point_color = "black",
+    median_color = "red",
+    point_size = 1.5,
+    point_alpha = 0.7,
+    base_size = 14
+) {
+  order_by <- match.arg(order_by)
+
+  # Parse cancer type from sample names (format: CancerType::SampleID)
+  sample_names <- names(signature_values)
+  cancer_types <- sub("::.*", "", sample_names)
+
+  # Create data frame with all samples (before filtering)
+  df_all <- data.frame(
+    sample = sample_names,
+    cancer_type = cancer_types,
+    mutations = as.numeric(signature_values),
+    stringsAsFactors = FALSE
+  )
+
+  # Calculate sample counts per cancer type (before any filtering)
+  total_by_type <- as.data.frame(table(df_all$cancer_type))
+  colnames(total_by_type) <- c("cancer_type", "total_samples")
+
+  nonzero_by_type <- as.data.frame(table(df_all$cancer_type[df_all$mutations > 0]))
+  colnames(nonzero_by_type) <- c("cancer_type", "nonzero_samples")
+
+  sample_counts <- merge(total_by_type, nonzero_by_type,
+                         by = "cancer_type", all.x = TRUE)
+  sample_counts$nonzero_samples[is.na(sample_counts$nonzero_samples)] <- 0
+
+  # Create working data frame for plotting
+
+  df <- df_all
+
+  # Normalize to per megabase if genome size provided
+  if (!is.null(genome_size_mb)) {
+    df$mutations <- df$mutations / genome_size_mb
+    y_label <- "Number of Mutations per Megabase"
+  } else {
+    y_label <- "Number of Mutations"
+  }
+
+  # Exclude zeros for plotting (but we already captured counts above)
+  if (exclude_zero) {
+    df <- df[df$mutations > 0, ]
+  }
+
+  # Filter cancer types with insufficient samples
+  type_counts <- table(df$cancer_type)
+  valid_types <- names(type_counts)[type_counts >= min_samples]
+  df <- df[df$cancer_type %in% valid_types, ]
+
+  if (nrow(df) == 0) {
+    warning("No data remaining after filtering")
+    return(list(plot = NULL, sample_counts = sample_counts))
+  }
+
+  # Calculate medians for each cancer type
+  medians <- aggregate(mutations ~ cancer_type, data = df, FUN = median)
+  colnames(medians) <- c("cancer_type", "median_mutations")
+
+  # Calculate sample counts for plotting (after filtering)
+  counts <- as.data.frame(table(df$cancer_type))
+  colnames(counts) <- c("cancer_type", "n_samples")
+
+  # Merge medians and counts
+  summary_df <- merge(medians, counts, by = "cancer_type")
+
+  # Order cancer types
+  if (order_by == "median") {
+    summary_df <- summary_df[order(summary_df$median_mutations), ]
+  } else if (order_by == "name") {
+    summary_df <- summary_df[order(summary_df$cancer_type), ]
+  } else if (order_by == "count") {
+    summary_df <- summary_df[order(-summary_df$n_samples), ]
+  }
+
+  # Create ordered factor for cancer types
+  type_order <- summary_df$cancer_type
+  df$cancer_type <- factor(df$cancer_type, levels = type_order)
+  summary_df$cancer_type <- factor(summary_df$cancer_type, levels = type_order)
+
+  # Create numeric x positions for better control
+  df$x_pos <- as.numeric(df$cancer_type)
+  summary_df$x_pos <- as.numeric(summary_df$cancer_type)
+
+  # Create alternating background rectangles data
+  n_types <- length(type_order)
+  bg_df <- data.frame(
+    xmin = seq(0.5, n_types - 0.5, by = 1),
+    xmax = seq(1.5, n_types + 0.5, by = 1),
+    fill = rep(bg_colors, length.out = n_types)
+  )
+
+  # Build the plot
+  p <- ggplot2::ggplot(df, ggplot2::aes(x = x_pos, y = mutations)) +
+    # Alternating background
+    ggplot2::geom_rect(
+      data = bg_df,
+      ggplot2::aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf, fill = fill),
+      inherit.aes = FALSE,
+      alpha = 0.2
+    ) +
+    ggplot2::scale_fill_identity() +
+    # Points with jitter
+    ggplot2::geom_jitter(
+      width = 0.3,
+      height = 0,
+      size = point_size,
+      alpha = point_alpha,
+      color = point_color
+    ) +
+    # Median lines
+    ggplot2::geom_segment(
+      data = summary_df,
+      ggplot2::aes(
+        x = x_pos - 0.4,
+        xend = x_pos + 0.4,
+        y = median_mutations,
+        yend = median_mutations
+      ),
+      color = median_color,
+      linewidth = 1,
+      linetype = "dashed",
+      inherit.aes = FALSE
+    ) +
+    # X-axis labels (cancer types)
+    ggplot2::scale_x_continuous(
+      breaks = seq_along(type_order),
+      labels = type_order
+    ) +
+    ggplot2::labs(
+      title = paste0(signature_name, " mutations"),
+      x = NULL,
+      y = y_label
+    ) +
+    ggplot2::theme_bw(base_size = base_size) +
+    ggplot2::theme(
+      axis.text.x = ggplot2::element_text(angle = 90, hjust = 1, vjust = 0.5),
+      panel.grid.major.x = ggplot2::element_blank(),
+      panel.grid.minor.x = ggplot2::element_blank(),
+      legend.position = "none"
+    )
+
+  # Apply log scale if requested
+  if (log_scale) {
+    p <- p + ggplot2::scale_y_log10(
+      labels = scales::label_number(drop0trailing = TRUE)
+    )
+  }
+
+  return(list(plot = p, sample_counts = sample_counts))
+}
+
+
+#' Generate hamburger plot for a signature from assignment matrix
+#'
+#' Convenience wrapper that extracts a signature's values from the
+#' assignment matrix and creates the hamburger plot.
+#'
+#' @param signature_name Character: name of the signature (row name in matrix).
+#' @param assignment_matrix Data frame with signatures as rows, samples as columns.
+#'   Column names should be in format "CancerType::SampleID".
+#' @param ... Additional arguments passed to plot_signature_by_cancer_type.
+#' @return A list with components:
+#'   \item{plot}{A ggplot2 object (or NULL if no data after filtering)}
+#'   \item{sample_counts}{Data frame with columns: cancer_type, total_samples,
+#'     nonzero_samples (number of samples with non-zero signature mutations)}
+plot_signature_hamburger <- function(
+    signature_name,
+    assignment_matrix,
+    ...
+) {
+  if (!signature_name %in% rownames(assignment_matrix)) {
+    stop("Signature '", signature_name, "' not found in assignment matrix")
+  }
+
+  sig_values <- as.numeric(assignment_matrix[signature_name, ])
+  names(sig_values) <- colnames(assignment_matrix)
+
+  plot_signature_by_cancer_type(
+    signature_values = sig_values,
+    signature_name = signature_name,
+    ...
+  )
+}
+
 #" Format signature name with Greek letters
 #'
 #' Replaces _alpha with α and _beta with β in signature names
@@ -305,6 +530,8 @@ generate_section_footer <- function(sig_data) {
 #' @param cosmic_signatures Data frame of COSMIC signatures for matching plots
 #' @param jin_signatures Data frame of Jin signatures for matching plots
 #' @param koh_signatures Data frame of Koh signatures for matching plots
+#' @param assignment_matrix Data frame with signature assignments (signatures as
+#'   rows, samples as columns). Column names should be "CancerType::SampleID".
 #' @return List with paths to all generated plot files
 generate_plots_to_files <- function(
   sig_data,
@@ -324,7 +551,8 @@ generate_plots_to_files <- function(
   cosmic_signatures = NULL,
   jin_signatures = NULL,
   koh_signatures = NULL,
-  min_ts_to_trigger = 0.15
+  min_ts_to_trigger = 0.15,
+  assignment_matrix = NULL
 ) {
   # Create safe filename prefix from signature name
   safe_name <- gsub("[^a-zA-Z0-9_]", "_", sig_data$type89_sig_id)
@@ -363,7 +591,8 @@ generate_plots_to_files <- function(
     ),
     id83_sig_ablated_catalog = NULL,
     id83_mapped_ablated_catalog = NULL,
-    id83_catalog_ablated_catalog = NULL
+    id83_catalog_ablated_catalog = NULL,
+    hamburger = file.path(plot_dir, paste0(safe_name, "_hamburger.png"))
   )
 
   # Helper to save ggplot
@@ -723,6 +952,46 @@ generate_plots_to_files <- function(
     paths$koh_plots <- koh_plot_list
   }
 
+  # Hamburger plot (signature mutations by cancer type)
+  paths$hamburger_sample_counts <- NULL
+  if (!is.null(assignment_matrix) &&
+      sig_data$type89_sig_id %in% rownames(assignment_matrix)) {
+    tryCatch({
+      hamburger_result <- plot_signature_hamburger(
+        signature_name = sig_data$type89_sig_id,
+        assignment_matrix = assignment_matrix,
+        genome_size_mb = getp("genome_size_mb"),
+        min_samples = getp("min_samples_hamburger"),
+        log_scale = TRUE,
+        exclude_zero = TRUE,
+        order_by = "median",
+        point_size = getp("point_size_hamburger"),
+        point_alpha = getp("point_alpha_hamburger"),
+        base_size = getp("basesize_hamburger")
+      )
+      paths$hamburger_sample_counts <- hamburger_result$sample_counts
+      if (!is.null(hamburger_result$plot)) {
+        # Suppress log scale transformation warnings during save
+        suppressWarnings(
+          save_ggplot(
+            hamburger_result$plot,
+            paths$hamburger,
+            width = getp("w_hamburger"),
+            height = getp("h_hamburger")
+          )
+        )
+      } else {
+        paths$hamburger <- NULL
+      }
+    }, error = function(e) {
+      warning("Failed to generate hamburger plot for ", sig_data$type89_sig_id,
+              ": ", e$message)
+      paths$hamburger <<- NULL
+    })
+  } else {
+    paths$hamburger <- NULL
+  }
+
   return(paths)
 }
 
@@ -732,6 +1001,7 @@ generate_plots_to_files <- function(
 #' @param all_sig_data List of signature data from compute_sig_data
 #' @param ... Additional arguments passed to generate_plots_to_files
 #' @param n_workers Number of parallel workers (default 10)
+#' @param assignment_matrix Data frame with signature assignments for hamburger plots
 #' @return List of plot paths for each signature
 generate_all_plots_parallel <- function(
   all_sig_data,
@@ -752,7 +1022,8 @@ generate_all_plots_parallel <- function(
   jin_signatures = NULL,
   koh_signatures = NULL,
   min_ts_to_trigger = 0.15,
-  n_workers = 10
+  n_workers = 10,
+  assignment_matrix = NULL
 ) {
   # Create plot directory
   dir.create(plot_dir, showWarnings = FALSE, recursive = TRUE)
@@ -782,12 +1053,13 @@ generate_all_plots_parallel <- function(
         cosmic_signatures = cosmic_signatures,
         jin_signatures = jin_signatures,
         koh_signatures = koh_signatures,
-        min_ts_to_trigger = min_ts_to_trigger
+        min_ts_to_trigger = min_ts_to_trigger,
+        assignment_matrix = assignment_matrix
       )
     },
     .options = furrr::furrr_options(
       seed = TRUE,
-      packages = c("ggplot2", "ICAMS", "mSigPlot", "indelsig.tools.lib")
+      packages = c("ggplot2", "ICAMS", "mSigPlot", "indelsig.tools.lib", "scales")
     ),
     .progress = TRUE
   )
@@ -824,6 +1096,7 @@ check_plot_cache <- function(
     "Liu_et_al_83_type_spectra.tsv",
     "Liu_et_al_final_476_type_signatures.tsv",
     "Liu_et_al_476_type_spectra.tsv",
+    "Liu_et_al_89_type_signature_assignments.tsv",
     "89type_to_83type_connection.tsv",
     "COSMIC_v3.5_ID_GRCh37_signatures.tsv",
     "jin_2024_sup_tab_1_signatures.tsv",
@@ -886,6 +1159,7 @@ save_plot_cache <- function(
     "Liu_et_al_83_type_spectra.tsv",
     "Liu_et_al_final_476_type_signatures.tsv",
     "Liu_et_al_476_type_spectra.tsv",
+    "Liu_et_al_89_type_signature_assignments.tsv",
     "89type_to_83type_connection.tsv",
     "COSMIC_v3.5_ID_GRCh37_signatures.tsv",
     "jin_2024_sup_tab_1_signatures.tsv",
@@ -962,7 +1236,8 @@ reconstruct_plot_paths <- function(signature_names, plot_dir) {
       ),
       id83_sig_ablated_catalog = NULL,
       id83_mapped_ablated_catalog = NULL,
-      id83_catalog_ablated_catalog = NULL
+      id83_catalog_ablated_catalog = NULL,
+      hamburger = file.path(plot_dir, paste0(safe_name, "_hamburger.png"))
     )
 
     # Set to NULL if file doesn't exist (skip the ablated_catalog entries which are always NULL)
@@ -989,7 +1264,8 @@ reconstruct_plot_paths <- function(signature_names, plot_dir) {
       "id83_catalog_ablated",
       "id83_sig_ablated_catalog",
       "id83_mapped_ablated_catalog",
-      "id83_catalog_ablated_catalog"
+      "id83_catalog_ablated_catalog",
+      "hamburger"
     )
 
     # Find any COSMIC plots for this signature
