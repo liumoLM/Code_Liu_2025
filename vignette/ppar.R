@@ -24,6 +24,16 @@ ppar <- list(
   basesize83 = 25,
   textsize83 = 5,
 
+  # For hamburger/snake plots (signature by cancer type)
+  w_hamburger = 12,
+  h_hamburger = 6,
+  hw_hamburger = "70%",
+  basesize_hamburger = 12,
+  point_size_hamburger = 1.2,
+  point_alpha_hamburger = 0.6,
+  min_samples_hamburger = 3,
+  genome_size_mb = 3000,  # WGS genome size in MB for normalization
+
   # Plot scaling for the html output
   hw = "100%", # Default
 

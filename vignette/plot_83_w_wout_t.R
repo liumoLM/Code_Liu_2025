@@ -111,7 +111,7 @@ plot_83_w_wout_t <- function(
   )
 
   # Build modified title
-  if (is.null(plot_title) || plot_tile == "") {
+  if (is.null(plot_title) || plot_title == "") {
     modified_title <- suffix
   } else {
     modified_title <- paste(plot_title, suffix, sep = ", ")

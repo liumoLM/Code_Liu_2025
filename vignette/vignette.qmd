@@ -72,6 +72,7 @@ library(data.table)
 library(mSigPlot)
 library(data.table)
 library(ggplot2)
+library(scales)
 library(future)
 library(furrr)
 library(tidyr)
@@ -525,7 +526,8 @@ if (cache_valid) {
     jin_signatures = jin_sigs,
     koh_signatures = koh_sigs,
     min_ts_to_trigger = min_ts_to_trigger,
-    n_workers = 10
+    n_workers = 10,
+    assignment_matrix = ID89.mSigAct.assignment
   )
   save_plot_cache(data_dir, plot_dir)
   message("Plots generated and cache saved in: ", plot_dir)
