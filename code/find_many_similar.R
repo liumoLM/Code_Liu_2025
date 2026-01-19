@@ -21,7 +21,8 @@ find_many_similar <- function(
   cosine_cutoff = 0.8,
   out_pdf = NULL,
   num_exemplars = 10,
-  min_mutations = 0
+  min_mutations = 0,
+  do_plot = TRUE
 ) {
   # Read signature and spectra files
   sigs <- read.table(sig_path, sep = "\t", header = TRUE, row.names = 1)
@@ -123,39 +124,41 @@ find_many_similar <- function(
     out_pdf <- paste0(sig_col, "_exemplars.pdf")
   }
 
-  # Create plots
-  plots <- list()
+  if (do_plot) {
+    # Create plots
+    plots <- list()
 
-  # Plot signature first
-  sig_df <- sigs[, sig_col, drop = FALSE]
-  plots[[1]] <- plotit(sig_df, paste("Signature:", sig_col))
+    # Plot signature first
+    sig_df <- sigs[, sig_col, drop = FALSE]
+    plots[[1]] <- plotit(sig_df, paste("Signature:", sig_col))
 
-  # Plot top exemplars
-  for (i in seq_len(nrow(top_exemplars))) {
-    spec_name <- top_exemplars$spectrum[i]
-    cosine_val <- top_exemplars$cosine[i]
-    total_muts <- top_exemplars$total_mutations[i]
+    # Plot top exemplars
+    for (i in seq_len(nrow(top_exemplars))) {
+      spec_name <- top_exemplars$spectrum[i]
+      cosine_val <- top_exemplars$cosine[i]
+      total_muts <- top_exemplars$total_mutations[i]
 
-    spec_df <- spectra[, spec_name, drop = FALSE]
-    title <- sprintf(
-      "%s (cosine: %.4f, n=%d)",
-      spec_name,
-      cosine_val,
-      total_muts
-    )
+      spec_df <- spectra[, spec_name, drop = FALSE]
+      title <- sprintf(
+        "%s (cosine: %.4f, n=%d)",
+        spec_name,
+        cosine_val,
+        total_muts
+      )
 
-    plots[[length(plots) + 1]] <- plotit(spec_df, title)
+      plots[[length(plots) + 1]] <- plotit(spec_df, title)
+    }
+
+    # Save to PDF
+    pdf_height <- 3 * length(plots)
+    pdf_width <- 12
+
+    cairo_pdf(out_pdf, width = pdf_width, height = pdf_height)
+    combined_plot <- gridExtra::grid.arrange(grobs = plots, ncol = 1)
+    dev.off()
+
+    message(paste("Saved plot to", out_pdf))
   }
-
-  # Save to PDF
-  pdf_height <- 3 * length(plots)
-  pdf_width <- 12
-
-  cairo_pdf(out_pdf, width = pdf_width, height = pdf_height)
-  combined_plot <- gridExtra::grid.arrange(grobs = plots, ncol = 1)
-  dev.off()
-
-  message(paste("Saved plot to", out_pdf))
   message(paste(
     "Found",
     nrow(above_cutoff),
@@ -174,23 +177,29 @@ find_many_similar <- function(
 find_samples_similar_to_sig = function(
   sig_id,
   max_num_similar = 30,
-  min_mutations = 50
+  min_mutations = 50,
+  cosine_cutoff = 0.9,
+  do_plot = TRUE
 ) {
   # browser()
   out_dir = "plot_output/plots_of_similar_spectra"
+  res = list()
   for (type in c("89", "476")) {
-    (find_many_similar(
+    (res0 = find_many_similar(
       sig_path = glue(
         "Manuscript_data/Liu_et_al_final_{type}_type_signatures.tsv"
       ),
       sig_id,
       glue("Manuscript_data/Liu_et_al_{type}_type_spectra.tsv"),
-      cosine_cutoff = 0.9,
+      cosine_cutoff = cosine_cutoff,
       num_exemplars = max_num_similar,
       out_pdf = glue("{out_dir}/spectra_like_{sig_id}_{type}.pdf"),
-      min_mutations = min_mutations
+      min_mutations = min_mutations,
+      do_plot = do_plot
     ))
+    res = c(res, list(type = res0))
   }
+  res
 }
 
 sigs = read.table(
@@ -206,9 +215,12 @@ for (signame in colnames(sigs)) {
 }
 
 
-find_samples_similar_to_sig("InsDel4a")
-find_samples_similar_to_sig("InsDel_F")
-find_samples_similar_to_sig("InsDel4b")
+five_b = find_samples_similar_to_sig(
+  "InsDel5b",
+  max_num_similar = 1000,
+  cosine_cutoff = 0.95,
+  do_plot = FALSE
+)
 
 ########################################################
 
