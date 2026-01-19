@@ -1,6 +1,8 @@
 library(gridExtra)
 library(ggplot2)
 library(philentropy)
+library(mSigPlot)
+library(glue)
 
 #' Find exemplar spectra for a given signature
 #' @param sig_path Path to .tsv file with signatures
@@ -12,7 +14,7 @@ library(philentropy)
 #' @param min_mutations Minimum total mutations to include spectrum (default: 0)
 #' @return A data frame with cosine similarities for all spectra above cutoff
 #' @export
-exemplars_one_sig <- function(
+find_many_similar <- function(
   sig_path,
   sig_col,
   spectra_path,
@@ -27,7 +29,8 @@ exemplars_one_sig <- function(
 
   # Check that sig_col exists
   if (!sig_col %in% colnames(sigs)) {
-    stop(paste("Column", sig_col, "not found in signature file"))
+    warning(paste("Column", sig_col, "not found in signature file", sig_path))
+    return()
   }
 
   # Check row counts match
@@ -168,7 +171,90 @@ exemplars_one_sig <- function(
   )
 }
 
-exemplars_one_sig(
+find_samples_similar_to_sig = function(
+  sig_id,
+  max_num_similar = 30,
+  min_mutations = 50
+) {
+  # browser()
+  out_dir = "plot_output/plots_of_similar_spectra"
+  for (type in c("89", "476")) {
+    (find_many_similar(
+      sig_path = glue(
+        "Manuscript_data/Liu_et_al_final_{type}_type_signatures.tsv"
+      ),
+      sig_id,
+      glue("Manuscript_data/Liu_et_al_{type}_type_spectra.tsv"),
+      cosine_cutoff = 0.9,
+      num_exemplars = max_num_similar,
+      out_pdf = glue("{out_dir}/spectra_like_{sig_id}_{type}.pdf"),
+      min_mutations = min_mutations
+    ))
+  }
+}
+
+sigs = read.table(
+  "Manuscript_data/Liu_et_al_final_89_type_signatures.tsv",
+  sep = "\t",
+  header = TRUE,
+  row.names = 1
+)
+
+for (signame in colnames(sigs)) {
+  message(signame)
+  find_samples_similar_to_sig(signame)
+}
+
+
+find_samples_similar_to_sig("InsDel4a")
+find_samples_similar_to_sig("InsDel_F")
+find_samples_similar_to_sig("InsDel4b")
+
+########################################################
+
+find_many_similar(
+  sig_path = "../Manuscript_data/Liu_et_al_final_89_type_signatures.tsv",
+  "InsDel_F",
+  "../Manuscript_data/Liu_et_al_89_type_spectra.tsv",
+  cosine_cutoff = 0.9,
+  num_exemplars = 30,
+  out_pdf = "exemplars_for_IndDelF.pdf",
+  min_mutations = 50
+)
+
+library(mSigPlot)
+find_many_similar(
+  sig_path = "../Manuscript_data/Liu_et_al_final_476_type_signatures.tsv",
+  "InsDel_F",
+  "../Manuscript_data/Liu_et_al_476_type_spectra.tsv",
+  cosine_cutoff = 0.9,
+  num_exemplars = 30,
+  out_pdf = "exemplars_for_IndDelF_476.pdf",
+  min_mutations = 50
+)
+
+find_many_similar(
+  sig_path = "../Manuscript_data/Liu_et_al_final_89_type_signatures.tsv",
+  "InsDell1",
+  "../Manuscript_data/Liu_et_al_89_type_spectra.tsv",
+  cosine_cutoff = 0.9,
+  num_exemplars = 30,
+  out_pdf = "exemplars_for_IndDel1a.pdf",
+  min_mutations = 50
+)
+
+library(mSigPlot)
+find_many_similar(
+  sig_path = "../Manuscript_data/Liu_et_al_final_476_type_signatures.tsv",
+  "InsDel1a",
+  "../Manuscript_data/Liu_et_al_476_type_spectra.tsv",
+  cosine_cutoff = 0.9,
+  num_exemplars = 30,
+  out_pdf = "exemplars_for_IndDel1a_476.pdf",
+  min_mutations = 50
+)
+
+find_many_similar(
   sig_path = "../Manuscript_data/Liu_et_al_final_89_type_signatures.tsv",
   "InsDel_P",
   "../Manuscript_data/Liu_et_al_89_type_spectra.tsv",
@@ -178,7 +264,7 @@ exemplars_one_sig(
   min_mutations = 50
 )
 
-exemplars_one_sig(
+find_many_similar(
   "../Manuscript_data/COSMIC_v3.5_ID_GRCh37_signatures.tsv",
   "ID10",
   "../Manuscript_data/Liu_et_al_83_type_spectra.tsv",
@@ -187,7 +273,7 @@ exemplars_one_sig(
   min_mutations = 50
 )
 
-exemplars_one_sig(
+find_many_similar(
   "../Manuscript_data/COSMIC_v3.5_ID_GRCh37_signatures.tsv",
   "ID10",
   "../Manuscript_data/Liu_et_al_83_type_spectra.tsv",
@@ -197,7 +283,7 @@ exemplars_one_sig(
 )
 
 
-exemplars_one_sig(
+find_many_similar(
   "../Manuscript_data/Liu_et_al_final_83_type_signatures.tsv",
   "C_ID10",
   "../Manuscript_data/Liu_et_al_83_type_spectra.tsv",
@@ -207,7 +293,7 @@ exemplars_one_sig(
 )
 
 
-exemplars_one_sig(
+find_many_similar(
   "../Manuscript_data/Liu_et_al_final_83_type_signatures.tsv",
   "C_ID7",
   "../Manuscript_data/Liu_et_al_83_type_spectra.tsv",
@@ -216,7 +302,7 @@ exemplars_one_sig(
   min_mutations = 50
 )
 
-exemplars_one_sig(
+find_many_similar(
   "../Manuscript_data/COSMIC_v3.5_ID_GRCh37_signatures.tsv",
   "ID7",
   "../Manuscript_data/Liu_et_al_83_type_spectra.tsv",
