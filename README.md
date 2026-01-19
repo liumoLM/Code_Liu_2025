@@ -6,3 +6,7 @@ To render single-file html files for each signature, first render vignette.qmd, 
 command line run
 
 `Rscript render_separate_pages.R`
+
+library(quarto)
+setwd("vignette")
+quarto_render("vignette.qmd", output_format = "html")
