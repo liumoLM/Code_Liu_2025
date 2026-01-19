@@ -32,19 +32,19 @@ source("plot_83_w_wout_t.R")
 #'   \item{sample_counts}{Data frame with columns: cancer_type, total_samples,
 #'     nonzero_samples (number of samples with non-zero signature mutations)}
 plot_signature_by_cancer_type <- function(
-    signature_values,
-    signature_name = "Signature",
-    genome_size_mb = NULL,
-    min_samples = 1,
-    log_scale = TRUE,
-    exclude_zero = TRUE,
-    order_by = c("median", "name", "count"),
-    bg_colors = c("#EDF8B1", "#2C7FB8"),
-    point_color = "black",
-    median_color = "red",
-    point_size = 1.5,
-    point_alpha = 0.7,
-    base_size = 14
+  signature_values,
+  signature_name = "Signature",
+  genome_size_mb = NULL,
+  min_samples = 1,
+  log_scale = TRUE,
+  exclude_zero = TRUE,
+  order_by = c("median", "name", "count"),
+  bg_colors = c("#EDF8B1", "#2C7FB8"),
+  point_color = "black",
+  median_color = "red",
+  point_size = 1.5,
+  point_alpha = 0.7,
+  base_size = 14
 ) {
   order_by <- match.arg(order_by)
 
@@ -64,11 +64,17 @@ plot_signature_by_cancer_type <- function(
   total_by_type <- as.data.frame(table(df_all$cancer_type))
   colnames(total_by_type) <- c("cancer_type", "total_samples")
 
-  nonzero_by_type <- as.data.frame(table(df_all$cancer_type[df_all$mutations > 0]))
+  nonzero_by_type <- as.data.frame(table(df_all$cancer_type[
+    df_all$mutations > 0
+  ]))
   colnames(nonzero_by_type) <- c("cancer_type", "nonzero_samples")
 
-  sample_counts <- merge(total_by_type, nonzero_by_type,
-                         by = "cancer_type", all.x = TRUE)
+  sample_counts <- merge(
+    total_by_type,
+    nonzero_by_type,
+    by = "cancer_type",
+    all.x = TRUE
+  )
   sample_counts$nonzero_samples[is.na(sample_counts$nonzero_samples)] <- 0
 
   # Create working data frame for plotting
@@ -140,7 +146,13 @@ plot_signature_by_cancer_type <- function(
     # Alternating background
     ggplot2::geom_rect(
       data = bg_df,
-      ggplot2::aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf, fill = fill),
+      ggplot2::aes(
+        xmin = xmin,
+        xmax = xmax,
+        ymin = -Inf,
+        ymax = Inf,
+        fill = fill
+      ),
       inherit.aes = FALSE,
       alpha = 0.2
     ) +
@@ -187,9 +199,10 @@ plot_signature_by_cancer_type <- function(
 
   # Apply log scale if requested
   if (log_scale) {
-    p <- p + ggplot2::scale_y_log10(
-      labels = scales::label_number(drop0trailing = TRUE)
-    )
+    p <- p +
+      ggplot2::scale_y_log10(
+        labels = scales::label_number(drop0trailing = TRUE)
+      )
   }
 
   return(list(plot = p, sample_counts = sample_counts))
@@ -210,9 +223,9 @@ plot_signature_by_cancer_type <- function(
 #'   \item{sample_counts}{Data frame with columns: cancer_type, total_samples,
 #'     nonzero_samples (number of samples with non-zero signature mutations)}
 plot_signature_hamburger <- function(
-    signature_name,
-    assignment_matrix,
-    ...
+  signature_name,
+  assignment_matrix,
+  ...
 ) {
   if (!signature_name %in% rownames(assignment_matrix)) {
     stop("Signature '", signature_name, "' not found in assignment matrix")
@@ -954,40 +967,49 @@ generate_plots_to_files <- function(
 
   # Hamburger plot (signature mutations by cancer type)
   paths$hamburger_sample_counts <- NULL
-  if (!is.null(assignment_matrix) &&
-      sig_data$type89_sig_id %in% rownames(assignment_matrix)) {
-    tryCatch({
-      hamburger_result <- plot_signature_hamburger(
-        signature_name = sig_data$type89_sig_id,
-        assignment_matrix = assignment_matrix,
-        genome_size_mb = getp("genome_size_mb"),
-        min_samples = getp("min_samples_hamburger"),
-        log_scale = TRUE,
-        exclude_zero = TRUE,
-        order_by = "median",
-        point_size = getp("point_size_hamburger"),
-        point_alpha = getp("point_alpha_hamburger"),
-        base_size = getp("basesize_hamburger")
-      )
-      paths$hamburger_sample_counts <- hamburger_result$sample_counts
-      if (!is.null(hamburger_result$plot)) {
-        # Suppress log scale transformation warnings during save
-        suppressWarnings(
-          save_ggplot(
-            hamburger_result$plot,
-            paths$hamburger,
-            width = getp("w_hamburger"),
-            height = getp("h_hamburger")
-          )
+  if (
+    !is.null(assignment_matrix) &&
+      sig_data$type89_sig_id %in% rownames(assignment_matrix)
+  ) {
+    tryCatch(
+      {
+        hamburger_result <- plot_signature_hamburger(
+          signature_name = sig_data$type89_sig_id,
+          assignment_matrix = assignment_matrix,
+          genome_size_mb = getp("genome_size_mb"),
+          min_samples = getp("min_samples_hamburger"),
+          log_scale = TRUE,
+          exclude_zero = TRUE,
+          order_by = "median",
+          point_size = getp("point_size_hamburger"),
+          point_alpha = getp("point_alpha_hamburger"),
+          base_size = getp("basesize_hamburger")
         )
-      } else {
-        paths$hamburger <- NULL
+        paths$hamburger_sample_counts <- hamburger_result$sample_counts
+        if (!is.null(hamburger_result$plot)) {
+          # Suppress log scale transformation warnings during save
+          suppressWarnings(
+            save_ggplot(
+              hamburger_result$plot,
+              paths$hamburger,
+              width = getp("w_hamburger"),
+              height = getp("h_hamburger")
+            )
+          )
+        } else {
+          paths$hamburger <- NULL
+        }
+      },
+      error = function(e) {
+        warning(
+          "Failed to generate hamburger plot for ",
+          sig_data$type89_sig_id,
+          ": ",
+          e$message
+        )
+        paths$hamburger <<- NULL
       }
-    }, error = function(e) {
-      warning("Failed to generate hamburger plot for ", sig_data$type89_sig_id,
-              ": ", e$message)
-      paths$hamburger <<- NULL
-    })
+    )
   } else {
     paths$hamburger <- NULL
   }
@@ -1059,7 +1081,13 @@ generate_all_plots_parallel <- function(
     },
     .options = furrr::furrr_options(
       seed = TRUE,
-      packages = c("ggplot2", "ICAMS", "mSigPlot", "indelsig.tools.lib", "scales")
+      packages = c(
+        "ggplot2",
+        "ICAMS",
+        "mSigPlot",
+        "indelsig.tools.lib",
+        "scales"
+      )
     ),
     .progress = TRUE
   )
@@ -1237,14 +1265,16 @@ reconstruct_plot_paths <- function(signature_names, plot_dir) {
       id83_sig_ablated_catalog = NULL,
       id83_mapped_ablated_catalog = NULL,
       id83_catalog_ablated_catalog = NULL,
-      hamburger = file.path(plot_dir, paste0(safe_name, "_hamburger.png"))
+      hamburger = file.path(plot_dir, paste0(safe_name, "_hamburger.png")),
+      hamburger_sample_counts = NULL  # Data frame, cannot reconstruct from cache
     )
 
-    # Set to NULL if file doesn't exist (skip the ablated_catalog entries which are always NULL)
+    # Set to NULL if file doesn't exist (skip non-path entries)
     paths <- lapply(names(paths), function(nm) {
       p <- paths[[nm]]
-      if (grepl("_ablated_catalog$", nm)) {
-        return(NULL) # ablated_catalog is in-memory only, always NULL from cache
+      # Skip entries that are data frames, not file paths
+      if (grepl("_ablated_catalog$", nm) || nm == "hamburger_sample_counts") {
+        return(NULL)  # In-memory only, always NULL from cache
       }
       if (is.null(p) || !file.exists(p)) NULL else p
     })
@@ -1265,7 +1295,8 @@ reconstruct_plot_paths <- function(signature_names, plot_dir) {
       "id83_sig_ablated_catalog",
       "id83_mapped_ablated_catalog",
       "id83_catalog_ablated_catalog",
-      "hamburger"
+      "hamburger",
+      "hamburger_sample_counts"
     )
 
     # Find any COSMIC plots for this signature
