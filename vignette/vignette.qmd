@@ -46,7 +46,7 @@ execute:
 # general the detection of changes is not perfect.
 # When in doubt regenerate the plots.
 # ======================================================
-REGENERATE_PLOTS <- FALSE
+REGENERATE_PLOTS <- T # FALSE
 data_dir <- "../Manuscript_data/"
 
 # Minimum cosine similarity to show matching COSMIC signatures
@@ -427,7 +427,7 @@ for (i in seq_along(all_sig_data)) {
 ```
 
 ```{r}
-#| label: create-signature-table
+#| label: create-signature-table-1
 #| include: false
 
 # Transform all_sig_data to a tibble with nested columns
@@ -437,6 +437,11 @@ sig_table <- all_sig_data %>%
 
 stopifnot(sig_table$sig_name == sig_table$type89_sig_id)
 sig_table <- dplyr::mutate(sig_table, sig_name = NULL)
+```
+
+```{r}
+#| label: create-signature-table-2
+#| include: false
 
 # Extract best match (highest cosine) from each nested matches column
 get_best_match <- function(matches_df, sig_col, cosine_col = "cosine") {
@@ -481,7 +486,7 @@ sig_table <- sig_table %>%
     best_match_koh,
     cosine_v_koh,
     exemplar_id,
-    cosine_89_exemplar = cosine89,
+    cosine_v_89_exemplar = cosine89,
     .after = type89_sig_id
   )
 
@@ -494,7 +499,7 @@ write.csv(sig_table, "prot_table_1.csv")
 #| include: false
 
 # Plot caching: only regenerate if source data has changed
-# To force regeneration: delete figure/parallel_plots/ or set REGENERATE_PLOTS <- TRUE
+# To force regeneration: delete figure/parallel_plots/ or set REGENERATE_PLOTS <- TRtUE
 plot_dir <- "figure/parallel_plots"
 
 cache_valid <- check_plot_cache(data_dir, plot_dir) && !REGENERATE_PLOTS
@@ -526,8 +531,7 @@ if (cache_valid) {
     jin_signatures = jin_sigs,
     koh_signatures = koh_sigs,
     min_ts_to_trigger = min_ts_to_trigger,
-    n_workers = 10,
-    assignment_matrix = ID89.mSigAct.assignment
+    n_workers = 10
   )
   save_plot_cache(data_dir, plot_dir)
   message("Plots generated and cache saved in: ", plot_dir)
