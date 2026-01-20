@@ -243,8 +243,7 @@ if (!is.null(plot_paths$id83_mapped)) {
   }
   cat(
     "\n\n",
-    "83-type signature converted from 476-type signature corresponding to ",
-    sig_data$type89_sig_id,
+    "83-type signature converted from the corresponding signature discovered in the 476-type classification",
     cosine_text,
     "\n\n",
     sep = ""
