@@ -4,7 +4,9 @@
     "cSpell.words": [
         "indel",
         "indels",
-        "Nanda"
+        "Nanda",
+        "Rscript",
+        "setwd"
     ],
     "cSpell.enabledFileTypes": {
         "markdown": true

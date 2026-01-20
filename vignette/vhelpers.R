@@ -205,13 +205,13 @@ compute_sig_data <- function(
     ] <- 0
 
     # Cosine of diff vs signature
-    result$cosine89_diff <-
+    result$cosine_sig_89_v_partial_spec <-
       lsa::cosine(
         as.numeric(ID89_signatures[, type89_sig_id]),
         as.numeric(as.matrix(result$target_sig_partial_spectrum))
       )
   } else {
-    result$cosine89_diff <- NA
+    result$cosine_sig_89_v_partial_spec <- NA
     result$residual_spectrum <- NULL
     result$target_sig_partial_spectrum <- NULL
   }
@@ -452,7 +452,7 @@ generate_plots_to_files <- function(
       " (A minus B) " #| Cosine similarity to ",
       # sig_data$type89_sig_id,
       # " = ",
-      # format(sig_data$cosine89_diff, digits = 4)
+      # format(sig_data$cosine_sig_89_v_partial_spec, digits = 4)
     )
 
     p3 <- p89(
