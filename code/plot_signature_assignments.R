@@ -5,14 +5,31 @@
 # distribution of signature mutations across cancer types. Each dot represents
 # a sample; the red dashed line shows the median for each cancer type.
 #
-# Usage: Rscript generate_hamburger_pdf.R
+# Usage: Rscript plot_signature_assignments.R <83|89|83from89>
 
 library(ggplot2)
 library(scales)
 
+# Parse command line arguments
+args <- commandArgs(trailingOnly = TRUE)
+if (length(args) != 1 || !args[1] %in% c("83", "89", "83from89")) {
+  stop("Usage: Rscript plot_signature_assignments.R <83|89|83from89>")
+}
+mode <- args[1]
+
 # Configuration
 data_dir <- "../Manuscript_data/"
-output_file <- "per_signature_assignments.pdf"
+
+if (mode == "83") {
+  input_file <- file.path(data_dir, "Liu_et_al_83_type_signature_assignments.tsv")
+  output_file <- "83_assignments.pdf"
+} else if (mode == "89") {
+  input_file <- file.path(data_dir, "Liu_et_al_89_type_signature_assignments.tsv")
+  output_file <- "89_assignments.pdf"
+} else if (mode == "83from89") {
+  input_file <- file.path(data_dir, "recompressed_assignments.tsv")
+  output_file <- "83_assignments_from_89.pdf"
+}
 
 # Plotting parameters
 params <- list(
@@ -289,24 +306,15 @@ plot_signature_hamburger <- function(
 # Main execution
 # =============================================================================
 
-message("Loading assignment matrix...")
+message("Loading assignment matrix from: ", input_file)
 assignment_matrix <- read.delim(
-  file.path(data_dir, "Liu_et_al_89_type_signature_assignments.tsv"),
+  input_file,
   row.names = 1,
   check.names = FALSE
 )
 
-message("Loading signature names from 89type_to_83type_connection.tsv...")
-connect_89_to_83 <- read.delim(
-  file.path(data_dir, "89type_to_83type_connection.tsv"),
-  sep = "\t"
-)
-signature_names <- connect_89_to_83[[1]] # InDel89 column
-
-# Filter to signatures present in assignment matrix
-signature_names <- signature_names[
-  signature_names %in% rownames(assignment_matrix)
-]
+# Use all signatures from the assignment matrix
+signature_names <- rownames(assignment_matrix)
 message("Found ", length(signature_names), " signatures in assignment matrix")
 
 # Generate PDF with one plot per page
