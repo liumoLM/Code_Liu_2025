@@ -407,7 +407,7 @@ generate_plots_to_files <- function(
       ID89_mapped_signatures[, mapped_col_name, drop = FALSE],
       plot_title = paste0(
         sig_data$type89_sig_id,
-        " converted from 476-type signature | cosine similarity to ",
+        " converted from signature discovered in the 476-type spectra | cosine similarity to ",
         sig_data$type89_sig_id,
         " = ",
         format(sig_data$cosine89_mapped, digits = getp("cosine_digits"))
@@ -978,7 +978,7 @@ reconstruct_plot_paths <- function(signature_names, plot_dir) {
       p <- paths[[nm]]
       # Skip entries that are data frames, not file paths
       if (grepl("_ablated_catalog$", nm)) {
-        return(NULL)  # In-memory only, always NULL from cache
+        return(NULL) # In-memory only, always NULL from cache
       }
       if (is.null(p) || !file.exists(p)) NULL else p
     })
