@@ -1,8 +1,6 @@
-##Input
-library(gridExtra)
-library(ggplot2)
 library(indelsig.tools.lib)
-Mo_template_Koh89 <- as.data.frame(read.table(text = "
+Mo_template_Koh89 <- as.data.frame(read.table(
+  text = "
 IndelType                 Indel
 [Del(C):R1]A              Del(C)
 [Del(C):R1]T              Del(C)
@@ -93,48 +91,74 @@ Del(6,):M2                Del(2,):M(1,)
 Del(6,):M3                Del(2,):M(1,)
 Del(6,):M(4,)             Del(2,):M(1,)
 Complex                    Complex
-", header = TRUE, sep = "", fill = TRUE, stringsAsFactors = FALSE))
+",
+  header = TRUE,
+  sep = "",
+  fill = TRUE,
+  stringsAsFactors = FALSE
+))
 
 
-
-
-## this function directly takes output from ICAMS::AnnovateIDVcf. 
+## this function directly takes output from ICAMS::AnnovateIDVcf.
 #' @param muts_list ICAMS annotated ID vcf
 #' @param sample_col  the column containing the sample name
-GenerateKoh89CatalogfromAnnotateVcf <- function (muts_list, sample_col){
+GenerateKoh89CatalogfromAnnotateVcf <- function(muts_list, sample_col) {
   muts_list <- as.data.frame(muts_list)
-  indel_catalogue <- data.frame(table(muts_list[, sample_col], 
-                                      muts_list$Koh_89))
+  indel_catalogue <- data.frame(table(
+    muts_list[, sample_col],
+    muts_list$Koh_89
+  ))
   names(indel_catalogue) <- c("Sample", "IndelType", "freq")
-  indel_catalogue <- reshape2::dcast(indel_catalogue, IndelType ~ 
-                                       Sample, value.var = "freq")
-  indel_catalogue <- merge(Mo_template_Koh89, indel_catalogue, 
-                           by = "IndelType", all.x = T)
+  indel_catalogue <- reshape2::dcast(
+    indel_catalogue,
+    IndelType ~
+      Sample,
+    value.var = "freq"
+  )
+  indel_catalogue <- merge(
+    Mo_template_Koh89,
+    indel_catalogue,
+    by = "IndelType",
+    all.x = T
+  )
   indel_catalogue[is.na(indel_catalogue)] <- 0
   rownames(indel_catalogue) <- indel_catalogue[, "IndelType"]
   return(indel_catalogue[Mo_template_Koh89$IndelType, -c(1:2), drop = FALSE])
 }
 
 
-
 Mo_template_Koh476 <- indelsig.tools.lib::indel_template_type_4_full
-Mo_template_Koh476$IndelType <- gsub("R9","R(9,)",Mo_template_Koh476$IndelType)
+Mo_template_Koh476$IndelType <- gsub(
+  "R9",
+  "R(9,)",
+  Mo_template_Koh476$IndelType
+)
 Mo_template_Koh476$IndelType[403] <- "Del5:U1:R(5,9)"
 
 
-## this function directly takes output from ICAMS::AnnovateIDVcf. 
+## this function directly takes output from ICAMS::AnnovateIDVcf.
 #' @param muts_list ICAMS annotated ID vcf
 #' @param sample_col  the column containing the sample name
 
-GenerateKoh476CatalogfromAnnotateVcf <- function (muts_list, sample_col){
+GenerateKoh476CatalogfromAnnotateVcf <- function(muts_list, sample_col) {
   muts_list <- as.data.frame(muts_list)
-  indel_catalogue <- data.frame(table(muts_list[, sample_col], 
-                                      muts_list$Koh_476))
+  indel_catalogue <- data.frame(table(
+    muts_list[, sample_col],
+    muts_list$Koh_476
+  ))
   names(indel_catalogue) <- c("Sample", "IndelType", "freq")
-  indel_catalogue <- reshape2::dcast(indel_catalogue, IndelType ~ 
-                                       Sample, value.var = "freq")
-  indel_catalogue <- merge(Mo_template_Koh476, indel_catalogue, 
-                           by = "IndelType", all.x = T)
+  indel_catalogue <- reshape2::dcast(
+    indel_catalogue,
+    IndelType ~
+      Sample,
+    value.var = "freq"
+  )
+  indel_catalogue <- merge(
+    Mo_template_Koh476,
+    indel_catalogue,
+    by = "IndelType",
+    all.x = T
+  )
   indel_catalogue[is.na(indel_catalogue)] <- 0
   rownames(indel_catalogue) <- indel_catalogue[, "IndelType"]
   return(indel_catalogue[Mo_template_Koh476$IndelType, -c(1:2), drop = FALSE])
