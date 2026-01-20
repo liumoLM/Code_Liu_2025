@@ -46,7 +46,7 @@ execute:
 # general the detection of changes is not perfect.
 # When in doubt regenerate the plots.
 # ======================================================
-REGENERATE_PLOTS <- FALSE
+REGENERATE_PLOTS <- T # FALSE
 data_dir <- "../Manuscript_data/"
 
 # Minimum cosine similarity to show matching COSMIC signatures
