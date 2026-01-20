@@ -11,39 +11,9 @@ df <- read.csv("prot_table_1.csv", stringsAsFactors = FALSE)
 # Replace underscores with spaces in column names
 names(df) <- gsub("_", " ", names(df))
 
+# Append asterisk to type83 sig id where is polyT removed is TRUE
 polyT_rows <- which(df$`is polyT removed` == TRUE)
 df$`type83 sig id`[polyT_rows] <- paste0(df$`type83 sig id`[polyT_rows], "**")
-
-# Remove "jin" prefix from best_match_jin values
-df$`best match jin` <- gsub("^jin", "", df$`best match jin`)
-
-# Handle best_match_koh duplicates: add asterisk to best match, track non-best for graying
-# For non-duplicates, also add dagger
-best_koh_col <- which(names(df) == "best match koh")
-cos_koh_col <- which(names(df) == "cos v koh")
-
-# Get non-NA values and find duplicates
-koh_values <- df$`best match koh`
-non_na_idx <- which(!is.na(koh_values))
-
-# Track rows to gray out (non-best duplicates)
-rows_to_gray <- c()
-
-# Process each unique non-NA value
-unique_koh <- unique(koh_values[non_na_idx])
-for (koh_val in unique_koh) {
-  matching_rows <- which(koh_values == koh_val)
-  if (length(matching_rows) > 1) {
-    # Duplicate: find row with highest cos_v_koh
-    cos_vals <- df$`cos v koh`[matching_rows]
-    best_idx <- matching_rows[which.max(cos_vals)]
-    non_best_idx <- setdiff(matching_rows, best_idx)
-    # Add asterisk to best match (only for duplicates)
-    df$`best match koh`[best_idx] <- paste0(df$`best match koh`[best_idx], "*")
-    # Track non-best rows for graying
-    rows_to_gray <- c(rows_to_gray, non_best_idx)
-  }
-}
 
 # Create workbook and worksheet
 wb <- createWorkbook()
@@ -88,37 +58,6 @@ for (col in 1:ncol(df)) {
       rows = 2:(nrow(df) + 1),
       cols = col,
       gridExpand = TRUE
-    )
-  }
-}
-
-# Apply gray style to non-best duplicate rows for best_match_koh and cos_v_koh columns
-if (length(rows_to_gray) > 0) {
-  grayStyle <- createStyle(fontColour = "#B0B0B0", halign = "center")
-  grayNumericStyle <- createStyle(
-    fontColour = "#B0B0B0",
-    numFmt = "0.0000",
-    halign = "center"
-  )
-  for (row_idx in rows_to_gray) {
-    excel_row <- row_idx + 1 # Add 1 for header row
-    # Gray out best_match_koh (text column)
-    addStyle(
-      wb,
-      1,
-      grayStyle,
-      rows = excel_row,
-      cols = best_koh_col,
-      stack = TRUE
-    )
-    # Gray out cos_v_koh (numeric column)
-    addStyle(
-      wb,
-      1,
-      grayNumericStyle,
-      rows = excel_row,
-      cols = cos_koh_col,
-      stack = TRUE
     )
   }
 }
@@ -191,11 +130,9 @@ for (i in seq_along(lengths)) {
   freezePane(wb, 1, firstRow = TRUE, firstCol = TRUE)
 }
 
-# Add footnotes
-footnote <- "* This is the signature with the best match to the given signature_id."
-writeData(wb, 1, footnote, startRow = 50, startCol = 1)
+# Add footnote at row 50
 footnote <- "** indicates that in the supporting tumor's spectrum, insertions of a single T in long poly-T contexts were set to 0 before calculating cosine similarity to the 83-type signature."
-writeData(wb, 1, footnote, startRow = 51, startCol = 1)
+writeData(wb, 1, footnote, startRow = 50, startCol = 1)
 
 # Save workbook
 saveWorkbook(wb, "prot_table_1.xlsx", overwrite = TRUE)
