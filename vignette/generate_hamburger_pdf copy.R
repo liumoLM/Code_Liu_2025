@@ -22,7 +22,7 @@ params <- list(
   point_size = 1.2,
   point_alpha = 0.6,
   min_samples = 3,
-  genome_size_mb = NULL
+  genome_size_mb = 3000
 )
 
 #' Create hamburger/snake plot showing signature mutations across cancer types
@@ -156,28 +156,6 @@ plot_signature_by_cancer_type <- function(
   df$x_pos <- as.numeric(df$cancer_type)
   summary_df$x_pos <- as.numeric(summary_df$cancer_type)
 
-  # Sort points within each cancer type by mutation value (ascending)
-  df <- df[order(df$cancer_type, df$mutations), ]
-
-  # Calculate within-group rank and spread across x-axis
-  df$within_rank <- ave(
-    seq_len(nrow(df)),
-    df$cancer_type,
-    FUN = function(x) seq_along(x)
-  )
-  df$group_size <- ave(
-    seq_len(nrow(df)),
-    df$cancer_type,
-    FUN = length
-  )
-
-  # Spread points from x_pos - 0.4 to x_pos + 0.4
-  df$x_plot <- df$x_pos +
-    0.8 * (df$within_rank - 1) / pmax(df$group_size - 1, 1) -
-    0.4
-  # Handle single-point groups (center them)
-  df$x_plot[df$group_size == 1] <- df$x_pos[df$group_size == 1]
-
   # Create alternating background rectangles data
   n_types <- length(type_order)
   bg_df <- data.frame(
@@ -187,7 +165,7 @@ plot_signature_by_cancer_type <- function(
   )
 
   # Build the plot
-  p <- ggplot2::ggplot(df, ggplot2::aes(x = x_plot, y = mutations)) +
+  p <- ggplot2::ggplot(df, ggplot2::aes(x = x_pos, y = mutations)) +
     # Alternating background
     ggplot2::geom_rect(
       data = bg_df,
@@ -202,8 +180,10 @@ plot_signature_by_cancer_type <- function(
       alpha = 0.2
     ) +
     ggplot2::scale_fill_identity() +
-    # Points (sorted within cancer type, no jitter needed)
-    ggplot2::geom_point(
+    # Points with jitter
+    ggplot2::geom_jitter(
+      width = 0.3,
+      height = 0,
       size = point_size,
       alpha = point_alpha,
       color = point_color
@@ -301,12 +281,10 @@ connect_89_to_83 <- read.delim(
   file.path(data_dir, "89type_to_83type_connection.tsv"),
   sep = "\t"
 )
-signature_names <- connect_89_to_83[[1]] # InDel89 column
+signature_names <- connect_89_to_83[[1]]  # InDel89 column
 
 # Filter to signatures present in assignment matrix
-signature_names <- signature_names[
-  signature_names %in% rownames(assignment_matrix)
-]
+signature_names <- signature_names[signature_names %in% rownames(assignment_matrix)]
 message("Found ", length(signature_names), " signatures in assignment matrix")
 
 # Generate PDF with one plot per page
