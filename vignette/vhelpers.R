@@ -140,7 +140,6 @@ compute_sig_data <- function(
       as.numeric(ID89_signatures[, type89_sig_id]),
       as.numeric(ID89_catalogs[, exemplar_id])
     )
-
   # Compute cosine similarity between main signature and mapped signature
   if (has_mapped_476_sig) {
     result$cosine89_mapped <-
@@ -288,7 +287,7 @@ generate_section_footer <- function(sig_data) {
     "\n\n---\n"
   )
 }
-
+debug(compute_sig_data)
 
 #' Generate all plots for a signature and save to files
 #'
