@@ -10,5 +10,14 @@
     ],
     "cSpell.enabledFileTypes": {
         "markdown": true
-    }
+    },
+    "spellright.language": [
+        "en_US"
+    ],
+    "spellright.documentTypes": [
+        "markdown",
+        "latex",
+        "plaintext",
+        "quarto"
+    ]
 }
