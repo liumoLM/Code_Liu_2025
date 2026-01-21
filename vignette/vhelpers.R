@@ -86,14 +86,16 @@ compute_sig_data <- function(
   koh_matches = NULL
 ) {
   message("type89_sig_id = ", type89_sig_id)
+
+  has_476_sig <- type89_sig_id %in% colnames(ID476_signatures)
   # Check if mapped 89-type signature exists (column name is {signature}_converted)
   mapped_col_name <- paste0(type89_sig_id, "_converted")
-  has_mapped_476_sig <- !is.null(ID89_mapped_signatures) &&
+  has_mapped_476_sig <- has_476_sig &&
+    !is.null(ID89_mapped_signatures) &&
     mapped_col_name %in% colnames(ID89_mapped_signatures)
 
   # Check if mapped 83-type signature exists
   # Only consider it if a 476-type signature was extracted
-  has_476_sig <- type89_sig_id %in% colnames(ID476_signatures)
   has_83_mapped_sig <- has_476_sig &&
     !is.null(ID83_mapped_signatures) &&
     mapped_col_name %in% colnames(ID83_mapped_signatures)
