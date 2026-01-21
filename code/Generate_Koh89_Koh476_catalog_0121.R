@@ -1,0 +1,628 @@
+##Input
+library(gridExtra)
+library(ggplot2)
+library(indelsig.tools.lib)
+Mo_template_Koh89 <- as.data.frame(read.table(text = "
+IndelType                 Indel
+[Del(C):R1]A              Del(C)
+[Del(C):R1]T              Del(C)
+[Del(C):R2]A              Del(C)
+[Del(C):R2]T              Del(C)
+[Del(C):R3]A              Del(C)
+[Del(C):R3]T              Del(C)
+[Del(C):R(4,5)]A          Del(C)
+[Del(C):R(4,5)]T          Del(C)
+[Del(C):R(1,5)]G          Del(C)
+Del(C):R(6,9)             Del(C)
+A[Del(T):R(1,4)]A         Del(T)
+A[Del(T):R(1,4)]C         Del(T)
+A[Del(T):R(1,4)]G         Del(T)
+C[Del(T):R(1,4)]A         Del(T)
+C[Del(T):R(1,4)]C         Del(T)
+C[Del(T):R(1,4)]G         Del(T)
+G[Del(T):R(1,4)]A         Del(T)
+G[Del(T):R(1,4)]C         Del(T)
+G[Del(T):R(1,4)]G         Del(T)
+A[Del(T):R(5,7)]A         Del(T)
+A[Del(T):R(5,7)]C         Del(T)
+A[Del(T):R(5,7)]G         Del(T)
+C[Del(T):R(5,7)]A         Del(T)
+C[Del(T):R(5,7)]C         Del(T)
+C[Del(T):R(5,7)]G         Del(T)
+G[Del(T):R(5,7)]A         Del(T)
+G[Del(T):R(5,7)]C         Del(T)
+G[Del(T):R(5,7)]G         Del(T)
+A[Del(T):R(8,)]A          Del(T)
+A[Del(T):R(8,)]C          Del(T)
+A[Del(T):R(8,)]G          Del(T)
+C[Del(T):R(8,)]A          Del(T)
+C[Del(T):R(8,)]C          Del(T)
+C[Del(T):R(8,)]G          Del(T)
+G[Del(T):R(8,)]A          Del(T)
+G[Del(T):R(8,)]C          Del(T)
+G[Del(T):R(8,)]G          Del(T)
+A[Ins(C):R0]A             Ins(C)
+A[Ins(C):R0]T             Ins(C)
+Ins(C):R(0,3)             Ins(C)
+Ins(C):R(4,6)             Ins(C)
+Ins(C):R(7,)              Ins(C)
+A[Ins(T):R(0,4)]A         Ins(T)
+A[Ins(T):R(0,4)]C         Ins(T)
+A[Ins(T):R(0,4)]G         Ins(T)
+C[Ins(T):R(0,4)]A         Ins(T)
+C[Ins(T):R(0,4)]C         Ins(T)
+C[Ins(T):R(0,4)]G         Ins(T)
+G[Ins(T):R(0,4)]A         Ins(T)
+G[Ins(T):R(0,4)]C         Ins(T)
+G[Ins(T):R(0,4)]G         Ins(T)
+A[Ins(T):R(5,7)]A         Ins(T)
+A[Ins(T):R(5,7)]C         Ins(T)
+A[Ins(T):R(5,7)]G         Ins(T)
+C[Ins(T):R(5,7)]A         Ins(T)
+C[Ins(T):R(5,7)]C         Ins(T)
+C[Ins(T):R(5,7)]G         Ins(T)
+G[Ins(T):R(5,7)]A         Ins(T)
+G[Ins(T):R(5,7)]C         Ins(T)
+G[Ins(T):R(5,7)]G         Ins(T)
+A[Ins(T):R(8,)]A          Ins(T)
+A[Ins(T):R(8,)]C          Ins(T)
+A[Ins(T):R(8,)]G          Ins(T)
+C[Ins(T):R(8,)]A          Ins(T)
+C[Ins(T):R(8,)]C          Ins(T)
+C[Ins(T):R(8,)]G          Ins(T)
+G[Ins(T):R(8,)]A          Ins(T)
+G[Ins(T):R(8,)]C          Ins(T)
+G[Ins(T):R(8,)]G          Ins(T)
+Del(2,4):R1               Del(2,):R(0,9)
+Del(5,):R1                Del(2,):R(0,9)
+Del(2,8):U(1,2):R(2,4)    Del(2,):R(0,9)
+Del(2,):U(1,2):R(5,)      Del(2,):R(0,9)
+Del(3,):U(3,):R2          Del(2,):R(0,9)
+Del(3,):U(3,):R(3,)       Del(2,):R(0,9)
+Ins(2,4):R0               Ins(2,)
+Ins(5,):R0                Ins(2,)
+Ins(2,4):R1               Ins(2,)
+Ins(5,):R1                Ins(2,)
+Ins(2,):R(2,4)            Ins(2,)
+Ins(2,):R(5,)             Ins(2,)
+Del(2,5):M1               Del(2,):M(1,)
+Del(3,5):M2               Del(2,):M(1,)
+Del(4,5):M(3,4)           Del(2,):M(1,)
+Del(6,):M1                Del(2,):M(1,)
+Del(6,):M2                Del(2,):M(1,)
+Del(6,):M3                Del(2,):M(1,)
+Del(6,):M(4,)             Del(2,):M(1,)
+Complex                    Complex
+", header = TRUE, sep = "", fill = TRUE, stringsAsFactors = FALSE))
+
+
+
+
+## this function directly takes output from ICAMS::AnnovateIDVcf. 
+#' @param muts_list ICAMS annotated ID vcf
+#' @param sample_col  the column containing the sample name
+GenerateKoh89CatalogfromAnnotateVcf <- function (muts_list, sample_col){
+  muts_list <- as.data.frame(muts_list)
+  indel_catalogue <- data.frame(table(muts_list[, sample_col], 
+                                      muts_list$Koh_89))
+  names(indel_catalogue) <- c("Sample", "IndelType", "freq")
+  indel_catalogue <- reshape2::dcast(indel_catalogue, IndelType ~ 
+                                       Sample, value.var = "freq")
+  indel_catalogue <- merge(Mo_template_Koh89, indel_catalogue, 
+                           by = "IndelType", all.x = T)
+  indel_catalogue[is.na(indel_catalogue)] <- 0
+  rownames(indel_catalogue) <- indel_catalogue[, "IndelType"]
+  return(indel_catalogue[Mo_template_Koh89$IndelType, -c(1:2), drop = FALSE])
+}
+
+
+
+Mo_template_Koh476 <- structure(list(IndelType = c("A[Del(C):R1]A", "A[Del(C):R1]G", "A[Del(C):R1]T", "A[Del(C):R2]A", "A[Del(C):R2]G", 
+                                                   "A[Del(C):R2]T", "A[Del(C):R3]A", "A[Del(C):R3]G", "A[Del(C):R3]T", 
+                                                   "A[Del(C):R4]A", "A[Del(C):R4]G", "A[Del(C):R4]T", "A[Del(C):R5]A", 
+                                                   "A[Del(C):R5]G", "A[Del(C):R5]T", "A[Del(C):R6]A", "A[Del(C):R6]G", 
+                                                   "A[Del(C):R6]T", "A[Del(C):R7]A", "A[Del(C):R7]G", "A[Del(C):R7]T", 
+                                                   "A[Del(C):R8]A", "A[Del(C):R8]G", "A[Del(C):R8]T", "A[Del(C):R(9,)]A", 
+                                                   "A[Del(C):R(9,)]G", "A[Del(C):R(9,)]T", "G[Del(C):R1]A", "G[Del(C):R1]G", 
+                                                   "G[Del(C):R1]T", "G[Del(C):R2]A", "G[Del(C):R2]G", "G[Del(C):R2]T", 
+                                                   "G[Del(C):R3]A", "G[Del(C):R3]G", "G[Del(C):R3]T", "G[Del(C):R4]A", 
+                                                   "G[Del(C):R4]G", "G[Del(C):R4]T", "G[Del(C):R5]A", "G[Del(C):R5]G", 
+                                                   "G[Del(C):R5]T", "G[Del(C):R6]A", "G[Del(C):R6]G", "G[Del(C):R6]T", 
+                                                   "G[Del(C):R7]A", "G[Del(C):R7]G", "G[Del(C):R7]T", "G[Del(C):R8]A", 
+                                                   "G[Del(C):R8]G", "G[Del(C):R8]T", "G[Del(C):R(9,)]A", "G[Del(C):R(9,)]G", 
+                                                   "G[Del(C):R(9,)]T", "T[Del(C):R1]A", "T[Del(C):R1]G", "T[Del(C):R1]T", 
+                                                   "T[Del(C):R2]A", "T[Del(C):R2]G", "T[Del(C):R2]T", "T[Del(C):R3]A", 
+                                                   "T[Del(C):R3]G", "T[Del(C):R3]T", "T[Del(C):R4]A", "T[Del(C):R4]G", 
+                                                   "T[Del(C):R4]T", "T[Del(C):R5]A", "T[Del(C):R5]G", "T[Del(C):R5]T", 
+                                                   "T[Del(C):R6]A", "T[Del(C):R6]G", "T[Del(C):R6]T", "T[Del(C):R7]A", 
+                                                   "T[Del(C):R7]G", "T[Del(C):R7]T", "T[Del(C):R8]A", "T[Del(C):R8]G", 
+                                                   "T[Del(C):R8]T", "T[Del(C):R(9,)]A", "T[Del(C):R(9,)]G", "T[Del(C):R(9,)]T", 
+                                                   "A[Del(T):R1]A", "A[Del(T):R1]C", "A[Del(T):R1]G", "A[Del(T):R2]A", 
+                                                   "A[Del(T):R2]C", "A[Del(T):R2]G", "A[Del(T):R3]A", "A[Del(T):R3]C", 
+                                                   "A[Del(T):R3]G", "A[Del(T):R4]A", "A[Del(T):R4]C", "A[Del(T):R4]G", 
+                                                   "A[Del(T):R5]A", "A[Del(T):R5]C", "A[Del(T):R5]G", "A[Del(T):R6]A", 
+                                                   "A[Del(T):R6]C", "A[Del(T):R6]G", "A[Del(T):R7]A", "A[Del(T):R7]C", 
+                                                   "A[Del(T):R7]G", "A[Del(T):R8]A", "A[Del(T):R8]C", "A[Del(T):R8]G", 
+                                                   "A[Del(T):R(9,)]A", "A[Del(T):R(9,)]C", "A[Del(T):R(9,)]G", "C[Del(T):R1]A", 
+                                                   "C[Del(T):R1]C", "C[Del(T):R1]G", "C[Del(T):R2]A", "C[Del(T):R2]C", 
+                                                   "C[Del(T):R2]G", "C[Del(T):R3]A", "C[Del(T):R3]C", "C[Del(T):R3]G", 
+                                                   "C[Del(T):R4]A", "C[Del(T):R4]C", "C[Del(T):R4]G", "C[Del(T):R5]A", 
+                                                   "C[Del(T):R5]C", "C[Del(T):R5]G", "C[Del(T):R6]A", "C[Del(T):R6]C", 
+                                                   "C[Del(T):R6]G", "C[Del(T):R7]A", "C[Del(T):R7]C", "C[Del(T):R7]G", 
+                                                   "C[Del(T):R8]A", "C[Del(T):R8]C", "C[Del(T):R8]G", "C[Del(T):R(9,)]A", 
+                                                   "C[Del(T):R(9,)]C", "C[Del(T):R(9,)]G", "G[Del(T):R1]A", "G[Del(T):R1]C", 
+                                                   "G[Del(T):R1]G", "G[Del(T):R2]A", "G[Del(T):R2]C", "G[Del(T):R2]G", 
+                                                   "G[Del(T):R3]A", "G[Del(T):R3]C", "G[Del(T):R3]G", "G[Del(T):R4]A", 
+                                                   "G[Del(T):R4]C", "G[Del(T):R4]G", "G[Del(T):R5]A", "G[Del(T):R5]C", 
+                                                   "G[Del(T):R5]G", "G[Del(T):R6]A", "G[Del(T):R6]C", "G[Del(T):R6]G", 
+                                                   "G[Del(T):R7]A", "G[Del(T):R7]C", "G[Del(T):R7]G", "G[Del(T):R8]A", 
+                                                   "G[Del(T):R8]C", "G[Del(T):R8]G", "G[Del(T):R(9,)]A", "G[Del(T):R(9,)]C", 
+                                                   "G[Del(T):R(9,)]G",
+                                                   "A[Ins(C):R0]A", "A[Ins(C):R0]G", "A[Ins(C):R0]T", "A[Ins(C):R1]A", "A[Ins(C):R1]G", 
+                                                   "A[Ins(C):R1]T", "A[Ins(C):R2]A", "A[Ins(C):R2]G", "A[Ins(C):R2]T", 
+                                                   "A[Ins(C):R3]A", "A[Ins(C):R3]G", "A[Ins(C):R3]T", "A[Ins(C):R4]A", 
+                                                   "A[Ins(C):R4]G", "A[Ins(C):R4]T", "A[Ins(C):R5]A", "A[Ins(C):R5]G", 
+                                                   "A[Ins(C):R5]T", "A[Ins(C):R6]A", "A[Ins(C):R6]G", "A[Ins(C):R6]T", 
+                                                   "A[Ins(C):R7]A", "A[Ins(C):R7]G", "A[Ins(C):R7]T", "A[Ins(C):R8]A", 
+                                                   "A[Ins(C):R8]G", "A[Ins(C):R8]T", "A[Ins(C):R(9,)]A", "A[Ins(C):R(9,)]G", 
+                                                   "A[Ins(C):R(9,)]T", "G[Ins(C):R0]A", "G[Ins(C):R0]G", "G[Ins(C):R0]T", 
+                                                   "G[Ins(C):R1]A", "G[Ins(C):R1]G", "G[Ins(C):R1]T", "G[Ins(C):R2]A", 
+                                                   "G[Ins(C):R2]G", "G[Ins(C):R2]T", "G[Ins(C):R3]A", "G[Ins(C):R3]G", 
+                                                   "G[Ins(C):R3]T", "G[Ins(C):R4]A", "G[Ins(C):R4]G", "G[Ins(C):R4]T", 
+                                                   "G[Ins(C):R5]A", "G[Ins(C):R5]G", "G[Ins(C):R5]T", "G[Ins(C):R6]A", 
+                                                   "G[Ins(C):R6]G", "G[Ins(C):R6]T", "G[Ins(C):R7]A", "G[Ins(C):R7]G", 
+                                                   "G[Ins(C):R7]T", "G[Ins(C):R8]A", "G[Ins(C):R8]G", "G[Ins(C):R8]T", 
+                                                   "G[Ins(C):R(9,)]A", "G[Ins(C):R(9,)]G", "G[Ins(C):R(9,)]T", "T[Ins(C):R0]A", 
+                                                   "T[Ins(C):R0]G", "T[Ins(C):R0]T", "T[Ins(C):R1]A", "T[Ins(C):R1]G", 
+                                                   "T[Ins(C):R1]T", "T[Ins(C):R2]A", "T[Ins(C):R2]G", "T[Ins(C):R2]T", 
+                                                   "T[Ins(C):R3]A", "T[Ins(C):R3]G", "T[Ins(C):R3]T", "T[Ins(C):R4]A", 
+                                                   "T[Ins(C):R4]G", "T[Ins(C):R4]T", "T[Ins(C):R5]A", "T[Ins(C):R5]G", 
+                                                   "T[Ins(C):R5]T", "T[Ins(C):R6]A", "T[Ins(C):R6]G", "T[Ins(C):R6]T", 
+                                                   "T[Ins(C):R7]A", "T[Ins(C):R7]G", "T[Ins(C):R7]T", "T[Ins(C):R8]A", 
+                                                   "T[Ins(C):R8]G", "T[Ins(C):R8]T", "T[Ins(C):R(9,)]A", "T[Ins(C):R(9,)]G", 
+                                                   "T[Ins(C):R(9,)]T", "A[Ins(T):R0]A", "A[Ins(T):R0]C", "A[Ins(T):R0]G", 
+                                                   "A[Ins(T):R1]A", "A[Ins(T):R1]C", "A[Ins(T):R1]G", "A[Ins(T):R2]A", 
+                                                   "A[Ins(T):R2]C", "A[Ins(T):R2]G", "A[Ins(T):R3]A", "A[Ins(T):R3]C", 
+                                                   "A[Ins(T):R3]G", "A[Ins(T):R4]A", "A[Ins(T):R4]C", "A[Ins(T):R4]G", 
+                                                   "A[Ins(T):R5]A", "A[Ins(T):R5]C", "A[Ins(T):R5]G", "A[Ins(T):R6]A", 
+                                                   "A[Ins(T):R6]C", "A[Ins(T):R6]G", "A[Ins(T):R7]A", "A[Ins(T):R7]C", 
+                                                   "A[Ins(T):R7]G", "A[Ins(T):R8]A", "A[Ins(T):R8]C", "A[Ins(T):R8]G", 
+                                                   "A[Ins(T):R(9,)]A", "A[Ins(T):R(9,)]C", "A[Ins(T):R(9,)]G", "C[Ins(T):R0]A", 
+                                                   "C[Ins(T):R0]C", "C[Ins(T):R0]G", "C[Ins(T):R1]A", "C[Ins(T):R1]C", 
+                                                   "C[Ins(T):R1]G", "C[Ins(T):R2]A", "C[Ins(T):R2]C", "C[Ins(T):R2]G", 
+                                                   "C[Ins(T):R3]A", "C[Ins(T):R3]C", "C[Ins(T):R3]G", "C[Ins(T):R4]A", 
+                                                   "C[Ins(T):R4]C", "C[Ins(T):R4]G", "C[Ins(T):R5]A", "C[Ins(T):R5]C", 
+                                                   "C[Ins(T):R5]G", "C[Ins(T):R6]A", "C[Ins(T):R6]C", "C[Ins(T):R6]G", 
+                                                   "C[Ins(T):R7]A", "C[Ins(T):R7]C", "C[Ins(T):R7]G", "C[Ins(T):R8]A", 
+                                                   "C[Ins(T):R8]C", "C[Ins(T):R8]G", "C[Ins(T):R(9,)]A", "C[Ins(T):R(9,)]C", 
+                                                   "C[Ins(T):R(9,)]G", "G[Ins(T):R0]A", "G[Ins(T):R0]C", "G[Ins(T):R0]G", 
+                                                   "G[Ins(T):R1]A", "G[Ins(T):R1]C", "G[Ins(T):R1]G", "G[Ins(T):R2]A", 
+                                                   "G[Ins(T):R2]C", "G[Ins(T):R2]G", "G[Ins(T):R3]A", "G[Ins(T):R3]C", 
+                                                   "G[Ins(T):R3]G", "G[Ins(T):R4]A", "G[Ins(T):R4]C", "G[Ins(T):R4]G", 
+                                                   "G[Ins(T):R5]A", "G[Ins(T):R5]C", "G[Ins(T):R5]G", "G[Ins(T):R6]A", 
+                                                   "G[Ins(T):R6]C", "G[Ins(T):R6]G", "G[Ins(T):R7]A", "G[Ins(T):R7]C", 
+                                                   "G[Ins(T):R7]G", "G[Ins(T):R8]A", "G[Ins(T):R8]C", "G[Ins(T):R8]G", 
+                                                   "G[Ins(T):R(9,)]A", "G[Ins(T):R(9,)]C", "G[Ins(T):R(9,)]G", 
+                                                   "Del2:U1:R1", "Del3:U1:R1", "Del4:U1:R1", 
+                                                   "Del5:U1:R1", "Del6:U1:R1", "Del7:U1:R1", "Del8:U1:R1", 
+                                                   "Del9:U1:R1", "Del(10,):U1:R1", "Del2:U(2,):R1", "Del3:U(2,):R1", 
+                                                   "Del4:U(2,):R1", "Del5:U(2,):R1", "Del6:U(2,):R1", "Del7:U(2,):R1", 
+                                                   "Del8:U(2,):R1", "Del9:U(2,):R1", "Del(10,):U(2,):R1", 
+                                                   "Del2:U1:R3", "Del2:U1:R4", "Del2:U1:R(5,9)", "Del2:U2:R2", 
+                                                   "Del2:U2:R3", "Del2:U2:R4", "Del2:U2:R(5,9)", "Del3:U1:R4", 
+                                                   "Del3:U1:R(5,9)", "Del3:U3:R2", "Del3:U3:R3", "Del3:U3:R4", 
+                                                   "Del3:U3:R(5,9)", "Del4:U1:R(5,9)", "Del4:U2:R3", "Del4:U2:R4", 
+                                                   "Del4:U2:R(5,9)", "Del4:U4:R2", "Del4:U4:R3", "Del4:U4:R4", 
+                                                   "Del4:U4:R(5,9)", "Del5:U1:R(5,9)", "Del5:U5:R2", "Del5:U5:R3", 
+                                                   "Del5:U5:R4", "Del5:U5:R(5,9)", "Del(6,):U1:R(7,9)", 
+                                                   "Del(6,):U2:R(4,9)", "Del(6,):U3:R(3,9)", "Del(6,):U(4,):R(2,9)", 
+                                                   
+                                                   "Ins(2,4):M","Ins(5,):M", "Ins2:U1:R0", "Ins3:U1:R0", "Ins4:U1:R0", 
+                                                   "Ins2:U2:R0", "Ins3:U3:R0", "Ins4:U2:R0", "Ins4:U4:R0", 
+                                                   "Ins(5,):R0", "Ins2:U1:R1", "Ins2:U1:R2", "Ins2:U1:R3", 
+                                                   "Ins2:U1:R4", "Ins2:U1:R(5,9)", "Ins2:U2:R1", "Ins2:U2:R2", 
+                                                   "Ins2:U2:R3", "Ins2:U2:R4", "Ins2:U2:R(5,9)", "Ins3:U1:R1", 
+                                                   "Ins3:U1:R2", "Ins3:U1:R3", "Ins3:U1:R4", "Ins3:U1:R(5,9)", 
+                                                   "Ins3:U3:R1", "Ins3:U3:R2", "Ins3:U3:R3", "Ins3:U3:R4", 
+                                                   "Ins3:U3:R(5,9)", "Ins4:U1:R1", "Ins4:U1:R2", "Ins4:U1:R3", 
+                                                   "Ins4:U1:R4", "Ins4:U1:R(5,9)", "Ins4:U2:R1", "Ins4:U2:R2", 
+                                                   "Ins4:U2:R3", "Ins4:U2:R4", "Ins4:U2:R(5,9)", "Ins4:U4:R1", 
+                                                   "Ins4:U4:R2", "Ins4:U4:R3", "Ins4:U4:R4", "Ins4:U4:R(5,9)", 
+                                                   "Ins(5,):U1:R1", "Ins(5,):U1:R2", "Ins(5,):U1:R3", "Ins(5,):U1:R4", 
+                                                   "Ins(5,):U1:R(5,9)", "Ins(5,):U2:R1", "Ins(5,):U2:R2", 
+                                                   "Ins(5,):U2:R3", "Ins(5,):U2:R4", "Ins(5,):U2:R(5,9)", 
+                                                   "Ins(5,):U(3,):R1", "Ins(5,):U(3,):R2", "Ins(5,):U(3,):R3", 
+                                                   "Ins(5,):U(3,):R4", "Ins(5,):U(3,):R(5,9)", 
+                                                   
+                                                   "Del2:M1", "Del3:M1", "Del3:M2", "Del4:M1", "Del4:M2", 
+                                                   "Del4:M3", "Del5:M1", "Del5:M2", "Del5:M3", "Del5:M4", 
+                                                   "Del6:M1", "Del6:M2", "Del6:M3", "Del6:M4", "Del6:M5", 
+                                                   "Del(7,):M1", "Del(7,):M2", "Del(7,):M3", "Del(7,):M4", 
+                                                   "Del(7,):M5", "Del(7,):M(6,)", 
+                                                   "Complex(0,1)", "Complex(2,5)", "Complex(6,10)", "Complex(11,20)", "Complex(21,)"), 
+                                     Indel = c("Del(C)", "Del(C)", 
+                                               "Del(C)", "Del(C)", "Del(C)", "Del(C)", "Del(C)", "Del(C)", 
+                                               "Del(C)", "Del(C)", "Del(C)", "Del(C)", "Del(C)", "Del(C)", 
+                                               "Del(C)", "Del(C)", "Del(C)", "Del(C)", "Del(C)", "Del(C)", 
+                                               "Del(C)", "Del(C)", "Del(C)", "Del(C)", "Del(C)", "Del(C)", 
+                                               "Del(C)", "Del(C)", "Del(C)", "Del(C)", "Del(C)", "Del(C)", 
+                                               "Del(C)", "Del(C)", "Del(C)", "Del(C)", "Del(C)", "Del(C)", 
+                                               "Del(C)", "Del(C)", "Del(C)", "Del(C)", "Del(C)", "Del(C)", 
+                                               "Del(C)", "Del(C)", "Del(C)", "Del(C)", "Del(C)", "Del(C)", 
+                                               "Del(C)", "Del(C)", "Del(C)", "Del(C)", "Del(C)", "Del(C)", 
+                                               "Del(C)", "Del(C)", "Del(C)", "Del(C)", "Del(C)", "Del(C)", 
+                                               "Del(C)", "Del(C)", "Del(C)", "Del(C)", "Del(C)", "Del(C)", 
+                                               "Del(C)", "Del(C)", "Del(C)", "Del(C)", "Del(C)", "Del(C)", 
+                                               "Del(C)", "Del(C)", "Del(C)", "Del(C)", "Del(C)", "Del(C)", 
+                                               "Del(C)", "Del(T)", "Del(T)", "Del(T)", "Del(T)", "Del(T)", 
+                                               "Del(T)", "Del(T)", "Del(T)", "Del(T)", "Del(T)", "Del(T)", 
+                                               "Del(T)", "Del(T)", "Del(T)", "Del(T)", "Del(T)", "Del(T)", 
+                                               "Del(T)", "Del(T)", "Del(T)", "Del(T)", "Del(T)", "Del(T)", 
+                                               "Del(T)", "Del(T)", "Del(T)", "Del(T)", "Del(T)", "Del(T)", 
+                                               "Del(T)", "Del(T)", "Del(T)", "Del(T)", "Del(T)", "Del(T)", 
+                                               "Del(T)", "Del(T)", "Del(T)", "Del(T)", "Del(T)", "Del(T)", 
+                                               "Del(T)", "Del(T)", "Del(T)", "Del(T)", "Del(T)", "Del(T)", 
+                                               "Del(T)", "Del(T)", "Del(T)", "Del(T)", "Del(T)", "Del(T)", 
+                                               "Del(T)", "Del(T)", "Del(T)", "Del(T)", "Del(T)", "Del(T)", 
+                                               "Del(T)", "Del(T)", "Del(T)", "Del(T)", "Del(T)", "Del(T)", 
+                                               "Del(T)", "Del(T)", "Del(T)", "Del(T)", "Del(T)", "Del(T)", 
+                                               "Del(T)", "Del(T)", "Del(T)", "Del(T)", "Del(T)", "Del(T)", 
+                                               "Del(T)", "Del(T)", "Del(T)", "Del(T)",
+                                               "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", 
+                                               "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", 
+                                               "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", 
+                                               "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", 
+                                               "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", 
+                                               "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", 
+                                               "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", 
+                                               "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", 
+                                               "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", 
+                                               "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", 
+                                               "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", 
+                                               "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", 
+                                               "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", 
+                                               "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", 
+                                               "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(C)", "Ins(T)", 
+                                               "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", 
+                                               "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", 
+                                               "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", 
+                                               "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", 
+                                               "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", 
+                                               "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", 
+                                               "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", 
+                                               "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", 
+                                               "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", 
+                                               "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", 
+                                               "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", 
+                                               "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", 
+                                               "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", 
+                                               "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", 
+                                               "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", "Ins(T)", 
+                                               "Del(2,):R(1,9)", "Del(2,):R(1,9)", "Del(2,):R(1,9)", 
+                                               "Del(2,):R(1,9)", "Del(2,):R(1,9)", "Del(2,):R(1,9)", 
+                                               "Del(2,):R(1,9)", "Del(2,):R(1,9)", "Del(2,):R(1,9)", 
+                                               "Del(2,):R(1,9)", "Del(2,):R(1,9)", "Del(2,):R(1,9)", 
+                                               "Del(2,):R(1,9)", "Del(2,):R(1,9)", "Del(2,):R(1,9)", 
+                                               "Del(2,):R(1,9)", "Del(2,):R(1,9)", "Del(2,):R(1,9)", 
+                                               "Del(2,):R(1,9)", "Del(2,):R(1,9)", "Del(2,):R(1,9)", 
+                                               "Del(2,):R(1,9)", "Del(2,):R(1,9)", "Del(2,):R(1,9)", 
+                                               "Del(2,):R(1,9)", "Del(2,):R(1,9)", "Del(2,):R(1,9)", 
+                                               "Del(2,):R(1,9)", "Del(2,):R(1,9)", "Del(2,):R(1,9)", 
+                                               "Del(2,):R(1,9)", "Del(2,):R(1,9)", "Del(2,):R(1,9)", 
+                                               "Del(2,):R(1,9)", "Del(2,):R(1,9)", "Del(2,):R(1,9)", 
+                                               "Del(2,):R(1,9)", "Del(2,):R(1,9)", "Del(2,):R(1,9)", 
+                                               "Del(2,):R(1,9)", "Del(2,):R(1,9)", "Del(2,):R(1,9)", 
+                                               "Del(2,):R(1,9)", "Del(2,):R(1,9)", "Del(2,):R(1,9)", 
+                                               "Del(2,):R(1,9)", "Del(2,):R(1,9)", 
+                                               "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", 
+                                               "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", 
+                                               "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", 
+                                               "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", 
+                                               "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", 
+                                               "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", 
+                                               "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", 
+                                               "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", 
+                                               "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", 
+                                               "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", 
+                                               "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", 
+                                               "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", 
+                                               "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", 
+                                               "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", 
+                                               "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", 
+                                               "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", 
+                                               "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", 
+                                               "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", 
+                                               "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", "Ins(2,):R(0,9)", 
+                                               "Ins(2,):R(0,9)", "Ins(2,):R(0,9)",  "Del(2,):R(1,9)", 
+                                               "Del(2,):M(1,)", "Del(2,):M(1,)", "Del(2,):M(1,)", "Del(2,):M(1,)", "Del(2,):M(1,)", 
+                                               "Del(2,):M(1,)", "Del(2,):M(1,)", "Del(2,):M(1,)", "Del(2,):M(1,)", 
+                                               "Del(2,):M(1,)", "Del(2,):M(1,)", "Del(2,):M(1,)", "Del(2,):M(1,)", 
+                                               "Del(2,):M(1,)", "Del(2,):M(1,)", "Del(2,):M(1,)", "Del(2,):M(1,)", 
+                                               "Del(2,):M(1,)", "Del(2,):M(1,)", "Del(2,):M(1,)", "Del(2,):M(1,)", 
+                                               "Complex", "Complex", "Complex", "Complex", "Complex"), 
+                                     Indel3 = c( "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", 
+                                                 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion",
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Insertion", "Insertion", "Insertion", "Insertion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", "Deletion", "Deletion", "Deletion", "Deletion", 
+                                                 "Deletion", 
+                                                 "Complex", "Complex", "Complex", "Complex", "Complex"), 
+                                     Figlabel = c( "A[Del(C):R1]A", 
+                                                   "A[Del(C):R1]G", "A[Del(C):R1]T", "A[Del(C):R2]A", 
+                                                   "A[Del(C):R2]G", "A[Del(C):R2]T", "A[Del(C):R3]A", 
+                                                   "A[Del(C):R3]G", "A[Del(C):R3]T", "A[Del(C):R4]A", 
+                                                   "A[Del(C):R4]G", "A[Del(C):R4]T", "A[Del(C):R5]A", 
+                                                   "A[Del(C):R5]G", "A[Del(C):R5]T", "A[Del(C):R6]A", 
+                                                   "A[Del(C):R6]G", "A[Del(C):R6]T", "A[Del(C):R7]A", 
+                                                   "A[Del(C):R7]G", "A[Del(C):R7]T", "A[Del(C):R8]A", 
+                                                   "A[Del(C):R8]G", "A[Del(C):R8]T", "A[Del(C):R(9,)]A", 
+                                                   "A[Del(C):R(9,)]G", "A[Del(C):R(9,)]T", "G[Del(C):R1]A", 
+                                                   "G[Del(C):R1]G", "G[Del(C):R1]T", "G[Del(C):R2]A", 
+                                                   "G[Del(C):R2]G", "G[Del(C):R2]T", "G[Del(C):R3]A", 
+                                                   "G[Del(C):R3]G", "G[Del(C):R3]T", "G[Del(C):R4]A", 
+                                                   "G[Del(C):R4]G", "G[Del(C):R4]T", "G[Del(C):R5]A", 
+                                                   "G[Del(C):R5]G", "G[Del(C):R5]T", "G[Del(C):R6]A", 
+                                                   "G[Del(C):R6]G", "G[Del(C):R6]T", "G[Del(C):R7]A", 
+                                                   "G[Del(C):R7]G", "G[Del(C):R7]T", "G[Del(C):R8]A", 
+                                                   "G[Del(C):R8]G", "G[Del(C):R8]T", "G[Del(C):R(9,)]A", 
+                                                   "G[Del(C):R(9,)]G", "G[Del(C):R(9,)]T", "T[Del(C):R1]A", 
+                                                   "T[Del(C):R1]G", "T[Del(C):R1]T", "T[Del(C):R2]A", 
+                                                   "T[Del(C):R2]G", "T[Del(C):R2]T", "T[Del(C):R3]A", 
+                                                   "T[Del(C):R3]G", "T[Del(C):R3]T", "T[Del(C):R4]A", 
+                                                   "T[Del(C):R4]G", "T[Del(C):R4]T", "T[Del(C):R5]A", 
+                                                   "T[Del(C):R5]G", "T[Del(C):R5]T", "T[Del(C):R6]A", 
+                                                   "T[Del(C):R6]G", "T[Del(C):R6]T", "T[Del(C):R7]A", 
+                                                   "T[Del(C):R7]G", "T[Del(C):R7]T", "T[Del(C):R8]A", 
+                                                   "T[Del(C):R8]G", "T[Del(C):R8]T", "T[Del(C):R(9,)]A", 
+                                                   "T[Del(C):R(9,)]G", "T[Del(C):R(9,)]T", "A[Del(T):R1]A", 
+                                                   "A[Del(T):R1]C", "A[Del(T):R1]G", "A[Del(T):R2]A", 
+                                                   "A[Del(T):R2]C", "A[Del(T):R2]G", "A[Del(T):R3]A", 
+                                                   "A[Del(T):R3]C", "A[Del(T):R3]G", "A[Del(T):R4]A", 
+                                                   "A[Del(T):R4]C", "A[Del(T):R4]G", "A[Del(T):R5]A", 
+                                                   "A[Del(T):R5]C", "A[Del(T):R5]G", "A[Del(T):R6]A", 
+                                                   "A[Del(T):R6]C", "A[Del(T):R6]G", "A[Del(T):R7]A", 
+                                                   "A[Del(T):R7]C", "A[Del(T):R7]G", "A[Del(T):R8]A", 
+                                                   "A[Del(T):R8]C", "A[Del(T):R8]G", "A[Del(T):R(9,)]A", 
+                                                   "A[Del(T):R(9,)]C", "A[Del(T):R(9,)]G", "C[Del(T):R1]A", 
+                                                   "C[Del(T):R1]C", "C[Del(T):R1]G", "C[Del(T):R2]A", 
+                                                   "C[Del(T):R2]C", "C[Del(T):R2]G", "C[Del(T):R3]A", 
+                                                   "C[Del(T):R3]C", "C[Del(T):R3]G", "C[Del(T):R4]A", 
+                                                   "C[Del(T):R4]C", "C[Del(T):R4]G", "C[Del(T):R5]A", 
+                                                   "C[Del(T):R5]C", "C[Del(T):R5]G", "C[Del(T):R6]A", 
+                                                   "C[Del(T):R6]C", "C[Del(T):R6]G", "C[Del(T):R7]A", 
+                                                   "C[Del(T):R7]C", "C[Del(T):R7]G", "C[Del(T):R8]A", 
+                                                   "C[Del(T):R8]C", "C[Del(T):R8]G", "C[Del(T):R(9,)]A", 
+                                                   "C[Del(T):R(9,)]C", "C[Del(T):R(9,)]G", "G[Del(T):R1]A", 
+                                                   "G[Del(T):R1]C", "G[Del(T):R1]G", "G[Del(T):R2]A", 
+                                                   "G[Del(T):R2]C", "G[Del(T):R2]G", "G[Del(T):R3]A", 
+                                                   "G[Del(T):R3]C", "G[Del(T):R3]G", "G[Del(T):R4]A", 
+                                                   "G[Del(T):R4]C", "G[Del(T):R4]G", "G[Del(T):R5]A", 
+                                                   "G[Del(T):R5]C", "G[Del(T):R5]G", "G[Del(T):R6]A", 
+                                                   "G[Del(T):R6]C", "G[Del(T):R6]G", "G[Del(T):R7]A", 
+                                                   "G[Del(T):R7]C", "G[Del(T):R7]G", "G[Del(T):R8]A", 
+                                                   "G[Del(T):R8]C", "G[Del(T):R8]G", "G[Del(T):R(9,)]A", 
+                                                   "G[Del(T):R(9,)]C", "G[Del(T):R(9,)]G", 
+                                                   "A[Ins(C):R0]A", "A[Ins(C):R0]G", 
+                                                   "A[Ins(C):R0]T", "A[Ins(C):R1]A", "A[Ins(C):R1]G", 
+                                                   "A[Ins(C):R1]T", "A[Ins(C):R2]A", "A[Ins(C):R2]G", 
+                                                   "A[Ins(C):R2]T", "A[Ins(C):R3]A", "A[Ins(C):R3]G", 
+                                                   "A[Ins(C):R3]T", "A[Ins(C):R4]A", "A[Ins(C):R4]G", 
+                                                   "A[Ins(C):R4]T", "A[Ins(C):R5]A", "A[Ins(C):R5]G", 
+                                                   "A[Ins(C):R5]T", "A[Ins(C):R6]A", "A[Ins(C):R6]G", 
+                                                   "A[Ins(C):R6]T", "A[Ins(C):R7]A", "A[Ins(C):R7]G", 
+                                                   "A[Ins(C):R7]T", "A[Ins(C):R8]A", "A[Ins(C):R8]G", 
+                                                   "A[Ins(C):R8]T", "A[Ins(C):R(9,)]A", "A[Ins(C):R(9,)]G", 
+                                                   "A[Ins(C):R(9,)]T", "G[Ins(C):R0]A", "G[Ins(C):R0]G", 
+                                                   "G[Ins(C):R0]T", "G[Ins(C):R1]A", "G[Ins(C):R1]G", 
+                                                   "G[Ins(C):R1]T", "G[Ins(C):R2]A", "G[Ins(C):R2]G", 
+                                                   "G[Ins(C):R2]T", "G[Ins(C):R3]A", "G[Ins(C):R3]G", 
+                                                   "G[Ins(C):R3]T", "G[Ins(C):R4]A", "G[Ins(C):R4]G", 
+                                                   "G[Ins(C):R4]T", "G[Ins(C):R5]A", "G[Ins(C):R5]G", 
+                                                   "G[Ins(C):R5]T", "G[Ins(C):R6]A", "G[Ins(C):R6]G", 
+                                                   "G[Ins(C):R6]T", "G[Ins(C):R7]A", "G[Ins(C):R7]G", 
+                                                   "G[Ins(C):R7]T", "G[Ins(C):R8]A", "G[Ins(C):R8]G", 
+                                                   "G[Ins(C):R8]T", "G[Ins(C):R(9,)]A", "G[Ins(C):R(9,)]G", 
+                                                   "G[Ins(C):R(9,)]T", "T[Ins(C):R0]A", "T[Ins(C):R0]G", 
+                                                   "T[Ins(C):R0]T", "T[Ins(C):R1]A", "T[Ins(C):R1]G", 
+                                                   "T[Ins(C):R1]T", "T[Ins(C):R2]A", "T[Ins(C):R2]G", 
+                                                   "T[Ins(C):R2]T", "T[Ins(C):R3]A", "T[Ins(C):R3]G", 
+                                                   "T[Ins(C):R3]T", "T[Ins(C):R4]A", "T[Ins(C):R4]G", 
+                                                   "T[Ins(C):R4]T", "T[Ins(C):R5]A", "T[Ins(C):R5]G", 
+                                                   "T[Ins(C):R5]T", "T[Ins(C):R6]A", "T[Ins(C):R6]G", 
+                                                   "T[Ins(C):R6]T", "T[Ins(C):R7]A", "T[Ins(C):R7]G", 
+                                                   "T[Ins(C):R7]T", "T[Ins(C):R8]A", "T[Ins(C):R8]G", 
+                                                   "T[Ins(C):R8]T", "T[Ins(C):R(9,)]A", "T[Ins(C):R(9,)]G", 
+                                                   "T[Ins(C):R(9,)]T", "A[Ins(T):R0]A", "A[Ins(T):R0]C", 
+                                                   "A[Ins(T):R0]G", "A[Ins(T):R1]A", "A[Ins(T):R1]C", 
+                                                   "A[Ins(T):R1]G", "A[Ins(T):R2]A", "A[Ins(T):R2]C", 
+                                                   "A[Ins(T):R2]G", "A[Ins(T):R3]A", "A[Ins(T):R3]C", 
+                                                   "A[Ins(T):R3]G", "A[Ins(T):R4]A", "A[Ins(T):R4]C", 
+                                                   "A[Ins(T):R4]G", "A[Ins(T):R5]A", "A[Ins(T):R5]C", 
+                                                   "A[Ins(T):R5]G", "A[Ins(T):R6]A", "A[Ins(T):R6]C", 
+                                                   "A[Ins(T):R6]G", "A[Ins(T):R7]A", "A[Ins(T):R7]C", 
+                                                   "A[Ins(T):R7]G", "A[Ins(T):R8]A", "A[Ins(T):R8]C", 
+                                                   "A[Ins(T):R8]G", "A[Ins(T):R(9,)]A", "A[Ins(T):R(9,)]C", 
+                                                   "A[Ins(T):R(9,)]G", "C[Ins(T):R0]A", "C[Ins(T):R0]C", 
+                                                   "C[Ins(T):R0]G", "C[Ins(T):R1]A", "C[Ins(T):R1]C", 
+                                                   "C[Ins(T):R1]G", "C[Ins(T):R2]A", "C[Ins(T):R2]C", 
+                                                   "C[Ins(T):R2]G", "C[Ins(T):R3]A", "C[Ins(T):R3]C", 
+                                                   "C[Ins(T):R3]G", "C[Ins(T):R4]A", "C[Ins(T):R4]C", 
+                                                   "C[Ins(T):R4]G", "C[Ins(T):R5]A", "C[Ins(T):R5]C", 
+                                                   "C[Ins(T):R5]G", "C[Ins(T):R6]A", "C[Ins(T):R6]C", 
+                                                   "C[Ins(T):R6]G", "C[Ins(T):R7]A", "C[Ins(T):R7]C", 
+                                                   "C[Ins(T):R7]G", "C[Ins(T):R8]A", "C[Ins(T):R8]C", 
+                                                   "C[Ins(T):R8]G", "C[Ins(T):R(9,)]A", "C[Ins(T):R(9,)]C", 
+                                                   "C[Ins(T):R(9,)]G", "G[Ins(T):R0]A", "G[Ins(T):R0]C", 
+                                                   "G[Ins(T):R0]G", "G[Ins(T):R1]A", "G[Ins(T):R1]C", 
+                                                   "G[Ins(T):R1]G", "G[Ins(T):R2]A", "G[Ins(T):R2]C", 
+                                                   "G[Ins(T):R2]G", "G[Ins(T):R3]A", "G[Ins(T):R3]C", 
+                                                   "G[Ins(T):R3]G", "G[Ins(T):R4]A", "G[Ins(T):R4]C", 
+                                                   "G[Ins(T):R4]G", "G[Ins(T):R5]A", "G[Ins(T):R5]C", 
+                                                   "G[Ins(T):R5]G", "G[Ins(T):R6]A", "G[Ins(T):R6]C", 
+                                                   "G[Ins(T):R6]G", "G[Ins(T):R7]A", "G[Ins(T):R7]C", 
+                                                   "G[Ins(T):R7]G", "G[Ins(T):R8]A", "G[Ins(T):R8]C", 
+                                                   "G[Ins(T):R8]G", "G[Ins(T):R(9,)]A", "G[Ins(T):R(9,)]C", 
+                                                   "G[Ins(T):R(9,)]G", 
+                                                   "Del2:U1:R1", "Del3:U1:R1", 
+                                                   "Del4:U1:R1", "Del5:U1:R1", "Del6:U1:R1", "Del7:U1:R1", 
+                                                   "Del8:U1:R1", "Del9:U1:R1", "Del(10,):U1:R1", "Del2:U(2,):R1", 
+                                                   "Del3:U(2,):R1", "Del4:U(2,):R1", "Del5:U(2,):R1", 
+                                                   "Del6:U(2,):R1", "Del7:U(2,):R1", "Del8:U(2,):R1", 
+                                                   "Del9:U(2,):R1", "Del(10,):U(2,):R1", "Del2:U1:R3", 
+                                                   "Del2:U1:R4", "Del2:U1:R(5,9)", "Del2:U2:R2", "Del2:U2:R3", 
+                                                   "Del2:U2:R4", "Del2:U2:R(5,9)", "Del3:U1:R4", "Del3:U1:R(5,9)", 
+                                                   "Del3:U3:R2", "Del3:U3:R3", "Del3:U3:R4", "Del3:U3:R(5,9)", 
+                                                   "Del4:U1:R(5,9)", "Del4:U2:R3", "Del4:U2:R4", "Del4:U2:R(5,9)", 
+                                                   "Del4:U4:R2", "Del4:U4:R3", "Del4:U4:R4", "Del4:U4:R(5,9)", 
+                                                   "Del5:U1:R(5,9)", "Del5:U5:R2", "Del5:U5:R3", "Del5:U5:R4", 
+                                                   "Del5:U5:R(5,9)", "Del(6,):U1:R(7,9)", "Del(6,):U2:R(4,9)", 
+                                                   "Del(6,):U3:R(3,9)", "Del(6,):U(4,):R(2,9)", 
+                                                   "Ins(2,4):M", "Ins(5,):M", "Ins2:U1:R0", 
+                                                   "Ins3:U1:R0", "Ins4:U1:R0", "Ins2:U2:R0", "Ins3:U3:R0", 
+                                                   "Ins4:U2:R0", "Ins4:U4:R0", "Ins(5,):R0", "Ins2:U1:R1", 
+                                                   "Ins2:U1:R2", "Ins2:U1:R3", "Ins2:U1:R4", "Ins2:U1:R(5,9)", 
+                                                   "Ins2:U2:R1", "Ins2:U2:R2", "Ins2:U2:R3", "Ins2:U2:R4", 
+                                                   "Ins2:U2:R(5,9)", "Ins3:U1:R1", "Ins3:U1:R2", "Ins3:U1:R3", 
+                                                   "Ins3:U1:R4", "Ins3:U1:R(5,9)", "Ins3:U3:R1", "Ins3:U3:R2", 
+                                                   "Ins3:U3:R3", "Ins3:U3:R4", "Ins3:U3:R(5,9)", "Ins4:U1:R1", 
+                                                   "Ins4:U1:R2", "Ins4:U1:R3", "Ins4:U1:R4", "Ins4:U1:R(5,9)", 
+                                                   "Ins4:U2:R1", "Ins4:U2:R2", "Ins4:U2:R3", "Ins4:U2:R4", 
+                                                   "Ins4:U2:R(5,9)", "Ins4:U4:R1", "Ins4:U4:R2", "Ins4:U4:R3", 
+                                                   "Ins4:U4:R4", "Ins4:U4:R(5,9)", "Ins(5,):U1:R1", 
+                                                   "Ins(5,):U1:R2", "Ins(5,):U1:R3", "Ins(5,):U1:R4", 
+                                                   "Ins(5,):U1:R(5,9)", "Ins(5,):U2:R1", "Ins(5,):U2:R2", 
+                                                   "Ins(5,):U2:R3", "Ins(5,):U2:R4", "Ins(5,):U2:R(5,9)", 
+                                                   "Ins(5,):U(3,):R1", "Ins(5,):U(3,):R2", "Ins(5,):U(3,):R3", 
+                                                   "Ins(5,):U(3,):R4", "Ins(5,):U(3,):R(5,9)", 
+                                                   "Del2:M1", 
+                                                   "Del3:M1", "Del3:M2", "Del4:M1", "Del4:M2", "Del4:M3", 
+                                                   "Del5:M1", "Del5:M2", "Del5:M3", "Del5:M4", "Del6:M1", 
+                                                   "Del6:M2", "Del6:M3", "Del6:M4", "Del6:M5", "Del(7,):M1", 
+                                                   "Del(7,):M2", "Del(7,):M3", "Del(7,):M4", "Del(7,):M5", 
+                                                   "Del(7,):M(6,)", "Complex(0,1)", "Complex(2,5)", 
+                                                   "Complex(6,10)", "Complex(11,20)", "Complex(21,)")), 
+                                class = "data.frame", row.names = c(NA, -476L))  
+
+
+
+
+## this function directly takes output from ICAMS::AnnovateIDVcf. 
+#' @param muts_list ICAMS annotated ID vcf
+#' @param sample_col  the column containing the sample name
+
+GenerateKoh476CatalogfromAnnotateVcf <- function (muts_list, sample_col){
+  muts_list <- as.data.frame(muts_list)
+  indel_catalogue <- data.frame(table(muts_list[, sample_col], 
+                                      muts_list$Koh_476))
+  names(indel_catalogue) <- c("Sample", "IndelType", "freq")
+  indel_catalogue <- reshape2::dcast(indel_catalogue, IndelType ~ 
+                                       Sample, value.var = "freq")
+  indel_catalogue <- merge(Mo_template_Koh476, indel_catalogue, 
+                           by = "IndelType", all.x = T)
+  indel_catalogue[is.na(indel_catalogue)] <- 0
+  rownames(indel_catalogue) <- indel_catalogue[, "IndelType"]
+  return(indel_catalogue[Mo_template_Koh476$IndelType, -c(1:4), drop = FALSE])
+}
