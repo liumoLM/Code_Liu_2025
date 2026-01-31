@@ -16,12 +16,21 @@ plot_dir <- "plot_output/assignment"
 
 in_out_pairs = list(
   list(
-    input_file = "Liu_et_al_83_plus_89_as_83_type_signature_assignments.tsv",
+    input_file = "assignment_from_172_type/Liu_et_al_83_plus_89_as_83_type_signature_assignments.tsv",
     output_file = "83_plus_89_as_83_assignments.pdf"
   ),
   list(
+    input_file = "assignment_from_172_type/Liu_et_al_83_plus_89_as_89_type_signature_assignments.tsv",
+    output_file = "83_plus_89_as_89_assignments.pdf"
+  ),
+  list(
     input_file = "Liu_et_al_648_type_signature_assignments.tsv",
-    output_file = "647_assignments.pdf"
+    output_file = "648_assignments.pdf"
+  ),
+
+  list(
+    input_file = "Liu_et_al_476_type_signature_assignments.tsv",
+    output_file = "476_assignments.pdf"
   )
 )
 
