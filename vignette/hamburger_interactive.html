@@ -249,6 +249,12 @@ sig_mapping <- read.delim(
   check.names = FALSE
 )
 
+# Load sample info for MSI status coloring
+sample_info <- read.delim(
+  file.path(data_dir, "sample_info.tsv"),
+  check.names = FALSE
+)
+
 # Get signature lists
 signatures_83_89 <- rownames(assignments_83_89)
 signatures_89 <- rownames(assignments_89)
@@ -398,6 +404,15 @@ output$hamburger_plot <- renderPlotly({
 
   all_shapes <- c(bg_shapes, median_shapes)
 
+  # Extract patient ID from sample_id (remove "CancerType::" prefix)
+  df$patient_id <- sub("^.*::", "", df$sample_id)
+
+  # Look up MSI status from sample_info
+  df$msi_status <- sample_info$`MSIseq_MSI-H`[match(df$patient_id, sample_info$Patient)]
+
+  # Set dot color: red for MSI-H (TRUE), black for others
+ df$dot_color <- ifelse(!is.na(df$msi_status) & df$msi_status == TRUE, "red", "black")
+
   # Create hover text
   df$hover_text <- paste0(
     "<b>Sample:<\u002fb> ",
@@ -407,7 +422,10 @@ output$hamburger_plot <- renderPlotly({
     df$cancer_type,
     "<br>",
     "<b>Mutations:<\u002fb> ",
-    round(df$mutations, 1)
+    round(df$mutations, 1),
+    "<br>",
+    "<b>MSI-H:<\u002fb> ",
+    ifelse(!is.na(df$msi_status) & df$msi_status == TRUE, "Yes", "No")
   )
 
   # Create title showing mapped signature name
@@ -424,7 +442,7 @@ output$hamburger_plot <- renderPlotly({
     y = ~mutations,
     type = "scatter",
     mode = "markers",
-    marker = list(size = 6, color = "black", opacity = 0.6),
+    marker = list(size = 6, color = ~dot_color, opacity = 0.6),
     text = ~hover_text,
     hoverinfo = "text",
     customdata = ~sample_id,
