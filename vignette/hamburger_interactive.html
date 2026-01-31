@@ -72,6 +72,8 @@ ul.task-list li input[type="checkbox"] {
 <label class="control-label" id="assignment_type-label" for="assignment_type">Assignment Type:</label>
 <div>
 <select id="assignment_type" class="shiny-input-select"><option value="83_89" selected="">83+89 as 83-type (33 signatures)</option>
+<option value="89">83+89 as 89-type (48 signatures)</option>
+<option value="476">476-type (44 signatures)</option>
 <option value="648">648-type (44 signatures)</option></select>
 <script type="application/json" data-for="assignment_type" data-nonempty="">{"plugins":["selectize-plugin-a11y"]}</script>
 </div>
@@ -99,7 +101,7 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">83-type</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">89-type</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">476-type</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">83-type</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">89-type</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">476-type</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false" href="">648 assignments / 476 plots</a></li></ul>
 <div class="tab-content">
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <div class="cell">
@@ -119,6 +121,13 @@ ul.task-list li input[type="checkbox"] {
 <div class="cell">
 <div class="cell-output-display no-overflow-x">
 <div id="spectrum_476_ui" class="shiny-html-output"></div>
+</div>
+</div>
+</div>
+<div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
+<div class="cell">
+<div class="cell-output-display no-overflow-x">
+<div id="spectrum_648_476_ui" class="shiny-html-output"></div>
 </div>
 </div>
 </div>
@@ -160,12 +169,15 @@ library(ggrepel)
 source("hamburger_helpers.R")
 
 # Data directory
-data_dir <- "../Manuscript_data/"
+data_dir <- "../Manuscript_data"
 
 # Load assignment matrices
 assignments_83_89 <- read.delim(
-
-  file.path(data_dir, "Liu_et_al_83_plus_89_as_83_type_signature_assignments.tsv"),
+  file.path(
+    data_dir,
+    "assignment_from_172_type",
+    "Liu_et_al_83_plus_89_as_83_type_signature_assignments.tsv"
+  ),
   row.names = 1,
   check.names = FALSE
 )
@@ -178,7 +190,11 @@ assignments_648 <- read.delim(
 
 # Load additional assignment files for decomposition view
 assignments_89 <- read.delim(
-  file.path(data_dir, "Liu_et_al_89_type_signature_assignments.tsv"),
+  file.path(
+    data_dir,
+    "assignment_from_172_type",
+    "Liu_et_al_83_plus_89_as_89_type_signature_assignments.tsv"
+  ),
   row.names = 1,
   check.names = FALSE
 )
@@ -235,28 +251,100 @@ sig_mapping <- read.delim(
 
 # Get signature lists
 signatures_83_89 <- rownames(assignments_83_89)
+signatures_89 <- rownames(assignments_89)
+signatures_476 <- rownames(assignments_476)
 signatures_648 <- rownames(assignments_648)
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
 output$signature_selector <- renderUI({
-  sigs <- if (input$assignment_type == "83_89") signatures_83_89 else signatures_648
+  sigs <- switch(
+    input$assignment_type,
+    "83_89" = signatures_83_89,
+    "89" = signatures_89,
+    "476" = signatures_476,
+    "648" = signatures_648,
+    signatures_83_89  # default
+  )
   selectInput("signature", "Signature:", choices = sigs)
 })
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
-# Reactive for current hamburger data
-hamburger_data <- reactive({
-  req(input$signature)
+# Helper function to map signature names between assignment types
+# 83_89 uses C_ID* names, while 89/476/648 use InsDel* names
+map_signature_name <- function(sig_name, from_type, to_type, mapping) {
 
-  assignment_matrix <- if (input$assignment_type == "83_89") {
-    assignments_83_89
-  } else {
-    assignments_648
+  if (from_type == to_type) {
+    return(sig_name)
   }
 
-  get_hamburger_data(input$signature, assignment_matrix, min_samples = 3)
+  # Determine if we need to convert between naming conventions
+  from_is_83 <- from_type == "83_89"
+  to_is_83 <- to_type == "83_89"
+
+  if (from_is_83 && !to_is_83) {
+    # Map from 83-type (C_ID*) to 89-type (InsDel*)
+    matches <- mapping$InDel89[mapping$InDel83 == sig_name]
+    if (length(matches) > 0) {
+      # Return the one with lowest lexicographic order
+      return(sort(matches)[1])
+    }
+  } else if (!from_is_83 && to_is_83) {
+    # Map from 89-type (InsDel*) to 83-type (C_ID*)
+    matches <- mapping$InDel83[mapping$InDel89 == sig_name]
+    if (length(matches) > 0) {
+      return(matches[1])
+    }
+  }
+  # If both use same naming convention (89/476/648), return as-is
+
+  # Return original if no mapping found
+  return(sig_name)
+}
+
+# Reactive to get the mapped signature name for current assignment type
+mapped_signature <- reactive({
+  req(input$signature, input$assignment_type)
+
+  sig_name <- input$signature
+
+  # Determine the source type based on whether the signature exists in each matrix
+  if (sig_name %in% rownames(assignments_83_89)) {
+    source_type <- "83_89"
+  } else if (sig_name %in% rownames(assignments_89)) {
+    source_type <- "89"
+  } else if (sig_name %in% rownames(assignments_476)) {
+    source_type <- "476"
+  } else if (sig_name %in% rownames(assignments_648)) {
+    source_type <- "648"
+  } else {
+    return(sig_name)
+  }
+
+  map_signature_name(sig_name, source_type, input$assignment_type, sig_mapping)
+})
+
+# Reactive for current hamburger data
+hamburger_data <- reactive({
+  sig_name <- mapped_signature()
+  req(sig_name)
+
+  assignment_matrix <- switch(
+    input$assignment_type,
+    "83_89" = assignments_83_89,
+    "89" = assignments_89,
+    "476" = assignments_476,
+    "648" = assignments_648,
+    assignments_83_89  # default
+  )
+
+  # Check if signature exists in the matrix
+  if (!sig_name %in% rownames(assignment_matrix)) {
+    return(NULL)
+  }
+
+  get_hamburger_data(sig_name, assignment_matrix, min_samples = 3)
 })
 
 # Render hamburger plot
@@ -264,7 +352,9 @@ output$hamburger_plot <- renderPlotly({
   df <- hamburger_data()
 
   if (is.null(df) || nrow(df) == 0) {
-    return(plotly_empty() |> layout(title = "No data available for this signature"))
+    return(
+      plotly_empty() |> layout(title = "No data available for this signature")
+    )
   }
 
   type_order <- attr(df, "type_order")
@@ -310,10 +400,23 @@ output$hamburger_plot <- renderPlotly({
 
   # Create hover text
   df$hover_text <- paste0(
-    "<b>Sample:<\u002fb> ", df$sample_id, "<br>",
-    "<b>Cancer Type:<\u002fb> ", df$cancer_type, "<br>",
-    "<b>Mutations:<\u002fb> ", round(df$mutations, 1)
+    "<b>Sample:<\u002fb> ",
+    df$sample_id,
+    "<br>",
+    "<b>Cancer Type:<\u002fb> ",
+    df$cancer_type,
+    "<br>",
+    "<b>Mutations:<\u002fb> ",
+    round(df$mutations, 1)
   )
+
+  # Create title showing mapped signature name
+  sig_display <- mapped_signature()
+  if (sig_display != input$signature) {
+    plot_title <- paste0(sig_display, " (from ", input$signature, ") mutations")
+  } else {
+    plot_title <- paste0(sig_display, " mutations")
+  }
 
   plot_ly(
     data = df,
@@ -328,7 +431,7 @@ output$hamburger_plot <- renderPlotly({
     source = "hamburger"
   ) |>
     layout(
-      title = list(text = paste0(input$signature, " mutations"), x = 0.5),
+      title = list(text = plot_title, x = 0.5),
       xaxis = list(
         title = "",
         tickmode = "array",
@@ -361,7 +464,7 @@ observeEvent(event_data("plotly_click", source = "hamburger"), {
   click_data <- event_data("plotly_click", source = "hamburger")
   if (!is.null(click_data)) {
     selected_sample(click_data$customdata[[1]])
-    show_decomposition(FALSE)  # Reset to spectrum view when new sample selected
+    show_decomposition(FALSE) # Reset to spectrum view when new sample selected
   }
 })
 
@@ -380,23 +483,34 @@ observeEvent(input$back_to_spectrum, {
 output$selected_info <- renderUI({
   sample_id <- selected_sample()
   if (is.null(sample_id)) {
-    tags$p(tags$strong("Select a point from the hamburger plot above to view spectrum."))
+    tags$p(tags$strong(
+      "Select a point from the hamburger plot above to view spectrum."
+    ))
   } else if (show_decomposition()) {
     tags$div(
       tags$p(
-        tags$strong("Selected Tumor: "), sample_id,
+        tags$strong("Selected Tumor: "),
+        sample_id,
         " - Showing signature decomposition"
       ),
-      actionButton("back_to_spectrum", "Back to Spectrum View",
-                   style = "margin-top: 5px;")
+      actionButton(
+        "back_to_spectrum",
+        "Back to Spectrum View",
+        style = "margin-top: 5px;"
+      )
     )
   } else {
     tags$p(
       tags$strong("Selected Tumor: "),
-      actionLink("sample_id_link", sample_id,
-                 style = "color: blue; text-decoration: underline; cursor: pointer;"),
-      tags$span(" (click to see signature decomposition)",
-                style = "color: gray; font-size: 0.9em;")
+      actionLink(
+        "sample_id_link",
+        sample_id,
+        style = "color: blue; text-decoration: underline; cursor: pointer;"
+      ),
+      tags$span(
+        " (click to see signature decomposition)",
+        style = "color: gray; font-size: 0.9em;"
+      )
     )
   }
 })
@@ -423,51 +537,60 @@ output$spectrum_83_ui <- renderUI({
   plotOutput("spectrum_83", height = height)
 })
 
-output$spectrum_83 <- renderPlot({
-  sample_id <- selected_sample()
-  sig_name <- input$signature
-  req(sample_id, sig_name)
+output$spectrum_83 <- renderPlot(
+  {
+    sample_id <- selected_sample()
+    sig_name <- input$signature
+    req(sample_id, sig_name)
 
-  if (!sample_id %in% colnames(spectra_83)) {
-    plot.new()
-    text(0.5, 0.5, paste("No ID83 data for", sample_id))
-    return()
-  }
+    if (!sample_id %in% colnames(spectra_83)) {
+      plot.new()
+      text(0.5, 0.5, paste("No ID83 data for", sample_id))
+      return()
+    }
 
-  # Check if we should show decomposition view
-  if (show_decomposition()) {
-    plot_decomposition(
-      sample_id = sample_id,
-      assignments = assignments_83_89,
-      signatures = sigs_83,
-      spectra = spectra_83,
-      plot_fn = mSigPlot::plot_83,
-      title_prefix = "ID83"
+    # Check if we should show decomposition view
+    if (show_decomposition()) {
+      plot_decomposition(
+        sample_id = sample_id,
+        assignments = assignments_83_89,
+        signatures = sigs_83,
+        spectra = spectra_83,
+        plot_fn = mSigPlot::plot_83,
+        title_prefix = "ID83"
+      )
+      return()
+    }
+
+    # Normal spectrum view
+    # Get the 83-type signature name
+    if (input$assignment_type == "83_89") {
+      sig_83_name <- sig_name # Already 83-type
+    } else {
+      # Map from 89-type to 83-type
+      idx <- match(sig_name, sig_mapping$InDel89)
+      sig_83_name <- if (!is.na(idx)) sig_mapping$InDel83[idx] else NULL
+    }
+
+    spectrum <- spectra_83[, sample_id, drop = FALSE]
+    p1 <- mSigPlot::plot_83(
+      spectrum,
+      plot_title = paste("Spectrum:", sample_id)
     )
-    return()
-  }
 
-  # Normal spectrum view
-  # Get the 83-type signature name
-  if (input$assignment_type == "83_89") {
-    sig_83_name <- sig_name  # Already 83-type
-  } else {
-    # Map from 89-type to 83-type
-    idx <- match(sig_name, sig_mapping$InDel89)
-    sig_83_name <- if (!is.na(idx)) sig_mapping$InDel83[idx] else NULL
-  }
-
-  spectrum <- spectra_83[, sample_id, drop = FALSE]
-  p1 <- mSigPlot::plot_83(spectrum, plot_title = paste("Spectrum:", sample_id))
-
-  if (!is.null(sig_83_name) && sig_83_name %in% colnames(sigs_83)) {
-    sig_data <- sigs_83[, sig_83_name, drop = FALSE]
-    p2 <- mSigPlot::plot_83(sig_data, plot_title = paste("Signature:", sig_83_name))
-    gridExtra::grid.arrange(p1, p2, ncol = 1)
-  } else {
-    p1
-  }
-}, res = 100)
+    if (!is.null(sig_83_name) && sig_83_name %in% colnames(sigs_83)) {
+      sig_data <- sigs_83[, sig_83_name, drop = FALSE]
+      p2 <- mSigPlot::plot_83(
+        sig_data,
+        plot_title = paste("Signature:", sig_83_name)
+      )
+      gridExtra::grid.arrange(p1, p2, ncol = 1)
+    } else {
+      p1
+    }
+  },
+  res = 100
+)
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
@@ -491,51 +614,60 @@ output$spectrum_89_ui <- renderUI({
   plotOutput("spectrum_89", height = height)
 })
 
-output$spectrum_89 <- renderPlot({
-  sample_id <- selected_sample()
-  sig_name <- input$signature
-  req(sample_id, sig_name)
+output$spectrum_89 <- renderPlot(
+  {
+    sample_id <- selected_sample()
+    sig_name <- input$signature
+    req(sample_id, sig_name)
 
-  if (!sample_id %in% colnames(spectra_89)) {
-    plot.new()
-    text(0.5, 0.5, paste("No ID89 data for", sample_id))
-    return()
-  }
+    if (!sample_id %in% colnames(spectra_89)) {
+      plot.new()
+      text(0.5, 0.5, paste("No ID89 data for", sample_id))
+      return()
+    }
 
-  # Check if we should show decomposition view
-  if (show_decomposition()) {
-    plot_decomposition(
-      sample_id = sample_id,
-      assignments = assignments_89,
-      signatures = sigs_89,
-      spectra = spectra_89,
-      plot_fn = mSigPlot::plot_89,
-      title_prefix = "ID89"
+    # Check if we should show decomposition view
+    if (show_decomposition()) {
+      plot_decomposition(
+        sample_id = sample_id,
+        assignments = assignments_89,
+        signatures = sigs_89,
+        spectra = spectra_89,
+        plot_fn = mSigPlot::plot_89,
+        title_prefix = "ID89"
+      )
+      return()
+    }
+
+    # Normal spectrum view
+    # Get the 89-type signature name
+    if (input$assignment_type == "648") {
+      sig_89_name <- sig_name # Already 89-type
+    } else {
+      # Map from 83-type to 89-type (find first matching 89-type)
+      idx <- which(sig_mapping$InDel83 == sig_name)
+      sig_89_name <- if (length(idx) > 0) sig_mapping$InDel89[idx[1]] else NULL
+    }
+
+    spectrum <- spectra_89[, sample_id, drop = FALSE]
+    p1 <- mSigPlot::plot_89(
+      spectrum,
+      plot_title = paste("Spectrum:", sample_id)
     )
-    return()
-  }
 
-  # Normal spectrum view
-  # Get the 89-type signature name
-  if (input$assignment_type == "648") {
-    sig_89_name <- sig_name  # Already 89-type
-  } else {
-    # Map from 83-type to 89-type (find first matching 89-type)
-    idx <- which(sig_mapping$InDel83 == sig_name)
-    sig_89_name <- if (length(idx) > 0) sig_mapping$InDel89[idx[1]] else NULL
-  }
-
-  spectrum <- spectra_89[, sample_id, drop = FALSE]
-  p1 <- mSigPlot::plot_89(spectrum, plot_title = paste("Spectrum:", sample_id))
-
-  if (!is.null(sig_89_name) && sig_89_name %in% colnames(sigs_89)) {
-    sig_data <- sigs_89[, sig_89_name, drop = FALSE]
-    p2 <- mSigPlot::plot_89(sig_data, plot_title = paste("Signature:", sig_89_name))
-    gridExtra::grid.arrange(p1, p2, ncol = 1)
-  } else {
-    p1
-  }
-}, res = 100)
+    if (!is.null(sig_89_name) && sig_89_name %in% colnames(sigs_89)) {
+      sig_data <- sigs_89[, sig_89_name, drop = FALSE]
+      p2 <- mSigPlot::plot_89(
+        sig_data,
+        plot_title = paste("Signature:", sig_89_name)
+      )
+      gridExtra::grid.arrange(p1, p2, ncol = 1)
+    } else {
+      p1
+    }
+  },
+  res = 100
+)
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
@@ -562,7 +694,9 @@ output$spectrum_476_ui <- renderUI({
 # Reactive to calculate 476 plot height for renderPlot
 spectrum_476_height <- reactive({
   sample_id <- selected_sample()
-  if (is.null(sample_id)) return(600)
+  if (is.null(sample_id)) {
+    return(600)
+  }
 
   if (show_decomposition() && sample_id %in% colnames(assignments_476)) {
     sample_assignments <- assignments_476[, sample_id]
@@ -573,52 +707,161 @@ spectrum_476_height <- reactive({
   600
 })
 
-output$spectrum_476 <- renderPlot({
-  sample_id <- selected_sample()
-  sig_name <- input$signature
-  req(sample_id, sig_name)
+output$spectrum_476 <- renderPlot(
+  {
+    sample_id <- selected_sample()
+    sig_name <- input$signature
+    req(sample_id, sig_name)
 
-  if (!sample_id %in% colnames(spectra_476)) {
-    plot.new()
-    text(0.5, 0.5, paste("No ID476 data for", sample_id))
-    return()
-  }
+    if (!sample_id %in% colnames(spectra_476)) {
+      plot.new()
+      text(0.5, 0.5, paste("No ID476 data for", sample_id))
+      return()
+    }
 
-  # Check if we should show decomposition view
-  if (show_decomposition()) {
-    plot_decomposition(
-      sample_id = sample_id,
-      assignments = assignments_476,
-      signatures = sigs_476,
-      spectra = spectra_476,
-      plot_fn = mSigPlot::plot_476,
-      title_prefix = "ID476"
+    # Check if we should show decomposition view
+    if (show_decomposition()) {
+      plot_decomposition(
+        sample_id = sample_id,
+        assignments = assignments_476,
+        signatures = sigs_476,
+        spectra = spectra_476,
+        plot_fn = mSigPlot::plot_476,
+        title_prefix = "ID476"
+      )
+      return()
+    }
+
+    # Normal spectrum view
+    # Get the 476-type signature name (uses same names as 89-type)
+    if (input$assignment_type == "648") {
+      # Already 89-type name, use directly
+      sig_476_name <- sig_name
+    } else {
+      # Map from 83-type to 89-type (find first matching)
+      idx <- which(sig_mapping$InDel83 == sig_name)
+      sig_476_name <- if (length(idx) > 0) sig_mapping$InDel89[idx[1]] else NULL
+    }
+
+    spectrum <- spectra_476[, sample_id, drop = FALSE]
+    p1 <- mSigPlot::plot_476(
+      spectrum,
+      plot_title = paste("Spectrum:", sample_id)
     )
-    return()
+
+    if (!is.null(sig_476_name) && sig_476_name %in% colnames(sigs_476)) {
+      sig_data <- sigs_476[, sig_476_name, drop = FALSE]
+      p2 <- mSigPlot::plot_476(
+        sig_data,
+        plot_title = paste("Signature:", sig_476_name)
+      )
+      gridExtra::grid.arrange(p1, p2, ncol = 1)
+    } else {
+      p1
+    }
+  },
+  res = 100,
+  width = 1400,
+  height = function() {
+    spectrum_476_height()
+  }
+)
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+# Dynamic UI for 648-assignments with 476-type plots
+output$spectrum_648_476_ui <- renderUI({
+  sample_id <- selected_sample()
+  if (is.null(sample_id)) {
+    return(tags$p("Select a sample to view spectrum."))
   }
 
-  # Normal spectrum view
-  # Get the 476-type signature name (uses same names as 89-type)
-  if (input$assignment_type == "648") {
-    # Already 89-type name, use directly
-    sig_476_name <- sig_name
+  # Calculate height based on number of non-zero signatures in decomposition mode
+  if (show_decomposition() && sample_id %in% colnames(assignments_648)) {
+    sample_assignments <- assignments_648[, sample_id]
+    n_sigs <- sum(sample_assignments > 0)
+    # 500px donut + 400px spectrum + 400px reconstructed + 400px per signature
+    height <- paste0(500 + 400 + 400 + n_sigs * 400, "px")
   } else {
-    # Map from 83-type to 89-type (find first matching)
-    idx <- which(sig_mapping$InDel83 == sig_name)
-    sig_476_name <- if (length(idx) > 0) sig_mapping$InDel89[idx[1]] else NULL
+    height <- "600px"
   }
 
-  spectrum <- spectra_476[, sample_id, drop = FALSE]
-  p1 <- mSigPlot::plot_476(spectrum, plot_title = paste("Spectrum:", sample_id))
+  plotOutput("spectrum_648_476", height = height, width = "100%")
+})
 
-  if (!is.null(sig_476_name) && sig_476_name %in% colnames(sigs_476)) {
-    sig_data <- sigs_476[, sig_476_name, drop = FALSE]
-    p2 <- mSigPlot::plot_476(sig_data, plot_title = paste("Signature:", sig_476_name))
-    gridExtra::grid.arrange(p1, p2, ncol = 1)
-  } else {
-    p1
+# Reactive to calculate plot height for renderPlot
+spectrum_648_476_height <- reactive({
+  sample_id <- selected_sample()
+  if (is.null(sample_id)) {
+    return(600)
   }
-}, res = 100, width = 1400, height = function() { spectrum_476_height() })
+
+  if (show_decomposition() && sample_id %in% colnames(assignments_648)) {
+    sample_assignments <- assignments_648[, sample_id]
+    n_sigs <- sum(sample_assignments > 0)
+    return(500 + 400 + 400 + n_sigs * 400)
+  }
+  600
+})
+
+output$spectrum_648_476 <- renderPlot(
+  {
+    sample_id <- selected_sample()
+    sig_name <- input$signature
+    req(sample_id, sig_name)
+
+    if (!sample_id %in% colnames(spectra_476)) {
+      plot.new()
+      text(0.5, 0.5, paste("No ID476 data for", sample_id))
+      return()
+    }
+
+    # Check if we should show decomposition view
+    if (show_decomposition()) {
+      plot_decomposition(
+        sample_id = sample_id,
+        assignments = assignments_648,
+        signatures = sigs_476,
+        spectra = spectra_476,
+        plot_fn = mSigPlot::plot_476,
+        title_prefix = "648 as 476"
+      )
+      return()
+    }
+
+    # Normal spectrum view
+    # Get the signature name (648-type uses same names as 476-type)
+    if (input$assignment_type == "648") {
+      sig_476_name <- sig_name
+    } else {
+      # Map from 83-type to 89-type (find first matching)
+      idx <- which(sig_mapping$InDel83 == sig_name)
+      sig_476_name <- if (length(idx) > 0) sig_mapping$InDel89[idx[1]] else NULL
+    }
+
+    spectrum <- spectra_476[, sample_id, drop = FALSE]
+    p1 <- mSigPlot::plot_476(
+      spectrum,
+      plot_title = paste("Spectrum:", sample_id)
+    )
+
+    if (!is.null(sig_476_name) && sig_476_name %in% colnames(sigs_476)) {
+      sig_data <- sigs_476[, sig_476_name, drop = FALSE]
+      p2 <- mSigPlot::plot_476(
+        sig_data,
+        plot_title = paste("Signature:", sig_476_name)
+      )
+      gridExtra::grid.arrange(p1, p2, ncol = 1)
+    } else {
+      p1
+    }
+  },
+  res = 100,
+  width = 1400,
+  height = function() {
+    spectrum_648_476_height()
+  }
+)
 </script>
  
 <script type="application/shiny-prerendered" data-context="server-extras">
