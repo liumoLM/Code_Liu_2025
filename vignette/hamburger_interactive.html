@@ -103,22 +103,22 @@ ul.task-list li input[type="checkbox"] {
 <div class="tab-content">
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <div class="cell">
-<div class="cell-output-display">
-<div class="shiny-plot-output html-fill-item" id="spectrum_83" style="width:100%;height:500px;"></div>
+<div class="cell-output-display no-overflow-x">
+<div id="spectrum_83_ui" class="shiny-html-output"></div>
 </div>
 </div>
 </div>
 <div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
 <div class="cell">
-<div class="cell-output-display">
-<div class="shiny-plot-output html-fill-item" id="spectrum_89" style="width:100%;height:500px;"></div>
+<div class="cell-output-display no-overflow-x">
+<div id="spectrum_89_ui" class="shiny-html-output"></div>
 </div>
 </div>
 </div>
 <div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
 <div class="cell">
-<div class="cell-output-display">
-<div class="shiny-plot-output html-fill-item" id="spectrum_476" style="width:100%;height:600px;"></div>
+<div class="cell-output-display no-overflow-x">
+<div id="spectrum_476_ui" class="shiny-html-output"></div>
 </div>
 </div>
 </div>
@@ -134,6 +134,7 @@ ul.task-list li input[type="checkbox"] {
 <li><p><strong>Select an assignment type</strong>: Choose between the 83+89 as 83-type assignments (33 signatures) or the 648-type assignments (44 signatures).</p></li>
 <li><p><strong>Select a signature</strong>: Pick a signature from the dropdown to view its hamburger plot.</p></li>
 <li><p><strong>Click on a point</strong>: Each point represents one tumor. Click on a point to view that tumor’s full mutational spectrum rendered with mSigPlot in ID83, ID89, and ID476 classifications.</p></li>
+<li><p><strong>View signature decomposition</strong>: Click on the sample ID (shown in blue) to see how that tumor’s spectrum is decomposed into constituent signatures. This shows a bar plot of mutation counts assigned to each signature, followed by plots of the individual signatures.</p></li>
 </ol>
 </section>
 <section id="reading-the-hamburger-plot" class="level3">
@@ -152,6 +153,7 @@ library(plotly)
 library(jsonlite)
 library(mSigPlot)
 library(gridExtra)
+library(ggplot2)
 
 # Load helper functions
 source("hamburger_helpers.R")
@@ -169,6 +171,19 @@ assignments_83_89 <- read.delim(
 
 assignments_648 <- read.delim(
   file.path(data_dir, "Liu_et_al_648_type_signature_assignments.tsv"),
+  row.names = 1,
+  check.names = FALSE
+)
+
+# Load additional assignment files for decomposition view
+assignments_89 <- read.delim(
+  file.path(data_dir, "Liu_et_al_89_type_signature_assignments.tsv"),
+  row.names = 1,
+  check.names = FALSE
+)
+
+assignments_476 <- read.delim(
+  file.path(data_dir, "Liu_et_al_476_type_signature_assignments.tsv"),
   row.names = 1,
   check.names = FALSE
 )
@@ -338,11 +353,25 @@ output$hamburger_plot <- renderPlotly({
 # Track selected sample from click
 selected_sample <- reactiveVal(NULL)
 
+# Track whether to show decomposition view
+show_decomposition <- reactiveVal(FALSE)
+
 observeEvent(event_data("plotly_click", source = "hamburger"), {
   click_data <- event_data("plotly_click", source = "hamburger")
   if (!is.null(click_data)) {
     selected_sample(click_data$customdata[[1]])
+    show_decomposition(FALSE)  # Reset to spectrum view when new sample selected
   }
+})
+
+# Handle click on sample ID to show decomposition
+observeEvent(input$sample_id_link, {
+  show_decomposition(TRUE)
+})
+
+# Handle click on back button to return to spectrum view
+observeEvent(input$back_to_spectrum, {
+  show_decomposition(FALSE)
 })
 </script>
  
@@ -351,13 +380,48 @@ output$selected_info <- renderUI({
   sample_id <- selected_sample()
   if (is.null(sample_id)) {
     tags$p(tags$strong("Select a point from the hamburger plot above to view spectrum."))
+  } else if (show_decomposition()) {
+    tags$div(
+      tags$p(
+        tags$strong("Selected Tumor: "), sample_id,
+        " - Showing signature decomposition"
+      ),
+      actionButton("back_to_spectrum", "Back to Spectrum View",
+                   style = "margin-top: 5px;")
+    )
   } else {
-    tags$p(tags$strong("Selected Tumor: "), sample_id)
+    tags$p(
+      tags$strong("Selected Tumor: "),
+      actionLink("sample_id_link", sample_id,
+                 style = "color: blue; text-decoration: underline; cursor: pointer;"),
+      tags$span(" (click to see signature decomposition)",
+                style = "color: gray; font-size: 0.9em;")
+    )
   }
 })
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
+# Dynamic UI for 83-type plot with adjustable height
+output$spectrum_83_ui <- renderUI({
+  sample_id <- selected_sample()
+  if (is.null(sample_id)) {
+    return(tags$p("Select a sample to view spectrum."))
+  }
+
+  # Calculate height based on number of non-zero signatures in decomposition mode
+  if (show_decomposition() && sample_id %in% colnames(assignments_83_89)) {
+    sample_assignments <- assignments_83_89[, sample_id]
+    n_sigs <- sum(sample_assignments > 0)
+    # 300px for spectrum + 400px for donut + 300px per signature
+    height <- paste0(300 + 400 + n_sigs * 300, "px")
+  } else {
+    height <- "500px"
+  }
+
+  plotOutput("spectrum_83", height = height)
+})
+
 output$spectrum_83 <- renderPlot({
   sample_id <- selected_sample()
   sig_name <- input$signature
@@ -369,6 +433,20 @@ output$spectrum_83 <- renderPlot({
     return()
   }
 
+  # Check if we should show decomposition view
+  if (show_decomposition()) {
+    plot_decomposition(
+      sample_id = sample_id,
+      assignments = assignments_83_89,
+      signatures = sigs_83,
+      spectra = spectra_83,
+      plot_fn = mSigPlot::plot_83,
+      title_prefix = "ID83"
+    )
+    return()
+  }
+
+  # Normal spectrum view
   # Get the 83-type signature name
   if (input$assignment_type == "83_89") {
     sig_83_name <- sig_name  # Already 83-type
@@ -392,6 +470,26 @@ output$spectrum_83 <- renderPlot({
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
+# Dynamic UI for 89-type plot with adjustable height
+output$spectrum_89_ui <- renderUI({
+  sample_id <- selected_sample()
+  if (is.null(sample_id)) {
+    return(tags$p("Select a sample to view spectrum."))
+  }
+
+  # Calculate height based on number of non-zero signatures in decomposition mode
+  if (show_decomposition() && sample_id %in% colnames(assignments_89)) {
+    sample_assignments <- assignments_89[, sample_id]
+    n_sigs <- sum(sample_assignments > 0)
+    # 300px for spectrum + 400px for donut + 300px per signature
+    height <- paste0(300 + 400 + n_sigs * 300, "px")
+  } else {
+    height <- "500px"
+  }
+
+  plotOutput("spectrum_89", height = height)
+})
+
 output$spectrum_89 <- renderPlot({
   sample_id <- selected_sample()
   sig_name <- input$signature
@@ -403,6 +501,20 @@ output$spectrum_89 <- renderPlot({
     return()
   }
 
+  # Check if we should show decomposition view
+  if (show_decomposition()) {
+    plot_decomposition(
+      sample_id = sample_id,
+      assignments = assignments_89,
+      signatures = sigs_89,
+      spectra = spectra_89,
+      plot_fn = mSigPlot::plot_89,
+      title_prefix = "ID89"
+    )
+    return()
+  }
+
+  # Normal spectrum view
   # Get the 89-type signature name
   if (input$assignment_type == "648") {
     sig_89_name <- sig_name  # Already 89-type
@@ -426,6 +538,40 @@ output$spectrum_89 <- renderPlot({
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
+# Dynamic UI for 476-type plot with adjustable height
+output$spectrum_476_ui <- renderUI({
+  sample_id <- selected_sample()
+  if (is.null(sample_id)) {
+    return(tags$p("Select a sample to view spectrum."))
+  }
+
+  # Calculate height based on number of non-zero signatures in decomposition mode
+  if (show_decomposition() && sample_id %in% colnames(assignments_476)) {
+    sample_assignments <- assignments_476[, sample_id]
+    n_sigs <- sum(sample_assignments > 0)
+    # 400px for spectrum + 500px for donut + 400px per signature (476-type plots need more height)
+    height <- paste0(400 + 500 + n_sigs * 400, "px")
+  } else {
+    height <- "600px"
+  }
+
+  plotOutput("spectrum_476", height = height, width = "100%")
+})
+
+# Reactive to calculate 476 plot height for renderPlot
+spectrum_476_height <- reactive({
+  sample_id <- selected_sample()
+  if (is.null(sample_id)) return(600)
+
+  if (show_decomposition() && sample_id %in% colnames(assignments_476)) {
+    sample_assignments <- assignments_476[, sample_id]
+    n_sigs <- sum(sample_assignments > 0)
+    # 400px for spectrum + 500px for donut + 400px per signature
+    return(400 + 500 + n_sigs * 400)
+  }
+  600
+})
+
 output$spectrum_476 <- renderPlot({
   sample_id <- selected_sample()
   sig_name <- input$signature
@@ -437,6 +583,20 @@ output$spectrum_476 <- renderPlot({
     return()
   }
 
+  # Check if we should show decomposition view
+  if (show_decomposition()) {
+    plot_decomposition(
+      sample_id = sample_id,
+      assignments = assignments_476,
+      signatures = sigs_476,
+      spectra = spectra_476,
+      plot_fn = mSigPlot::plot_476,
+      title_prefix = "ID476"
+    )
+    return()
+  }
+
+  # Normal spectrum view
   # Get the 476-type signature name (uses same names as 89-type)
   if (input$assignment_type == "648") {
     # Already 89-type name, use directly
@@ -457,7 +617,7 @@ output$spectrum_476 <- renderPlot({
   } else {
     p1
   }
-}, res = 100, width = 1400, height = 600)
+}, res = 100, width = 1400, height = function() { spectrum_476_height() })
 </script>
  
 <script type="application/shiny-prerendered" data-context="server-extras">
@@ -502,12 +662,12 @@ ojs_define <- function(..., .session = shiny::getDefaultReactiveDomain()) {
 </p>
 <!--html_preserve-->
 <script type="application/shiny-prerendered" data-context="dependencies">
-{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["selectize"]},{"type":"character","attributes":{},"value":["0.15.2"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["www/shared/selectize"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["js/selectize.min.js","accessibility/js/selectize-plugin-a11y.min.js"]},{"type":"character","attributes":{},"value":["css/selectize.bootstrap3.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["shiny"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["1.12.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["htmltools-fill"]},{"type":"character","attributes":{},"value":["0.5.9"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["fill"]}]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["fill.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["htmltools"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.5.9"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["htmlwidgets"]},{"type":"character","attributes":{},"value":["1.6.4"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["www"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["htmlwidgets.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["htmlwidgets"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["1.6.4"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["plotly-binding"]},{"type":"character","attributes":{},"value":["4.11.0"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["htmlwidgets"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["plotly.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["plotly"]},{"type":"logical","attributes":{},"value":[false]},{"type":"character","attributes":{},"value":["4.11.0"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["htmltools-fill"]},{"type":"character","attributes":{},"value":["0.5.9"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["fill"]}]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["fill.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["htmltools"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.5.9"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["htmltools-fill"]},{"type":"character","attributes":{},"value":["0.5.9"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["fill"]}]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["fill.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["htmltools"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.5.9"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["htmltools-fill"]},{"type":"character","attributes":{},"value":["0.5.9"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["fill"]}]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["fill.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["htmltools"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.5.9"]}]}]}
+{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["selectize"]},{"type":"character","attributes":{},"value":["0.15.2"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["www/shared/selectize"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["js/selectize.min.js","accessibility/js/selectize-plugin-a11y.min.js"]},{"type":"character","attributes":{},"value":["css/selectize.bootstrap3.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["shiny"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["1.12.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["htmltools-fill"]},{"type":"character","attributes":{},"value":["0.5.9"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["fill"]}]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["fill.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["htmltools"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.5.9"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["htmlwidgets"]},{"type":"character","attributes":{},"value":["1.6.4"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["www"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["htmlwidgets.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["htmlwidgets"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["1.6.4"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["plotly-binding"]},{"type":"character","attributes":{},"value":["4.12.0"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["htmlwidgets"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["plotly.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["plotly"]},{"type":"logical","attributes":{},"value":[false]},{"type":"character","attributes":{},"value":["4.12.0"]}]}]}
 </script>
 <!--/html_preserve-->
 <!--html_preserve-->
 <script type="application/shiny-prerendered" data-context="execution_dependencies">
-{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69]}},"value":[{"type":"character","attributes":{},"value":["base","bslib","cachem","Cairo","cli","compiler","data.table","datasets","dichromat","digest","dplyr","evaluate","farver","fastmap","generics","ggplot2","ggrepel","glue","graphics","grDevices","grid","gridExtra","gtable","htmltools","htmlwidgets","httpuv","httr","jquerylib","jsonlite","knitr","later","lazyeval","lifecycle","magrittr","memoise","methods","mime","mSigPlot","otel","pillar","pkgconfig","plotly","plyr","promises","purrr","R6","RColorBrewer","Rcpp","reshape2","rlang","rmarkdown","S7","sass","scales","shiny","stats","stringi","stringr","tibble","tidyr","tidyselect","tools","utils","vctrs","viridisLite","withr","xfun","xtable","yaml"]},{"type":"character","attributes":{},"value":["4.5.2","0.9.0","1.1.0","1.7-0","3.6.5","4.5.2","1.18.0","4.5.2","2.0-0.1","0.6.39","1.1.4","1.0.5","2.1.2","1.2.0","0.1.4","4.0.1","0.9.6","1.8.0","4.5.2","4.5.2","4.5.2","2.3","0.3.6","0.5.9","1.6.4","1.6.16","1.4.7","0.1.4","2.0.0","1.51","1.4.4","0.2.2","1.0.5","2.0.4","2.0.1","4.5.2","0.13","0.0.11","0.2.0","1.11.1","2.0.3","4.11.0","1.8.9","1.5.0","1.2.0","2.6.1","1.1-3","1.1.1","1.4.5","1.1.7","2.30","0.2.1","0.4.10","1.4.0","1.12.1","4.5.2","1.8.7","1.6.0","3.3.1","1.3.2","1.2.1","4.5.2","4.5.2","0.7.0","0.4.2","3.0.2","0.55","1.8-4","2.3.12"]}]}]}
+{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69]}},"value":[{"type":"character","attributes":{},"value":["base","bslib","cachem","Cairo","cli","compiler","data.table","datasets","dichromat","digest","dplyr","evaluate","farver","fastmap","generics","ggplot2","ggrepel","glue","graphics","grDevices","grid","gridExtra","gtable","htmltools","htmlwidgets","httpuv","httr","jquerylib","jsonlite","knitr","later","lazyeval","lifecycle","magrittr","memoise","methods","mime","mSigPlot","otel","pillar","pkgconfig","plotly","plyr","promises","purrr","R6","RColorBrewer","Rcpp","reshape2","rlang","rmarkdown","S7","sass","scales","shiny","stats","stringi","stringr","tibble","tidyr","tidyselect","tools","utils","vctrs","viridisLite","withr","xfun","xtable","yaml"]},{"type":"character","attributes":{},"value":["4.5.2","0.10.0","1.1.0","1.7-0","3.6.5","4.5.2","1.18.2.1","4.5.2","2.0-0.1","0.6.39","1.1.4","1.0.5","2.1.2","1.2.0","0.1.4","4.0.1","0.9.6","1.8.0","4.5.2","4.5.2","4.5.2","2.3","0.3.6","0.5.9","1.6.4","1.6.16","1.4.7","0.1.4","2.0.0","1.51","1.4.5","0.2.2","1.0.5","2.0.4","2.0.1","4.5.2","0.13","0.0.11","0.2.0","1.11.1","2.0.3","4.12.0","1.8.9","1.5.0","1.2.1","2.6.1","1.1-3","1.1.1","1.4.5","1.1.7","2.30","0.2.1","0.4.10","1.4.0","1.12.1","4.5.2","1.8.7","1.6.0","3.3.1","1.3.2","1.2.1","4.5.2","4.5.2","0.7.1","0.4.2","3.0.2","0.56","1.8-4","2.3.12"]}]}]}
 </script>
 <!--/html_preserve-->
 </section>

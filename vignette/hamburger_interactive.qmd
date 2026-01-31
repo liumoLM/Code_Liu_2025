@@ -17,6 +17,7 @@ library(plotly)
 library(jsonlite)
 library(mSigPlot)
 library(gridExtra)
+library(ggplot2)
 
 # Load helper functions
 source("hamburger_helpers.R")
@@ -34,6 +35,19 @@ assignments_83_89 <- read.delim(
 
 assignments_648 <- read.delim(
   file.path(data_dir, "Liu_et_al_648_type_signature_assignments.tsv"),
+  row.names = 1,
+  check.names = FALSE
+)
+
+# Load additional assignment files for decomposition view
+assignments_89 <- read.delim(
+  file.path(data_dir, "Liu_et_al_89_type_signature_assignments.tsv"),
+  row.names = 1,
+  check.names = FALSE
+)
+
+assignments_476 <- read.delim(
+  file.path(data_dir, "Liu_et_al_476_type_signature_assignments.tsv"),
   row.names = 1,
   check.names = FALSE
 )
@@ -240,11 +254,25 @@ output$hamburger_plot <- renderPlotly({
 # Track selected sample from click
 selected_sample <- reactiveVal(NULL)
 
+# Track whether to show decomposition view
+show_decomposition <- reactiveVal(FALSE)
+
 observeEvent(event_data("plotly_click", source = "hamburger"), {
   click_data <- event_data("plotly_click", source = "hamburger")
   if (!is.null(click_data)) {
     selected_sample(click_data$customdata[[1]])
+    show_decomposition(FALSE)  # Reset to spectrum view when new sample selected
   }
+})
+
+# Handle click on sample ID to show decomposition
+observeEvent(input$sample_id_link, {
+  show_decomposition(TRUE)
+})
+
+# Handle click on back button to return to spectrum view
+observeEvent(input$back_to_spectrum, {
+  show_decomposition(FALSE)
 })
 ```
 
@@ -264,8 +292,23 @@ output$selected_info <- renderUI({
   sample_id <- selected_sample()
   if (is.null(sample_id)) {
     tags$p(tags$strong("Select a point from the hamburger plot above to view spectrum."))
+  } else if (show_decomposition()) {
+    tags$div(
+      tags$p(
+        tags$strong("Selected Tumor: "), sample_id,
+        " - Showing signature decomposition"
+      ),
+      actionButton("back_to_spectrum", "Back to Spectrum View",
+                   style = "margin-top: 5px;")
+    )
   } else {
-    tags$p(tags$strong("Selected Tumor: "), sample_id)
+    tags$p(
+      tags$strong("Selected Tumor: "),
+      actionLink("sample_id_link", sample_id,
+                 style = "color: blue; text-decoration: underline; cursor: pointer;"),
+      tags$span(" (click to see signature decomposition)",
+                style = "color: gray; font-size: 0.9em;")
+    )
   }
 })
 ```
@@ -277,12 +320,32 @@ output$selected_info <- renderUI({
 ```{r}
 #| label: spectrum-83
 
-plotOutput("spectrum_83", height = "500px")
+uiOutput("spectrum_83_ui")
 ```
 
 ```{r}
 #| label: spectrum-83-server
 #| context: server
+
+# Dynamic UI for 83-type plot with adjustable height
+output$spectrum_83_ui <- renderUI({
+  sample_id <- selected_sample()
+  if (is.null(sample_id)) {
+    return(tags$p("Select a sample to view spectrum."))
+  }
+
+  # Calculate height based on number of non-zero signatures in decomposition mode
+  if (show_decomposition() && sample_id %in% colnames(assignments_83_89)) {
+    sample_assignments <- assignments_83_89[, sample_id]
+    n_sigs <- sum(sample_assignments > 0)
+    # 300px for spectrum + 400px for donut + 300px per signature
+    height <- paste0(300 + 400 + n_sigs * 300, "px")
+  } else {
+    height <- "500px"
+  }
+
+  plotOutput("spectrum_83", height = height)
+})
 
 output$spectrum_83 <- renderPlot({
   sample_id <- selected_sample()
@@ -295,6 +358,20 @@ output$spectrum_83 <- renderPlot({
     return()
   }
 
+  # Check if we should show decomposition view
+  if (show_decomposition()) {
+    plot_decomposition(
+      sample_id = sample_id,
+      assignments = assignments_83_89,
+      signatures = sigs_83,
+      spectra = spectra_83,
+      plot_fn = mSigPlot::plot_83,
+      title_prefix = "ID83"
+    )
+    return()
+  }
+
+  # Normal spectrum view
   # Get the 83-type signature name
   if (input$assignment_type == "83_89") {
     sig_83_name <- sig_name  # Already 83-type
@@ -322,12 +399,32 @@ output$spectrum_83 <- renderPlot({
 ```{r}
 #| label: spectrum-89
 
-plotOutput("spectrum_89", height = "500px")
+uiOutput("spectrum_89_ui")
 ```
 
 ```{r}
 #| label: spectrum-89-server
 #| context: server
+
+# Dynamic UI for 89-type plot with adjustable height
+output$spectrum_89_ui <- renderUI({
+  sample_id <- selected_sample()
+  if (is.null(sample_id)) {
+    return(tags$p("Select a sample to view spectrum."))
+  }
+
+  # Calculate height based on number of non-zero signatures in decomposition mode
+  if (show_decomposition() && sample_id %in% colnames(assignments_89)) {
+    sample_assignments <- assignments_89[, sample_id]
+    n_sigs <- sum(sample_assignments > 0)
+    # 300px for spectrum + 400px for donut + 300px per signature
+    height <- paste0(300 + 400 + n_sigs * 300, "px")
+  } else {
+    height <- "500px"
+  }
+
+  plotOutput("spectrum_89", height = height)
+})
 
 output$spectrum_89 <- renderPlot({
   sample_id <- selected_sample()
@@ -340,6 +437,20 @@ output$spectrum_89 <- renderPlot({
     return()
   }
 
+  # Check if we should show decomposition view
+  if (show_decomposition()) {
+    plot_decomposition(
+      sample_id = sample_id,
+      assignments = assignments_89,
+      signatures = sigs_89,
+      spectra = spectra_89,
+      plot_fn = mSigPlot::plot_89,
+      title_prefix = "ID89"
+    )
+    return()
+  }
+
+  # Normal spectrum view
   # Get the 89-type signature name
   if (input$assignment_type == "648") {
     sig_89_name <- sig_name  # Already 89-type
@@ -367,12 +478,46 @@ output$spectrum_89 <- renderPlot({
 ```{r}
 #| label: spectrum-476
 
-plotOutput("spectrum_476", height = "600px", width = "100%")
+uiOutput("spectrum_476_ui")
 ```
 
 ```{r}
 #| label: spectrum-476-server
 #| context: server
+
+# Dynamic UI for 476-type plot with adjustable height
+output$spectrum_476_ui <- renderUI({
+  sample_id <- selected_sample()
+  if (is.null(sample_id)) {
+    return(tags$p("Select a sample to view spectrum."))
+  }
+
+  # Calculate height based on number of non-zero signatures in decomposition mode
+  if (show_decomposition() && sample_id %in% colnames(assignments_476)) {
+    sample_assignments <- assignments_476[, sample_id]
+    n_sigs <- sum(sample_assignments > 0)
+    # 400px for spectrum + 500px for donut + 400px per signature (476-type plots need more height)
+    height <- paste0(400 + 500 + n_sigs * 400, "px")
+  } else {
+    height <- "600px"
+  }
+
+  plotOutput("spectrum_476", height = height, width = "100%")
+})
+
+# Reactive to calculate 476 plot height for renderPlot
+spectrum_476_height <- reactive({
+  sample_id <- selected_sample()
+  if (is.null(sample_id)) return(600)
+
+  if (show_decomposition() && sample_id %in% colnames(assignments_476)) {
+    sample_assignments <- assignments_476[, sample_id]
+    n_sigs <- sum(sample_assignments > 0)
+    # 400px for spectrum + 500px for donut + 400px per signature
+    return(400 + 500 + n_sigs * 400)
+  }
+  600
+})
 
 output$spectrum_476 <- renderPlot({
   sample_id <- selected_sample()
@@ -385,6 +530,20 @@ output$spectrum_476 <- renderPlot({
     return()
   }
 
+  # Check if we should show decomposition view
+  if (show_decomposition()) {
+    plot_decomposition(
+      sample_id = sample_id,
+      assignments = assignments_476,
+      signatures = sigs_476,
+      spectra = spectra_476,
+      plot_fn = mSigPlot::plot_476,
+      title_prefix = "ID476"
+    )
+    return()
+  }
+
+  # Normal spectrum view
   # Get the 476-type signature name (uses same names as 89-type)
   if (input$assignment_type == "648") {
     # Already 89-type name, use directly
@@ -405,7 +564,7 @@ output$spectrum_476 <- renderPlot({
   } else {
     p1
   }
-}, res = 100, width = 1400, height = 600)
+}, res = 100, width = 1400, height = function() { spectrum_476_height() })
 ```
 
 :::
@@ -421,6 +580,8 @@ This page displays **hamburger plots** (also known as snake plots) showing how m
 2. **Select a signature**: Pick a signature from the dropdown to view its hamburger plot.
 
 3. **Click on a point**: Each point represents one tumor. Click on a point to view that tumor's full mutational spectrum rendered with mSigPlot in ID83, ID89, and ID476 classifications.
+
+4. **View signature decomposition**: Click on the sample ID (shown in blue) to see how that tumor's spectrum is decomposed into constituent signatures. This shows a bar plot of mutation counts assigned to each signature, followed by plots of the individual signatures.
 
 ### Reading the Hamburger Plot
 
