@@ -1,1 +1,2 @@
-InsDel_J and InsDel_N cannot be distinguished in the 89-type representation because differences between are all subsumed in the set of deletions annotated L(2, ):U(1,2):R(5, ). These can be distinguished in the 83-type classification and, with difficulty in the 476-type classification. See notes under ID_N, below.
+InsDel_J and InsDel_N cannot be distinguished in the 89-type representation because the differences 
+between them are completely contained in the set of deletions classified as L(2, ):U(1,2):R(5, ). These deletions can be distinguished in the 83-type classification and, with difficulty, in the 476-type classification.
