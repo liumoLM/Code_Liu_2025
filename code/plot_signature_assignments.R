@@ -5,31 +5,26 @@
 # distribution of signature mutations across cancer types. Each dot represents
 # a sample; the red dashed line shows the median for each cancer type.
 #
-# Usage: Rscript plot_signature_assignments.R <83|89|83from89>
+# Usage: Rscript plot_signature_assignments.R
 
 library(ggplot2)
 library(scales)
 
-# Parse command line arguments
-args <- commandArgs(trailingOnly = TRUE)
-if (length(args) != 1 || !args[1] %in% c("83", "89", "83from89")) {
-  stop("Usage: Rscript plot_signature_assignments.R <83|89|83from89>")
-}
-mode <- args[1]
-
 # Configuration
-data_dir <- "../Manuscript_data/"
+data_dir <- "Manuscript_data/"
+plot_dir <- "plot_output/assignment"
 
-if (mode == "83") {
-  input_file <- file.path(data_dir, "Liu_et_al_83_type_signature_assignments.tsv")
-  output_file <- "83_assignments.pdf"
-} else if (mode == "89") {
-  input_file <- file.path(data_dir, "Liu_et_al_89_type_signature_assignments.tsv")
-  output_file <- "89_assignments.pdf"
-} else if (mode == "83from89") {
-  input_file <- file.path(data_dir, "recompressed_assignments.tsv")
-  output_file <- "83_assignments_from_89.pdf"
-}
+in_out_pairs = list(
+  list(
+    input_file = "Liu_et_al_83_plus_89_as_83_type_signature_assignments.tsv",
+    output_file = "83_plus_89_as_83_assignments.pdf"
+  ),
+  list(
+    input_file = "Liu_et_al_648_type_signature_assignments.tsv",
+    output_file = "647_assignments.pdf"
+  )
+)
+
 
 # Plotting parameters
 params <- list(
@@ -203,6 +198,18 @@ plot_signature_by_cancer_type <- function(
     fill = rep(bg_colors, length.out = n_types)
   )
 
+  # Create annotation data for sample counts at bottom
+  counts_for_plot <- sample_counts[sample_counts$cancer_type %in% type_order, ]
+  counts_for_plot$cancer_type <- factor(
+    counts_for_plot$cancer_type,
+    levels = type_order
+  )
+  counts_for_plot$x_pos <- as.numeric(counts_for_plot$cancer_type)
+  # Get y position for annotations (below minimum value on log scale)
+  y_min <- min(df$mutations)
+  # Position labels below the plot area (factor of 10 below minimum on log scale)
+  y_label_pos <- y_min / 10
+
   # Build the plot
   p <- ggplot2::ggplot(df, ggplot2::aes(x = x_plot, y = mutations)) +
     # Alternating background
@@ -239,11 +246,26 @@ plot_signature_by_cancer_type <- function(
       linetype = "dashed",
       inherit.aes = FALSE
     ) +
-    # X-axis labels (cancer types)
+    # Sample counts at bottom (nonzero / total)
+    ggplot2::geom_text(
+      data = counts_for_plot,
+      ggplot2::aes(
+        x = x_pos,
+        y = y_label_pos,
+        label = paste0(nonzero_samples, "\n", total_samples)
+      ),
+      vjust = 2.0,
+      size = 3.5,
+      lineheight = 0.9,
+      inherit.aes = FALSE
+    ) +
+    # X-axis labels (cancer types) at top
     ggplot2::scale_x_continuous(
       breaks = seq_along(type_order),
-      labels = type_order
+      labels = type_order,
+      position = "top"
     ) +
+    ggplot2::coord_cartesian(clip = "off") +
     ggplot2::labs(
       title = paste0(signature_name, " mutations"),
       x = NULL,
@@ -251,10 +273,15 @@ plot_signature_by_cancer_type <- function(
     ) +
     ggplot2::theme_bw(base_size = base_size) +
     ggplot2::theme(
-      axis.text.x = ggplot2::element_text(angle = 90, hjust = 1, vjust = 0.5),
+      axis.text.x = ggplot2::element_text(
+        angle = 60,
+        hjust = 0.0,
+        vjust = -0.5
+      ),
       panel.grid.major.x = ggplot2::element_blank(),
       panel.grid.minor.x = ggplot2::element_blank(),
-      legend.position = "none"
+      legend.position = "none",
+      plot.margin = ggplot2::margin(t = 5, r = 5, b = 80, l = 5, unit = "pt")
     )
 
   # Apply log scale if requested
@@ -302,53 +329,86 @@ plot_signature_hamburger <- function(
 }
 
 
+#' Read assignment file and generate hamburger plots to PDF
+#'
+#' Reads an assignment matrix file and generates a PDF with hamburger plots
+#' for each signature.
+#'
+#' @param input_file Character: filename of the assignment matrix (relative to data_dir).
+#' @param output_file Character: filename for the output PDF (relative to plot_dir).
+#' @param data_dir Character: directory containing the input file.
+#' @param plot_dir Character: directory for the output PDF.
+#' @param params List of plotting parameters (width, height, base_size,
+#'   point_size, point_alpha, min_samples, genome_size_mb).
+read_assignment_and_plot_hamburger <- function(
+  input_file,
+  output_file,
+  data_dir,
+  plot_dir,
+  params
+) {
+  input_path <- file.path(data_dir, input_file)
+  output_path <- file.path(plot_dir, output_file)
+
+  message("Loading assignment matrix from: ", input_path)
+  assignment_matrix <- read.delim(
+    input_path,
+    row.names = 1,
+    check.names = FALSE
+  )
+
+  signature_names <- rownames(assignment_matrix)
+  message("Found ", length(signature_names), " signatures in assignment matrix")
+
+  message("Generating PDF: ", output_path)
+  pdf(output_path, width = params$width, height = params$height)
+
+  for (sig_name in signature_names) {
+    message("  Plotting: ", sig_name)
+    result <- tryCatch(
+      {
+        plot_signature_hamburger(
+          signature_name = sig_name,
+          assignment_matrix = assignment_matrix,
+          genome_size_mb = params$genome_size_mb,
+          min_samples = params$min_samples,
+          log_scale = TRUE,
+          exclude_zero = TRUE,
+          order_by = "median",
+          point_size = params$point_size,
+          point_alpha = params$point_alpha,
+          base_size = params$base_size
+        )
+      },
+      error = function(e) {
+        warning("Failed to plot ", sig_name, ": ", e$message)
+        list(plot = NULL)
+      }
+    )
+
+    if (!is.null(result$plot)) {
+      # Suppress log scale transformation warnings
+      suppressWarnings(print(result$plot))
+    }
+  }
+
+  dev.off()
+  message("Generated: ", output_path)
+}
+
+
 # =============================================================================
 # Main execution
 # =============================================================================
 
-message("Loading assignment matrix from: ", input_file)
-assignment_matrix <- read.delim(
-  input_file,
-  row.names = 1,
-  check.names = FALSE
-)
+dir.create(plot_dir, showWarnings = FALSE, recursive = TRUE)
 
-# Use all signatures from the assignment matrix
-signature_names <- rownames(assignment_matrix)
-message("Found ", length(signature_names), " signatures in assignment matrix")
-
-# Generate PDF with one plot per page
-message("Generating PDF: ", output_file)
-pdf(output_file, width = params$width, height = params$height)
-
-for (sig_name in signature_names) {
-  message("  Plotting: ", sig_name)
-  result <- tryCatch(
-    {
-      plot_signature_hamburger(
-        signature_name = sig_name,
-        assignment_matrix = assignment_matrix,
-        genome_size_mb = params$genome_size_mb,
-        min_samples = params$min_samples,
-        log_scale = TRUE,
-        exclude_zero = TRUE,
-        order_by = "median",
-        point_size = params$point_size,
-        point_alpha = params$point_alpha,
-        base_size = params$base_size
-      )
-    },
-    error = function(e) {
-      warning("Failed to plot ", sig_name, ": ", e$message)
-      list(plot = NULL)
-    }
+for (pair in in_out_pairs) {
+  read_assignment_and_plot_hamburger(
+    input_file = pair$input_file,
+    output_file = pair$output_file,
+    data_dir = data_dir,
+    plot_dir = plot_dir,
+    params = params
   )
-
-  if (!is.null(result$plot)) {
-    # Suppress log scale transformation warnings
-    suppressWarnings(print(result$plot))
-  }
 }
-
-dev.off()
-message("Generated: ", output_file)
