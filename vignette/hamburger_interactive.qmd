@@ -1,0 +1,431 @@
+---
+title: "Interactive Signature Assignments"
+format: html
+server: shiny
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+#| context: setup
+
+library(shiny)
+library(plotly)
+library(jsonlite)
+library(mSigPlot)
+library(gridExtra)
+
+# Load helper functions
+source("hamburger_helpers.R")
+
+# Data directory
+data_dir <- "../Manuscript_data/"
+
+# Load assignment matrices
+assignments_83_89 <- read.delim(
+
+  file.path(data_dir, "Liu_et_al_83_plus_89_as_83_type_signature_assignments.tsv"),
+  row.names = 1,
+  check.names = FALSE
+)
+
+assignments_648 <- read.delim(
+  file.path(data_dir, "Liu_et_al_648_type_signature_assignments.tsv"),
+  row.names = 1,
+  check.names = FALSE
+)
+
+# Load spectra files
+spectra_83 <- read.delim(
+  file.path(data_dir, "Liu_et_al_83_type_spectra.tsv"),
+  row.names = 1,
+  check.names = FALSE
+)
+
+spectra_89 <- read.delim(
+  file.path(data_dir, "Liu_et_al_89_type_spectra.tsv"),
+  row.names = 1,
+  check.names = FALSE
+)
+
+spectra_476 <- read.delim(
+  file.path(data_dir, "Liu_et_al_476_type_spectra.tsv"),
+  row.names = 1,
+  check.names = FALSE
+)
+
+# Load signature files
+sigs_83 <- read.delim(
+  file.path(data_dir, "Liu_et_al_final_83_type_signatures.tsv"),
+  row.names = 1,
+  check.names = FALSE
+)
+
+sigs_89 <- read.delim(
+  file.path(data_dir, "Liu_et_al_final_89_type_signatures.tsv"),
+  row.names = 1,
+  check.names = FALSE
+)
+
+sigs_476 <- read.delim(
+  file.path(data_dir, "Liu_et_al_final_476_type_signatures.tsv"),
+  row.names = 1,
+  check.names = FALSE
+)
+
+# Load signature mapping (89-type to 83-type correspondence)
+sig_mapping <- read.delim(
+  file.path(data_dir, "89type_to_83type_connection.tsv"),
+  check.names = FALSE
+)
+
+# Get signature lists
+signatures_83_89 <- rownames(assignments_83_89)
+signatures_648 <- rownames(assignments_648)
+```
+
+This interactive visualization shows the distribution of signature mutations across cancer types ("hamburger plots"). Click on any point to view that tumor's mutational spectrum in ID83, ID89, and ID476 classifications using mSigPlot.
+
+## Select Assignment Type and Signature
+
+```{r}
+#| label: ui-controls
+#| panel: input
+
+selectInput(
+ "assignment_type",
+ "Assignment Type:",
+ choices = c(
+    "83+89 as 83-type (33 signatures)" = "83_89",
+    "648-type (44 signatures)" = "648"
+  ),
+  selected = "83_89"
+)
+
+uiOutput("signature_selector")
+```
+
+```{r}
+#| label: signature-selector-server
+#| context: server
+
+output$signature_selector <- renderUI({
+  sigs <- if (input$assignment_type == "83_89") signatures_83_89 else signatures_648
+  selectInput("signature", "Signature:", choices = sigs)
+})
+```
+
+## Hamburger Plot
+
+Click on any point to select a tumor and view its spectrum below.
+
+```{r}
+#| label: hamburger-plot
+
+plotlyOutput("hamburger_plot", height = "500px")
+```
+
+```{r}
+#| label: hamburger-plot-server
+#| context: server
+
+# Reactive for current hamburger data
+hamburger_data <- reactive({
+  req(input$signature)
+
+  assignment_matrix <- if (input$assignment_type == "83_89") {
+    assignments_83_89
+  } else {
+    assignments_648
+  }
+
+  get_hamburger_data(input$signature, assignment_matrix, min_samples = 3)
+})
+
+# Render hamburger plot
+output$hamburger_plot <- renderPlotly({
+  df <- hamburger_data()
+
+  if (is.null(df) || nrow(df) == 0) {
+    return(plotly_empty() |> layout(title = "No data available for this signature"))
+  }
+
+  type_order <- attr(df, "type_order")
+  medians <- attr(df, "medians")
+  n_types <- length(type_order)
+
+  bg_colors <- c("#EDF8B1", "#2C7FB8")
+
+  # Create alternating background shapes
+  bg_shapes <- lapply(seq_len(n_types), function(i) {
+    list(
+      type = "rect",
+      x0 = i - 0.5,
+      x1 = i + 0.5,
+      y0 = 0,
+      y1 = 1,
+      xref = "x",
+      yref = "paper",
+      fillcolor = bg_colors[(i - 1) %% 2 + 1],
+      opacity = 0.2,
+      line = list(width = 0),
+      layer = "below"
+    )
+  })
+
+  # Create median line shapes
+  median_shapes <- lapply(seq_len(nrow(medians)), function(i) {
+    x_pos <- which(type_order == medians$cancer_type[i])
+    list(
+      type = "line",
+      x0 = x_pos - 0.4,
+      x1 = x_pos + 0.4,
+      y0 = medians$median_mutations[i],
+      y1 = medians$median_mutations[i],
+      xref = "x",
+      yref = "y",
+      line = list(color = "red", width = 2, dash = "dash"),
+      layer = "above"
+    )
+  })
+
+  all_shapes <- c(bg_shapes, median_shapes)
+
+  # Create hover text
+  df$hover_text <- paste0(
+    "<b>Sample:</b> ", df$sample_id, "<br>",
+    "<b>Cancer Type:</b> ", df$cancer_type, "<br>",
+    "<b>Mutations:</b> ", round(df$mutations, 1)
+  )
+
+  plot_ly(
+    data = df,
+    x = ~x_plot,
+    y = ~mutations,
+    type = "scatter",
+    mode = "markers",
+    marker = list(size = 6, color = "black", opacity = 0.6),
+    text = ~hover_text,
+    hoverinfo = "text",
+    customdata = ~sample_id,
+    source = "hamburger"
+  ) |>
+    layout(
+      title = list(text = paste0(input$signature, " mutations"), x = 0.5),
+      xaxis = list(
+        title = "",
+        tickmode = "array",
+        tickvals = seq_len(n_types),
+        ticktext = as.character(type_order),
+        tickangle = 60,
+        side = "top",
+        showgrid = FALSE
+      ),
+      yaxis = list(
+        title = "Number of Mutations",
+        type = "log",
+        showgrid = TRUE
+      ),
+      shapes = all_shapes,
+      hovermode = "closest",
+      margin = list(t = 120, b = 50, l = 60, r = 20)
+    ) |>
+    config(displayModeBar = TRUE, displaylogo = FALSE) |>
+    event_register("plotly_click")
+})
+
+# Track selected sample from click
+selected_sample <- reactiveVal(NULL)
+
+observeEvent(event_data("plotly_click", source = "hamburger"), {
+  click_data <- event_data("plotly_click", source = "hamburger")
+  if (!is.null(click_data)) {
+    selected_sample(click_data$customdata[[1]])
+  }
+})
+```
+
+## Selected Tumor Spectrum
+
+```{r}
+#| label: selected-info
+
+uiOutput("selected_info")
+```
+
+```{r}
+#| label: selected-info-server
+#| context: server
+
+output$selected_info <- renderUI({
+  sample_id <- selected_sample()
+  if (is.null(sample_id)) {
+    tags$p(tags$strong("Select a point from the hamburger plot above to view spectrum."))
+  } else {
+    tags$p(tags$strong("Selected Tumor: "), sample_id)
+  }
+})
+```
+
+::: {.panel-tabset}
+
+### 83-type
+
+```{r}
+#| label: spectrum-83
+
+plotOutput("spectrum_83", height = "500px")
+```
+
+```{r}
+#| label: spectrum-83-server
+#| context: server
+
+output$spectrum_83 <- renderPlot({
+  sample_id <- selected_sample()
+  sig_name <- input$signature
+  req(sample_id, sig_name)
+
+  if (!sample_id %in% colnames(spectra_83)) {
+    plot.new()
+    text(0.5, 0.5, paste("No ID83 data for", sample_id))
+    return()
+  }
+
+  # Get the 83-type signature name
+  if (input$assignment_type == "83_89") {
+    sig_83_name <- sig_name  # Already 83-type
+  } else {
+    # Map from 89-type to 83-type
+    idx <- match(sig_name, sig_mapping$InDel89)
+    sig_83_name <- if (!is.na(idx)) sig_mapping$InDel83[idx] else NULL
+  }
+
+  spectrum <- spectra_83[, sample_id, drop = FALSE]
+  p1 <- mSigPlot::plot_83(spectrum, plot_title = paste("Spectrum:", sample_id))
+
+  if (!is.null(sig_83_name) && sig_83_name %in% colnames(sigs_83)) {
+    sig_data <- sigs_83[, sig_83_name, drop = FALSE]
+    p2 <- mSigPlot::plot_83(sig_data, plot_title = paste("Signature:", sig_83_name))
+    gridExtra::grid.arrange(p1, p2, ncol = 1)
+  } else {
+    p1
+  }
+}, res = 100)
+```
+
+### 89-type
+
+```{r}
+#| label: spectrum-89
+
+plotOutput("spectrum_89", height = "500px")
+```
+
+```{r}
+#| label: spectrum-89-server
+#| context: server
+
+output$spectrum_89 <- renderPlot({
+  sample_id <- selected_sample()
+  sig_name <- input$signature
+  req(sample_id, sig_name)
+
+  if (!sample_id %in% colnames(spectra_89)) {
+    plot.new()
+    text(0.5, 0.5, paste("No ID89 data for", sample_id))
+    return()
+  }
+
+  # Get the 89-type signature name
+  if (input$assignment_type == "648") {
+    sig_89_name <- sig_name  # Already 89-type
+  } else {
+    # Map from 83-type to 89-type (find first matching 89-type)
+    idx <- which(sig_mapping$InDel83 == sig_name)
+    sig_89_name <- if (length(idx) > 0) sig_mapping$InDel89[idx[1]] else NULL
+  }
+
+  spectrum <- spectra_89[, sample_id, drop = FALSE]
+  p1 <- mSigPlot::plot_89(spectrum, plot_title = paste("Spectrum:", sample_id))
+
+  if (!is.null(sig_89_name) && sig_89_name %in% colnames(sigs_89)) {
+    sig_data <- sigs_89[, sig_89_name, drop = FALSE]
+    p2 <- mSigPlot::plot_89(sig_data, plot_title = paste("Signature:", sig_89_name))
+    gridExtra::grid.arrange(p1, p2, ncol = 1)
+  } else {
+    p1
+  }
+}, res = 100)
+```
+
+### 476-type
+
+```{r}
+#| label: spectrum-476
+
+plotOutput("spectrum_476", height = "600px", width = "100%")
+```
+
+```{r}
+#| label: spectrum-476-server
+#| context: server
+
+output$spectrum_476 <- renderPlot({
+  sample_id <- selected_sample()
+  sig_name <- input$signature
+  req(sample_id, sig_name)
+
+  if (!sample_id %in% colnames(spectra_476)) {
+    plot.new()
+    text(0.5, 0.5, paste("No ID476 data for", sample_id))
+    return()
+  }
+
+  # Get the 476-type signature name (uses same names as 89-type)
+  if (input$assignment_type == "648") {
+    # Already 89-type name, use directly
+    sig_476_name <- sig_name
+  } else {
+    # Map from 83-type to 89-type (find first matching)
+    idx <- which(sig_mapping$InDel83 == sig_name)
+    sig_476_name <- if (length(idx) > 0) sig_mapping$InDel89[idx[1]] else NULL
+  }
+
+  spectrum <- spectra_476[, sample_id, drop = FALSE]
+  p1 <- mSigPlot::plot_476(spectrum, plot_title = paste("Spectrum:", sample_id))
+
+  if (!is.null(sig_476_name) && sig_476_name %in% colnames(sigs_476)) {
+    sig_data <- sigs_476[, sig_476_name, drop = FALSE]
+    p2 <- mSigPlot::plot_476(sig_data, plot_title = paste("Signature:", sig_476_name))
+    gridExtra::grid.arrange(p1, p2, ncol = 1)
+  } else {
+    p1
+  }
+}, res = 100, width = 1400, height = 600)
+```
+
+:::
+
+## About This Visualization
+
+This page displays **hamburger plots** (also known as snake plots) showing how mutations attributed to each signature are distributed across cancer types.
+
+### How to Use
+
+1. **Select an assignment type**: Choose between the 83+89 as 83-type assignments (33 signatures) or the 648-type assignments (44 signatures).
+
+2. **Select a signature**: Pick a signature from the dropdown to view its hamburger plot.
+
+3. **Click on a point**: Each point represents one tumor. Click on a point to view that tumor's full mutational spectrum rendered with mSigPlot in ID83, ID89, and ID476 classifications.
+
+### Reading the Hamburger Plot
+
+- **X-axis**: Cancer types, ordered by median mutation count (ascending)
+- **Y-axis**: Number of mutations attributed to this signature (log scale)
+- **Points**: Individual tumors, spread horizontally within each cancer type column
+- **Red dashed lines**: Median mutation count for each cancer type
+- **Alternating backgrounds**: Help distinguish adjacent cancer type columns
