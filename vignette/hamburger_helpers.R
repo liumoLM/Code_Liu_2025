@@ -364,8 +364,8 @@ spectra_to_json <- function(spectra_83, spectra_89, spectra_476) {
 
 #' Plot signature decomposition for a sample
 #'
-#' Creates a combined plot showing the sample spectrum, a donut chart of
-#' signature contributions, and the individual signature plots below.
+#' Creates a combined plot showing a donut chart of signature contributions,
+#' the sample spectrum, a reconstructed spectrum, and the individual signature plots.
 #'
 #' @param sample_id Character: the sample identifier (column name in assignments).
 #' @param assignments Data frame with samples as columns, signatures as rows.
@@ -389,15 +389,6 @@ plot_decomposition <- function(sample_id, assignments, signatures, spectra, plot
     return(NULL)
   }
   nonzero <- sort(nonzero, decreasing = TRUE)
-
-  # Create spectrum plot for this sample
-  p_spectrum <- NULL
-  if (sample_id %in% colnames(spectra)) {
-    spectrum_data <- spectra[, sample_id, drop = FALSE]
-    total_in_spectrum <- sum(spectrum_data[, 1])
-    spectrum_title <- paste0("Spectrum: ", sample_id, " (", format(round(total_in_spectrum), big.mark = ","), " total mutations)")
-    p_spectrum <- plot_fn(spectrum_data, plot_title = spectrum_title)
-  }
 
   # Create donut plot of signature assignments
   df <- data.frame(
@@ -423,25 +414,29 @@ plot_decomposition <- function(sample_id, assignments, signatures, spectra, plot
     ggplot2::geom_rect(
       ggplot2::aes(ymax = ymax, ymin = ymin, xmax = 8, xmin = 4, fill = signature)
     ) +
-    # Segments from donut edge to label position (in polar coords: x = radius, y = angle)
-    ggplot2::geom_segment(
-      ggplot2::aes(x = 8, y = y_mid, xend = 9.5, yend = y_mid),
-      color = "gray40", size = 0.5
-    ) +
-    # Labels outside the donut
-    ggplot2::geom_label(
-      ggplot2::aes(x = 10, y = y_mid, label = label, fill = signature),
+    # Labels with repulsion to avoid overlap
+    ggrepel::geom_label_repel(
+      ggplot2::aes(x = 8, y = y_mid, label = label, fill = signature),
       size = 3.5, color = "black", fontface = "bold",
       label.padding = ggplot2::unit(0.25, "lines"),
-      label.size = 0.3, hjust = 0
+      xlim = c(9, 14),  # Keep labels outside the donut
+      ylim = c(-0.1, 1.1),  # Allow some vertical flexibility
+      direction = "y",  # Repel primarily in y direction (angular)
+      segment.color = "gray40",
+      segment.size = 0.5,
+      box.padding = 0.5,
+      point.padding = 0.3,
+      force = 2,
+      max.overlaps = Inf,
+      min.segment.length = 0
     ) +
     ggplot2::coord_polar(theta = "y") +
-    ggplot2::xlim(c(0, 14)) +
+    ggplot2::xlim(c(0, 16)) +
     ggplot2::ylim(c(0, 1)) +
     ggplot2::scale_fill_manual(values = donut_colors) +
     ggplot2::labs(
-      title = paste0("Signature Decomposition"),
-      subtitle = paste0("Assigned: ", format(round(total_mutations), big.mark = ","), " mutations")
+      title = paste0("Signature Decomposition: ", sample_id),
+      subtitle = paste0("Total Assigned: ", format(round(total_mutations), big.mark = ","), " mutations")
     ) +
     ggplot2::theme_void() +
     ggplot2::theme(
@@ -450,8 +445,43 @@ plot_decomposition <- function(sample_id, assignments, signatures, spectra, plot
       legend.position = "none"
     )
 
+  # Create spectrum plot for this sample
+  p_spectrum <- NULL
+  if (sample_id %in% colnames(spectra)) {
+    spectrum_data <- spectra[, sample_id, drop = FALSE]
+    total_in_spectrum <- sum(spectrum_data[, 1])
+    spectrum_title <- paste0("Observed Spectrum: ", sample_id, " (", format(round(total_in_spectrum), big.mark = ","), " total mutations)")
+    p_spectrum <- plot_fn(spectrum_data, plot_title = spectrum_title)
+  }
+
+  # Create reconstructed spectrum using mSigAct::ReconstructSpectrum
+  p_reconstructed <- NULL
+  sig_names_ordered <- names(nonzero)
+  # Get signatures that exist in the signatures matrix
+  valid_sigs <- sig_names_ordered[sig_names_ordered %in% colnames(signatures)]
+  if (length(valid_sigs) > 0 && sample_id %in% colnames(spectra)) {
+    # Extract the signatures matrix for valid signatures
+    sigs_matrix <- as.matrix(signatures[, valid_sigs, drop = FALSE])
+    # Extract exposures for valid signatures
+    exposures <- nonzero[valid_sigs]
+
+    # Reconstruct the spectrum
+    reconstructed <- mSigAct::ReconstructSpectrum(sigs_matrix, exposures, TRUE)
+    colnames(reconstructed) <- "Reconstructed"
+
+    # Calculate cosine similarity between original and reconstructed
+    original_vec <- as.numeric(spectra[, sample_id])
+    reconstructed_vec <- as.numeric(reconstructed[, 1])
+    cos_sim <- sum(original_vec * reconstructed_vec) /
+               (sqrt(sum(original_vec^2)) * sqrt(sum(reconstructed_vec^2)))
+
+    total_reconstructed <- sum(reconstructed)
+    recon_title <- paste0("Reconstructed Spectrum (", format(round(total_reconstructed), big.mark = ","),
+                          " mutations, cosine similarity: ", round(cos_sim, 4), ")")
+    p_reconstructed <- plot_fn(reconstructed, plot_title = recon_title)
+  }
+
   # Create signature plots for each non-zero signature (in descending order)
-  sig_names_ordered <- names(sort(nonzero, decreasing = TRUE))
   sig_plots <- lapply(sig_names_ordered, function(sig_name) {
     if (sig_name %in% colnames(signatures)) {
       count_val <- nonzero[sig_name]
@@ -463,16 +493,23 @@ plot_decomposition <- function(sample_id, assignments, signatures, spectra, plot
   })
   sig_plots <- Filter(Negate(is.null), sig_plots)
 
-  # Combine: spectrum on top, donut below, then signature plots
+  # Combine: donut first, then spectrum, then reconstructed, then signature plots
+  all_plots <- list(p_donut)
+  heights <- c(4)  # Donut height
+
   if (!is.null(p_spectrum)) {
-    all_plots <- c(list(p_spectrum), list(p_donut), sig_plots)
-    n_plots <- length(all_plots)
-    # Spectrum: 3, Donut: 4, each signature: 3
-    heights <- c(3, 4, rep(3, n_plots - 2))
-  } else {
-    all_plots <- c(list(p_donut), sig_plots)
-    n_plots <- length(all_plots)
-    heights <- c(4, rep(3, n_plots - 1))
+    all_plots <- c(all_plots, list(p_spectrum))
+    heights <- c(heights, 3)
+  }
+
+  if (!is.null(p_reconstructed)) {
+    all_plots <- c(all_plots, list(p_reconstructed))
+    heights <- c(heights, 3)
+  }
+
+  if (length(sig_plots) > 0) {
+    all_plots <- c(all_plots, sig_plots)
+    heights <- c(heights, rep(3, length(sig_plots)))
   }
 
   do.call(gridExtra::grid.arrange, c(all_plots, list(ncol = 1, heights = heights)))

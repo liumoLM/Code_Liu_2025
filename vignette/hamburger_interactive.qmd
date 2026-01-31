@@ -18,6 +18,7 @@ library(jsonlite)
 library(mSigPlot)
 library(gridExtra)
 library(ggplot2)
+library(ggrepel)
 
 # Load helper functions
 source("hamburger_helpers.R")
@@ -338,8 +339,8 @@ output$spectrum_83_ui <- renderUI({
   if (show_decomposition() && sample_id %in% colnames(assignments_83_89)) {
     sample_assignments <- assignments_83_89[, sample_id]
     n_sigs <- sum(sample_assignments > 0)
-    # 300px for spectrum + 400px for donut + 300px per signature
-    height <- paste0(300 + 400 + n_sigs * 300, "px")
+    # 400px donut + 300px spectrum + 300px reconstructed + 300px per signature
+    height <- paste0(400 + 300 + 300 + n_sigs * 300, "px")
   } else {
     height <- "500px"
   }
@@ -417,8 +418,8 @@ output$spectrum_89_ui <- renderUI({
   if (show_decomposition() && sample_id %in% colnames(assignments_89)) {
     sample_assignments <- assignments_89[, sample_id]
     n_sigs <- sum(sample_assignments > 0)
-    # 300px for spectrum + 400px for donut + 300px per signature
-    height <- paste0(300 + 400 + n_sigs * 300, "px")
+    # 400px donut + 300px spectrum + 300px reconstructed + 300px per signature
+    height <- paste0(400 + 300 + 300 + n_sigs * 300, "px")
   } else {
     height <- "500px"
   }
@@ -496,8 +497,8 @@ output$spectrum_476_ui <- renderUI({
   if (show_decomposition() && sample_id %in% colnames(assignments_476)) {
     sample_assignments <- assignments_476[, sample_id]
     n_sigs <- sum(sample_assignments > 0)
-    # 400px for spectrum + 500px for donut + 400px per signature (476-type plots need more height)
-    height <- paste0(400 + 500 + n_sigs * 400, "px")
+    # 500px donut + 400px spectrum + 400px reconstructed + 400px per signature (476-type plots need more height)
+    height <- paste0(500 + 400 + 400 + n_sigs * 400, "px")
   } else {
     height <- "600px"
   }
@@ -513,8 +514,8 @@ spectrum_476_height <- reactive({
   if (show_decomposition() && sample_id %in% colnames(assignments_476)) {
     sample_assignments <- assignments_476[, sample_id]
     n_sigs <- sum(sample_assignments > 0)
-    # 400px for spectrum + 500px for donut + 400px per signature
-    return(400 + 500 + n_sigs * 400)
+    # 500px donut + 400px spectrum + 400px reconstructed + 400px per signature
+    return(500 + 400 + 400 + n_sigs * 400)
   }
   600
 })
