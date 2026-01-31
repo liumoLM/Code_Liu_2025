@@ -29,7 +29,7 @@ get_hamburger_data <- function(
 
   # Create data frame with all samples
 
-df <- data.frame(
+  df <- data.frame(
     sample_id = sample_names,
     cancer_type = cancer_types,
     mutations = sig_values,
@@ -43,7 +43,12 @@ df <- data.frame(
   nonzero_by_type <- as.data.frame(table(df$cancer_type[df$mutations > 0]))
   colnames(nonzero_by_type) <- c("cancer_type", "nonzero_samples")
 
-  sample_counts <- merge(total_by_type, nonzero_by_type, by = "cancer_type", all.x = TRUE)
+  sample_counts <- merge(
+    total_by_type,
+    nonzero_by_type,
+    by = "cancer_type",
+    all.x = TRUE
+  )
   sample_counts$nonzero_samples[is.na(sample_counts$nonzero_samples)] <- 0
 
   # Filter zeros if requested
@@ -89,7 +94,8 @@ df <- data.frame(
 
   # Spread points within each cancer type column
   df$x_plot <- df$x_pos +
-    0.8 * (df$within_rank - 1) / pmax(df$group_size - 1, 1) - 0.4
+    0.8 * (df$within_rank - 1) / pmax(df$group_size - 1, 1) -
+    0.4
   df$x_plot[df$group_size == 1] <- df$x_pos[df$group_size == 1]
 
   # Add median info
@@ -97,7 +103,10 @@ df <- data.frame(
 
   # Add sample counts
   sample_counts <- sample_counts[sample_counts$cancer_type %in% type_order, ]
-  sample_counts$cancer_type <- factor(sample_counts$cancer_type, levels = type_order)
+  sample_counts$cancer_type <- factor(
+    sample_counts$cancer_type,
+    levels = type_order
+  )
   df <- merge(df, sample_counts, by = "cancer_type")
 
   # Restore order
@@ -169,9 +178,14 @@ create_interactive_hamburger <- function(
 
   # Create hover text
   df$hover_text <- paste0(
-    "<b>Sample:</b> ", df$sample_id, "<br>",
-    "<b>Cancer Type:</b> ", df$cancer_type, "<br>",
-    "<b>Mutations:</b> ", round(df$mutations, 1)
+    "<b>Sample:</b> ",
+    df$sample_id,
+    "<br>",
+    "<b>Cancer Type:</b> ",
+    df$cancer_type,
+    "<br>",
+    "<b>Mutations:</b> ",
+    round(df$mutations, 1)
   )
 
   # Create the plotly figure
@@ -299,16 +313,34 @@ get_mutation_colors <- function(id_type = "ID83") {
 #' @param mut_type Character: mutation type string (e.g., "DEL:C:1:0").
 #' @return Character: color category key.
 classify_mutation <- function(mut_type) {
-  if (grepl("^DEL:C:1:", mut_type)) return("DEL:C")
-  if (grepl("^DEL:T:1:", mut_type)) return("DEL:T")
-  if (grepl("^DEL:[CT]:[2-9]|^DEL:[CT]:[0-9]{2}", mut_type)) return("DEL:repeats")
-  if (grepl("^DEL:.*:M:", mut_type) || grepl("^DEL:MH", mut_type)) return("DEL:MH")
-  if (grepl("^INS:C:1:", mut_type)) return("INS:C")
-  if (grepl("^INS:T:1:", mut_type)) return("INS:T")
-  if (grepl("^INS:[CT]:[2-9]|^INS:[CT]:[0-9]{2}", mut_type)) return("INS:repeats")
-  if (grepl("^INS:", mut_type)) return("INS:other")
-  if (grepl("^DEL:", mut_type)) return("DEL:repeats")
-  return("DEL:C")  # fallback
+  if (grepl("^DEL:C:1:", mut_type)) {
+    return("DEL:C")
+  }
+  if (grepl("^DEL:T:1:", mut_type)) {
+    return("DEL:T")
+  }
+  if (grepl("^DEL:[CT]:[2-9]|^DEL:[CT]:[0-9]{2}", mut_type)) {
+    return("DEL:repeats")
+  }
+  if (grepl("^DEL:.*:M:", mut_type) || grepl("^DEL:MH", mut_type)) {
+    return("DEL:MH")
+  }
+  if (grepl("^INS:C:1:", mut_type)) {
+    return("INS:C")
+  }
+  if (grepl("^INS:T:1:", mut_type)) {
+    return("INS:T")
+  }
+  if (grepl("^INS:[CT]:[2-9]|^INS:[CT]:[0-9]{2}", mut_type)) {
+    return("INS:repeats")
+  }
+  if (grepl("^INS:", mut_type)) {
+    return("INS:other")
+  }
+  if (grepl("^DEL:", mut_type)) {
+    return("DEL:repeats")
+  }
+  return("DEL:C") # fallback
 }
 
 
@@ -374,7 +406,14 @@ spectra_to_json <- function(spectra_83, spectra_89, spectra_476) {
 #' @param plot_fn Function to plot a single signature (e.g., mSigPlot::plot_83).
 #' @param title_prefix Character: prefix for the plot title.
 #' @return A grid of plots arranged vertically, or NULL if no non-zero assignments.
-plot_decomposition <- function(sample_id, assignments, signatures, spectra, plot_fn, title_prefix = "") {
+plot_decomposition <- function(
+  sample_id,
+  assignments,
+  signatures,
+  spectra,
+  plot_fn,
+  title_prefix = ""
+) {
   # Get assignments for this sample
   if (!sample_id %in% colnames(assignments)) {
     return(NULL)
@@ -398,9 +437,13 @@ plot_decomposition <- function(sample_id, assignments, signatures, spectra, plot
   df$fraction <- df$count / sum(df$count)
   df$ymax <- cumsum(df$fraction)
   df$ymin <- c(0, head(df$ymax, -1))
-  df$y_mid <- (df$ymax + df$ymin) / 2  # Middle of each slice in y (theta) space
+  df$y_mid <- (df$ymax + df$ymin) / 2 # Middle of each slice in y (theta) space
 
-  df$label <- paste0(df$signature, ": ", format(round(df$count), big.mark = ","))
+  df$label <- paste0(
+    df$signature,
+    ": ",
+    format(round(df$count), big.mark = ",")
+  )
 
   # Generate colors for the donut segments
   n_sigs <- nrow(df)
@@ -412,16 +455,28 @@ plot_decomposition <- function(sample_id, assignments, signatures, spectra, plot
   p_donut <- ggplot2::ggplot(df) +
     # Donut segments
     ggplot2::geom_rect(
-      ggplot2::aes(ymax = ymax, ymin = ymin, xmax = 8, xmin = 4, fill = signature)
+      ggplot2::aes(
+        ymax = ymax,
+        ymin = ymin,
+        xmax = 8,
+        xmin = 4,
+        fill = signature
+      )
     ) +
     # Labels with repulsion to avoid overlap
     ggrepel::geom_label_repel(
       ggplot2::aes(x = 8, y = y_mid, label = label, fill = signature),
-      size = 3.5, color = "black", fontface = "bold",
+      size = 3.5,
+      color = "black",
+      fontface = "bold",
       label.padding = ggplot2::unit(0.25, "lines"),
-      xlim = c(9, 14),  # Keep labels outside the donut
-      ylim = c(-0.1, 1.1),  # Allow some vertical flexibility
-      direction = "y",  # Repel primarily in y direction (angular)
+      # Remove xlim and ylim constraints that force labels into a narrow band:
+      # xlim = c(9, 14),
+      # ylim = c(-0.1, 1.1),
+
+      # Change direction to "both" to allow radial movement:
+      direction = "both", # Allow repulsion in all directions (radially)
+
       segment.color = "gray40",
       segment.size = 0.5,
       box.padding = 0.5,
@@ -430,13 +485,24 @@ plot_decomposition <- function(sample_id, assignments, signatures, spectra, plot
       max.overlaps = Inf,
       min.segment.length = 0
     ) +
+    # Set scales with limits and expansion in one call to avoid warnings
+    ggplot2::scale_x_continuous(
+      limits = c(0, 18),
+      expand = ggplot2::expansion(mult = c(0, 0.1))
+    ) +
+    ggplot2::scale_y_continuous(
+      limits = c(0, 1),
+      expand = ggplot2::expansion(mult = c(0, 0))
+    ) +
     ggplot2::coord_polar(theta = "y") +
-    ggplot2::xlim(c(0, 16)) +
-    ggplot2::ylim(c(0, 1)) +
     ggplot2::scale_fill_manual(values = donut_colors) +
     ggplot2::labs(
       title = paste0("Signature Decomposition: ", sample_id),
-      subtitle = paste0("Total Assigned: ", format(round(total_mutations), big.mark = ","), " mutations")
+      subtitle = paste0(
+        "Total Assigned: ",
+        format(round(total_mutations), big.mark = ","),
+        " mutations"
+      )
     ) +
     ggplot2::theme_void() +
     ggplot2::theme(
@@ -450,7 +516,13 @@ plot_decomposition <- function(sample_id, assignments, signatures, spectra, plot
   if (sample_id %in% colnames(spectra)) {
     spectrum_data <- spectra[, sample_id, drop = FALSE]
     total_in_spectrum <- sum(spectrum_data[, 1])
-    spectrum_title <- paste0("Observed Spectrum: ", sample_id, " (", format(round(total_in_spectrum), big.mark = ","), " total mutations)")
+    spectrum_title <- paste0(
+      "Observed Spectrum: ",
+      sample_id,
+      " (",
+      format(round(total_in_spectrum), big.mark = ","),
+      " total mutations)"
+    )
     p_spectrum <- plot_fn(spectrum_data, plot_title = spectrum_title)
   }
 
@@ -473,11 +545,16 @@ plot_decomposition <- function(sample_id, assignments, signatures, spectra, plot
     original_vec <- as.numeric(spectra[, sample_id])
     reconstructed_vec <- as.numeric(reconstructed[, 1])
     cos_sim <- sum(original_vec * reconstructed_vec) /
-               (sqrt(sum(original_vec^2)) * sqrt(sum(reconstructed_vec^2)))
+      (sqrt(sum(original_vec^2)) * sqrt(sum(reconstructed_vec^2)))
 
     total_reconstructed <- sum(reconstructed)
-    recon_title <- paste0("Reconstructed Spectrum (", format(round(total_reconstructed), big.mark = ","),
-                          " mutations, cosine similarity: ", round(cos_sim, 4), ")")
+    recon_title <- paste0(
+      "Reconstructed Spectrum (",
+      format(round(total_reconstructed), big.mark = ","),
+      " mutations, cosine similarity: ",
+      round(cos_sim, 4),
+      ")"
+    )
     p_reconstructed <- plot_fn(reconstructed, plot_title = recon_title)
   }
 
@@ -485,8 +562,16 @@ plot_decomposition <- function(sample_id, assignments, signatures, spectra, plot
   sig_plots <- lapply(sig_names_ordered, function(sig_name) {
     if (sig_name %in% colnames(signatures)) {
       count_val <- nonzero[sig_name]
-      title_with_count <- paste0(sig_name, ": ", format(round(count_val), big.mark = ","), " mutations")
-      plot_fn(signatures[, sig_name, drop = FALSE], plot_title = title_with_count)
+      title_with_count <- paste0(
+        sig_name,
+        ": ",
+        format(round(count_val), big.mark = ","),
+        " mutations"
+      )
+      plot_fn(
+        signatures[, sig_name, drop = FALSE],
+        plot_title = title_with_count
+      )
     } else {
       NULL
     }
@@ -495,7 +580,7 @@ plot_decomposition <- function(sample_id, assignments, signatures, spectra, plot
 
   # Combine: donut first, then spectrum, then reconstructed, then signature plots
   all_plots <- list(p_donut)
-  heights <- c(4)  # Donut height
+  heights <- c(4) # Donut height
 
   if (!is.null(p_spectrum)) {
     all_plots <- c(all_plots, list(p_spectrum))
@@ -512,5 +597,8 @@ plot_decomposition <- function(sample_id, assignments, signatures, spectra, plot
     heights <- c(heights, rep(3, length(sig_plots)))
   }
 
-  do.call(gridExtra::grid.arrange, c(all_plots, list(ncol = 1, heights = heights)))
+  do.call(
+    gridExtra::grid.arrange,
+    c(all_plots, list(ncol = 1, heights = heights))
+  )
 }
