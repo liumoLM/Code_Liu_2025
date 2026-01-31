@@ -14,6 +14,12 @@ library(scales)
 data_dir <- "Manuscript_data/"
 plot_dir <- "plot_output/assignment"
 
+# Load sample info for MSI status coloring
+sample_info <- read.delim(
+  file.path(data_dir, "sample_info.tsv"),
+  check.names = FALSE
+)
+
 in_out_pairs = list(
   list(
     input_file = "assignment_from_172_type/Liu_et_al_83_plus_89_as_83_type_signature_assignments.tsv",
@@ -65,11 +71,14 @@ params <- list(
 #' @param order_by Character: how to order cancer types. One of "median"
 #'   (ascending median), "name" (alphabetical), or "count" (sample count).
 #' @param bg_colors Character vector of length 2 for alternating background.
-#' @param point_color Character: color for sample points.
+#' @param point_color Character: default color for sample points (used when
+#'   sample_info is NULL or sample not found).
 #' @param median_color Character: color for median lines.
 #' @param point_size Numeric: size of sample points.
 #' @param point_alpha Numeric: transparency of points (0-1).
 #' @param base_size Numeric: base font size for the plot.
+#' @param sample_info Data frame with sample info including MSI status. Must have
+#'   columns 'Patient' and 'MSIseq_MSI-H'. If provided, MSI-H samples are colored red.
 #' @return A list with components:
 #'   \item{plot}{A ggplot2 object (or NULL if no data after filtering)}
 #'   \item{sample_counts}{Data frame with columns: cancer_type, total_samples,
@@ -78,7 +87,6 @@ plot_signature_by_cancer_type <- function(
   signature_values,
   signature_name = "Signature",
   genome_size_mb = NULL,
-
   min_samples = 1,
   log_scale = TRUE,
   exclude_zero = TRUE,
@@ -88,7 +96,8 @@ plot_signature_by_cancer_type <- function(
   median_color = "red",
   point_size = 1.5,
   point_alpha = 0.7,
-  base_size = 14
+  base_size = 14,
+  sample_info = NULL
 ) {
   order_by <- match.arg(order_by)
 
@@ -103,6 +112,31 @@ plot_signature_by_cancer_type <- function(
     mutations = as.numeric(signature_values),
     stringsAsFactors = FALSE
   )
+
+  # Add MSI status coloring and shape if sample_info provided
+  if (!is.null(sample_info)) {
+    # Extract patient ID by removing "CancerType::" prefix
+    df_all$patient_id <- sub("^.*::", "", df_all$sample)
+    # Look up MSI status
+    df_all$msi_status <- sample_info$`MSIseq_MSI-H`[
+      match(df_all$patient_id, sample_info$Patient)
+    ]
+    # Set color: red for MSI-H (TRUE), default point_color for others
+    df_all$dot_color <- ifelse(
+      !is.na(df_all$msi_status) & df_all$msi_status == TRUE,
+      "red",
+      point_color
+    )
+    # Set shape: solid triangle (17) for MSI-H, circle (16) for others
+    df_all$dot_shape <- ifelse(
+      !is.na(df_all$msi_status) & df_all$msi_status == TRUE,
+      17,  # solid triangle
+      16   # solid circle
+    )
+  } else {
+    df_all$dot_color <- point_color
+    df_all$dot_shape <- 16  # solid circle
+  }
 
   # Calculate sample counts per cancer type (before any filtering)
   total_by_type <- as.data.frame(table(df_all$cancer_type))
@@ -236,11 +270,14 @@ plot_signature_by_cancer_type <- function(
     ) +
     ggplot2::scale_fill_identity() +
     # Points (sorted within cancer type, no jitter needed)
+    # Color and shape by MSI status: red triangles for MSI-H, black circles for others
     ggplot2::geom_point(
+      ggplot2::aes(color = dot_color, shape = dot_shape),
       size = point_size,
-      alpha = point_alpha,
-      color = point_color
+      alpha = point_alpha
     ) +
+    ggplot2::scale_color_identity() +
+    ggplot2::scale_shape_identity() +
     # Median lines
     ggplot2::geom_segment(
       data = summary_df,
@@ -313,6 +350,8 @@ plot_signature_by_cancer_type <- function(
 #' @param signature_name Character: name of the signature (row name in matrix).
 #' @param assignment_matrix Data frame with signatures as rows, samples as columns.
 #'   Column names should be in format "CancerType::SampleID".
+#' @param sample_info Data frame with sample info including MSI status. If provided,
+#'   MSI-H samples are colored red.
 #' @param ... Additional arguments passed to plot_signature_by_cancer_type.
 #' @return A list with components:
 #'   \item{plot}{A ggplot2 object (or NULL if no data after filtering)}
@@ -321,6 +360,7 @@ plot_signature_by_cancer_type <- function(
 plot_signature_hamburger <- function(
   signature_name,
   assignment_matrix,
+  sample_info = NULL,
   ...
 ) {
   if (!signature_name %in% rownames(assignment_matrix)) {
@@ -333,6 +373,7 @@ plot_signature_hamburger <- function(
   plot_signature_by_cancer_type(
     signature_values = sig_values,
     signature_name = signature_name,
+    sample_info = sample_info,
     ...
   )
 }
@@ -349,12 +390,15 @@ plot_signature_hamburger <- function(
 #' @param plot_dir Character: directory for the output PDF.
 #' @param params List of plotting parameters (width, height, base_size,
 #'   point_size, point_alpha, min_samples, genome_size_mb).
+#' @param sample_info Data frame with sample info including MSI status. If provided,
+#'   MSI-H samples are colored red.
 read_assignment_and_plot_hamburger <- function(
   input_file,
   output_file,
   data_dir,
   plot_dir,
-  params
+  params,
+  sample_info = NULL
 ) {
   input_path <- file.path(data_dir, input_file)
   output_path <- file.path(plot_dir, output_file)
@@ -379,6 +423,7 @@ read_assignment_and_plot_hamburger <- function(
         plot_signature_hamburger(
           signature_name = sig_name,
           assignment_matrix = assignment_matrix,
+          sample_info = sample_info,
           genome_size_mb = params$genome_size_mb,
           min_samples = params$min_samples,
           log_scale = TRUE,
@@ -418,6 +463,7 @@ for (pair in in_out_pairs) {
     output_file = pair$output_file,
     data_dir = data_dir,
     plot_dir = plot_dir,
-    params = params
+    params = params,
+    sample_info = sample_info
   )
 }
