@@ -1,12 +1,22 @@
 ---
-title: "Signatures of insertion and deletion mutations (indels)"
+title: "Repertoire of insertion/deletion mutational signatures based on three classification schemes"
+author:
+  - Mo Liu
+  - Mi Ni Huang
+  - Xue Ming Wu
+  - Qi Zheng
+  - Runtian Yao
+  - Ying Yang
+  - Runxi Shen
+  - Steven G. Rozen
 date: today
 format:
   html:
+    output-file: "repertoire_of_indel_mutational_signatures.html"
     toc: true
     toc-location: left
     toc-depth: 2
-    toc-title: "Signatures"
+    toc-title: "Contents"
     code-fold: true
     self-contained: true
     css: styles.css
