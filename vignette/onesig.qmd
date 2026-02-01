@@ -9,7 +9,7 @@
 cat(
   '\n\n# ',
   format_signature_name(sig_data$type89_sig_id),
-  ' {.signature-section}\n\n',
+  ' {#', tolower(sig_data$type89_sig_id), ' .signature-section}\n\n',
   sep = ''
 )
 

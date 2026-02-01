@@ -70,13 +70,13 @@ library(magrittr)
 library(gridExtra)
 library(data.table)
 library(mSigPlot)
-library(data.table)
 library(ggplot2)
 library(scales)
 library(future)
 library(furrr)
 library(tidyr)
 library(tibble)
+library(DT)
 
 ```
 
@@ -516,6 +516,16 @@ sig_table2 <- sig_table %>%
 
 write.csv(sig_table2, "prot_table_1.csv", row.names = FALSE)
 
+```
+
+# Overview {#overview .signature-section}
+
+```{r}
+#| label: overview-table
+#| echo: false
+
+source("table_1_as_dt.R")
+create_overview_table(sig_table2)
 ```
 
 ```{r}
