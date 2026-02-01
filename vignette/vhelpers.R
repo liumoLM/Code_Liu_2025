@@ -15,6 +15,20 @@ format_signature_name <- function(name) {
   name
 }
 
+#' Create HTML hyperlink for signature ID
+#'
+#' Converts a signature ID to an HTML hyperlink pointing to its section.
+#' The display name uses Greek letters, and the anchor uses the original
+#' ASCII sig_id (lowercased) to match explicit IDs in section headers.
+#'
+#' @param sig_id Character: the signature identifier (e.g., "InsDel1a", "InsDel_A_alpha")
+#' @return Character: HTML anchor tag (e.g., '<a href="#insdel_a_alpha">InsDel_Aα</a>')
+make_sig_hyperlink <- function(sig_id) {
+  display_name <- format_signature_name(sig_id)
+  anchor_id <- tolower(sig_id)  # Use original ASCII ID for anchor
+  paste0('<a href="#', anchor_id, '">', display_name, '</a>')
+}
+
 #' Create a fenced div with a style class
 #'
 #' @param txt Character: the text content for the div
