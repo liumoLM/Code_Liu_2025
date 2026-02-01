@@ -5,25 +5,27 @@
 
 library(openxlsx)
 
+source("table_1_col_name_mapping.R")
+
 # Read CSV
 df <- read.csv("prot_table_1.csv", stringsAsFactors = FALSE)
 
 # Replace underscores with spaces in column names
-names(df) <- gsub("_", " ", names(df))
+# names(df) <- gsub("_", " ", names(df))
 
-polyT_rows <- which(df$`is polyT removed` == TRUE)
-df$`type83 sig id`[polyT_rows] <- paste0(df$`type83 sig id`[polyT_rows], "**")
+polyT_rows <- which(df$`is_polyT_removed` == TRUE)
+df$`type83_sig_id`[polyT_rows] <- paste0(df$`type83_sig_id`[polyT_rows], "**")
 
 # Remove "jin" prefix from best_match_jin values
-df$`best match jin` <- gsub("^jin", "", df$`best match jin`)
+df$`best_match_jin` <- gsub("^jin", "", df$`best_match_jin`)
 
 # Handle best_match_koh duplicates: add asterisk to best match, track non-best for graying
 # For non-duplicates, also add dagger
-best_koh_col <- which(names(df) == "best match koh")
-cos_koh_col <- which(names(df) == "cos v koh")
+best_koh_col <- which(names(df) == "best_match_koh")
+cos_koh_col <- which(names(df) == "cos_v_koh")
 
 # Get non-NA values and find duplicates
-koh_values <- df$`best match koh`
+koh_values <- df$`best_match_koh`
 non_na_idx <- which(!is.na(koh_values))
 
 # Track rows to gray out (non-best duplicates)
@@ -35,11 +37,11 @@ for (koh_val in unique_koh) {
   matching_rows <- which(koh_values == koh_val)
   if (length(matching_rows) > 1) {
     # Duplicate: find row with highest cos_v_koh
-    cos_vals <- df$`cos v koh`[matching_rows]
+    cos_vals <- df$`cos_v_koh`[matching_rows]
     best_idx <- matching_rows[which.max(cos_vals)]
     non_best_idx <- setdiff(matching_rows, best_idx)
     # Add asterisk to best match (only for duplicates)
-    df$`best match koh`[best_idx] <- paste0(df$`best match koh`[best_idx], "*")
+    df$`best_match_koh`[best_idx] <- paste0(df$`best_match_koh`[best_idx], "*")
     # Track non-best rows for graying
     rows_to_gray <- c(rows_to_gray, non_best_idx)
   }
@@ -48,6 +50,9 @@ for (koh_val in unique_koh) {
 # Create workbook and worksheet
 wb <- createWorkbook()
 addWorksheet(wb, "Table 1")
+
+# Remove is_polyT_removed column (no longer needed after marking rows with **)
+df$is_polyT_removed <- NULL
 
 # Write data starting at row 1
 writeData(wb, 1, df, startRow = 1, startCol = 1)
@@ -140,11 +145,11 @@ col_widths <- sapply(1:ncol(df), function(col) {
 setColWidths(wb, 1, cols = 1:ncol(df), widths = col_widths)
 
 # Find column indices for merge range
-merge_start_col <- which(names(df) == "type83 sig id")
-merge_end_col <- which(names(df) == "cosine v jin")
+merge_start_col <- which(names(df) == "type83_sig_id")
+merge_end_col <- which(names(df) == "cosine_v_jin")
 
 # Find groups of consecutive rows with same type83 sig id
-type83_col <- df$`type83 sig id`
+type83_col <- df$`type83_sig_id`
 
 # Get run-length encoding of type83_sig_id
 rle_result <- rle(type83_col)
@@ -191,10 +196,14 @@ for (i in seq_along(lengths)) {
   freezePane(wb, 1, firstRow = TRUE, firstCol = TRUE)
 }
 
+# Replace header row with user-friendly column names
+mapped_names <- as.list(table_1_col_name_mapping(names(df)))
+writeData(wb, 1, mapped_names, startRow = 1, startCol = 1, colNames = FALSE)
+
 # Add footnotes
-footnote <- "* This is the signature with the best match to the given signature_id."
+footnote <- "* This is the signature with the best match to the given type-89 signature."
 writeData(wb, 1, footnote, startRow = 50, startCol = 1)
-footnote <- "** indicates that in the supporting tumor's spectrum, insertions of a single T in long poly-T contexts were set to 0 before calculating cosine similarity to the 83-type signature."
+footnote <- "** indicates that in the linking tumor's spectrum, insertions of single Ts in long poly-T contexts were set to 0 before calculating cosine similarity to the 83-type signature."
 writeData(wb, 1, footnote, startRow = 51, startCol = 1)
 
 # Save workbook

@@ -53,7 +53,7 @@ find_sig_txt <- function(sig_id) {
 #' Compute cosine similarities for a signature-catalog pair
 #'
 #' @param type89_sig_id Character: the ID89 signature name
-#' @param exemplar_id Character: the identifier of the supporting tumor
+#' @param exemplar_id Character: the identifier of the linking tumor
 #' @param ID89_signatures Data frame of ID89 signatures
 #' @param ID89_catalogs Data frame of ID89 catalogs
 #' @param ID83_signatures ICAMS catalog of ID83 signatures
@@ -424,7 +424,7 @@ generate_plots_to_files <- function(
   p2 <- p89(
     catalogtoplot,
     plot_title = paste0(
-      "Spectrum A, from ",
+      "Spectrum of linking-tumor ",
       sig_data$exemplar_id,
       " | cosine similarity to ",
       sig_data$type89_sig_id,
@@ -438,7 +438,7 @@ generate_plots_to_files <- function(
   # ID89 Plots 3 & 4: Decomposition (only for non-InsDel15/16)
   if (!sig_data$is_insdel15_16 && !is.null(sig_data$residual_spectrum)) {
     target_sig_title <- paste0(
-      "Spectrum B: partial mutational spectrum of ",
+      "Partial mutational spectrum of linking-tumor ",
       sig_data$exemplar_id,
       " due to ",
       sig_data$type89_sig_id
@@ -448,8 +448,8 @@ generate_plots_to_files <- function(
       "Remaining mutations in ",
       sig_data$exemplar_id,
       " not due to ",
-      sig_data$type89_sig_id,
-      " (A minus B) " #| Cosine similarity to ",
+      sig_data$type89_sig_id
+      # " (A minus B) " #| Cosine similarity to ",
       # sig_data$type89_sig_id,
       # " = ",
       # format(sig_data$cosine_sig_89_v_partial_spec, digits = 4)
@@ -509,7 +509,7 @@ generate_plots_to_files <- function(
     p5 <- p476(
       ID476_catalogs[, sig_data$exemplar_id],
       plot_title = paste0(
-        "476-type spectrum of the supporting tumor ",
+        "476-type spectrum of the linking-tumor ",
         sig_data$exemplar_id
       )
     )
