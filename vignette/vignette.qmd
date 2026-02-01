@@ -476,7 +476,12 @@ sig_table2 <- sig_table %>%
     -koh_matches,
     -residual_spectrum,
     -target_sig_partial_spectrum,
-    -cosine_sig_89_v_partial_spec
+    -cosine_sig_89_v_partial_spec,
+    -has_83_signature,
+    -has_83_mapped_signature,
+    -has_476_signature,
+    -is_insdel15_16,
+    -has_mapped_476_sig
   ) %>%
   dplyr::relocate(
     signature_id = type89_sig_id,
@@ -503,10 +508,10 @@ sig_table2 <- sig_table %>%
 
     sig83_from_476_v_83_cos = cosine83_mapped,
 
-    is_polyT_removed,
-    is_insdel15_16,
-    has_476_signature,
-    has_83_signature
+    is_polyT_removed #,
+    # is_insdel15_16,
+    #has_476_signature,
+    #has_83_signature
   )
 
 write.csv(sig_table2, "prot_table_1.csv", row.names = FALSE)
