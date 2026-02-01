@@ -287,7 +287,6 @@ generate_section_footer <- function(sig_data) {
     "\n\n---\n"
   )
 }
-debug(compute_sig_data)
 
 #' Generate all plots for a signature and save to files
 #'
