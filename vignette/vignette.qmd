@@ -529,6 +529,8 @@ write.csv(sig_table2, "prot_table_1.csv", row.names = FALSE)
 
 ```
 
+::: {.content-visible when-format="html"}
+
 # Overview {#overview .signature-section}
 
 ```{r}
@@ -538,6 +540,8 @@ write.csv(sig_table2, "prot_table_1.csv", row.names = FALSE)
 source("table_1_as_dt.R")
 create_overview_table(sig_table2)
 ```
+
+:::
 
 ```{r}
 #| label: generate-plots-parallel
