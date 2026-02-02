@@ -26,6 +26,7 @@ format:
       gutter-width: 1rem
       margin-width: 200px
   pdf:
+    output-file: "repertoire_of_indel_mutational_signatures.pdf"
     toc: true
     toc-depth: 2
     documentclass: article
