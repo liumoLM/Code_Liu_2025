@@ -358,22 +358,33 @@ to.plot.all.ID476.catalogs <- to.plot.all.ID476.catalogs[, -1]
 ```
 
 ```{r}
+#| label: get-code-for-mapped-signatures
+#| include: false
+
+# Get functions to "collapse" 476 spectra or catalogs to
+# 89-type or 83-type spectra/catalogs
+source(here::here("code", "map_476_to_other.R"))
+```
+
+```{r}
 #| label: setup6-mapped-signatures
 #| include: false
 
 # Load 89-type signatures mapped from 476-type
-ID89_mapped_from_476 <- read.delim(
-  "89_mapped_from_476.tsv",
-  sep = "\t",
-  row.names = 1
-)
+ID89_mapped_from_476 <- t476_to_89(type476_sigs)
+# read.delim(
+#"89_mapped_from_476.tsv",
+#sep = "\t",
+#row.names = 1
+#)
 
 # Load 83-type signatures mapped from 476-type
-ID83_mapped_from_476 <- read.delim(
-  "83_mapped_from_476.tsv",
-  sep = "\t",
-  row.names = 1
-)
+ID83_mapped_from_476 <- t476_to_83(type476_sigs)
+#read.delim(
+#"83_mapped_from_476.tsv",
+#sep = "\t",
+#row.names = 1
+#)
 
 ```
 
@@ -382,7 +393,7 @@ ID83_mapped_from_476 <- read.delim(
 #| include: false
 
 # Load helper functions for modular processing
-source("vhelpers.R")
+source(here::here("vignette", "vhelpers.R"))
 ```
 
 ```{r}
