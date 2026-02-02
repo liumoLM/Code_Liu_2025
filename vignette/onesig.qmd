@@ -9,7 +9,9 @@
 cat(
   '\n\n# ',
   format_signature_name(sig_data$type89_sig_id),
-  ' {#', tolower(sig_data$type89_sig_id), ' .signature-section}\n\n',
+  ' {#',
+  tolower(sig_data$type89_sig_id),
+  ' .signature-section}\n\n',
   sep = ''
 )
 
@@ -24,7 +26,12 @@ if (!is.null(note0)) {
 }
 
 if (!is.null(sig_data$ID83signature) && sig_data$ID83signature != "") {
-  cat("(corresponds to 83-type signature ", sig_data$ID83signature, ')\n\n')
+  cat(
+    "(corresponds to 83-type signature ",
+    sig_data$ID83signature,
+    ')\n\n',
+    sep = ""
+  )
 }
 
 ```
@@ -198,9 +205,6 @@ if (sig_data$has_83_signature) {
     style = ".callout-note"
   )
 }
-if (!knitr::is_latex_output()) {
-  cat('\n\n<details>\n<summary>Click here to show 83-type plots</summary>\n\n')
-}
 ```
 
 ```{r}
@@ -370,17 +374,6 @@ if (!is.null(plot_paths$jin_plots) && length(plot_paths$jin_plots) > 0) {
     }
   }
 }
-```
-
-```{r}
-#| echo: false
-#| output: asis
-
-# Close the details element for 83-type section
-if (!knitr::is_latex_output()) {
-  cat("\n\n</details>\n\n")
-}
-
 ```
 
 ```{r}

@@ -7,4 +7,6 @@ classifications.
 
 These single T deletions in long poly-T contexts are present in the 83-type signature collapsed from the 476-type InsDel_J 
 signature, which makes the deletions of 2 bases hard to see in the plot. 
-However, since we are collapsing from 476-categories that does not capture the differences between InsDel_J (89-type representation of ID_J) and InsDel_N (89-type representation of ID_N)very well, the differences between InsDel_J and InsDel_N are not visible. 
+However, since we are collapsing from 476-categories that also do not capture the
+differences between InsDel_J (89-type representation of ID_J) and InsDel_N (89-type representation of ID_N) 
+very well, the differences between InsDel_J and InsDel_N are not visible. 
