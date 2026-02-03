@@ -259,14 +259,11 @@ names(jin_matches) <- rownames(jin_cosine_matrix)
 #| label: setup3
 #| include: false
 
-type89_sigs <- as.data.frame(fread(file.path(
-  data_dir,
-  "Liu_et_al_final_89_type_signatures.tsv"
-)))
-row.names(
-  type89_sigs
-) <- type89_sigs[, 1]
-type89_sigs <- type89_sigs[, -1]
+type89_sigs <- read.delim(
+  file.path(data_dir, "Liu_et_al_final_89_type_signatures.tsv"),
+  sep = '\t',
+  row.names = 1
+)
 
 
 type89_spectra <- as.data.frame(data.table::fread(
@@ -330,7 +327,7 @@ names(koh_matches) <- rownames(koh_cosine_matrix)
 ID89.mSigAct.assignment <- read.delim(
   file.path(
     data_dir,
-    "Liu_et_al_89_type_signature_assignments.tsv"
+    "../Manuscript_data/Liu_et_al_89_type_signature_assignments.tsv"
   ),
   row.names = 1,
   check.names = FALSE
