@@ -42,7 +42,7 @@ get_tgca_indel_vcf2 = function() {
 }
 
 
-source("~/github/Code_Liu_2025/code/Generate_Koh89_Koh476_catalog.R")
+source("~/github/Code_Liu_2025/code/Generate_Koh89_Koh476_catalog_0121.R")
 
 make89catalog = function(tcgaid) {
   fullpath = dir(vcfdir, pattern = tcgaid, full.names = TRUE)
