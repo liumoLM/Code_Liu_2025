@@ -3,6 +3,9 @@
 
 source("plot_83_w_wout_t.R")
 
+# Source collapse functions for Sankey plot generation
+source(here::here("code", "collapse_476_to_83.R"))
+
 #' Format signature name with Greek letters
 #'
 #' Replaces _alpha with α and _beta with β in signature names
@@ -319,6 +322,7 @@ generate_section_footer <- function(sig_data) {
 #' @param cosmic_signatures Data frame of COSMIC signatures for matching plots
 #' @param jin_signatures Data frame of Jin signatures for matching plots
 #' @param koh_signatures Data frame of Koh signatures for matching plots
+#' @param collapse_flows List of flow data frames from bipartite matching collapse
 #' @return List with paths to all generated plot files
 generate_plots_to_files <- function(
   sig_data,
@@ -338,7 +342,8 @@ generate_plots_to_files <- function(
   cosmic_signatures = NULL,
   jin_signatures = NULL,
   koh_signatures = NULL,
-  min_ts_to_trigger = 0.15
+  min_ts_to_trigger = 0.15,
+  collapse_flows = NULL
 ) {
   # Create safe filename prefix from signature name
   safe_name <- gsub("[^a-zA-Z0-9_]", "_", sig_data$type89_sig_id)
@@ -737,6 +742,57 @@ generate_plots_to_files <- function(
     paths$koh_plots <- koh_plot_list
   }
 
+  # Sankey plots for 476-to-83 collapse (if flow data available)
+  paths$sankey_other_ins <- NULL
+  paths$sankey_other_del <- NULL
+  if (!is.null(collapse_flows) && sig_data$type89_sig_id %in% names(collapse_flows)) {
+    flows <- collapse_flows[[sig_data$type89_sig_id]]
+
+    # Create a result-like object for plot_collapse_sankey
+    collapse_result <- list(flows = flows)
+
+    title_prefix <- sprintf("%s -> %s", sig_data$type89_sig_id, sig_data$ID83signature)
+    sankey_plots <- plot_collapse_sankey(
+      collapse_result,
+      min_flow = 0.001,
+      title_prefix = title_prefix
+    )
+
+    # Save "other insertions" Sankey plot
+    if (!is.null(sankey_plots$other_ins)) {
+      sankey_ins_path <- file.path(
+        plot_dir,
+        paste0(safe_name, "_sankey_other_ins.png")
+      )
+      ggplot2::ggsave(
+        sankey_ins_path,
+        sankey_plots$other_ins,
+        width = 12,
+        height = 8,
+        dpi = 150,
+        bg = "white"
+      )
+      paths$sankey_other_ins <- sankey_ins_path
+    }
+
+    # Save "other deletions" Sankey plot
+    if (!is.null(sankey_plots$other_del)) {
+      sankey_del_path <- file.path(
+        plot_dir,
+        paste0(safe_name, "_sankey_other_del.png")
+      )
+      ggplot2::ggsave(
+        sankey_del_path,
+        sankey_plots$other_del,
+        width = 12,
+        height = 8,
+        dpi = 150,
+        bg = "white"
+      )
+      paths$sankey_other_del <- sankey_del_path
+    }
+  }
+
   return(paths)
 }
 
@@ -766,6 +822,7 @@ generate_all_plots_parallel <- function(
   jin_signatures = NULL,
   koh_signatures = NULL,
   min_ts_to_trigger = 0.15,
+  collapse_flows = NULL,
   n_workers = 10
 ) {
   # Create plot directory
@@ -796,7 +853,8 @@ generate_all_plots_parallel <- function(
         cosmic_signatures = cosmic_signatures,
         jin_signatures = jin_signatures,
         koh_signatures = koh_signatures,
-        min_ts_to_trigger = min_ts_to_trigger
+        min_ts_to_trigger = min_ts_to_trigger,
+        collapse_flows = collapse_flows
       )
     },
     .options = furrr::furrr_options(
@@ -806,7 +864,8 @@ generate_all_plots_parallel <- function(
         "ICAMS",
         "mSigPlot",
         "indelsig.tools.lib",
-        "scales"
+        "scales",
+        "ggalluvial"
       )
     ),
     .progress = TRUE
@@ -1098,6 +1157,18 @@ reconstruct_plot_paths <- function(signature_names, plot_dir) {
     } else {
       paths$koh_plots <- NULL
     }
+
+    # Sankey plots for 476-to-83 collapse
+    sankey_ins_path <- file.path(
+      plot_dir,
+      paste0(safe_name, "_sankey_other_ins.png")
+    )
+    sankey_del_path <- file.path(
+      plot_dir,
+      paste0(safe_name, "_sankey_other_del.png")
+    )
+    paths$sankey_other_ins <- if (file.exists(sankey_ins_path)) sankey_ins_path else NULL
+    paths$sankey_other_del <- if (file.exists(sankey_del_path)) sankey_del_path else NULL
 
     return(paths)
   })

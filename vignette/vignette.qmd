@@ -57,7 +57,7 @@ execute:
 # general the detection of changes is not perfect.
 # When in doubt regenerate the plots.
 # ======================================================
-REGENERATE_PLOTS <- FALSE
+REGENERATE_PLOTS <- T # FALSE
 data_dir <- here::here("Manuscript_data")
 
 # Minimum cosine similarity to show matching COSMIC signatures
@@ -361,6 +361,9 @@ to.plot.all.ID476.catalogs <- to.plot.all.ID476.catalogs[, -1]
 # Get functions to "collapse" 476 spectra or catalogs to
 # 89-type or 83-type spectra/catalogs
 source(here::here("code", "map_476_to_other.R"))
+
+# Load bipartite matching collapse function for 476-to-83 conversion
+source(here::here("code", "collapse_476_to_83.R"))
 ```
 
 ```{r}
@@ -369,20 +372,22 @@ source(here::here("code", "map_476_to_other.R"))
 
 # Load 89-type signatures mapped from 476-type
 ID89_mapped_from_476 <- t476_to_89(type476_sigs)
-# read.delim(
-#"89_mapped_from_476.tsv",
-#sep = "\t",
-#row.names = 1
-#)
 
-# Load 83-type signatures mapped from 476-type
-ID83_mapped_from_476 <- t476_to_83(type476_sigs)
-#read.delim(
-#"83_mapped_from_476.tsv",
-#sep = "\t",
-#row.names = 1
-#)
+# Load 83-type signatures mapped from 476-type using bipartite matching
+# This uses optimal redistribution to minimize squared error vs target 83-type sig
+ID83_mapped_from_476 <- collapse_all_476_to_83_matrix(
+  type476_sigs,
+  data_dir = data_dir,
+  store_flows = TRUE
+)
 
+# Extract cosine similarities for use in the vignette
+# These are the cosine similarities between the collapsed signature and the
+# native 83-type signature (computed during the bipartite matching)
+collapse_cosine_sims <- attr(ID83_mapped_from_476, "cosine_similarities")
+
+# Extract flows for Sankey plot generation
+collapse_flows <- attr(ID83_mapped_from_476, "flows")
 ```
 
 ```{r}
@@ -588,6 +593,7 @@ if (cache_valid) {
     jin_signatures = jin_sigs,
     koh_signatures = koh_sigs,
     min_ts_to_trigger = min_ts_to_trigger,
+    collapse_flows = collapse_flows,
     n_workers = 10
   )
   save_plot_cache(data_dir, plot_dir)

@@ -249,6 +249,7 @@ if (!is.null(plot_paths$id83_mapped)) {
   cat(
     "\n\n",
     "83-type signature converted from signature discovered in the 476-type spectra",
+    " (using bipartite matching optimization)",
     cosine_text,
     "\n\n",
     sep = ""
@@ -257,6 +258,31 @@ if (!is.null(plot_paths$id83_mapped)) {
   if (!is.null(plot_paths$id83_mapped_ablated)) {
     cat(suppressed_t_details)
     displayplot(plot_paths$id83_mapped_ablated, getp("hw83"))
+    cat('\n\n</details>\n\n')
+  }
+
+  # Sankey plots showing the flow from 476-type to 83-type (in a fold)
+  has_sankey <- !is.null(plot_paths$sankey_other_ins) ||
+    !is.null(plot_paths$sankey_other_del)
+  if (has_sankey) {
+    cat(r"(
+  <details>
+  <summary>Click to see flow diagrams: 476-type to 83-type collapse</summary>
+
+)")
+    cat("These Sankey diagrams show how the 476-type mutation categories ",
+        "are redistributed to 83-type categories using bipartite matching. ",
+        "We only show the diagrams for insertions or deletions of > 1 base ",
+        "because it is for these indels that 476-type categories map to ",
+        "> 1 83-type category.",
+        "\n\n")
+
+    if (!is.null(plot_paths$sankey_other_ins)) {
+      displayplot(plot_paths$sankey_other_ins, "100%")
+    }
+    if (!is.null(plot_paths$sankey_other_del)) {
+      displayplot(plot_paths$sankey_other_del, "100%")
+    }
     cat('\n\n</details>\n\n')
   }
 }

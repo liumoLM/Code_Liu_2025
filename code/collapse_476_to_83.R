@@ -4,7 +4,12 @@
 # Uses solve_bipartite_match() to optimally redistribute each 476-type
 # signature to match the corresponding 83-type signature as closely as possible.
 
-source("code/solve_bipartite_match.R")
+# Use here::here() for robust path resolution when sourced from different directories
+if (requireNamespace("here", quietly = TRUE)) {
+  source(here::here("code", "solve_bipartite_match.R"))
+} else {
+  source("code/solve_bipartite_match.R")
+}
 
 
 #' Generate missing edges for R(9,) types
@@ -753,6 +758,186 @@ plot_collapse_sankey <- function(result, min_flow = 0.001, title_prefix = "") {
 #' plot_collapse_476_to_83("InsDel1a", "C_ID1")
 #' plot_collapse_476_to_83("InsDel1a", "C_ID1", all_sankey = TRUE)
 #' }
+#' Collapse all 476-type signatures to 83-type using bipartite matching
+#'
+#' Creates a matrix of collapsed 83-type signatures from 476-type signatures,
+#' compatible with the vignette's expected format. Column names are
+#' `{sig_name}_converted` to match the convention used by `t476_to_89()`.
+#'
+#' @param type476_sigs Data frame of 476-type signatures (rows = mutation types,
+#'   columns = signature names like "InsDel1a")
+#' @param data_dir Directory containing the mapping and reference data files
+#' @param store_flows If TRUE, also stores the flow data for each signature pair
+#'   in the returned object's "flows" attribute
+#'
+#' @return A data frame with:
+#'   - Row names: 83-type mutation categories
+#'   - Columns: `{sig_name}_converted` for each signature that was collapsed
+#'   - Attribute "cosine_similarities": named vector of cosine similarities
+#'   - Attribute "flows" (if store_flows=TRUE): list of flow data frames
+#'
+#' @examples
+#' \dontrun{
+#' type476_sigs <- read.delim("Manuscript_data/Liu_et_al_final_476_type_signatures.tsv",
+#'                            row.names = 1)
+#' ID83_mapped <- collapse_all_476_to_83_matrix(type476_sigs)
+#' }
+collapse_all_476_to_83_matrix <- function(
+  type476_sigs,
+  data_dir = "Manuscript_data",
+  store_flows = FALSE
+) {
+  # Get the signature mapping (476/89-type name -> 83-type name)
+  mapping <- get_signature_mapping(data_dir)
+
+  # Load 83-type signatures to get row names and check availability
+  sig_83_file <- file.path(data_dir, "Liu_et_al_final_83_type_signatures.tsv")
+  sig_83_df <- read.delim(sig_83_file, row.names = 1, check.names = FALSE)
+  available_83 <- colnames(sig_83_df)
+  row_names_83 <- rownames(sig_83_df)
+
+  # Initialize output matrix
+  result_matrix <- matrix(
+    0,
+    nrow = length(row_names_83),
+    ncol = 0,
+    dimnames = list(row_names_83, NULL)
+  )
+  result_cols <- character(0)
+  cosine_similarities <- numeric(0)
+  flows_list <- list()
+
+  # Available 476-type signatures
+  available_476 <- colnames(type476_sigs)
+
+  for (i in seq_len(nrow(mapping))) {
+    sig_476 <- mapping$sig_476[i]
+    sig_83 <- mapping$sig_83[i]
+
+    if (sig_476 %in% available_476 && sig_83 %in% available_83) {
+      message(sprintf("Collapsing %s -> %s", sig_476, sig_83))
+      tryCatch(
+        {
+          collapse_result <- collapse_476_to_83(sig_476, sig_83, data_dir)
+
+          # Add collapsed signature to matrix
+          col_name <- paste0(sig_476, "_converted")
+          result_cols <- c(result_cols, col_name)
+
+          # The y vector contains the collapsed signature
+          y_col <- collapse_result$y[row_names_83]
+          result_matrix <- cbind(result_matrix, y_col)
+
+          # Store cosine similarity
+          cos_sim <- lsa::cosine(collapse_result$y, collapse_result$target)[1, 1]
+          cosine_similarities[col_name] <- cos_sim
+
+          # Store flows if requested
+          if (store_flows) {
+            flows_list[[sig_476]] <- collapse_result$flows
+          }
+
+          message(sprintf("  Cosine similarity: %.4f", cos_sim))
+        },
+        error = function(e) {
+          message(sprintf("Error collapsing %s -> %s: %s", sig_476, sig_83, e$message))
+        }
+      )
+    } else {
+      if (!sig_476 %in% available_476) {
+        message(sprintf("Skipping %s: not found in 476-type signatures", sig_476))
+      }
+      if (!sig_83 %in% available_83) {
+        message(sprintf("Skipping %s: %s not found in 83-type signatures", sig_476, sig_83))
+      }
+    }
+  }
+
+  # Set column names
+  colnames(result_matrix) <- result_cols
+
+  # Convert to data frame
+  result_df <- as.data.frame(result_matrix)
+
+  # Attach attributes
+  attr(result_df, "cosine_similarities") <- cosine_similarities
+  if (store_flows) {
+    attr(result_df, "flows") <- flows_list
+  }
+
+  result_df
+}
+
+
+#' Generate Sankey plot PNG for a signature pair
+#'
+#' Creates a Sankey plot PNG file for use in vignettes, showing the flow
+#' from 476-type to 83-type for the "other" category (non-single-base indels).
+#'
+#' @param sig_476_name Column name from 476-type signatures (e.g., "InsDel1a")
+#' @param sig_83_name Column name from 83-type signatures (e.g., "C_ID1")
+#' @param out_dir Output directory for the PNG file
+#' @param data_dir Directory containing the data files
+#' @param min_flow Minimum flow value to display
+#' @param width Plot width in inches
+#' @param height Plot height in inches
+#' @param dpi Resolution in dots per inch
+#'
+#' @return List with paths to generated PNG files:
+#'   \item{other_ins}{Path to "other insertions" Sankey PNG}
+#'   \item{other_del}{Path to "other deletions" Sankey PNG}
+#'   \item{cosine}{Cosine similarity between collapsed and target}
+#'
+#' @examples
+#' \dontrun{
+#' paths <- generate_sankey_png("InsDel1a", "C_ID1", "output")
+#' }
+generate_sankey_png <- function(
+  sig_476_name,
+  sig_83_name,
+  out_dir,
+  data_dir = "Manuscript_data",
+  min_flow = 0.001,
+  width = 12,
+  height = 8,
+  dpi = 150
+) {
+  # Collapse the signature
+  result <- collapse_476_to_83(sig_476_name, sig_83_name, data_dir)
+
+  # Calculate cosine similarity
+  cos_sim <- lsa::cosine(result$y, result$target)[1, 1]
+
+  # Generate Sankey plots
+  title_prefix <- sprintf("%s -> %s", sig_476_name, sig_83_name)
+  plots <- plot_collapse_sankey(result, min_flow = min_flow, title_prefix = title_prefix)
+
+  # Create output directory
+  dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
+
+  # Safe filename prefix
+  safe_name <- gsub("[^a-zA-Z0-9_]", "_", sig_476_name)
+
+  paths <- list(cosine = cos_sim)
+
+  # Save "other insertions" plot
+  if (!is.null(plots$other_ins)) {
+    path_ins <- file.path(out_dir, paste0(safe_name, "_sankey_other_ins.png"))
+    ggplot2::ggsave(path_ins, plots$other_ins, width = width, height = height, dpi = dpi, bg = "white")
+    paths$other_ins <- path_ins
+  }
+
+  # Save "other deletions" plot
+  if (!is.null(plots$other_del)) {
+    path_del <- file.path(out_dir, paste0(safe_name, "_sankey_other_del.png"))
+    ggplot2::ggsave(path_del, plots$other_del, width = width, height = height, dpi = dpi, bg = "white")
+    paths$other_del <- path_del
+  }
+
+  paths
+}
+
+
 plot_collapse_476_to_83 <- function(
   sig_476_name,
   sig_83_name,
