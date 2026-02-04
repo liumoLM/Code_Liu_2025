@@ -229,10 +229,12 @@ get_signature_mapping <- function(data_dir = "Manuscript_data") {
 #' @return A list with one element per successfully collapsed signature pair.
 #'   Each element is named by the 476-type signature name and contains the
 #'   result from collapse_476_to_83().
-collapse_all_signatures <- function(data_dir = "Manuscript_data",
-                                     out_dir = "output",
-                                     min_flow = 0.001,
-                                     all_sankey = FALSE) {
+collapse_and_plot_all_signatures <- function(
+  data_dir = "Manuscript_data",
+  out_dir = "output",
+  min_flow = 0.001,
+  all_sankey = FALSE
+) {
   mapping <- get_signature_mapping(data_dir)
 
   # Load signature files to check which signatures exist
@@ -255,7 +257,8 @@ collapse_all_signatures <- function(data_dir = "Manuscript_data",
       tryCatch(
         {
           results[[sig_476]] <- plot_collapse_476_to_83(
-            sig_476, sig_83,
+            sig_476,
+            sig_83,
             data_dir = data_dir,
             out_dir = out_dir,
             min_flow = min_flow,
@@ -371,14 +374,18 @@ extract_83_final_number <- function(x) {
 #' @param x Character vector of identifiers
 #' @return Numeric vector
 extract_first_number <- function(x) {
-  sapply(x, function(s) {
-    # Find first number (including 5+)
-    m <- regmatches(s, regexpr("\\d+", s))
-    if (length(m) > 0 && nchar(m) > 0) {
-      return(as.numeric(m))
-    }
-    return(NA_real_)
-  }, USE.NAMES = FALSE)
+  sapply(
+    x,
+    function(s) {
+      # Find first number (including 5+)
+      m <- regmatches(s, regexpr("\\d+", s))
+      if (length(m) > 0 && nchar(m) > 0) {
+        return(as.numeric(m))
+      }
+      return(NA_real_)
+    },
+    USE.NAMES = FALSE
+  )
 }
 
 
@@ -482,25 +489,37 @@ create_sankey_plot <- function(
     # M = 0 (first), no M = 1 (second)
     source_m_order <- ifelse(source_has_m, 0, 1)
     source_order <- order(source_m_order, source_first_num)
-    plot_data$source <- factor(plot_data$source, levels = source_levels[source_order])
+    plot_data$source <- factor(
+      plot_data$source,
+      levels = source_levels[source_order]
+    )
 
     target_levels <- unique(plot_data$target)
     target_has_m <- has_microhomology(target_levels)
     target_first_num <- extract_first_number(target_levels)
     target_m_order <- ifelse(target_has_m, 0, 1)
     target_order <- order(target_m_order, target_first_num)
-    plot_data$target <- factor(plot_data$target, levels = target_levels[target_order])
+    plot_data$target <- factor(
+      plot_data$target,
+      levels = target_levels[target_order]
+    )
   } else if (order_by_first_number) {
     # Order strata by first number only
     source_levels <- unique(plot_data$source)
     source_first_num <- extract_first_number(source_levels)
     source_order <- order(source_first_num)
-    plot_data$source <- factor(plot_data$source, levels = source_levels[source_order])
+    plot_data$source <- factor(
+      plot_data$source,
+      levels = source_levels[source_order]
+    )
 
     target_levels <- unique(plot_data$target)
     target_first_num <- extract_first_number(target_levels)
     target_order <- order(target_first_num)
-    plot_data$target <- factor(plot_data$target, levels = target_levels[target_order])
+    plot_data$target <- factor(
+      plot_data$target,
+      levels = target_levels[target_order]
+    )
   } else {
     # Order by flow for better visual appearance
     plot_data <- plot_data[order(-plot_data$flow), ]
@@ -783,7 +802,10 @@ plot_collapse_sankey <- function(result, min_flow = 0.001, title_prefix = "") {
 #' ID83_mapped <- collapse_all_476_to_83_matrix(type476_sigs)
 #' }
 collapse_all_476_to_83_matrix <- function(
-  type476_sigs,
+  type476_sigs = read.delim(
+    "Manuscript_data/Liu_et_al_final_476_type_signatures.tsv",
+    row.names = 1
+  ),
   data_dir = "Manuscript_data",
   store_flows = FALSE
 ) {
@@ -829,7 +851,10 @@ collapse_all_476_to_83_matrix <- function(
           result_matrix <- cbind(result_matrix, y_col)
 
           # Store cosine similarity
-          cos_sim <- lsa::cosine(collapse_result$y, collapse_result$target)[1, 1]
+          cos_sim <- lsa::cosine(collapse_result$y, collapse_result$target)[
+            1,
+            1
+          ]
           cosine_similarities[col_name] <- cos_sim
 
           # Store flows if requested
@@ -840,15 +865,27 @@ collapse_all_476_to_83_matrix <- function(
           message(sprintf("  Cosine similarity: %.4f", cos_sim))
         },
         error = function(e) {
-          message(sprintf("Error collapsing %s -> %s: %s", sig_476, sig_83, e$message))
+          message(sprintf(
+            "Error collapsing %s -> %s: %s",
+            sig_476,
+            sig_83,
+            e$message
+          ))
         }
       )
     } else {
       if (!sig_476 %in% available_476) {
-        message(sprintf("Skipping %s: not found in 476-type signatures", sig_476))
+        message(sprintf(
+          "Skipping %s: not found in 476-type signatures",
+          sig_476
+        ))
       }
       if (!sig_83 %in% available_83) {
-        message(sprintf("Skipping %s: %s not found in 83-type signatures", sig_476, sig_83))
+        message(sprintf(
+          "Skipping %s: %s not found in 83-type signatures",
+          sig_476,
+          sig_83
+        ))
       }
     }
   }
@@ -910,7 +947,11 @@ generate_sankey_png <- function(
 
   # Generate Sankey plots
   title_prefix <- sprintf("%s -> %s", sig_476_name, sig_83_name)
-  plots <- plot_collapse_sankey(result, min_flow = min_flow, title_prefix = title_prefix)
+  plots <- plot_collapse_sankey(
+    result,
+    min_flow = min_flow,
+    title_prefix = title_prefix
+  )
 
   # Create output directory
   dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
@@ -923,14 +964,28 @@ generate_sankey_png <- function(
   # Save "other insertions" plot
   if (!is.null(plots$other_ins)) {
     path_ins <- file.path(out_dir, paste0(safe_name, "_sankey_other_ins.png"))
-    ggplot2::ggsave(path_ins, plots$other_ins, width = width, height = height, dpi = dpi, bg = "white")
+    ggplot2::ggsave(
+      path_ins,
+      plots$other_ins,
+      width = width,
+      height = height,
+      dpi = dpi,
+      bg = "white"
+    )
     paths$other_ins <- path_ins
   }
 
   # Save "other deletions" plot
   if (!is.null(plots$other_del)) {
     path_del <- file.path(out_dir, paste0(safe_name, "_sankey_other_del.png"))
-    ggplot2::ggsave(path_del, plots$other_del, width = width, height = height, dpi = dpi, bg = "white")
+    ggplot2::ggsave(
+      path_del,
+      plots$other_del,
+      width = width,
+      height = height,
+      dpi = dpi,
+      bg = "white"
+    )
     paths$other_del <- path_del
   }
 
