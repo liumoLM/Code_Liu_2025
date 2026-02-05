@@ -7,40 +7,11 @@ library(stringi)
 library(dplyr)
 library(ICAMS)
 data_dir = "~/MEGA/important_mut_sig_data/tcga_from_2020_paper"
-indel_simple_path = file.path(data_dir, "indels_only.csv")
+
 vcfdir = file.path(data_dir, "vcfs")
-get_tgca_indel_vcf = function() {
-  xx = readr::read_delim(
-    file.path(data_dir, "v0.2.7.PUBLIC.SORTED.DEDUP.UNIQ.simple"),
-    delim = '\t',
-    col_names = c(
-      'cancer_type_long',
-      'ID',
-      'cancer_type',
-      'genome_version',
-      'mutation_type',
-      'CHROM',
-      'POS',
-      'POS2',
-      'REF',
-      'ALT',
-      'num_callers',
-      'callers'
-    ),
-    col_type = "cccccciiccic"
-  )
-  xx = dplyr::filter(xx, mutation_type %in% c("DEL", "INS"))
-  write_csv(xx, indel_simple_path)
-}
 
-get_tgca_indel_vcf2 = function() {
-  ICAMS:::GenerateVCFsFromIndelSimpleFile1(
-    file = indel_simple_path,
-    output.dir = file.path(data_dir, "vcfs"),
-    max.mc.cores = 5
-  )
-}
 
+# ICAMS:::GenerateVCFsFromIndelSimpleFile1(
 
 source("~/github/Code_Liu_2025/code/Generate_Koh89_Koh476_catalog_0121.R")
 
@@ -73,19 +44,25 @@ make476catalog = function(tcgaid) {
   return(GenerateKoh476CatalogfromAnnotateVcf(b3, "sample_id"))
 }
 
-id16_vcf_path = dir(
-  vcfdir,
-  pattern = "TCGA-13-0889-01A-01W-0420-08",
-  full.names = TRUE
-)
 foo = ICAMS::VCFsToCatalogs(
-  id16_vcf_path,
+  "ID15_ID16/OVARIAN.SEROUS.CYSTADENOCARCINOMA.TCGA-13-0889-01A-01W-0420-08.GRCh37.indel.vcf",
   filter.status = "PASS",
   ref.genome = "hg19"
 )
+correct_id16 = foo$catID
+colnames(correct_id16) = c('ID16')
+correct_id16 <- correct_id16 / colSums(correct_id16)
+write.table(
+  correct_id16,
+  "ID15_ID16/correct_ID16.tsv",
+  sep = '\t',
+  col.names = NA
+)
+
 bar = ICAMS::ReadVCFs(id16_vcf_path, filter.status = "PASS")
 qq = ICAMS::AnnotateIDVCF(bar[[1]], ref.genome = "hg19")
 
+# FROM HERE DOWN, IGNORE
 
 # wget https://www.openbioinformatics.org/annovar/download/0wgxR2rIVP/annovar.latest.tar.gz
 
@@ -110,22 +87,6 @@ colnames(c89)
 source("~/github/Code_Liu_2025/code/Koh89_Koh476_Plotting_Functions.R")
 library(PCAWG7)
 
-cats83 = PCAWG7::spectra$TCGA$ID
-colnames(cats83) = stringi::stri_replace(
-  colnames(cats83),
-  regex = "^.*::",
-  replacement = ""
-)
-cats83 = cats83[, idlist]
-write.table(cats83, file = "ID15_I16_83.tsv", sep = '\t', row.names = TRUE)
-
-sbs = PCAWG7::spectra$TCGA$SBS96
-colnames(sbs) = stringi::stri_replace(
-  colnames(sbs),
-  regex = "^.*::",
-  replacement = ""
-)
-sbs = sbs[, idlist]
 
 plotall <- function(xx) {
   library(ggplotify)
