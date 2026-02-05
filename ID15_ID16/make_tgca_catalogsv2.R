@@ -50,11 +50,24 @@ foo = ICAMS::VCFsToCatalogs(
   ref.genome = "hg19"
 )
 correct_id16 = foo$catID
+correct_16_linking_tumor = foo$catID
 colnames(correct_id16) = c('ID16')
 correct_id16 <- correct_id16 / colSums(correct_id16)
 write.table(
   correct_id16,
   "ID15_ID16/correct_ID16.tsv",
+  sep = '\t',
+  col.names = NA
+)
+uu = read.delim(
+  "Manuscript_data/Liu_et_al_83_type_spectra.tsv",
+  check.names = FALSE,
+  row.names = 1
+)
+uu[, "WES::TCGA-13-0889-01A-01W-0420-08"] = correct_16_linking_tumor
+write.table(
+  uu,
+  "Manuscript_data/Liu_et_al_83_type_spectra.tsv",
   sep = '\t',
   col.names = NA
 )
