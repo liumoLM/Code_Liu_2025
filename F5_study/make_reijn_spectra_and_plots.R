@@ -5,6 +5,9 @@ library(ICAMS)
 library(mSigPlot)
 library(ggplot2)
 library(cowplot)
+library(patchwork)
+library(glue)
+library(Cairo)
 
 sigFfile = "DRUP01030028T"
 sig4file = "CPCT02100089T"
@@ -26,8 +29,9 @@ myplot476 = function(xx, plot_title) {
   plot_476(
     xx,
     plot_title = plot_title,
-    base_size = 8,
-    label_size = 1
+    base_size = 11,
+    label_size = 3,
+    text_size = 3
   )
 }
 
@@ -143,45 +147,45 @@ stdread("Manuscript_data/Liu_et_al_476_type_spectra.tsv") %>%
   dplyr::select(dplyr::contains(sig4file)) %>%
   myplot476(glue("InsDel4 linking tumor {sig4file}")) -> f4476
 
-p_tight <- theme(plot.margin = margin(0, 0, 0, 0, "pt"))
 
-grob1 <- gridExtra::arrangeGrob(
-  grobs = c(
-    sigF476 + p_tight,
-    fF476 + p_tight,
-    sig4476 + p_tight,
-    f4476 + p_tight,
-    mice["mouse476"] + p_tight,
-    cells476["cell476_mut"] + p_tight,
-    cells476["cell476_wt"] + p_tight
-  ),
-  ncol = 1,
-  nrow = 7,
-  padding = unit(0, "line")
+pw1 <- sigF476 /
+  fF476 /
+  sig4476 /
+  f4476 /
+  mice[["mouse476"]] /
+  cells476[["cell476_mut"]] /
+  cells476[["cell476_wt"]] &
+  theme(plot.margin = margin(0, 0, 0, 0, "pt"))
+
+# Define the final layout with 1/2 inch margins on all sides
+pa <- plot_annotation(
+  theme = theme(
+    # 'plot.margin' here refers to the margin of the entire assembly
+    plot.margin = margin(0.75, 0.75, 0.75, 0.75, "in")
+  )
 )
+
 ggsave(
   "F5_study/insdelF_plots.pdf",
-  grob1,
-  width = 10,
-  height = 14,
+  pw1 + pa,
+  device = cairo_pdf,
+  width = 8.5,
+  height = 11,
   units = "in"
 )
 
-grob2 <- gridExtra::arrangeGrob(
-  grobs = c(
-    mice["mouse89"],
-    cells89,
-    mice["mouse83"],
-    cells83,
-    sig83F,
-    sig834
-  ),
-  ncol = 1,
-  padding = unit(0, "line")
-)
+pw2 <- mice[["mouse89"]] /
+  cells89[["cell89_mut"]] /
+  cells89[["cell89_wt"]] /
+  mice[["mouse83"]] /
+  cells83[[1]] /
+  cells83[[2]] /
+  sig83F /
+  sig834
 ggsave(
   "F5_study/insdelF_more_plots.pdf",
-  grob2,
+  pw2,
+  device = cairo_pdf,
   width = 10,
   height = 15,
   units = "in"
