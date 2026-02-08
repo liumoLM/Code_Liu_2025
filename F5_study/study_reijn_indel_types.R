@@ -17,10 +17,10 @@ mvcf %>%
   dplyr::filter(nchar(ins_or_del_seq) > 1) %>%
   dplyr::count(short_visual) %>%
   dplyr::arrange(desc(n)) %>%
-  write.csv("tmp/F5_study/reij_mouse.csv")
+  write.csv("F5_study/reijn_mouse.csv")
 
 rvcf %>%
   dplyr::filter(nchar(ins_or_del_seq) > 1) %>%
   dplyr::count(short_visual) %>%
   dplyr::arrange(desc(n)) %>%
-  write.csv("tmp/F5_study/reij_rpe1.csv")
+  write.csv("F5_study/reijn_rpe1.csv")
