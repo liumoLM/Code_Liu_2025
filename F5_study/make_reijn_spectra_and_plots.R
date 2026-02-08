@@ -102,7 +102,7 @@ cells83 = plot_cells83()
 
 
 cowplot::save_plot(
-  "tmp/F5_study/insdelF_plots.pdf",
+  "F5_study/insdelF_plots.pdf",
   gridExtra::marrangeGrob(
     grobs = c(
       mice["mouse476"],
