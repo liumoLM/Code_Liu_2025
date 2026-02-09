@@ -19,19 +19,21 @@ myplot83 = function(xx, plot_title) {
   plot_83(
     xx,
     plot_title = plot_title,
-    base_size = base_size83,
-    text_size = text_size83,
-    count_label_size = count_label_size83
+    base_size = 11,
+    text_size = 4,
+    count_label_size = 3.5
   )
 }
+
 
 myplot476 = function(xx, plot_title) {
   plot_476(
     xx,
     plot_title = plot_title,
-    base_size = 11,
+    base_size = 10,
     label_size = 3,
-    text_size = 3
+    text_size = 2.5,
+    label_threshold_denominator = 10
   )
 }
 
@@ -42,10 +44,6 @@ rpe1 = files[2]
 mvcf = read.delim(mouse, sep = '\t')
 
 rvcf = read.delim(rpe1, sep = '\t')
-
-base_size83 <- 25
-text_size83 <- 7
-count_label_size83 <- 6.5
 
 # MICE, type 476 and type 89
 plot_mice = function() {
@@ -62,7 +60,12 @@ plot_mice = function() {
     list(all_mice = mvcf[, 1:8]),
     ref.genome = "mm10"
   )
-  mouse83 = myplot83(all_mice_83[[1]], plot_title = "Mutated mice")
+  all_mice_83[[1]]["DEL:T:1:5+", ] <- 0
+  all_mice_83[[1]]["INS:T:1:5+", ] <- 0
+  mouse83 = myplot83(
+    all_mice_83[[1]],
+    plot_title = "Mutated mice, ins/del T in long polyT <- 0"
+  )
   return(c(mouse476 = p4_1, mouse89 = p8_1, mouse83 = mouse83))
 }
 mice = plot_mice()
@@ -100,10 +103,21 @@ plot_cells83 = function() {
     `$`(catalog) -> cats
   mut = cats[, 1:2]
   wt = cats[, 3:5]
+  # browser()
   all_mut = as.data.frame(rowSums(mut))
-  cell83_mut = myplot83(all_mut, plot_title = "Mutated cells")
+  all_mut["DEL:T:1:5+", ] <- 0
+  all_mut["INS:T:1:5+", ] <- 0
+  cell83_mut = myplot83(
+    all_mut,
+    plot_title = "Mutated cells, ins/del T in long polyT <- 0"
+  )
   all_wt = as.data.frame(rowSums(wt))
-  cell83_wt = myplot83(all_wt, plot_title = "Wild-type cells")
+  all_wt["DEL:T:1:5+", ] <- 0
+  all_wt["INS:T:1:5+", ] <- 0
+  cell83_wt = myplot83(
+    all_wt,
+    plot_title = "Wild-type cells, ins/del T in long polyT <- 0"
+  )
   return(c(cell83_mut, cell83_wt))
 }
 cells83 = plot_cells83()
@@ -148,43 +162,83 @@ stdread("Manuscript_data/Liu_et_al_476_type_spectra.tsv") %>%
   myplot476(glue("InsDel4 linking tumor {sig4file}")) -> f4476
 
 
-pw1 <- sigF476 /
+pw476 <- (sigF476 /
   fF476 /
-  sig4476 /
-  f4476 /
   mice[["mouse476"]] /
   cells476[["cell476_mut"]] /
-  cells476[["cell476_wt"]] &
-  theme(plot.margin = margin(0, 0, 0, 0, "pt"))
+  cells476[["cell476_wt"]] /
+  sig4476 /
+  f4476) &
+  theme(
+    # Removes the "Indel Type" text and its occupied space
+    axis.title.x = element_blank(),
+    # Removes the x-axis text (R11A, etc.) if you don't need them for every plot
+    # axis.text.x = element_blank(),
+    plot.margin = margin(t = 0, r = 0, b = -0.2, l = 0, unit = "cm")
+  ) &
+  coord_cartesian(clip = "on") &
+  scale_y_continuous(expand = c(0, 0))
 
-# Define the final layout with 1/2 inch margins on all sides
 pa <- plot_annotation(
+  caption = "Indel Type",
   theme = theme(
-    # 'plot.margin' here refers to the margin of the entire assembly
+    # Centers the caption at the bottom of the page
+    plot.caption = element_text(hjust = 0.5, size = 12, face = "plain"),
+    # This remains your 0.75-inch page border
     plot.margin = margin(0.75, 0.75, 0.75, 0.75, "in")
   )
 )
 
 ggsave(
-  "F5_study/insdelF_plots.pdf",
-  pw1 + pa,
+  "F5_study/insdelF_plots_476.pdf",
+  pw476 + pa,
   device = cairo_pdf,
   width = 8.5,
   height = 11,
   units = "in"
 )
 
-pw2 <- mice[["mouse89"]] /
+pw89 <- (mice[["mouse89"]] /
   cells89[["cell89_mut"]] /
-  cells89[["cell89_wt"]] /
+  cells89[["cell89_wt"]]) &
+  theme(
+    # Removes the "Indel Type" text and its occupied space
+    axis.title.x = element_blank(),
+    # Removes the x-axis text (R11A, etc.) if you don't need them for every plot
+    # axis.text.x = element_blank(),
+    plot.margin = margin(t = 0, r = 0, b = -0.2, l = 0, unit = "cm")
+  ) &
+  coord_cartesian(clip = "on") &
+  scale_y_continuous(expand = c(0, 0))
+
+ggsave(
+  "F5_study/insdelF_plots_89.pdf",
+  pw89 + pa,
+  device = cairo_pdf,
+  width = 8.5,
+  height = 11,
+  units = "in"
+)
+
+pw83 <- (sig83F /
   mice[["mouse83"]] /
   cells83[[1]] /
   cells83[[2]] /
-  sig83F /
-  sig834
+  sig834) &
+  theme(
+    # Removes the "Indel Type" text and its occupied space
+    axis.title.x = element_blank(),
+    # Removes the x-axis text (R11A, etc.) if you don't need them for every plot
+    # axis.text.x = element_blank(),
+    plot.margin = margin(t = 0.5, r = 0, b = 0.5, l = 0, unit = "cm")
+  ) &
+  coord_cartesian(clip = "off") &
+  scale_y_continuous(expand = c(0, 0))
+
+
 ggsave(
-  "F5_study/insdelF_more_plots.pdf",
-  pw2,
+  "F5_study/insdelF83_plots.pdf",
+  pw83 + pa,
   device = cairo_pdf,
   width = 10,
   height = 15,
