@@ -143,32 +143,18 @@ for (deltype in c(
   "Del2:U2:R2"
 )) {
   cat("###", deltype, "\n\n")
-  all_norm %>%
-    filter(Koh_476 == deltype) %>%
-    select(-Koh_476) %>%
-    mutate(prop_n = sprintf("%.4f", prop_n), n = as.character(n)) %>%
-    tidyr::pivot_wider(
-      id_cols = c(norm, short_visual),
-      names_from = source,
-      values_from = c(n, prop_n),
-      names_glue = "{source} {.value}",
-      names_vary = "slowest",
-      values_fill = ""
-    ) %>%
-    {
-      wide <- .
-      prop_cols <- grep("prop_n", names(wide), value = TRUE)
-      total <- setNames(as.list(rep("", ncol(wide))), names(wide))
-      total[["norm"]] <- "**Total**"
-      for (pc in prop_cols) {
-        vals <- as.numeric(wide[[pc]][wide[[pc]] != ""])
-        total[[pc]] <- sprintf("%.4f", sum(vals, na.rm = TRUE))
-      }
-      bind_rows(wide, tibble(!!!total))
-    } %>%
-    knitr::kable() %>%
-    print()
-  cat("\n\n")
+  sub <- all_norm %>%
+    filter(Koh_476 == deltype)
+  for (src in unique(sub$source)) {
+    cat("**", src, "**\n\n", sep = "")
+    sub %>%
+      filter(source == src) %>%
+      select(-Koh_476, -source) %>%
+      mutate(prop_n = sprintf("%.4f", prop_n)) %>%
+      knitr::kable() %>%
+      print()
+    cat("\n\n")
+  }
 }
 ```
 
