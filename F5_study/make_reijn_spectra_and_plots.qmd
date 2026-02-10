@@ -59,23 +59,22 @@ myplot476 = function(xx, plot_title) {
 There are multiple samples in each VCF, as indicated by column `Sample`.
 
 ```{r}
-files = dir("Manuscript_data", pattern = "Reijn", full.names = TRUE)
-mouse = files[1]
-rpe1 = files[2]
+mouse = "../Manuscript_data/Reijn.mouse.vcfs.with.annotation.txt"
+rpe1 = "../Manuscript_data/Reijn.rpe1.vcfs.with.annotation.txt"
 
-mvcf = read.delim(mouse, sep = '\t') # Mice
+mvcf = fread(mouse) # Mice
 
-rvcf = read.delim(rpe1, sep = '\t') # Cells
+rvcf = fread(rpe1) # Cells
 ```
 
 ## Split Reijn cell data by mutated and wild-type
 
 ```{r}
 rvcf %>% dplyr::filter(Sample %in% c("AKO1_4", "BKO1_4")) -> cell_mut
-stdwrite(cell_mut, "Manuscript_data/Reijn_mut_cell_annot.vcf")
+fwrite(cell_mut, "../Manuscript_data/Reijn_mut_cell_annot.vcf")
 
 rvcf %>% dplyr::filter(!Sample %in% c("AKO1_4", "BKO1_4")) -> cell_wt
-stdwrite(cell_wt, "Manuscript_data/Reijn_wt_cell_annot.vcf")
+fwrite(cell_wt, "../Manuscript_data/Reijn_wt_cell_annot.vcf")
 ```
 
 ## Get Reijn summary spectra catalogs
@@ -87,7 +86,7 @@ GenerateKoh476CatalogfromAnnotateVcf(mvcf, "Sample") %>%
 
 colnames(mouse476) <- "all_mouse_mutations_summed"
 
-stdwrite(mouse476, "F5_study/mutated_mice.tsv")
+stdwrite(mouse476, "mutated_mice.tsv")
 
 ```
 
@@ -124,9 +123,9 @@ mice = plot_mice()
 plot_cells476 = function() {
   r4 = GenerateKoh476CatalogfromAnnotateVcf(rvcf, "Sample")
   r4_mut = r4[, 1:2]
-  stdwrite("F5_study/mutated_cells.tsv")
+  stdwrite(r4_mut, "mutated_cells.tsv")
   r4_wt = r4[, 3:5]
-  stdrwrte("F5_study/wild_type_cells.tsv")
+  stdwrite(r4_mut, "wild_type_cells.tsv")
   r_all_mut = as.data.frame(rowSums(r4_mut))
   p4_2 = myplot476(r_all_mut, plot_title = "Mutated cells")
   r_all_wt = as.data.frame(rowSums(r4_wt))
@@ -187,11 +186,11 @@ cells83 = plot_cells83()
 ## Signature plots (83 type)
 
 ```{r}
-stdread("Manuscript_data/Liu_et_al_final_83_type_signatures.tsv") %>%
+stdread("../Manuscript_data/Liu_et_al_final_83_type_signatures.tsv") %>%
   `[`("ID_F") %>%
   myplot83("ID_F") -> sig83F
 
-stdread("Manuscript_data/Liu_et_al_final_83_type_signatures.tsv") %>%
+stdread("../Manuscript_data/Liu_et_al_final_83_type_signatures.tsv") %>%
   `[`("C_ID4") %>%
   myplot83("C_ID4") -> sig834
 ```
@@ -199,7 +198,7 @@ stdread("Manuscript_data/Liu_et_al_final_83_type_signatures.tsv") %>%
 ## Signature plots (476 type)
 
 ```{r}
-stdread("Manuscript_data/Liu_et_al_final_476_type_signatures.tsv") %>%
+stdread("../Manuscript_data/Liu_et_al_final_476_type_signatures.tsv") %>%
   dplyr::select(dplyr::contains("InsDel_F")) -> sigF_catalog
 sigF_catalog["Del2:M1", ]
 # 0.2399
@@ -209,7 +208,7 @@ sigF_catalog["Del2:U2:R2", ]
 sigF_catalog %>%
   myplot476("InsDelF") -> sigF476
 
-stdread("Manuscript_data/Liu_et_al_final_476_type_signatures.tsv") %>%
+stdread("../Manuscript_data/Liu_et_al_final_476_type_signatures.tsv") %>%
   `[`("InsDel4") -> sig4_catalog
 sig4_catalog["Del2:M1", ]
 # 0.04781
@@ -223,13 +222,17 @@ sig4_catalog %>%
 ## Linking tumor spectra
 
 ```{r}
-stdread("Manuscript_data/Liu_et_al_476_type_spectra.tsv") %>%
+stdread("../Manuscript_data/Liu_et_al_476_type_spectra.tsv") %>%
   dplyr::select(dplyr::contains(sigFfile)) -> sFlink_catalog
 
 sFlink_catalog %>%
   myplot476(glue("InsDelF linking tumor {sigFfile}")) -> fF476
 sFlink_catalog["Del2:M1", ]
+
 # 339
+
+sFlink_catalog["Del2:M1", ] / colSums(sFlink_catalog)
+
 sFlink_catalog["Del2:U2:R2", ]
 # 294
 
@@ -239,14 +242,14 @@ sFlink_catalog %>%
   filter(!grepl("\\([CT]\\)", rownames(sFlink_catalog))) %>%
   colSums()
 
-stdread("Manuscript_data/Liu_et_al_476_type_spectra.tsv") %>%
+stdread("../Manuscript_data/Liu_et_al_476_type_spectra.tsv") %>%
   dplyr::select(dplyr::contains(sig4file)) -> s4link_catalog
 s4link_catalog["Del2:M1", ]
 # 38
 s4link_catalog["Del2:U2:R2", ]
 # 77
 
-s4link_catlog %>%
+s4link_catalog %>%
   myplot476(glue("InsDel4 linking tumor {sig4file}")) -> f4476
 ```
 
@@ -281,7 +284,7 @@ pa <- plot_annotation(
 )
 
 ggsave(
-  "F5_study/insdelF_plots_476.pdf",
+  "insdelF_plots_476.pdf",
   pw476 + pa,
   device = cairo_pdf,
   width = 8.5,
@@ -307,7 +310,7 @@ pw89 <- (mice[["mouse89"]] /
   scale_y_continuous(expand = c(0, 0))
 
 ggsave(
-  "F5_study/insdelF_plots_89.pdf",
+  "insdelF_plots_89.pdf",
   pw89 + pa,
   device = cairo_pdf,
   width = 8.5,
@@ -336,7 +339,7 @@ pw83 <- (sig83F /
 
 
 ggsave(
-  "F5_study/insdelF83_plots.pdf",
+  "insdelF83_plots.pdf",
   pw83 + pa,
   device = cairo_pdf,
   width = 10,
