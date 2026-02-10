@@ -1,5 +1,11 @@
-# make_reijn_spectra.R
+---
+title: "Reijn spectra and plots"
+format: html
+---
 
+## Setup
+
+```{r}
 library(magrittr)
 library(ICAMS)
 library(mSigPlot)
@@ -13,8 +19,11 @@ sigFfile = "DRUP01030028T"
 sig4file = "CPCT02100089T"
 
 source("code/Generate_Koh89_Koh476_catalog_0121.R")
+```
 
-## Plot linking tumors and signature spectra
+## Helper functions
+
+```{r}
 stdread = function(ff) {
   read.delim(ff, sep = '\t', row.names = 1)
 }
@@ -33,7 +42,6 @@ myplot83 = function(xx, plot_title) {
   )
 }
 
-
 myplot476 = function(xx, plot_title) {
   plot_476(
     xx,
@@ -44,7 +52,13 @@ myplot476 = function(xx, plot_title) {
     label_threshold_denominator = 10
   )
 }
+```
 
+## Read Annotated VCFs from Reijn data
+
+There are multiple samples in each VCF, as indicated by column `Sample`.
+
+```{r}
 files = dir("Manuscript_data", pattern = "Reijn", full.names = TRUE)
 mouse = files[1]
 rpe1 = files[2]
@@ -52,14 +66,36 @@ rpe1 = files[2]
 mvcf = read.delim(mouse, sep = '\t') # Mice
 
 rvcf = read.delim(rpe1, sep = '\t') # Cells
+```
 
-# MICE, type 476 and type 89
+## Split Reijn cell data by mutated and wild-type
+
+```{r}
+rvcf %>% dplyr::filter(Sample %in% c("AKO1_4", "BKO1_4")) -> cell_mut
+stdwrite(cell_mut, "Manuscript_data/Reijn_mut_cell_annot.vcf")
+
+rvcf %>% dplyr::filter(!Sample %in% c("AKO1_4", "BKO1_4")) -> cell_wt
+stdwrite(cell_wt, "Manuscript_data/Reijn_wt_cell_annot.vcf")
+```
+
+## Get Reijn summary spectra catalogs
+
+```{r}
+GenerateKoh476CatalogfromAnnotateVcf(mvcf, "Sample") %>%
+  rowSums() %>%
+  as.data.frame() -> mouse476
+
+colnames(mouse476) <- "all_mouse_mutations_summed"
+
+stdwrite(mouse476, "F5_study/mutated_mice.tsv")
+
+```
+
+## Plot mice (476, 89, and 83 types)
+
+```{r}
 plot_mice = function() {
-  m4 = GenerateKoh476CatalogfromAnnotateVcf(mvcf, "Sample")
-  m_all = as.data.frame(rowSums(m4))
-  colnames(m_all) <- "all_mouse_mutations_summed"
-  stdwrite(m_all, "F5_study/mutated_mice.tsv")
-  p4_1 = myplot476(m_all, plot_title = "Mutated mice")
+  p4_1 = myplot476(mouse476, plot_title = "Mutated mice")
 
   xm4 = GenerateKoh89CatalogfromAnnotateVcf(mvcf, "Sample")
   xm_all = as.data.frame(rowSums(xm4))
@@ -80,7 +116,11 @@ plot_mice = function() {
 }
 
 mice = plot_mice()
+```
 
+## Plot cells (476 type)
+
+```{r}
 plot_cells476 = function() {
   r4 = GenerateKoh476CatalogfromAnnotateVcf(rvcf, "Sample")
   r4_mut = r4[, 1:2]
@@ -94,7 +134,11 @@ plot_cells476 = function() {
   return(c(cell476_mut = p4_2, cell476_wt = p4_3))
 }
 cells476 = plot_cells476()
+```
 
+## Plot cells (89 type)
+
+```{r}
 plot_cells89 = function() {
   xr4 = GenerateKoh89CatalogfromAnnotateVcf(rvcf, "Sample")
   xr4_mut = xr4[, 1:2]
@@ -106,7 +150,11 @@ plot_cells89 = function() {
   return(c(cell89_mut = p8_2, cell89_wt = p8_3))
 }
 cells89 = plot_cells89()
+```
 
+## Plot cells (83 type)
+
+```{r}
 plot_cells83 = function() {
   rvcf %>%
     dplyr::select(CHROM, POS, ALT, REF, Sample) %>%
@@ -134,8 +182,11 @@ plot_cells83 = function() {
   return(c(cell83_mut, cell83_wt))
 }
 cells83 = plot_cells83()
+```
 
+## Signature plots (83 type)
 
+```{r}
 stdread("Manuscript_data/Liu_et_al_final_83_type_signatures.tsv") %>%
   `[`("ID_F") %>%
   myplot83("ID_F") -> sig83F
@@ -143,16 +194,11 @@ stdread("Manuscript_data/Liu_et_al_final_83_type_signatures.tsv") %>%
 stdread("Manuscript_data/Liu_et_al_final_83_type_signatures.tsv") %>%
   `[`("C_ID4") %>%
   myplot83("C_ID4") -> sig834
+```
 
+## Signature plots (476 type)
 
-# stdread("Manuscript_data/Liu_et_al_final_89_type_signatures.tsv") %>%
-#  `[`("ID_F") %>%
-#  plot_89() -> sigF_89
-
-#stdread("Manuscript_data/Liu_et_al_final_89_type_signatures.tsv") %>%
-#  `[`("C_ID4") %>%
-#  plot_89() -> sig4_89
-
+```{r}
 stdread("Manuscript_data/Liu_et_al_final_476_type_signatures.tsv") %>%
   dplyr::select(dplyr::contains("InsDel_F")) -> sigF_catalog
 sigF_catalog["Del2:M1", ]
@@ -172,8 +218,11 @@ sig4_catalog["Del2:U2:R2", ]
 
 sig4_catalog %>%
   myplot476("InsDel4") -> sig4476
+```
 
+## Linking tumor spectra
 
+```{r}
 stdread("Manuscript_data/Liu_et_al_476_type_spectra.tsv") %>%
   dplyr::select(dplyr::contains(sigFfile)) -> sFlink_catalog
 
@@ -199,8 +248,11 @@ s4link_catalog["Del2:U2:R2", ]
 
 s4link_catlog %>%
   myplot476(glue("InsDel4 linking tumor {sig4file}")) -> f4476
+```
 
+## Combined 476-type plot
 
+```{r}
 pw476 <- (sigF476 /
   fF476 /
   mice[["mouse476"]] /
@@ -236,7 +288,11 @@ ggsave(
   height = 11,
   units = "in"
 )
+```
 
+## Combined 89-type plot
+
+```{r}
 pw89 <- (mice[["mouse89"]] /
   cells89[["cell89_mut"]] /
   cells89[["cell89_wt"]]) &
@@ -258,7 +314,11 @@ ggsave(
   height = 11,
   units = "in"
 )
+```
 
+## Combined 83-type plot
+
+```{r}
 pw83 <- (sig83F /
   mice[["mouse83"]] /
   cells83[[1]] /
@@ -283,3 +343,4 @@ ggsave(
   height = 15,
   units = "in"
 )
+```
