@@ -14,6 +14,7 @@ library(cowplot)
 library(patchwork)
 library(glue)
 library(Cairo)
+library(data.table)
 
 sigFfile = "DRUP01030028T"
 sig4file = "CPCT02100089T"
@@ -329,8 +330,10 @@ cells476_r = plot_cells476_right()
 
 sigF476_r = sigF_catalog %>% myplot476right("InsDelF")
 sig4476_r = sig4_catalog %>% myplot476right("InsDel4")
-fF476_r = sFlink_catalog %>% myplot476right(glue("InsDelF linking tumor {sigFfile}"))
-f4476_r = s4link_catalog %>% myplot476right(glue("InsDel4 linking tumor {sig4file}"))
+fF476_r = sFlink_catalog %>%
+  myplot476right(glue("InsDelF linking tumor {sigFfile}"))
+f4476_r = s4link_catalog %>%
+  myplot476right(glue("InsDel4 linking tumor {sig4file}"))
 
 pw476r <- (sigF476_r /
   fF476_r /
