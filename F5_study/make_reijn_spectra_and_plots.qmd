@@ -18,7 +18,7 @@ library(Cairo)
 sigFfile = "DRUP01030028T"
 sig4file = "CPCT02100089T"
 
-source("code/Generate_Koh89_Koh476_catalog_0121.R")
+source("../code/Generate_Koh89_Koh476_catalog_0121.R")
 ```
 
 ## Helper functions
@@ -49,7 +49,18 @@ myplot476 = function(xx, plot_title) {
     base_size = 10,
     label_size = 3,
     text_size = 2.5,
-    label_threshold_denominator = 10
+    label_threshold_denominator = 4
+  )
+}
+
+myplot476right = function(xx, plot_title) {
+  plot_476_right(
+    xx,
+    plot_title = plot_title,
+    base_size = 10,
+    label_size = 3,
+    text_size = 2.5,
+    label_threshold_denominator = 4
   )
 }
 ```
@@ -284,8 +295,60 @@ pa <- plot_annotation(
 )
 
 ggsave(
-  "insdelF_plots_476.pdf",
+  "F476.pdf",
   pw476 + pa,
+  device = cairo_pdf,
+  width = 8.5,
+  height = 11,
+  units = "in"
+)
+```
+
+## Combined 476-type plot (right)
+
+```{r}
+#| label: plot476right
+
+plot_mice_right = function() {
+  myplot476right(mouse476, plot_title = "Mutated mice")
+}
+
+plot_cells476_right = function() {
+  r4 = GenerateKoh476CatalogfromAnnotateVcf(rvcf, "Sample")
+  r4_mut = r4[, 1:2]
+  r4_wt = r4[, 3:5]
+  r_all_mut = as.data.frame(rowSums(r4_mut))
+  p4_2 = myplot476right(r_all_mut, plot_title = "Mutated cells")
+  r_all_wt = as.data.frame(rowSums(r4_wt))
+  p4_3 = myplot476right(r_all_wt, plot_title = "Wild-type cells")
+  return(c(cell476_mut = p4_2, cell476_wt = p4_3))
+}
+
+mice_r = list(mouse476 = plot_mice_right())
+cells476_r = plot_cells476_right()
+
+sigF476_r = sigF_catalog %>% myplot476right("InsDelF")
+sig4476_r = sig4_catalog %>% myplot476right("InsDel4")
+fF476_r = sFlink_catalog %>% myplot476right(glue("InsDelF linking tumor {sigFfile}"))
+f4476_r = s4link_catalog %>% myplot476right(glue("InsDel4 linking tumor {sig4file}"))
+
+pw476r <- (sigF476_r /
+  fF476_r /
+  mice_r[["mouse476"]] /
+  cells476_r[["cell476_mut"]] /
+  cells476_r[["cell476_wt"]] /
+  sig4476_r /
+  f4476_r) &
+  theme(
+    axis.title.x = element_blank(),
+    plot.margin = margin(t = 0, r = 0, b = -0.2, l = 0, unit = "cm")
+  ) &
+  coord_cartesian(clip = "on") &
+  scale_y_continuous(expand = c(0, 0))
+
+ggsave(
+  "F476_right.pdf",
+  pw476r + pa,
   device = cairo_pdf,
   width = 8.5,
   height = 11,
@@ -310,7 +373,7 @@ pw89 <- (mice[["mouse89"]] /
   scale_y_continuous(expand = c(0, 0))
 
 ggsave(
-  "insdelF_plots_89.pdf",
+  "F89.pdf",
   pw89 + pa,
   device = cairo_pdf,
   width = 8.5,
@@ -339,7 +402,7 @@ pw83 <- (sig83F /
 
 
 ggsave(
-  "insdelF83_plots.pdf",
+  "F83.pdf",
   pw83 + pa,
   device = cairo_pdf,
   width = 10,
