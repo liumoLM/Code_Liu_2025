@@ -1,5 +1,5 @@
 ---
-title: "Reijn spectra and plots"
+title: "Reijns spectra and plots"
 format: html
 ---
 
@@ -43,6 +43,19 @@ myplot83 = function(xx, plot_title) {
   )
 }
 
+myplot89 = function(xx, plot_title) {
+  plot_89(
+    xx,
+    plot_title = plot_title,
+    base_size = 11,
+    top_bar_text_size = 1.2,
+    x_axis_tick_label_size = 0.5,
+    y_axis_tick_label_size = 0.6,
+    y_title_size = 1,
+    title_text_size = 1.2
+  )
+}
+
 myplot476 = function(xx, plot_title) {
   plot_476(
     xx,
@@ -66,7 +79,7 @@ myplot476right = function(xx, plot_title) {
 }
 ```
 
-## Read Annotated VCFs from Reijn data
+## Read Annotated VCFs from Reijns data
 
 There are multiple samples in each VCF, as indicated by column `Sample`.
 
@@ -79,7 +92,7 @@ mvcf = fread(mouse) # Mice
 rvcf = fread(rpe1) # Cells
 ```
 
-## Split Reijn cell data by mutated and wild-type
+## Split Reijns cell data by mutated and wild-type
 
 ```{r}
 rvcf %>% dplyr::filter(Sample %in% c("AKO1_4", "BKO1_4")) -> cell_mut
@@ -89,7 +102,7 @@ rvcf %>% dplyr::filter(!Sample %in% c("AKO1_4", "BKO1_4")) -> cell_wt
 fwrite(cell_wt, "../Manuscript_data/Reijn_wt_cell_annot.vcf")
 ```
 
-## Get Reijn summary spectra catalogs
+## Get  Reijns summary spectra catalogs
 
 ```{r}
 GenerateKoh476CatalogfromAnnotateVcf(mvcf, "Sample") %>%
@@ -110,7 +123,7 @@ plot_mice = function() {
 
   xm4 = GenerateKoh89CatalogfromAnnotateVcf(mvcf, "Sample")
   xm_all = as.data.frame(rowSums(xm4))
-  p8_1 = plot_89(xm_all, base_size = 20, plot_title = "Mutated mice")
+  p8_1 = myplot89(xm_all, plot_title = "Mutated mice")
 
   colnames(mvcf)[1:2] <- c("CHROM", "POS")
   all_mice_83 = ICAMS::VCFsToIDCatalogs(
@@ -132,6 +145,8 @@ mice = plot_mice()
 ## Plot cells (476 type)
 
 ```{r}
+#| label: plotcells476
+
 plot_cells476 = function() {
   r4 = GenerateKoh476CatalogfromAnnotateVcf(rvcf, "Sample")
   r4_mut = r4[, 1:2]
@@ -139,10 +154,14 @@ plot_cells476 = function() {
   r4_wt = r4[, 3:5]
   stdwrite(r4_mut, "wild_type_cells.tsv")
   r_all_mut = as.data.frame(rowSums(r4_mut))
-  p4_2 = myplot476(r_all_mut, plot_title = "Mutated cells")
+  cell476_mut = myplot476(r_all_mut, plot_title = "Mutated cells")
   r_all_wt = as.data.frame(rowSums(r4_wt))
   p4_3 = myplot476(r_all_wt, plot_title = "Wild-type cells")
-  return(c(cell476_mut = p4_2, cell476_wt = p4_3))
+
+  return(c(
+    cell476_mut = cell476_mut,
+    cell476_wt = p4_3
+  ))
 }
 cells476 = plot_cells476()
 ```
@@ -155,9 +174,9 @@ plot_cells89 = function() {
   xr4_mut = xr4[, 1:2]
   xr4_wt = xr4[, 3:5]
   xr_all_mut = as.data.frame(rowSums(xr4_mut))
-  p8_2 = plot_89(xr_all_mut, base_size = 20, plot_title = "Mutated cells")
+  p8_2 = myplot89(xr_all_mut, plot_title = "Mutated cells")
   xr_all_wt = as.data.frame(rowSums(xr4_wt))
-  p8_3 = plot_89(xr_all_wt, base_size = 20, plot_title = "Wild-type cells")
+  p8_3 = myplot89(xr_all_wt, plot_title = "Wild-type cells")
   return(c(cell89_mut = p8_2, cell89_wt = p8_3))
 }
 cells89 = plot_cells89()
@@ -268,6 +287,8 @@ s4link_catalog %>%
 ## Combined 476-type plot
 
 ```{r}
+#| label: layout476
+
 pw476 <- (sigF476 /
   fF476 /
   mice[["mouse476"]] /
@@ -335,13 +356,21 @@ fF476_r = sFlink_catalog %>%
 f4476_r = s4link_catalog %>%
   myplot476right(glue("InsDel4 linking tumor {sig4file}"))
 
-pw476r <- (sigF476_r /
-  fF476_r /
-  mice_r[["mouse476"]] /
-  cells476_r[["cell476_mut"]] /
-  cells476_r[["cell476_wt"]] /
-  sig4476_r /
-  f4476_r) &
+pw476r <- (sigF476_r +
+  fF476_r +
+  mice_r[["mouse476"]] +
+  cells476_r[["cell476_mut"]] +
+  plot_spacer() +
+  cells476_r[["cell476_wt"]] +
+  sig4476_r +
+  f4476_r +
+  plot_spacer() +
+  plot_spacer() +
+  plot_spacer() +
+  plot_spacer() +
+  plot_spacer() +
+  plot_spacer() +
+  plot_layout(ncol = 2, nrow = 7)) &
   theme(
     axis.title.x = element_blank(),
     plot.margin = margin(t = 0, r = 0, b = -0.2, l = 0, unit = "cm")

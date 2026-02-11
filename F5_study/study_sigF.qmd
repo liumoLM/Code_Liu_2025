@@ -93,7 +93,7 @@ normit = function(xx) {
     mutate(post = gsub("\\[", "", post)) %>%
     mutate(clean = gsub("]", "", gsub("[><\\[]", "", vis2))) %>%
     mutate(
-      norm = ifelse(substr(clean, 1, 1) %in% c("C", "T"), revc(clean), clean)
+      norm = ifelse(substr(clean, 1, 1) %in% c("A", "G"), revc(clean), clean)
     ) %>%
     mutate(prop_n = n / sum(xx$n)) %>%
     select(Koh_476, norm, n, prop_n, Koh_476, short_visual)
@@ -179,12 +179,12 @@ for (deltype in c(
 
 ```{r}
 normF %>%
-  filter(grepl("AG", norm)) %>%
+  filter(grepl("T.T", norm)) %>%
   select(n) %>%
   sum() %>%
   '/'(sum(normF$n))
 norm4 %>%
-  filter(grepl("AG", norm)) %>%
+  filter(grepl("T.T", norm)) %>%
   select(n) %>%
   sum() %>%
   '/'(sum(norm4$n))
