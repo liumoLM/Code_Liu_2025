@@ -1,6 +1,6 @@
 #' Plot ID83 catalog with optional suppression of high polyT rows
 #'
-#' Wraps mSigPlot::plot_83 to optionally generate a second plot with polyT 5+
+#' Wraps mSigPlot::: to optionally generate a second plot with polyT 5+
 #' rows set to -3 when mutation counts exceed a threshold.
 #'
 #' @param catalog An ID83 catalog (matrix or data frame with row names).
@@ -28,7 +28,9 @@ plot_83_w_wout_t <- function(
   text_size = NULL,
   base_size = NULL,
   min_ts_to_trigger = .1,
-  ablate_both = TRUE
+  ablate_both = TRUE,
+  show_counts = TRUE,
+  count_label_cex = 0.7
 ) {
   # Row names for polyT 5+ rows
   del_t_row <- "DEL:T:1:5+"
