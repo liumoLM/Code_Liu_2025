@@ -57,7 +57,7 @@ execute:
 # general the detection of changes is not perfect.
 # When in doubt regenerate the plots.
 # ======================================================
-REGENERATE_PLOTS <- FALSE
+REGENERATE_PLOTS <- T # FALSE
 data_dir <- here::here("Manuscript_data")
 
 # Minimum cosine similarity to show matching COSMIC signatures
@@ -584,9 +584,6 @@ if (cache_valid) {
     ID476_signatures = type476_sigs,
     ID476_catalogs = to.plot.all.ID476.catalogs,
     plot_dir = plot_dir,
-    plot476_base_size = plot476_base_size,
-    plot476_label_size = plot476_label_size,
-    plot476_simplify_labels = plto476_simplify_labels,
     ID89_mapped_signatures = ID89_mapped_from_476,
     ID83_mapped_signatures = ID83_mapped_from_476,
     cosmic_signatures = cosmic_sigs,

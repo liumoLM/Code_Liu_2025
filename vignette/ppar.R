@@ -1,10 +1,6 @@
 # Plotting parameters for vignette
 # Changes to this file will trigger plot regeneration
 
-plot476_base_size <- 25
-plot476_label_size <- 3
-plto476_simplify_labels <- FALSE
-
 ppar <- list(
   w476 = 19,
   h476 = 6,
@@ -23,6 +19,8 @@ ppar <- list(
   h83 = 6,
   basesize83 = 25,
   textsize83 = 5,
+
+  plot476_base_size = 25,
 
   # Plot scaling for the html output
   hw = "100%", # Default

@@ -28,7 +28,7 @@ format_signature_name <- function(name) {
 #' @return Character: HTML anchor tag (e.g., '<a href="#insdel_a_alpha">InsDel_Aα</a>')
 make_sig_hyperlink <- function(sig_id) {
   display_name <- format_signature_name(sig_id)
-  anchor_id <- tolower(sig_id)  # Use original ASCII ID for anchor
+  anchor_id <- tolower(sig_id) # Use original ASCII ID for anchor
   paste0('<a href="#', anchor_id, '">', display_name, '</a>')
 }
 
@@ -316,9 +316,6 @@ generate_section_footer <- function(sig_data) {
 #' @param ID476_signatures Data frame of ID476 signatures
 #' @param ID476_catalogs Data frame of ID476 catalogs
 #' @param plot_dir Directory to save plots
-#' @param plot476_base_size Base font size for 476 plots
-#' @param plot476_label_size Label size for 476 plots
-#' @param plot476_simplify_labels Whether to simplify labels
 #' @param cosmic_signatures Data frame of COSMIC signatures for matching plots
 #' @param jin_signatures Data frame of Jin signatures for matching plots
 #' @param koh_signatures Data frame of Koh signatures for matching plots
@@ -334,9 +331,7 @@ generate_plots_to_files <- function(
   ID476_signatures,
   ID476_catalogs,
   plot_dir,
-  plot476_base_size = 20,
   plot476_label_size = 3,
-  plot476_simplify_labels = FALSE,
   ID89_mapped_signatures = NULL,
   ID83_mapped_signatures = NULL,
   cosmic_signatures = NULL,
@@ -401,10 +396,11 @@ generate_plots_to_files <- function(
     mSigPlot::plot_89(
       catalog,
       plot_title = plot_title,
-      text_size = getp('textsize89'),
-      top_bar_text_size = getp('topbartextsize89'),
+      # text_size = getp('textsize89'),
+      # top_bar_text_size = getp('topbartextsize89'),
       base_size = getp('basesize89'),
-      setyaxis = setyaxis
+      setyaxis = setyaxis,
+      count_label_size = 0.9
     )
   }
 
@@ -497,11 +493,11 @@ generate_plots_to_files <- function(
     mSigPlot::plot_476(
       catalog,
       plot_title = plot_title,
-      text_size = 5,
-      label_size = plot476_label_size,
+      # text_size = 5,
+      # label_size = plot476_label_size,
       num_labels = 5,
-      base_size = plot476_base_size,
-      simplify_labels = plot476_simplify_labels
+      base_size = ppar[["plot476_base_size"]] # ,
+      #simplify_labels = plot476_simplify_labels
     )
   }
 
@@ -542,7 +538,7 @@ generate_plots_to_files <- function(
     plot_83_w_wout_t(
       catalog,
       plot_title = plot_title,
-      text_size = getp('textsize83'),
+      # text_size = getp('textsize83'),
       base_size = getp('basesize83'),
       min_ts_to_trigger = min_ts
     )
@@ -745,13 +741,20 @@ generate_plots_to_files <- function(
   # Sankey plots for 476-to-83 collapse (if flow data available)
   paths$sankey_other_ins <- NULL
   paths$sankey_other_del <- NULL
-  if (!is.null(collapse_flows) && sig_data$type89_sig_id %in% names(collapse_flows)) {
+  if (
+    !is.null(collapse_flows) &&
+      sig_data$type89_sig_id %in% names(collapse_flows)
+  ) {
     flows <- collapse_flows[[sig_data$type89_sig_id]]
 
     # Create a result-like object for plot_collapse_sankey
     collapse_result <- list(flows = flows)
 
-    title_prefix <- sprintf("%s -> %s", sig_data$type89_sig_id, sig_data$ID83signature)
+    title_prefix <- sprintf(
+      "%s -> %s",
+      sig_data$type89_sig_id,
+      sig_data$ID83signature
+    )
     sankey_plots <- plot_collapse_sankey(
       collapse_result,
       min_flow = 0.001,
@@ -813,9 +816,6 @@ generate_all_plots_parallel <- function(
   ID476_signatures,
   ID476_catalogs,
   plot_dir,
-  plot476_base_size = 20,
-  plot476_label_size = 3,
-  plot476_simplify_labels = FALSE,
   ID89_mapped_signatures = NULL,
   ID83_mapped_signatures = NULL,
   cosmic_signatures = NULL,
@@ -845,9 +845,6 @@ generate_all_plots_parallel <- function(
         ID476_signatures = ID476_signatures,
         ID476_catalogs = ID476_catalogs,
         plot_dir = plot_dir,
-        plot476_base_size = plot476_base_size,
-        plot476_label_size = plot476_label_size,
-        plot476_simplify_labels = plot476_simplify_labels,
         ID89_mapped_signatures = ID89_mapped_signatures,
         ID83_mapped_signatures = ID83_mapped_signatures,
         cosmic_signatures = cosmic_signatures,
@@ -1167,8 +1164,16 @@ reconstruct_plot_paths <- function(signature_names, plot_dir) {
       plot_dir,
       paste0(safe_name, "_sankey_other_del.png")
     )
-    paths$sankey_other_ins <- if (file.exists(sankey_ins_path)) sankey_ins_path else NULL
-    paths$sankey_other_del <- if (file.exists(sankey_del_path)) sankey_del_path else NULL
+    paths$sankey_other_ins <- if (file.exists(sankey_ins_path)) {
+      sankey_ins_path
+    } else {
+      NULL
+    }
+    paths$sankey_other_del <- if (file.exists(sankey_del_path)) {
+      sankey_del_path
+    } else {
+      NULL
+    }
 
     return(paths)
   })

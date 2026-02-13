@@ -38,8 +38,7 @@ myplot83 = function(xx, plot_title) {
     xx,
     plot_title = plot_title,
     base_size = 11,
-    text_size = 4,
-    count_label_size = 3.5
+    count_label_cex = 0.9
   )
 }
 
@@ -48,9 +47,8 @@ myplot89 = function(xx, plot_title) {
     xx,
     plot_title = plot_title,
     base_size = 11,
-    top_bar_text_size = 1.2,
-    x_axis_tick_label_size = 0.5,
-    y_axis_tick_label_size = 0.6,
+    # x_axis_tick_label_size = 0.5,
+    # y_axis_tick_label_size = 0.6,
     y_title_size = 1,
     title_text_size = 1.2
   )
@@ -61,8 +59,8 @@ myplot476 = function(xx, plot_title) {
     xx,
     plot_title = plot_title,
     base_size = 10,
-    label_size = 3,
-    text_size = 2.5,
+    # label_size = 3,
+    # text_size = 2.5,
     label_threshold_denominator = 4
   )
 }
@@ -72,8 +70,9 @@ myplot476right = function(xx, plot_title) {
     xx,
     plot_title = plot_title,
     base_size = 10,
-    label_size = 3,
-    text_size = 2.5,
+    # label_size = 3,
+    # text_size = 2.5,
+    show_counts = FALSE,
     label_threshold_denominator = 4
   )
 }
@@ -119,11 +118,13 @@ stdwrite(mouse476, "mutated_mice.tsv")
 
 ```{r}
 plot_mice = function() {
-  p4_1 = myplot476(mouse476, plot_title = "Mutated mice")
+  title = "RNase H2 deficient mouse tumor"
+  p4_1 = myplot476(mouse476, plot_title = title)
+  mouse476_right = myplot476right(mouse476, plot_title = title)
 
   xm4 = GenerateKoh89CatalogfromAnnotateVcf(mvcf, "Sample")
   xm_all = as.data.frame(rowSums(xm4))
-  p8_1 = myplot89(xm_all, plot_title = "Mutated mice")
+  p8_1 = myplot89(xm_all, plot_title = title)
 
   colnames(mvcf)[1:2] <- c("CHROM", "POS")
   all_mice_83 = ICAMS::VCFsToIDCatalogs(
@@ -134,9 +135,14 @@ plot_mice = function() {
   all_mice_83[[1]]["INS:T:1:5+", ] <- 0
   mouse83 = myplot83(
     all_mice_83[[1]],
-    plot_title = "Mutated mice, ins/del T in long polyT <- 0"
+    plot_title = glue("{title}, ins/del T in long polyT <- 0")
   )
-  return(c(mouse476 = p4_1, mouse89 = p8_1, mouse83 = mouse83))
+  return(c(
+    mouse476 = p4_1,
+    mouse89 = p8_1,
+    mouse83 = mouse83,
+    mouse476_right = mouse476_right
+  ))
 }
 
 mice = plot_mice()
@@ -146,7 +152,7 @@ mice = plot_mice()
 
 ```{r}
 #| label: plotcells476
-
+mutcelltitle = "RNase H2 deficient cells"
 plot_cells476 = function() {
   r4 = GenerateKoh476CatalogfromAnnotateVcf(rvcf, "Sample")
   r4_mut = r4[, 1:2]
@@ -154,7 +160,7 @@ plot_cells476 = function() {
   r4_wt = r4[, 3:5]
   stdwrite(r4_mut, "wild_type_cells.tsv")
   r_all_mut = as.data.frame(rowSums(r4_mut))
-  cell476_mut = myplot476(r_all_mut, plot_title = "Mutated cells")
+  cell476_mut = myplot476(r_all_mut, plot_title = mutcelltitle)
   r_all_wt = as.data.frame(rowSums(r4_wt))
   p4_3 = myplot476(r_all_wt, plot_title = "Wild-type cells")
 
@@ -174,7 +180,7 @@ plot_cells89 = function() {
   xr4_mut = xr4[, 1:2]
   xr4_wt = xr4[, 3:5]
   xr_all_mut = as.data.frame(rowSums(xr4_mut))
-  p8_2 = myplot89(xr_all_mut, plot_title = "Mutated cells")
+  p8_2 = myplot89(xr_all_mut, plot_title = mutcelltitle)
   xr_all_wt = as.data.frame(rowSums(xr4_wt))
   p8_3 = myplot89(xr_all_wt, plot_title = "Wild-type cells")
   return(c(cell89_mut = p8_2, cell89_wt = p8_3))
@@ -200,7 +206,7 @@ plot_cells83 = function() {
   all_mut["INS:T:1:5+", ] <- 0
   cell83_mut = myplot83(
     all_mut,
-    plot_title = "Mutated cells, ins/del T in long polyT <- 0"
+    plot_title = glue("{mutcelltitle}, ins/del T in long polyT <- 0")
   )
   all_wt = as.data.frame(rowSums(wt))
   all_wt["DEL:T:1:5+", ] <- 0
@@ -331,22 +337,17 @@ ggsave(
 ```{r}
 #| label: plot476right
 
-plot_mice_right = function() {
-  myplot476right(mouse476, plot_title = "Mutated mice")
-}
-
 plot_cells476_right = function() {
   r4 = GenerateKoh476CatalogfromAnnotateVcf(rvcf, "Sample")
   r4_mut = r4[, 1:2]
   r4_wt = r4[, 3:5]
   r_all_mut = as.data.frame(rowSums(r4_mut))
-  p4_2 = myplot476right(r_all_mut, plot_title = "Mutated cells")
+  cell476_mut_right = myplot476right(r_all_mut, plot_title = mutcelltitle)
   r_all_wt = as.data.frame(rowSums(r4_wt))
   p4_3 = myplot476right(r_all_wt, plot_title = "Wild-type cells")
-  return(c(cell476_mut = p4_2, cell476_wt = p4_3))
+  return(c(cell476_mut_right = cell476_mut_right, cell476_wt = p4_3))
 }
 
-mice_r = list(mouse476 = plot_mice_right())
 cells476_r = plot_cells476_right()
 
 sigF476_r = sigF_catalog %>% myplot476right("InsDelF")
@@ -358,8 +359,8 @@ f4476_r = s4link_catalog %>%
 
 pw476r <- (sigF476_r +
   fF476_r +
-  mice_r[["mouse476"]] +
-  cells476_r[["cell476_mut"]] +
+  mice[["mouse476_right"]] +
+  cells476_r[["cell476_mut_right"]] +
   plot_spacer() +
   cells476_r[["cell476_wt"]] +
   sig4476_r +

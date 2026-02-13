@@ -49,7 +49,9 @@ find_quarto <- function() {
 
 quarto_bin <- find_quarto()
 if (is.null(quarto_bin)) {
-  stop("Could not find quarto executable. Please install Quarto or set QUARTO_PATH.")
+  stop(
+    "Could not find quarto executable. Please install Quarto or set QUARTO_PATH."
+  )
 }
 message("Using quarto: ", quarto_bin)
 
@@ -120,28 +122,37 @@ if (need_rds) {
 
   type83_spectra <- read.delim(
     file.path(data_dir, "Liu_et_al_83_type_spectra.tsv"),
-    sep = "\t", row.names = 1, check.names = FALSE
+    sep = "\t",
+    row.names = 1,
+    check.names = FALSE
   )
   type83_spectra.no.polyT <- type83_spectra
   type83_spectra.no.polyT[c("DEL:T:1:5+", "INS:T:1:5+"), ] <- 0
 
   type83_sigs <- read.delim(
     file.path(data_dir, "Liu_et_al_final_83_type_signatures.tsv"),
-    sep = "\t", row.names = 1, check.names = FALSE
+    sep = "\t",
+    row.names = 1,
+    check.names = FALSE
   )
 
   cosmic_sigs <- read.delim(
     file.path(data_dir, "COSMIC_v3.5_ID_GRCh37_signatures.tsv"),
-    sep = "\t", row.names = 1, check.names = FALSE
+    sep = "\t",
+    row.names = 1,
+    check.names = FALSE
   )
 
   jin_sigs <- read.delim(
     file.path(data_dir, "jin_2024_sup_tab_1_signatures.tsv"),
-    sep = "\t", row.names = 1, check.names = FALSE
+    sep = "\t",
+    row.names = 1,
+    check.names = FALSE
   )
 
   type89_sigs <- as.data.frame(fread(file.path(
-    data_dir, "Liu_et_al_final_89_type_signatures.tsv"
+    data_dir,
+    "Liu_et_al_final_89_type_signatures.tsv"
   )))
   row.names(type89_sigs) <- type89_sigs[, 1]
   type89_sigs <- type89_sigs[, -1]
@@ -154,12 +165,15 @@ if (need_rds) {
 
   koh_sigs <- read.delim(
     file.path(data_dir, "Koh_signatures.tsv"),
-    sep = "\t", row.names = 1, check.names = FALSE
+    sep = "\t",
+    row.names = 1,
+    check.names = FALSE
   )
 
   ID89.mSigAct.assignment <- read.delim(
     file.path(data_dir, "Liu_et_al_89_type_signature_assignments.tsv"),
-    row.names = 1, check.names = FALSE
+    row.names = 1,
+    check.names = FALSE
   )
 
   type476_sigs <- as.data.frame(fread(
@@ -175,10 +189,14 @@ if (need_rds) {
   to.plot.all.ID476.catalogs <- to.plot.all.ID476.catalogs[, -1]
 
   ID89_mapped_from_476 <- read.delim(
-    "89_mapped_from_476.tsv", sep = "\t", row.names = 1
+    "89_mapped_from_476.tsv",
+    sep = "\t",
+    row.names = 1
   )
   ID83_mapped_from_476 <- read.delim(
-    "83_mapped_from_476.tsv", sep = "\t", row.names = 1
+    "83_mapped_from_476.tsv",
+    sep = "\t",
+    row.names = 1
   )
 
   # Compute cosine similarity matrices
@@ -186,7 +204,9 @@ if (need_rds) {
 
   # COSMIC matches
   cosmic_cosine_matrix <- matrix(
-    NA, nrow = ncol(type83_sigs), ncol = ncol(cosmic_sigs),
+    NA,
+    nrow = ncol(type83_sigs),
+    ncol = ncol(cosmic_sigs),
     dimnames = list(colnames(type83_sigs), colnames(cosmic_sigs))
   )
   for (i in seq_len(ncol(type83_sigs))) {
@@ -200,14 +220,18 @@ if (need_rds) {
   cosmic_matches <- lapply(seq_len(nrow(cosmic_cosine_matrix)), function(i) {
     cosines <- cosmic_cosine_matrix[i, ]
     matches <- which(cosines >= COSMIC_min_cosine)
-    if (length(matches) == 0) return(NULL)
+    if (length(matches) == 0) {
+      return(NULL)
+    }
     data.frame(cosmic_sig = names(matches), cosine = cosines[matches])
   })
   names(cosmic_matches) <- rownames(cosmic_cosine_matrix)
 
   # Jin matches
   jin_cosine_matrix <- matrix(
-    NA, nrow = ncol(type83_sigs), ncol = ncol(jin_sigs),
+    NA,
+    nrow = ncol(type83_sigs),
+    ncol = ncol(jin_sigs),
     dimnames = list(colnames(type83_sigs), colnames(jin_sigs))
   )
   for (i in seq_len(ncol(type83_sigs))) {
@@ -221,14 +245,18 @@ if (need_rds) {
   jin_matches <- lapply(seq_len(nrow(jin_cosine_matrix)), function(i) {
     cosines <- jin_cosine_matrix[i, ]
     matches <- which(cosines >= Jin_min_cosine)
-    if (length(matches) == 0) return(NULL)
+    if (length(matches) == 0) {
+      return(NULL)
+    }
     data.frame(jin_sig = names(matches), cosine = cosines[matches])
   })
   names(jin_matches) <- rownames(jin_cosine_matrix)
 
   # Koh matches
   koh_cosine_matrix <- matrix(
-    NA, nrow = ncol(type89_sigs), ncol = ncol(koh_sigs),
+    NA,
+    nrow = ncol(type89_sigs),
+    ncol = ncol(koh_sigs),
     dimnames = list(colnames(type89_sigs), colnames(koh_sigs))
   )
   for (i in seq_len(ncol(type89_sigs))) {
@@ -242,7 +270,9 @@ if (need_rds) {
   koh_matches <- lapply(seq_len(nrow(koh_cosine_matrix)), function(i) {
     cosines <- koh_cosine_matrix[i, ]
     matches <- which(cosines >= koh_min_cosine)
-    if (length(matches) == 0) return(NULL)
+    if (length(matches) == 0) {
+      return(NULL)
+    }
     data.frame(koh_sig = names(matches), cosine = cosines[matches])
   })
   names(koh_matches) <- rownames(koh_cosine_matrix)
@@ -293,9 +323,6 @@ if (need_rds) {
       ID476_signatures = type476_sigs,
       ID476_catalogs = to.plot.all.ID476.catalogs,
       plot_dir = plot_dir,
-      plot476_base_size = plot476_base_size,
-      plot476_label_size = plot476_label_size,
-      plot476_simplify_labels = plto476_simplify_labels,
       ID89_mapped_signatures = ID89_mapped_from_476,
       ID83_mapped_signatures = ID83_mapped_from_476,
       cosmic_signatures = cosmic_sigs,
@@ -312,7 +339,6 @@ if (need_rds) {
   saveRDS(all_sig_data, all_sig_data_path)
   saveRDS(all_plot_paths, all_plot_paths_path)
   message("RDS files saved to: ", rds_dir)
-
 } else {
   message("Loading existing RDS files...")
   all_sig_data <- readRDS(all_sig_data_path)
