@@ -5,10 +5,16 @@
 # distribution of signature mutations across cancer types. Each dot represents
 # a sample; the red dashed line shows the median for each cancer type.
 #
-# Usage: Rscript plot_signature_assignments.R
+# Usage: Rscript plot_signature_assignments.R [--min-fraction 0.0]
 
 library(ggplot2)
 library(scales)
+library(argparser)
+
+p <- arg_parser("Generate per-signature assignment hamburger plots to PDF")
+p <- add_argument(p, "--min-fraction", type = "double", default = 0.0,
+  help = "Only plot a sample's point for a signature if that signature accounts for >= this fraction of the sample's total mutations")
+args <- parse_args(p)
 
 # Configuration
 data_dir <- "Manuscript_data/"
@@ -352,6 +358,8 @@ plot_signature_by_cancer_type <- function(
 #'   Column names should be in format "CancerType::SampleID".
 #' @param sample_info Data frame with sample info including MSI status. If provided,
 #'   MSI-H samples are colored red.
+#' @param min_fraction Numeric: only plot a sample's point if this signature
+#'   accounts for >= \code{min_fraction} of the sample's total mutations.
 #' @param ... Additional arguments passed to plot_signature_by_cancer_type.
 #' @return A list with components:
 #'   \item{plot}{A ggplot2 object (or NULL if no data after filtering)}
@@ -361,6 +369,7 @@ plot_signature_hamburger <- function(
   signature_name,
   assignment_matrix,
   sample_info = NULL,
+  min_fraction = 0.0,
   ...
 ) {
   if (!signature_name %in% rownames(assignment_matrix)) {
@@ -369,6 +378,14 @@ plot_signature_hamburger <- function(
 
   sig_values <- as.numeric(assignment_matrix[signature_name, ])
   names(sig_values) <- colnames(assignment_matrix)
+
+  # Zero out samples where this signature's fraction is below min_fraction
+  if (min_fraction > 0) {
+    sample_totals <- colSums(assignment_matrix)
+    fractions <- sig_values / sample_totals
+    fractions[is.na(fractions)] <- 0
+    sig_values[fractions < min_fraction] <- 0
+  }
 
   plot_signature_by_cancer_type(
     signature_values = sig_values,
@@ -392,13 +409,16 @@ plot_signature_hamburger <- function(
 #'   point_size, point_alpha, min_samples, genome_size_mb).
 #' @param sample_info Data frame with sample info including MSI status. If provided,
 #'   MSI-H samples are colored red.
+#' @param min_fraction Numeric: only plot a sample's point if the signature
+#'   accounts for >= this fraction of the sample's total mutations.
 read_assignment_and_plot_hamburger <- function(
   input_file,
   output_file,
   data_dir,
   plot_dir,
   params,
-  sample_info = NULL
+  sample_info = NULL,
+  min_fraction = 0.0
 ) {
   input_path <- file.path(data_dir, input_file)
   output_path <- file.path(plot_dir, output_file)
@@ -424,6 +444,7 @@ read_assignment_and_plot_hamburger <- function(
           signature_name = sig_name,
           assignment_matrix = assignment_matrix,
           sample_info = sample_info,
+          min_fraction = min_fraction,
           genome_size_mb = params$genome_size_mb,
           min_samples = params$min_samples,
           log_scale = TRUE,
@@ -460,10 +481,11 @@ dir.create(plot_dir, showWarnings = FALSE, recursive = TRUE)
 for (pair in in_out_pairs) {
   read_assignment_and_plot_hamburger(
     input_file = pair$input_file,
-    output_file = pair$output_file,
+    output_file = sub("\\.pdf$", paste0("_mf", args$min_fraction, ".pdf"), pair$output_file),
     data_dir = data_dir,
     plot_dir = plot_dir,
     params = params,
-    sample_info = sample_info
+    sample_info = sample_info,
+    min_fraction = args$min_fraction
   )
 }
