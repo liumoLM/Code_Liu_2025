@@ -18,6 +18,9 @@ if (length(args) < 1) {
 n <- as.integer(args[1])
 
 library(ICAMS)
+library(foreach)
+library(doFuture)
+library(progressr)
 
 # Find all .purple.somatic.vcf.gz files
 input_files <- list.files(pattern = "\\.purple\\.somatic\\.vcf\\.gz$")
@@ -38,7 +41,6 @@ files_to_process <- Filter(
   },
   input_files
 )
-browser()
 
 message(length(files_to_process), " files need annotation (no existing output)")
 
@@ -52,33 +54,37 @@ if (length(files_to_process) == 0) {
 
 message("Processing ", length(files_to_process), " files")
 
-# Process each file
-for (f in files_to_process) {
-  prefix <- sub("\\.purple\\.somatic\\.vcf\\.gz$", "", f)
-  output_file <- paste0(prefix, ".annotated.indel.vcf.gz")
+plan(multisession, workers = 10)
 
-  message("Processing: ", f)
+with_progress({
+  p <- progressor(along = files_to_process)
 
-  # Read VCF (filter.status = NULL accepts all variants)
-  vcf <- ICAMS:::ReadVCF(f, filter.status = NULL)
+  foreach(f = files_to_process,
+          .options.future = list(packages = c("ICAMS"))) %dofuture% {
+    prefix <- sub("\\.purple\\.somatic\\.vcf\\.gz$", "", f)
+    output_file <- paste0(prefix, ".annotated.indel.vcf.gz")
 
-  # Discard rows where REF and ALT have same length (not indels)
-  is_indel <- nchar(vcf$REF) != nchar(vcf$ALT)
-  vcf <- vcf[is_indel, ]
+    # Read VCF (filter.status = NULL accepts all variants)
+    vcf <- ICAMS:::ReadVCF(f, filter.status = NULL)
 
-  # Annotate
-  result <- ICAMS::AnnotateIDVCF(ID.vcf = vcf, ref.genome = "hg19")
+    # Discard rows where REF and ALT have same length (not indels)
+    is_indel <- nchar(vcf$REF) != nchar(vcf$ALT)
+    vcf <- vcf[is_indel, ]
 
-  # Write annotated VCF
-  write.table(
-    result$annotated.vcf,
-    gzfile(output_file),
-    sep = "\t",
-    row.names = FALSE,
-    quote = FALSE
-  )
+    # Annotate
+    result <- ICAMS::AnnotateIDVCF(ID.vcf = vcf, ref.genome = "hg19")
 
-  message("  -> Written: ", output_file)
-}
+    # Write annotated VCF
+    write.table(
+      result$annotated.vcf,
+      gzfile(output_file),
+      sep = "\t",
+      row.names = FALSE,
+      quote = FALSE
+    )
+
+    p(message = sprintf("Written: %s", output_file))
+  }
+})
 
 message("Done")
