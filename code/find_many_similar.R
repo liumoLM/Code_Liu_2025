@@ -124,31 +124,31 @@ find_many_similar <- function(
     out_pdf <- paste0(sig_col, "_exemplars.pdf")
   }
 
+  # Create plots
+  plots <- list()
+
+  # Plot signature first
+  sig_df <- sigs[, sig_col, drop = FALSE]
+  plots[[1]] <- plotit(sig_df, paste("Signature:", sig_col))
+
+  # Plot top exemplars
+  for (i in seq_len(nrow(top_exemplars))) {
+    spec_name <- top_exemplars$spectrum[i]
+    cosine_val <- top_exemplars$cosine[i]
+    total_muts <- top_exemplars$total_mutations[i]
+
+    spec_df <- spectra[, spec_name, drop = FALSE]
+    title <- sprintf(
+      "%s (cosine: %.4f, n=%d)",
+      spec_name,
+      cosine_val,
+      total_muts
+    )
+
+    plots[[length(plots) + 1]] <- plotit(spec_df, title)
+  }
+
   if (do_plot) {
-    # Create plots
-    plots <- list()
-
-    # Plot signature first
-    sig_df <- sigs[, sig_col, drop = FALSE]
-    plots[[1]] <- plotit(sig_df, paste("Signature:", sig_col))
-
-    # Plot top exemplars
-    for (i in seq_len(nrow(top_exemplars))) {
-      spec_name <- top_exemplars$spectrum[i]
-      cosine_val <- top_exemplars$cosine[i]
-      total_muts <- top_exemplars$total_mutations[i]
-
-      spec_df <- spectra[, spec_name, drop = FALSE]
-      title <- sprintf(
-        "%s (cosine: %.4f, n=%d)",
-        spec_name,
-        cosine_val,
-        total_muts
-      )
-
-      plots[[length(plots) + 1]] <- plotit(spec_df, title)
-    }
-
     # Save to PDF
     pdf_height <- 3 * length(plots)
     pdf_width <- 12
@@ -170,7 +170,8 @@ find_many_similar <- function(
   list(
     all_results = cosine_results,
     above_cutoff = above_cutoff,
-    top_exemplars = top_exemplars
+    top_exemplars = top_exemplars,
+    plots = plots
   )
 }
 
