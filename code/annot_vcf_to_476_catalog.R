@@ -24,16 +24,18 @@ annot_vcf_to_476_catalog <- function(
   annot_vcf %>%
     dplyr::mutate(pos_id = paste0(CHROM, "-", POS)) -> vcf_with_pos_id
 
+  if (domessage) {
+    message("Checking for dup rows with different ALT values")
+  }
   vcf_with_pos_id %>%
-    group_by(pos_id) %>%
-    filter(n_distinct(ALT) > 1) %>%
-    pull(pos_id) %>%
-    unique() -> multiple_alts
+    dplyr::group_by(pos_id) %>%
+    dplyr::filter(n_distinct(ALT) > 1) %>%
+    select(pos_id, REF, ALT) -> multiple_alts
 
-  if (length(multiple_alts) > 0) {
+  if (nrow(multiple_alts) > 0) {
     warning(
       "Differences in 'ALT'; only 1 ALT value chosen arbitrarily at the following positions: ",
-      paste(multiple_alts, collapse = ", ")
+      print(multiple_alts)
     )
   }
 
