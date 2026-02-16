@@ -31,10 +31,12 @@ compare_spectrum_to_vcf <- function(sample_id) {
 
   file_spectrum <- spectra[, sample_id]
 
+  FILTER_PASS <- !grepl("::SP", sample_id)
   vcf <- read_annotated_vcf(sample_id)
   computed_spectrum <- annot_vcf_to_476_catalog(
     vcf,
-    "computed_spectrum"
+    "computed_spectrum",
+    FILTER_PASS = FILTER_PASS
   )$computed_spectrum
 
   file_total <- sum(file_spectrum)
