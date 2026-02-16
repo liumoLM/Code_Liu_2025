@@ -1,9 +1,12 @@
 ---
 title: "MSI Study"
-format: html
+format:
+  html:
+    code-fold: true
 params:
   sig_to_report: "InsDel_J"
   types_of_interest: ["Del2:U1:R(5,9)"]
+  cosine_cutoff: 0.9
 ---
 
 ```{r}
@@ -19,6 +22,7 @@ params:
 
 ```{r}
 #| label: setup
+#| output: false
 
 library(tidyverse)
 library(knitr)
@@ -49,6 +53,7 @@ sigs <- read.delim(
 
 ```{r}
 #| label: find-similar
+#| output: false
 
 similar_spectra <- find_many_similar(
   sig_path = here::here(
@@ -56,7 +61,7 @@ similar_spectra <- find_many_similar(
   ),
   sig_col = params$sig_to_report,
   spectra_path = here::here("Manuscript_data/Liu_et_al_476_type_spectra.tsv"),
-  cosine_cutoff = 0.9,
+  cosine_cutoff = params$cosine_cutoff,
   num_exemplars = 10,
   min_mutations = 50,
   out_pdf = here::here(
@@ -82,13 +87,14 @@ for (p in similar_spectra$plots) {
 
 ```{r}
 #| label: validate-spectra
+#| output: asis
 
 annot_vcf_list <- list()
 
 for (raw_id in similar_spectra$top_exemplars$spectrum) {
   # find_many_similar uses check.names=TRUE so :: becomes ..
   id <- gsub("\\.\\.", "::", raw_id)
-  cat("## Processing ", id)
+  cat("### Processing ", id)
   result <- tryCatch(
     {
       vcf <- read_annotated_vcf(id)
@@ -123,10 +129,14 @@ for (raw_id in similar_spectra$top_exemplars$spectrum) {
     }
   )
 }
+```
+
+```{r}
+#| output: asis
 
 annot_vcf <- rbindlist(annot_vcf_list, fill = TRUE)
 cat(sprintf(
-  "\nCombined VCF: %d rows from %d samples\n",
+  "\n### Combined VCF has %d rows from %d samples\n",
   nrow(annot_vcf),
   length(annot_vcf_list)
 ))
@@ -156,8 +166,8 @@ for (i in seq_along(patterns)) {
 
   counts <- annot_vcf |>
     dplyr::filter(grepl(pat, Koh_476)) |>
-    dplyr::count(R_outside_ins_or_del_seq) |>
-    dplyr::mutate(repeat_count = 1 + R_outside_ins_or_del_seq)
+    dplyr::count(R) |>
+    dplyr::mutate(repeat_count = R)
 
   if (nrow(counts) == 0) {
     cat(sprintf("\n### %s\n\nNo mutations found.\n\n", label))
