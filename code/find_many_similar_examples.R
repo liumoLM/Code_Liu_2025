@@ -38,6 +38,18 @@ find_many_similar(
   min_mutations = 50
 )
 
+find_many_similar(
+  sig_path = here::here(
+    "Manuscript_data/Liu_et_al_final_476_type_signatures.tsv"
+  ),
+  "InsDel_K_beta",
+  here::here("Manuscript_data/Liu_et_al_476_type_spectra.tsv"),
+  cosine_cutoff = 0.85,
+  num_exemplars = 30,
+  out_pdf = "exemplars_for_IndDel_K_beta.pdf",
+  min_mutations = 50
+)
+
 
 find_many_similar(
   sig_path = "../Manuscript_data/Liu_et_al_final_89_type_signatures.tsv",

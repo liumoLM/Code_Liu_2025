@@ -113,6 +113,8 @@ find_many_similar <- function(
 
   # Sort by cosine similarity (descending)
   cosine_results <- cosine_results[order(-cosine_results$cosine), ]
+  message("initial num cosine results: ", nrow(cosine_results))
+  # cosine_results is a data.frame with columns spectrum, cosine, total_mutations
 
   # Filter by cutoff
   above_cutoff <- cosine_results[cosine_results$cosine >= cosine_cutoff, ]
@@ -127,7 +129,8 @@ find_many_similar <- function(
   }
 
   # Select top exemplars for plotting
-  top_exemplars <- head(cosine_results, num_exemplars)
+  top_exemplars <- head(above_cutoff, num_exemplars)
+  # top_exemplars is a data.frame with columns spectrum, cosine, total_mutations
 
   # Set output PDF path
   if (is.null(out_pdf)) {
@@ -194,7 +197,6 @@ find_samples_similar_to_sig = function(
   cosine_cutoff = 0.9,
   do_plot = TRUE
 ) {
-  # browser()
   out_dir = "plot_output/plots_of_similar_spectra"
   res = list()
   for (type in c("89", "476")) {
