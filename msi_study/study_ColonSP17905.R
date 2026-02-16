@@ -9,3 +9,7 @@ vv = read_annotated_vcf(sample_id)
 
 vv %>%
   count(Koh_476, R, sort = TRUE, name = "newcount") -> vvv
+
+source(here::here("code/annot_vcf_to_476_catalog.R"))
+
+cc = annot_vcf_to_476_catalog(vv)

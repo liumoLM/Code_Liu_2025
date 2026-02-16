@@ -64,10 +64,7 @@ similar_spectra <- find_many_similar(
   cosine_cutoff = params$cosine_cutoff,
   num_exemplars = 10,
   min_mutations = 50,
-  out_pdf = here::here(
-    "msi_study",
-    paste0("exemplars_for_", params$sig_to_report, ".pdf")
-  )
+  do_plot = FALSE
 )
 ```
 
@@ -95,39 +92,35 @@ for (raw_id in similar_spectra$top_exemplars$spectrum) {
   # find_many_similar uses check.names=TRUE so :: becomes ..
   id <- gsub("\\.\\.", "::", raw_id)
   cat("### Processing ", id)
-  result <- tryCatch(
-    {
-      vcf <- read_annotated_vcf(id)
-      FILTER_PASS = !grepl("::SP", id)
-      computed_spectrum <- annot_vcf_to_476_catalog(
-        vcf,
-        'computed_spectrum',
-        FILTER_PASS = FILTER_PASS
-      )$computed_spectrum
 
-      file_spectrum <- spectra[, id]
+  vcf <- read_annotated_vcf(id)
+  if (is.null(vcf)) {
+    next
+  }
+  FILTER_PASS = !grepl("::SP", id)
+  computed_spectrum <- annot_vcf_to_476_catalog(
+    vcf,
+    'computed_spectrum',
+    FILTER_PASS = FILTER_PASS
+  )$computed_spectrum
 
-      computed_total <- sum(computed_spectrum)
-      file_total <- sum(file_spectrum)
-      abs_diff <- sum(abs(computed_spectrum - file_spectrum))
-      cos_sim <- lsa::cosine(computed_spectrum, file_spectrum)[1, 1]
+  file_spectrum <- spectra[, id]
 
-      cat(sprintf(
-        "**%s**: computed=%d, file=%d, abs_diff=%.1f, cosine=%.6f\n\n",
-        id,
-        computed_total,
-        file_total,
-        abs_diff,
-        cos_sim
-      ))
+  computed_total <- sum(computed_spectrum)
+  file_total <- sum(file_spectrum)
+  abs_diff <- sum(abs(computed_spectrum - file_spectrum))
+  cos_sim <- lsa::cosine(computed_spectrum, file_spectrum)[1, 1]
 
-      annot_vcf_list[[id]] <- vcf
-    },
-    error = function(e) {
-      cat(sprintf("**%s**: skipped (%s)\n\n", id, e$message))
-      NULL
-    }
-  )
+  cat(sprintf(
+    "**%s**: computed=%d, file=%d, abs_diff=%.1f, cosine=%.6f\n\n",
+    id,
+    computed_total,
+    file_total,
+    abs_diff,
+    cos_sim
+  ))
+
+  annot_vcf_list[[id]] <- vcf
 }
 ```
 
