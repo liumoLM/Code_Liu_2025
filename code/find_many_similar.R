@@ -24,6 +24,7 @@ find_many_similar <- function(
   min_mutations = 0,
   do_plot = TRUE
 ) {
+  message("find_many_similar, sig_col = ", sig_col)
   # Read signature and spectra files
   sigs <- read.table(sig_path, sep = "\t", header = TRUE, row.names = 1)
   spectra <- read.table(spectra_path, sep = "\t", header = TRUE, row.names = 1)
@@ -115,6 +116,15 @@ find_many_similar <- function(
 
   # Filter by cutoff
   above_cutoff <- cosine_results[cosine_results$cosine >= cosine_cutoff, ]
+  if (nrow(above_cutoff) == 0) {
+    message("No results above ", cosine_cutoff)
+    return(list(
+      all_results = c(),
+      above_cutoff = c(),
+      top_exemplars = c(),
+      plots = c
+    ))
+  }
 
   # Select top exemplars for plotting
   top_exemplars <- head(cosine_results, num_exemplars)
@@ -129,6 +139,8 @@ find_many_similar <- function(
 
   # Plot signature first
   sig_df <- sigs[, sig_col, drop = FALSE]
+
+  message("About to plot signature ", sig_col)
   plots[[1]] <- plotit(sig_df, paste("Signature:", sig_col))
 
   # Plot top exemplars
