@@ -56,7 +56,7 @@ similar_spectra <- find_many_similar(
   ),
   sig_col = params$sig_to_report,
   spectra_path = here::here("Manuscript_data/Liu_et_al_476_type_spectra.tsv"),
-  cosine_cutoff = 0.99,
+  cosine_cutoff = 0.9,
   num_exemplars = 10,
   min_mutations = 50,
   out_pdf = here::here(
@@ -136,7 +136,7 @@ if (!has_vcf_data) {
 }
 ```
 
-## Poly-T and Poly-C tract length distributions
+## Poly-T and Poly-C tract length distributions for `r params$sig_to_report`
 
 ```{r}
 #| label: tract-lengths
@@ -184,7 +184,7 @@ for (i in seq_along(patterns)) {
 }
 ```
 
-## Investigate types of interest
+## Investigate types of interest `r params$sig_to_report`
 
 ```{r}
 #| label: types-of-interest

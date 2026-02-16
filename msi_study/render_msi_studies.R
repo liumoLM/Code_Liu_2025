@@ -65,9 +65,9 @@ quarto::quarto_render(
 
 quarto::quarto_render(
   input = here::here("msi_study/msi_study.qmd"),
-  output_file = "InsDel_Kbeta_msi_study.html",
+  output_file = "InsDel_K_beta_msi_study.html",
   execute_params = list(
-    sig_to_report = "InsDel_Kbeta",
+    sig_to_report = "InsDel_K_beta",
     types_of_interest = c()
   )
 )
