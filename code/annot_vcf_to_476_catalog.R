@@ -1,16 +1,28 @@
 annot_vcf_to_476_catalog <- function(
   annot_vcf,
-  sample_id = "no_sample_id_provided"
+  sample_id = "no_sample_id_provided",
+  FILTER_PASS = FALSE
 ) {
   domessage = TRUE
-
-  annot_vcf %>%
-    filter(FILTER == "PASS") %>%
-    dplyr::mutate(pos_id = paste0(CHROM, "-", POS)) -> vcf_with_pos_id
+  if (colnames(annot_vcf)[1] == "CHROM") {
+    colnames(annot_vcf)[1] <- "CHROM"
+  }
 
   if (domessage) {
-    message("num PASS rows = ", nrow(vcf_with_pos_id))
+    message("initial annot_vcf rows = ", nrow(annot_vcf))
   }
+
+  if (FILTER_PASS) {
+    annot_vcf %>%
+      filter(FILTER == "PASS") -> annot_vcf
+  }
+
+  if (domessage) {
+    message("num PASS rows = ", nrow(annot_vcf))
+  }
+
+  annot_vcf %>%
+    dplyr::mutate(pos_id = paste0(CHROM, "-", POS)) -> vcf_with_pos_id
 
   vcf_with_pos_id %>%
     group_by(pos_id) %>%
