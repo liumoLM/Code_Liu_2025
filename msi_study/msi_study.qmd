@@ -1,12 +1,14 @@
 ---
-title: "MSI Study"
+title: "`r paste(params$sig_to_report, params$cosine_cutoff, params$num_exemplars, sep = '-')`"
 format:
   html:
     code-fold: true
+    embed-resources: true
 params:
   sig_to_report: "InsDel_J"
   types_of_interest: ["Del2:U1:R(5,9)"]
   cosine_cutoff: 0.9
+  num_exemplars: 10
 ---
 
 ```{r}
@@ -27,10 +29,10 @@ params:
 library(tidyverse)
 library(knitr)
 library(data.table)
+library(ICAMS)
 
 source(here::here("code/find_many_similar.R"))
 source(here::here("code/read_annotated_vcf.R"))
-source(here::here("code/annot_vcf_to_476_catalog.R"))
 ```
 
 ```{r}
@@ -49,7 +51,7 @@ sigs <- read.delim(
 )
 ```
 
-## Find spectra similar to `r params$sig_to_report`
+## Find up to `r params$num_exemplars` spectra similar to `r params$sig_to_report`, with similarity >= `r params$cosine_cutoff`
 
 ```{r}
 #| label: find-similar
@@ -62,9 +64,10 @@ similar_spectra <- find_many_similar(
   sig_col = params$sig_to_report,
   spectra_path = here::here("Manuscript_data/Liu_et_al_476_type_spectra.tsv"),
   cosine_cutoff = params$cosine_cutoff,
-  num_exemplars = 10,
+  num_exemplars = params$num_exemplars,
   min_mutations = 50,
-  do_plot = FALSE
+  do_plot = FALSE, # TRUE,
+  out_pdf = here::here(paste0("msi_study/", params$sig_to_report, ".pdf"))
 )
 ```
 
@@ -88,17 +91,22 @@ for (p in similar_spectra$plots) {
 
 annot_vcf_list <- list()
 
+spec_num <- 1
 for (raw_id in similar_spectra$top_exemplars$spectrum) {
   # find_many_similar uses check.names=TRUE so :: becomes ..
   id <- gsub("\\.\\.", "::", raw_id)
-  cat("### Processing ", id)
+  cat("### ", spec_num, " Processing ", id)
+  spec_num <- spec_num + 1
 
   vcf <- read_annotated_vcf(id)
   if (is.null(vcf)) {
     next
   }
   FILTER_PASS = !grepl("::SP", id)
-  computed_spectrum <- annot_vcf_to_476_catalog(
+  if (is.null(FILTER_PASS) || is.na(FILTER_PASS)) {
+    stop("Problem with FILTER_PASS")
+  }
+  computed_spectrum <- ICAMS::annot_vcf_to_476_catalog(
     vcf,
     'computed_spectrum',
     FILTER_PASS = FILTER_PASS
@@ -145,6 +153,7 @@ if (!has_vcf_data) {
 #| label: tract-lengths
 #| fig-height: 4
 #| eval: !expr has_vcf_data
+#| results: asis
 
 patterns <- c(
   "Del\\(T" = "Del(T)",
@@ -152,6 +161,7 @@ patterns <- c(
   "Del\\(C" = "Del(C)",
   "Ins\\(C" = "Ins(C)"
 )
+
 
 for (i in seq_along(patterns)) {
   pat <- names(patterns)[i]
@@ -163,16 +173,18 @@ for (i in seq_along(patterns)) {
     dplyr::mutate(repeat_count = R)
 
   if (nrow(counts) == 0) {
-    cat(sprintf("\n### %s\n\nNo mutations found.\n\n", label))
+    cat(sprintf("\n\n### %s\n\nNo mutations found.\n\n", label))
     next
   }
 
   cat(sprintf(
-    "\n### %s\n\nMean: %.2f, Median: %.1f, SD: %.2f\n\n",
+    "\n### %s\n\nMean: %.2f, Median: %.1f, SD: %.2f, prop: %.2f, count: %d\n\n",
     label,
     weighted.mean(counts$repeat_count, counts$n),
     median(rep(counts$repeat_count, counts$n)),
-    sd(rep(counts$repeat_count, counts$n))
+    sd(rep(counts$repeat_count, counts$n)),
+    sum(counts$n) / nrow(annot_vcf),
+    sum(counts$n)
   ))
 
   p <- ggplot(counts, aes(x = repeat_count, weight = n)) +
@@ -184,6 +196,7 @@ for (i in seq_along(patterns)) {
     ) +
     theme_minimal()
   print(p)
+  cat('\n ')
 }
 ```
 
@@ -199,7 +212,7 @@ for (indel_type in params$types_of_interest) {
 
   summary_of_type <- annot_vcf |>
     dplyr::filter(Koh_476 == indel_type) |>
-    dplyr::count(ins_or_del_seq, R_outside_ins_or_del_seq, short_visual) |>
+    dplyr::count(ins_or_del_seq, R_outside_ins_or_del_seq, R, short_visual) |>
     dplyr::arrange(desc(n))
 
   if (nrow(summary_of_type) == 0) {
