@@ -23,54 +23,28 @@ read_annotated_vcf <- function(tumor_id) {
     aliquot_id <- PCAWG7::map_SP_ID_to_aliquot_ID(sp_match)
     pattern <- paste0("*", aliquot_id, "*annotated.indel.vcf.gz")
     hits <- Sys.glob(file.path(pcawg_dir, pattern))
-    if (length(hits) == 0) {
-      warning(
-        "No file found for aliquot ID ",
-        aliquot_id,
-        " (from SP ID ",
-        sp_match,
-        ") in ",
-        pcawg_dir
-      )
-      return(NULL)
-    }
-    if (length(hits) > 1) {
-      warning(
-        "Multiple files found for aliquot ID ",
-        aliquot_id,
-        " (from SP ID ",
-        sp_match,
-        ") in ",
-        pcawg_dir,
-        ":\n",
-        paste(hits, collapse = "\n")
-      )
-      return(NULL)
-    }
-    return(data.table::fread(hits))
-  }
-
-  if (grepl("::", tumor_id, fixed = TRUE)) {
+  } else if (grepl("::", tumor_id, fixed = TRUE)) {
     id <- sub("^.*::", "", tumor_id)
     pattern <- paste0("*", id, "*annotated.indel.vcf.gz")
     hits <- Sys.glob(file.path(h_dir, pattern))
-    if (length(hits) == 0) {
-      warning("No file found for ID ", id, " in ", h_dir)
-      return(NULL)
-    }
-    if (length(hits) > 1) {
-      warning(
-        "Multiple files found for ID ",
-        id,
-        " in ",
-        h_dir,
-        ":\n",
-        paste(hits, collapse = "\n")
-      )
-      return(NULL)
-    }
-    return(data.table::fread(hits))
+  } else {
+    warning("No files found for ", tumor_id)
+    return(NULL)
   }
 
-  return(NULL)
+  if (length(hits) > 1) {
+    warning(
+      "Multiple files found for aliquot ID ",
+      aliquot_id,
+      " (from SP ID ",
+      sp_match,
+      ") in ",
+      pcawg_dir,
+      ":\n",
+      paste(hits, collapse = "\n")
+    )
+    return(NULL)
+  }
+
+  return(data.table::fread(hits))
 }

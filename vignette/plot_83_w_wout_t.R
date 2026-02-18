@@ -5,7 +5,7 @@
 #'
 #' @param catalog An ID83 catalog (matrix or data frame with row names).
 #' @param plot_title Title for the plot(s).
-#' @param text_size Text size passed to plot_83.
+#' @param text_cex Text size passed to plot_83.
 #' @param base_size Base size passed to plot_83.
 #' @param min_ts_to_trigger If >= 1.1, treated as an absolute count threshold.
 #'   If < 1.1, treated as a proportion of total mutations.
@@ -25,7 +25,7 @@
 plot_83_w_wout_t <- function(
   catalog,
   plot_title = NULL,
-  text_size = NULL,
+  text_cex = NULL,
   base_size = NULL,
   min_ts_to_trigger = .1,
   ablate_both = TRUE,
@@ -65,8 +65,8 @@ plot_83_w_wout_t <- function(
   if (!is.null(plot_title)) {
     plot_args$plot_title <- plot_title
   }
-  if (!is.null(text_size)) {
-    plot_args$text_size <- text_size
+  if (!is.null(text_cex)) {
+    plot_args$text_cex <- text_cex
   }
   if (!is.null(base_size)) {
     plot_args$base_size <- base_size
@@ -124,8 +124,8 @@ plot_83_w_wout_t <- function(
     catalog = catalog_modified2,
     plot_title = modified_title
   )
-  if (!is.null(text_size)) {
-    plot_args_modified$text_size <- text_size
+  if (!is.null(text_cex)) {
+    plot_args_modified$text_cex <- text_cex
   }
   if (!is.null(base_size)) {
     plot_args_modified$base_size <- base_size
