@@ -41,14 +41,26 @@ quarto::quarto_render(
 
 quarto::quarto_render(
   input = here::here("msi_study/msi_study.qmd"),
-  output_file = "InsDel_J_msi_study.html",
+  output_file = "InsDel_J_msi_study_sim_0.95.html",
   execute_params = list(
     sig_to_report = "InsDel_J",
     num_exemplars = 50,
-    cosine_cutoff = 0.9, # 0.989,
+    cosine_cutoff = 0.95, # 0.989,
     types_of_interest = c("Del2:U1:R(5,9)", "De3:U1:R(5,9)")
   )
 )
+
+quarto::quarto_render(
+  input = here::here("msi_study/msi_study.qmd"),
+  output_file = "InsDel_J_msi_study_sim_0.85_max_n_100.html",
+  execute_params = list(
+    sig_to_report = "InsDel_J",
+    num_exemplars = 100,
+    cosine_cutoff = 0.85, # 0.989,
+    types_of_interest = c()
+  )
+)
+
 
 quarto::quarto_render(
   input = here::here("msi_study/msi_study.qmd"),
