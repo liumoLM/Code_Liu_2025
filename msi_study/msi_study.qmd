@@ -51,7 +51,7 @@ sigs <- read.delim(
 )
 ```
 
-## Find up to `r params$num_exemplars` spectra similar to `r params$sig_to_report`, with similarity >= `r params$cosine_cutoff`
+## Find <= `r params$num_exemplars` spectra similar to `r params$sig_to_report` with similarity >= `r params$cosine_cutoff`
 
 ```{r}
 #| label: find-similar
@@ -95,7 +95,7 @@ spec_num <- 1
 for (raw_id in similar_spectra$top_exemplars$spectrum) {
   # find_many_similar uses check.names=TRUE so :: becomes ..
   id <- gsub("\\.\\.", "::", raw_id)
-  cat("### ", spec_num, " Processing ", id)
+  cat("### ", spec_num, " Processing ", id, "\n\n")
   spec_num <- spec_num + 1
 
   vcf <- read_annotated_vcf(id)
@@ -120,8 +120,7 @@ for (raw_id in similar_spectra$top_exemplars$spectrum) {
   cos_sim <- lsa::cosine(computed_spectrum, file_spectrum)[1, 1]
 
   cat(sprintf(
-    "**%s**: computed=%d, file=%d, abs_diff=%.1f, cosine=%.6f\n\n",
-    id,
+    "\n\ncomputed=%d, file=%d, abs_diff=%.1f, cosine=%.6f\n\n",
     computed_total,
     file_total,
     abs_diff,
