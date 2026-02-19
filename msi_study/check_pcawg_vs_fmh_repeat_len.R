@@ -36,10 +36,12 @@ run_polyT_analysis <- function(vcf_dir, dataset_label, max_files, pdf_path,
 
   del2_detail <- tibble(short_visual = character(), R = integer(), n = integer())
   del2_pat <- "^Del2:U1:R\\(5,9\\)$"
+  total_indels <- 0L
 
   for (f in top_files) {
     cat("Reading", basename(f), "\n")
     vcf <- fread(f)
+    total_indels <- total_indels + nrow(vcf)
 
     for (i in seq_along(patterns)) {
       pat <- names(patterns)[i]
@@ -113,24 +115,26 @@ run_polyT_analysis <- function(vcf_dir, dataset_label, max_files, pdf_path,
     group_by(short_visual, R) |>
     summarise(n = sum(n), .groups = "drop") |>
     arrange(desc(n))
+  any_row <- tibble(short_visual = "ANY", R = NA_integer_, n = total_indels)
+  del2_agg <- bind_rows(any_row, del2_agg)
   write.csv(del2_agg, csv_path, row.names = FALSE)
   cat(sprintf("Del2:U1:R(5,9) detail saved to %s (%d rows)\n", csv_path, nrow(del2_agg)))
 }
 
-# Run for PCAWG
+# Run for PCAWG - top 20
 run_polyT_analysis(
   vcf_dir = "~/MEGA/important_mut_sig_data/pcawg_indel_vcfs",
   dataset_label = "PCAWG",
-  max_files = 1000,
-  pdf_path = here::here("msi_study/check_pcawg.pdf"),
-  csv_path = here::here("msi_study/check_pcawg_Del2_U1_R5_9.csv")
+  max_files = 20,
+  pdf_path = here::here("msi_study/check_pcawg_top20.pdf"),
+  csv_path = here::here("msi_study/check_pcawg_top20_Del2_U1_R5_9.csv")
 )
 
-# Run for FMH
+# Run for FMH - top 20
 run_polyT_analysis(
   vcf_dir = "~/MEGA/important_mut_sig_data/fmh-unfiltered_vcfs",
   dataset_label = "FMH",
-  max_files = 1000,
-  pdf_path = here::here("msi_study/check_fmh.pdf"),
-  csv_path = here::here("msi_study/check_fmh_Del2_U1_R5_9.csv")
+  max_files = 20,
+  pdf_path = here::here("msi_study/check_fmh_top20.pdf"),
+  csv_path = here::here("msi_study/check_fmh_top20_Del2_U1_R5_9.csv")
 )
