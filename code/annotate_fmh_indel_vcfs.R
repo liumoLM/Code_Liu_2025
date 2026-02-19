@@ -54,37 +54,40 @@ if (length(files_to_process) == 0) {
 
 message("Processing ", length(files_to_process), " files")
 
-plan(multisession, workers = 10)
+plan(multisession, workers = 5)
 
 with_progress({
   p <- progressor(along = files_to_process)
 
-  foreach(f = files_to_process,
-          .options.future = list(packages = c("ICAMS"))) %dofuture% {
-    prefix <- sub("\\.purple\\.somatic\\.vcf\\.gz$", "", f)
-    output_file <- paste0(prefix, ".annotated.indel.vcf.gz")
+  foreach(
+    f = files_to_process,
+    .options.future = list(packages = c("ICAMS"))
+  ) %dofuture%
+    {
+      prefix <- sub("\\.purple\\.somatic\\.vcf\\.gz$", "", f)
+      output_file <- paste0(prefix, ".annotated.indel.vcf.gz")
 
-    # Read VCF (filter.status = NULL accepts all variants)
-    vcf <- ICAMS:::ReadVCF(f, filter.status = NULL)
+      # Read VCF (filter.status = NULL accepts all variants)
+      vcf <- ICAMS:::ReadVCF(f, filter.status = NULL)
 
-    # Discard rows where REF and ALT have same length (not indels)
-    is_indel <- nchar(vcf$REF) != nchar(vcf$ALT)
-    vcf <- vcf[is_indel, ]
+      # Discard rows where REF and ALT have same length (not indels)
+      is_indel <- nchar(vcf$REF) != nchar(vcf$ALT)
+      vcf <- vcf[is_indel, ]
 
-    # Annotate
-    result <- ICAMS::AnnotateIDVCF(ID.vcf = vcf, ref.genome = "hg19")
+      # Annotate
+      result <- ICAMS::AnnotateIDVCF(ID.vcf = vcf, ref.genome = "hg19")
 
-    # Write annotated VCF
-    write.table(
-      result$annotated.vcf,
-      gzfile(output_file),
-      sep = "\t",
-      row.names = FALSE,
-      quote = FALSE
-    )
+      # Write annotated VCF
+      write.table(
+        result$annotated.vcf,
+        gzfile(output_file),
+        sep = "\t",
+        row.names = FALSE,
+        quote = FALSE
+      )
 
-    p(message = sprintf("Written: %s", output_file))
-  }
+      p(message = sprintf("Written: %s", output_file))
+    }
 })
 
 message("Done")
