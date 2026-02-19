@@ -10,8 +10,15 @@ patterns <- c(
   "^Del2:U1:R\\(5,9\\)$" = "Del2:U1:R(5,9)"
 )
 
-run_polyT_analysis <- function(vcf_dir, dataset_label, max_files, pdf_path,
-                               csv_path) {
+max_files = 200
+
+run_polyT_analysis <- function(
+  vcf_dir,
+  dataset_label,
+  max_files,
+  pdf_path,
+  csv_path
+) {
   all_files <- list.files(
     path.expand(vcf_dir),
     pattern = "annotated\\.indel\\.vcf\\.gz$",
@@ -34,7 +41,11 @@ run_polyT_analysis <- function(vcf_dir, dataset_label, max_files, pdf_path,
     names(patterns)
   )
 
-  del2_detail <- tibble(short_visual = character(), R = integer(), n = integer())
+  del2_detail <- tibble(
+    short_visual = character(),
+    R = integer(),
+    n = integer()
+  )
   del2_pat <- "^Del2:U1:R\\(5,9\\)$"
   total_indels <- 0L
 
@@ -118,23 +129,31 @@ run_polyT_analysis <- function(vcf_dir, dataset_label, max_files, pdf_path,
   any_row <- tibble(short_visual = "ANY", R = NA_integer_, n = total_indels)
   del2_agg <- bind_rows(any_row, del2_agg)
   write.csv(del2_agg, csv_path, row.names = FALSE)
-  cat(sprintf("Del2:U1:R(5,9) detail saved to %s (%d rows)\n", csv_path, nrow(del2_agg)))
+  cat(sprintf(
+    "Del2:U1:R(5,9) detail saved to %s (%d rows)\n",
+    csv_path,
+    nrow(del2_agg)
+  ))
 }
 
 # Run for PCAWG - top 20
 run_polyT_analysis(
   vcf_dir = "~/MEGA/important_mut_sig_data/pcawg_indel_vcfs",
   dataset_label = "PCAWG",
-  max_files = 20,
-  pdf_path = here::here("msi_study/check_pcawg_top20.pdf"),
-  csv_path = here::here("msi_study/check_pcawg_top20_Del2_U1_R5_9.csv")
+  max_files = max_files,
+  pdf_path = here::here(glue::glue("msi_study/check_pcawg_top{max_files}.pdf")),
+  csv_path = here::here(glue::glue(
+    "msi_study/check_pcawg_top{max_files}_Del2_U1_R5_9.csv"
+  ))
 )
 
 # Run for FMH - top 20
 run_polyT_analysis(
   vcf_dir = "~/MEGA/important_mut_sig_data/fmh-unfiltered_vcfs",
   dataset_label = "FMH",
-  max_files = 20,
-  pdf_path = here::here("msi_study/check_fmh_top20.pdf"),
-  csv_path = here::here("msi_study/check_fmh_top20_Del2_U1_R5_9.csv")
+  max_files = max_files,
+  pdf_path = here::here(glue::glue("msi_study/check_fmh_top{max_files}.pdf")),
+  csv_path = here::here(glue::glue(
+    "msi_study/check_fmh_top{max_files}_Del2_U1_R5_9.csv"
+  ))
 )

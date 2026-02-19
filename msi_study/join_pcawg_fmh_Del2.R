@@ -1,8 +1,15 @@
 library(tidyverse)
 library(openxlsx)
+library(glue)
 
-pcawg <- read.csv(here::here("msi_study/check_pcawg_top20_Del2_U1_R5_9.csv"))
-fmh <- read.csv(here::here("msi_study/check_fmh_top20_Del2_U1_R5_9.csv"))
+max_files = 200
+
+pcawg <- read.csv(here::here(
+  glue::glue("msi_study/check_pcawg_top{max_files}_Del2_U1_R5_9.csv")
+))
+fmh <- read.csv(here::here(
+  glue::glue("msi_study/check_fmh_top{max_files}_Del2_U1_R5_9.csv")
+))
 
 # Extract total indel counts from ANY row, then remove it
 pcawg_total <- pcawg$n[pcawg$short_visual == "ANY"]
@@ -28,13 +35,17 @@ joined <- full_join(pcawg, fmh, by = c("short_visual", "R")) |>
 any_row <- tibble(
   short_visual = "ANY",
   R = NA_integer_,
-  pcawg_n = pcawg_total, fmh_n = fmh_total,
-  pcawg_prop = NA_real_, fmh_prop = NA_real_,
+  pcawg_n = pcawg_total,
+  fmh_n = fmh_total,
+  pcawg_prop = NA_real_,
+  fmh_prop = NA_real_,
   prop_ratio_pcawg_over_fmh = NA_real_
 )
 joined <- bind_rows(any_row, joined)
 
-out_path <- here::here("msi_study/joined_pcawg_fmh_top20_Del2_U1_R5_9.xlsx")
+out_path <- here::here(glue::glue(
+  "msi_study/joined_pcawg_fmh_top{max_files}_Del2_U1_R5_9.xlsx"
+))
 write.xlsx(joined, out_path)
 cat(sprintf("Wrote %d rows to %s\n", nrow(joined), out_path))
 
@@ -57,12 +68,18 @@ joined_by_R <- full_join(pcawg_by_R, fmh_by_R, by = "R") |>
 
 any_row_R <- tibble(
   R = NA_integer_,
-  pcawg_n = pcawg_total, fmh_n = fmh_total,
-  pcawg_prop = NA_real_, fmh_prop = NA_real_,
+  pcawg_n = pcawg_total,
+  fmh_n = fmh_total,
+  pcawg_prop = NA_real_,
+  fmh_prop = NA_real_,
   prop_ratio_pcawg_over_fmh = NA_real_
 )
 joined_by_R <- bind_rows(any_row_R, joined_by_R)
 
-out_path_R <- here::here("msi_study/joined_pcawg_fmh_top20_Del2_U1_R5_9_by_R.xlsx")
+out_path_R <- here::here(
+  glue::glue(
+    "msi_study/joined_pcawg_fmh_top{max_files}0_Del2_U1_R5_9_by_R.xlsx"
+  )
+)
 write.xlsx(joined_by_R, out_path_R)
 cat(sprintf("Wrote %d rows to %s\n", nrow(joined_by_R), out_path_R))
