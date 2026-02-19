@@ -94,6 +94,11 @@ run_polyT_analysis <- function(
       next
     }
 
+    n_lt9 <- sum(counts$n[counts$repeat_count < 9])
+    n_ge9 <- sum(counts$n[counts$repeat_count >= 9])
+    n_eq9 <- sum(counts$n[counts$repeat_count == 9])
+    ratio_eq9_ge9 <- if (n_ge9 > 0) n_eq9 / n_ge9 else Inf
+
     cat(sprintf(
       "\n%s: Mean=%.2f, Median=%.1f, SD=%.2f, count=%d\n",
       label,
@@ -101,6 +106,10 @@ run_polyT_analysis <- function(
       median(rep(counts$repeat_count, counts$n)),
       sd(rep(counts$repeat_count, counts$n)),
       sum(counts$n)
+    ))
+    cat(sprintf(
+      "  n(R<9)=%d, n(R>=9)=%d, n(R==9)=%d, ratio(R==9 / R>=9)=%.4f\n",
+      n_lt9, n_ge9, n_eq9, ratio_eq9_ge9
     ))
 
     p <- ggplot(counts, aes(x = repeat_count, weight = n)) +
