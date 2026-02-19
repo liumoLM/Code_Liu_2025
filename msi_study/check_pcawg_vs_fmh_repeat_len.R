@@ -6,10 +6,12 @@ patterns <- c(
   "Del\\(T" = "Del(T)",
   "Ins\\(T" = "Ins(T)",
   "Del\\(C" = "Del(C)",
-  "Ins\\(C" = "Ins(C)"
+  "Ins\\(C" = "Ins(C)",
+  "^Del2:U1:R\\(5,9\\)$" = "Del2:U1:R(5,9)"
 )
 
-run_polyT_analysis <- function(vcf_dir, dataset_label, max_files, pdf_path) {
+run_polyT_analysis <- function(vcf_dir, dataset_label, max_files, pdf_path,
+                               csv_path) {
   all_files <- list.files(
     path.expand(vcf_dir),
     pattern = "annotated\\.indel\\.vcf\\.gz$",
@@ -19,12 +21,21 @@ run_polyT_analysis <- function(vcf_dir, dataset_label, max_files, pdf_path) {
   top_files <- all_files[order(file_sizes, decreasing = TRUE)][
     1:min(max_files, length(all_files))
   ]
-  cat(sprintf("\n=== %s: selected %d files ===\n", dataset_label, length(top_files)))
+  cat(sprintf(
+    "\n=== %s: selected %d files ===\n",
+    dataset_label,
+    length(top_files)
+  ))
 
   counts_list <- setNames(
-    lapply(seq_along(patterns), function(x) tibble(repeat_count = integer(), n = integer())),
+    lapply(seq_along(patterns), function(x) {
+      tibble(repeat_count = integer(), n = integer())
+    }),
     names(patterns)
   )
+
+  del2_detail <- tibble(short_visual = character(), R = integer(), n = integer())
+  del2_pat <- "^Del2:U1:R\\(5,9\\)$"
 
   for (f in top_files) {
     cat("Reading", basename(f), "\n")
@@ -42,6 +53,14 @@ run_polyT_analysis <- function(vcf_dir, dataset_label, max_files, pdf_path) {
       if (nrow(counts) > 0) {
         counts_list[[pat]] <- bind_rows(counts_list[[pat]], counts)
       }
+    }
+
+    del2_rows <- vcf |>
+      as_tibble() |>
+      dplyr::filter(grepl(del2_pat, Koh_476)) |>
+      dplyr::count(short_visual, R)
+    if (nrow(del2_rows) > 0) {
+      del2_detail <- bind_rows(del2_detail, del2_rows)
     }
   }
 
@@ -74,8 +93,13 @@ run_polyT_analysis <- function(vcf_dir, dataset_label, max_files, pdf_path) {
     p <- ggplot(counts, aes(x = repeat_count, weight = n)) +
       geom_histogram(binwidth = 1, fill = "steelblue", color = "white") +
       labs(
-        title = paste(label, "repeat count distribution -",
-                      length(top_files), dataset_label, "samples"),
+        title = paste(
+          label,
+          "repeat count distribution -",
+          length(top_files),
+          dataset_label,
+          "samples"
+        ),
         x = "Repeat count",
         y = "Count"
       ) +
@@ -84,6 +108,13 @@ run_polyT_analysis <- function(vcf_dir, dataset_label, max_files, pdf_path) {
   }
   dev.off()
   cat(sprintf("\nPlots saved to %s\n", pdf_path))
+
+  del2_agg <- del2_detail |>
+    group_by(short_visual, R) |>
+    summarise(n = sum(n), .groups = "drop") |>
+    arrange(desc(n))
+  write.csv(del2_agg, csv_path, row.names = FALSE)
+  cat(sprintf("Del2:U1:R(5,9) detail saved to %s (%d rows)\n", csv_path, nrow(del2_agg)))
 }
 
 # Run for PCAWG
@@ -91,7 +122,8 @@ run_polyT_analysis(
   vcf_dir = "~/MEGA/important_mut_sig_data/pcawg_indel_vcfs",
   dataset_label = "PCAWG",
   max_files = 1000,
-  pdf_path = here::here("msi_study/checkSP_pcawg.pdf")
+  pdf_path = here::here("msi_study/check_pcawg.pdf"),
+  csv_path = here::here("msi_study/check_pcawg_Del2_U1_R5_9.csv")
 )
 
 # Run for FMH
@@ -99,5 +131,6 @@ run_polyT_analysis(
   vcf_dir = "~/MEGA/important_mut_sig_data/fmh-unfiltered_vcfs",
   dataset_label = "FMH",
   max_files = 1000,
-  pdf_path = here::here("msi_study/checkSP_fmh.pdf")
+  pdf_path = here::here("msi_study/check_fmh.pdf"),
+  csv_path = here::here("msi_study/check_fmh_Del2_U1_R5_9.csv")
 )
