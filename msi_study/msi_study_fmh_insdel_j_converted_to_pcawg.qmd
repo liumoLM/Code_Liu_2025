@@ -1,0 +1,76 @@
+---
+title: "FMH data artifically clipped like PCAWG data"
+format:
+  html:
+    code-fold: true
+    embed-resources: true
+params:
+  sig_to_report: "InsDel7"
+  cosine_cutoff: 0.8
+  num_exemplars: 200
+---
+
+Started with 67 HFM spectra with >= 0.95 cosine similarity to InsDel_J.
+
+Estimated clipping based on PCAWG spectra with >= 0.95 similarity to InsDel7.
+
+After clipping, compute similarity between the clipped HFM spectra and InsDel7. 
+
+```{r}
+#| label: setup
+#| output: false
+
+library(tidyverse)
+library(knitr)
+library(data.table)
+library(ICAMS)
+library(glue)
+
+source(here::here("code/find_many_similar.R"))
+```
+
+```{r}
+#| label: read-data
+
+sigs <- read.delim(
+  here::here("Manuscript_data/Liu_et_al_final_476_type_signatures.tsv"),
+  row.names = 1,
+  check.names = FALSE
+)
+```
+
+## Find spectra similar to `r params$sig_to_report` 
+
+```{r}
+#| label: find-similar
+#| output: false
+
+similar_spectra <- find_many_similar(
+  sig_path = here::here(
+    "Manuscript_data/Liu_et_al_final_476_type_signatures.tsv"
+  ),
+  sig_col = params$sig_to_report,
+  spectra_path = here::here("msi_study/fmh_J_converted_to_pcawg_spectra.tsv"),
+  cosine_cutoff = params$cosine_cutoff,
+  num_exemplars = params$num_exemplars,
+  min_mutations = 50,
+  do_plot = FALSE, # TRUE,
+  out_pdf = here::here(paste0("msi_study/J_converted_to_7.pdf"))
+)
+```
+
+### Exemplar spectra plots
+
+```{r}
+#| label: plot-exemplars
+#| fig-height: 3
+#| results: asis
+
+signum <- 0
+for (p in similar_spectra$plots) {
+  cat("\n\n####", signum, "\n\n")
+  signum <- signum + 1
+  print(p)
+}
+```
+

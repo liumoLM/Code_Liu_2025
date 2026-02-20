@@ -20,27 +20,22 @@ read_annotated_vcf <- function(tumor_id) {
   sp_match <- regmatches(tumor_id, regexpr("SP\\d+$", tumor_id))
 
   if (length(sp_match) == 1 && nchar(sp_match) > 0) {
-    aliquot_id <- PCAWG7::map_SP_ID_to_aliquot_ID(sp_match)
-    pattern <- paste0("*", aliquot_id, "*annotated.indel.vcf.gz")
+    pattern <- paste0("*", sp_match, "*annotated.indel.vcf.gz")
     hits <- Sys.glob(file.path(pcawg_dir, pattern))
     if (length(hits) == 0) {
       warning(
-        "No file found for aliquot ID ",
-        aliquot_id,
-        " (from SP ID ",
+        "No file found for ",
         sp_match,
-        ") in ",
+        " in ",
         pcawg_dir
       )
       return(NULL)
     }
     if (length(hits) > 1) {
       warning(
-        "Multiple files found for aliquot ID ",
-        aliquot_id,
-        " (from SP ID ",
+        "Multiple files found for ",
         sp_match,
-        ") in ",
+        " in ",
         pcawg_dir,
         ":\n",
         paste(hits, collapse = "\n")
