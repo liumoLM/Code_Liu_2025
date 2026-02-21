@@ -1,14 +1,16 @@
 ---
 title: "`r paste(params$sig_to_report, params$cosine_cutoff, params$num_exemplars, sep = '-')`"
+date: "`r Sys.time()`"
 format:
   html:
     code-fold: true
     embed-resources: true
 params:
-  sig_to_report: "InsDel_J"
+  sig_to_report: "InsDel9"
   types_of_interest: ["Del2:U1:R(5,9)"]
-  cosine_cutoff: 0.9
+  cosine_cutoff: 0.95
   num_exemplars: 10
+  indeltype: 476
 ---
 
 ```{r}
@@ -30,6 +32,7 @@ library(tidyverse)
 library(knitr)
 library(data.table)
 library(ICAMS)
+library(glue)
 
 source(here::here("code/find_many_similar.R"))
 source(here::here("code/read_annotated_vcf.R"))
@@ -38,14 +41,20 @@ source(here::here("code/read_annotated_vcf.R"))
 ```{r}
 #| label: read-data
 
+specfile <- here::here(glue(
+  "Manuscript_data/Liu_et_al_{params$indeltype}_type_spectra.tsv"
+))
 spectra <- read.delim(
-  here::here("Manuscript_data/Liu_et_al_476_type_spectra.tsv"),
+  specfile,
   row.names = 1,
   check.names = FALSE
 )
 
+sigfile <- here::here(glue(
+  "Manuscript_data/Liu_et_al_final_{params$indeltype}_type_signatures.tsv"
+))
 sigs <- read.delim(
-  here::here("Manuscript_data/Liu_et_al_final_476_type_signatures.tsv"),
+  sigfile,
   row.names = 1,
   check.names = FALSE
 )
@@ -58,11 +67,9 @@ sigs <- read.delim(
 #| output: false
 
 similar_spectra <- find_many_similar(
-  sig_path = here::here(
-    "Manuscript_data/Liu_et_al_final_476_type_signatures.tsv"
-  ),
+  sig_path = sigfile,
   sig_col = params$sig_to_report,
-  spectra_path = here::here("Manuscript_data/Liu_et_al_476_type_spectra.tsv"),
+  spectra_path = specfile,
   cosine_cutoff = params$cosine_cutoff,
   num_exemplars = params$num_exemplars,
   min_mutations = 50,
@@ -78,7 +85,10 @@ similar_spectra <- find_many_similar(
 #| fig-height: 3
 #| results: asis
 
+signum <- 0
 for (p in similar_spectra$plots) {
+  cat("\n\n####", signum, "\n\n")
+  signum <- signum + 1
   print(p)
 }
 ```
@@ -106,11 +116,21 @@ for (raw_id in similar_spectra$top_exemplars$spectrum) {
   if (is.null(FILTER_PASS) || is.na(FILTER_PASS)) {
     stop("Problem with FILTER_PASS")
   }
-  computed_spectrum <- ICAMS::annot_vcf_to_476_catalog(
-    vcf,
-    'computed_spectrum',
-    FILTER_PASS = FILTER_PASS
-  )$computed_spectrum
+  if (params$indeltype == 476) {
+    computed_spectrum <- ICAMS::annot_vcf_to_476_catalog(
+      vcf,
+      'computed_spectrum',
+      FILTER_PASS = FILTER_PASS
+    )$computed_spectrum
+  } else if (params$indeltype == 89) {
+    computed_spectrum <- ICAMS::annot_vcf_to_89_catalog(
+      vcf,
+      'computed_spectrum',
+      FILTER_PASS = FILTER_PASS
+    )$computed_spectrum
+  } else {
+    stop("unrecognized indeltype: ", params$indeltype)
+  }
 
   file_spectrum <- spectra[, id]
 
@@ -210,8 +230,9 @@ for (indel_type in params$types_of_interest) {
   cat(sprintf("\n### %s\n\n", indel_type))
 
   summary_of_type <- annot_vcf |>
-    dplyr::filter(Koh_476 == indel_type) |>
-    dplyr::count(ins_or_del_seq, R_outside_ins_or_del_seq, R, short_visual) |>
+    dplyr::filter(stringr::str_detect(Koh_476, indel_type)) |>
+    dplyr::count(short_visual, R_outside_ins_or_del_seq, R) |>
+    dplyr::rename(rout = R_outside_ins_or_del_seq) |>
     dplyr::arrange(desc(n))
 
   if (nrow(summary_of_type) == 0) {

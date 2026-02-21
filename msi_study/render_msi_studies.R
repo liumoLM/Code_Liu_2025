@@ -3,7 +3,7 @@ quarto::quarto_render(
   output_file = "InsDel2b_msi_study.html",
   execute_params = list(
     sig_to_report = "InsDel2b",
-    types_of_interest = c("Del2:U1:R(5,9)", "Ins2:U2:R(5,9)")
+    types_of_interest = c("\\QDel2:U1:R(5,9)\\E", "\\QIns2:U2:R(5,9)\\E")
   )
 )
 
@@ -13,7 +13,7 @@ quarto::quarto_render(
   execute_params = list(
     sig_to_report = "InsDel2c",
     cosine_cutoff = 0.95,
-    types_of_interest = c("Del2:U1:R(5,9)", "Ins2:U2:R(5,9)")
+    types_of_interest = c("\\QDel2:U1:R(5,9)\\E", "\\QIns2:U2:R(5,9)\\E")
   )
 )
 
@@ -24,7 +24,7 @@ quarto::quarto_render(
     sig_to_report = "InsDel7",
     cosine_cutoff = 0.85, # annotated VCF not avail, graylisted
     num_exemplars = 50,
-    types_of_interest = c("Del2:U1:R(5,9)", "Ins2:U2:R(5,9)")
+    types_of_interest = c("\\QDel2:U1:R(5,9)\\E", "\\QIns2:U2:R(5,9)\\E")
   )
 )
 
@@ -35,7 +35,7 @@ quarto::quarto_render(
     sig_to_report = "InsDel7",
     cosine_cutoff = 0.95, # annotated VCF not avail, graylisted
     num_exemplars = 50,
-    types_of_interest = c("Del2:U1:R(5,9)", "Ins2:U2:R(5,9)")
+    types_of_interest = c("\\QDel2:U1:R(5,9)\\E", "\\QIns2:U2:R(5,9)\\E")
   )
 )
 
@@ -46,7 +46,7 @@ quarto::quarto_render(
     sig_to_report = "InsDel_J",
     num_exemplars = 50,
     cosine_cutoff = 0.95, # 0.989,
-    types_of_interest = c("Del2:U1:R(5,9)", "De3:U1:R(5,9)")
+    types_of_interest = c("\\QDel2:U1:R(5,9)\\E", "\\QDe3:U1:R(5,9)\\E")
   )
 )
 
@@ -68,7 +68,7 @@ quarto::quarto_render(
   execute_params = list(
     sig_to_report = "InsDel_N",
     cosine_cutoff = 0.987,
-    types_of_interest = c("Del2:U1:R(5,9)", "Del3:U1:R(5,9)")
+    types_of_interest = c("\\QDel2:U1:R(5,9)\\E", "\\QDel3:U1:R(5,9)\\E")
   )
 )
 
@@ -79,7 +79,7 @@ quarto::quarto_render(
   execute_params = list(
     sig_to_report = "InsDel_O",
     cosine_cutoff = 0.93,
-    types_of_interest = c("Ins2:U1:R(5,9)", "Ins2:U2:R(5,9)")
+    types_of_interest = c("\\QIns2:U1:R(5,9)\\E", "\\QIns2:U2:R(5,9)\\E")
   )
 )
 
@@ -89,7 +89,11 @@ quarto::quarto_render(
   execute_params = list(
     sig_to_report = "InsDel_P",
     cosine_cutoff = 0.95,
-    types_of_interest = c("Ins2:U2:R(5,9)", "Del2:U2:R2", "Del3:U3:R2")
+    types_of_interest = c(
+      "\\QIns2:U2:R(5,9)\\E",
+      "\\QDel2:U2:R2\\E",
+      "\\QDel3:U3:R2\\E"
+    )
   )
 )
 
@@ -114,3 +118,54 @@ quarto::quarto_render(
     cosine_cutoff = 0.8
   )
 )
+
+# Render all signatures from the 89-to-83 mapping table
+conn <- read.delim(
+  here::here("Manuscript_data/89type_to_83type_connection.tsv")
+)
+sigids <- sub("_476$", "", conn$type476)
+sigids <- sigids[sigids != ""]
+
+
+for (sigid in sigids) {
+  quarto::quarto_render(
+    input = here::here("msi_study/msi_study.qmd"),
+    output_file = paste0(sigid, "_msi_study.html"),
+    execute_params = list(
+      sig_to_report = sigid,
+      cosine_cutoff = 0.85,
+      num_exemplars = 30,
+      types_of_interest = c(
+        "\\QDel2:U1:R(5,9)\\E",
+        "\\QIns2:U2:R(5,9)\\E",
+        "\\QDel2:U2:R2\\E",
+        "\\QDel3:U3:R2\\E",
+        "Ins[^2].*:U.:R.",
+        "Del.*M\\d",
+        "Del[^2].*:U.:R."
+      )
+    )
+  )
+}
+
+for (sigid in sigids) {
+  quarto::quarto_render(
+    input = here::here("msi_study/msi_study.qmd"),
+    output_file = paste0(sigid, "_89_msi_study.html"),
+    execute_params = list(
+      sig_to_report = sigid,
+      cosine_cutoff = 0.85,
+      num_exemplars = 30,
+      indeltype = 89,
+      types_of_interest = c(
+        "\\QDel2:U1:R(5,9)\\E",
+        "\\QIns2:U2:R(5,9)\\E",
+        "\\QDel2:U2:R2\\E",
+        "\\QDel3:U3:R2\\E",
+        "Ins[^2].*:U.:R.",
+        "Del.*M\\d",
+        "Del[^2].*:U.:R."
+      )
+    )
+  )
+}
