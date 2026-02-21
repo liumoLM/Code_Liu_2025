@@ -63,6 +63,10 @@ Reference signatures:
 - `Koh_signatures.tsv` - Koh et al. signatures
 - `jin_2024_sup_tab_1_signatures.tsv` - Jin 2024 signatures
 
+Annoated vcfs, outside of the workspace direcgtory tree:
+- `~/MEGA/important_mut_sig_data/pcawg_indel_vcfs/*.annotated.indel.vcf.gz` (PCAWG data)
+- `~/MEGA/important_mut_sig_data/fmh-unfiltered_vcfs/*.annotated.indel.vcf.gz` (FMH data)
+
 ## Code Organization
 
 - `code/` - Core R scripts for signature mapping and clustering
@@ -70,7 +74,7 @@ Reference signatures:
 - `signature_comparisons/` - Scripts for comparing signatures across sources (cosine similarity, best matches)
 - `vignette/` - R Markdown documents demonstrating signature analysis
 - `test_data/` - Test catalogs for ID83, ID89, ID476
-- `HEK293T/` - VCF files from HEK293T cell line experiments
+- `deep_analysis/` - More detailed analysis of repeat characteristics associated with indels
 
 ## Signature Comparison Workflow
 
@@ -83,3 +87,7 @@ The `signature_comparisons/` directory contains tools for comparing signatures:
 
 To convert between classification types (e.g., 476 to 89), see:
 - `code/code.to.map.476.89.R` - Uses `ID476_ID89_mapping.txt` mapping file
+
+## Other key code
+
+You are allowd to look in `~/github/ICAMS/` and `~/github/mSigPlot` to undersand functions that are important to this workspace
