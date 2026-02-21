@@ -124,7 +124,7 @@ find_many_similar <- function(
       all_results = c(),
       above_cutoff = c(),
       top_exemplars = c(),
-      plots = c
+      plots = c()
     ))
   }
 
