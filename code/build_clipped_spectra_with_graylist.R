@@ -1,12 +1,13 @@
 #!/usr/bin/env Rscript
 #
 # Build clipped (R <= 9) spectra catalogs for all annotated VCF files
-# from PCAWG and FMH datasets, for each of the three classification types
-# (83, 89, 476). Processes files sequentially, writing each column directly
-# to a pre-allocated HDF5 dataset to minimize memory usage.
+# from PCAWG, FMH, and PCAWG graylist datasets, for each of the three
+# classification types (83, 89, 476). Processes files sequentially,
+# writing each column directly to a pre-allocated HDF5 dataset to
+# minimize memory usage.
 # Converts the HDF5 datasets to TSVs at the end.
 
-# to do column lookup in the hdf5 file, do something link
+# to do column lookup in the hdf5 file, do something like
 
 #  h5 <- H5File$new("clipped_spectra.h5", mode = "r")
 #  sids <- h5[["sample_ids"]][]
@@ -27,6 +28,9 @@ vcf_files <- sort(c(
   )),
   Sys.glob(path.expand(
     "~/MEGA/important_mut_sig_data/fmh-unfiltered_vcfs/*.annotated.indel.vcf.gz"
+  )),
+  Sys.glob(path.expand(
+    "~/MEGA/important_mut_sig_data/ICGC-Pan-Can-PCAWG7-2016-08-12-rawdata/final_consensus_12aug_passonly/graylist/indel/*.annotated.indel.vcf.gz"
   ))
 ))
 
@@ -35,6 +39,12 @@ n_samples <- length(vcf_files)
 cat("Found", n_samples, "VCF files\n")
 
 sample_ids <- str_extract(basename(vcf_files), "^[^.]+")
+
+# Check for duplicate sample IDs across the three sources
+if (anyDuplicated(sample_ids)) {
+  dup <- sample_ids[duplicated(sample_ids)]
+  stop("Duplicate sample IDs found: ", paste(dup, collapse = ", "))
+}
 
 out_dir <- here::here("Manuscript_data")
 h5_path <- file.path(out_dir, "clipped_spectra.h5")
