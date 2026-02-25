@@ -150,3 +150,34 @@ for (indeltype in c("89", "476")) {
     )
   }
 }
+
+# Render all signatures from the 89-to-83 mapping table
+conn <- read.delim(
+  here::here("Manuscript_data/89type_to_83type_connection.tsv")
+)
+sigids <- unique(conn$InDel83)
+
+
+for (indeltype in c("83")) {
+  for (sigid in sigids) {
+    quarto::quarto_render(
+      input = here::here("msi_study/clip_study.qmd"),
+      output_file = paste0(sigid, "_", indeltype, "_clip_study.html"),
+      execute_params = list(
+        sig_to_report = sigid,
+        cosine_cutoff = 0.0,
+        num_exemplars = 30,
+        indeltype = indeltype,
+        types_of_interest = c(
+          "\\QDel2:U1:R(5,9)\\E",
+          "\\QIns2:U2:R(5,9)\\E",
+          "\\QDel2:U2:R2\\E",
+          "\\QDel3:U3:R2\\E",
+          "Ins[^2].*:U.:R.",
+          "Del.*M\\d",
+          "Del[^2].*:U.:R."
+        )
+      )
+    )
+  }
+}

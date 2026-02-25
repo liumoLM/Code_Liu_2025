@@ -6,23 +6,25 @@ format:
     code-fold: true
     embed-resources: true
 params:
-  sig_to_report: "InsDel9"
+  sig_to_report: "C_ID7"
   types_of_interest: ["Del2:U1:R(5,9)"]
-  cosine_cutoff: 0.95
-  num_exemplars: 10
-  indeltype: 476
+  cosine_cutoff: 0
+  num_exemplars: 30
+  indeltype: 83
 ---
 
 ```{r}
-#| label: tempfordebug
+#| label: set-params-for-debug
 
-params <- list(
-  sig_to_report = "InsDel7",
-  types_of_interest = "Del2:U1:R(5,9)",
-  indeltype = "476",
-  num_exemplars = 10,
-  cosine_cutoff = 0.7
-)
+if (!exists("params") || length(params) == 0) {
+  params <- list(
+    sig_to_report = "C_ID7",
+    types_of_interest = "Del2:U1:R(5,9)",
+    indeltype = 83,
+    num_exemplars = 10,
+    cosine_cutoff = 0
+  )
+}
 
 ```
 
@@ -56,6 +58,7 @@ spectra <- read.delim(
 sigfile <- here::here(glue(
   "Manuscript_data/Liu_et_al_final_{params$indeltype}_type_signatures.tsv"
 ))
+
 sigs <- read.delim(
   sigfile,
   row.names = 1,
@@ -118,6 +121,7 @@ for (raw_id in similar_spectra$top_exemplars$spectrum) {
   vcf <- read_annotated_vcf(id)
   if (is.null(vcf)) {
     next
+    message("No VCF found for ", id)
   }
   vcf <- dplyr::filter(vcf, R <= 9)
 
@@ -133,6 +137,12 @@ for (raw_id in similar_spectra$top_exemplars$spectrum) {
     )$computed_spectrum
   } else if (params$indeltype == 89) {
     computed_spectrum <- ICAMS::annot_vcf_to_89_catalog(
+      vcf,
+      'computed_spectrum',
+      FILTER_PASS = FILTER_PASS
+    )$computed_spectrum
+  } else if (params$indeltype == 83) {
+    computed_spectrum <- ICAMS::annot_vcf_to_83_catalog(
       vcf,
       'computed_spectrum',
       FILTER_PASS = FILTER_PASS

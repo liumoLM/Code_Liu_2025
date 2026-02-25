@@ -45,27 +45,25 @@ read_annotated_vcf <- function(tumor_id) {
     return(data.table::fread(hits))
   }
 
-  if (grepl("::", tumor_id, fixed = TRUE)) {
-    id <- sub("^.*::", "", tumor_id)
-    pattern <- paste0("*", id, "*annotated.indel.vcf.gz")
-    hits <- Sys.glob(file.path(h_dir, pattern))
-    if (length(hits) == 0) {
-      warning("No file found for ID ", id, " in ", h_dir)
-      return(NULL)
-    }
-    if (length(hits) > 1) {
-      warning(
-        "Multiple files found for ID ",
-        id,
-        " in ",
-        h_dir,
-        ":\n",
-        paste(hits, collapse = "\n")
-      )
-      return(NULL)
-    }
-    return(data.table::fread(hits))
+  id <- sub("^.*::", "", tumor_id)
+  pattern <- paste0("*", id, "*annotated.indel.vcf.gz")
+  hits <- Sys.glob(file.path(h_dir, pattern))
+  if (length(hits) == 0) {
+    warning("No file found for ID ", id, " in ", h_dir)
+    return(NULL)
   }
+  if (length(hits) > 1) {
+    warning(
+      "Multiple files found for ID ",
+      id,
+      " in ",
+      h_dir,
+      ":\n",
+      paste(hits, collapse = "\n")
+    )
+    return(NULL)
+  }
+  return(data.table::fread(hits))
 
   return(NULL)
 }
