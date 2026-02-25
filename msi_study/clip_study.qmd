@@ -1,0 +1,272 @@
+---
+title: "Clip > 9 study: `r paste(params$sig_to_report, params$cosine_cutoff, params$num_exemplars, sep = '-')`"
+date: "`r Sys.time()`"
+format:
+  html:
+    code-fold: true
+    embed-resources: true
+params:
+  sig_to_report: "InsDel9"
+  types_of_interest: ["Del2:U1:R(5,9)"]
+  cosine_cutoff: 0.95
+  num_exemplars: 10
+  indeltype: 476
+---
+
+```{r}
+#| label: tempfordebug
+#| eval: false
+
+params <- list(
+  sig_to_report = "InsDel_J",
+  types_of_interest = "Del2:U1:R(5,9)",
+  indeltype = "476",
+  num_exemplars = 10,
+  cosine_cutoff = 0.7
+)
+
+```
+
+
+```{r}
+#| label: setup
+#| output: false
+
+library(tidyverse)
+library(knitr)
+library(data.table)
+library(ICAMS)
+library(glue)
+
+source(here::here("code/find_many_similar.R"))
+source(here::here("code/read_annotated_vcf.R"))
+```
+
+```{r}
+#| label: read-data
+
+specfile <- here::here(glue(
+  "Manuscript_data/{params$indeltype}_clipped_spectra.tsv"
+))
+spectra <- read.delim(
+  specfile,
+  row.names = 1,
+  check.names = FALSE
+)
+
+sigfile <- here::here(glue(
+  "Manuscript_data/Liu_et_al_final_{params$indeltype}_type_signatures.tsv"
+))
+sigs <- read.delim(
+  sigfile,
+  row.names = 1,
+  check.names = FALSE
+)
+```
+
+## Find <= `r params$num_exemplars` spectra similar to `r params$sig_to_report` with similarity >= `r params$cosine_cutoff`
+
+```{r}
+#| label: find-similar
+#| output: false
+
+similar_spectra <- find_many_similar(
+  sig_path = sigfile,
+  sig_col = params$sig_to_report,
+  spectra_path = specfile,
+  cosine_cutoff = params$cosine_cutoff,
+  num_exemplars = params$num_exemplars,
+  min_mutations = 50,
+  do_plot = FALSE, # TRUE,
+  out_pdf = here::here(paste0(
+    "msi_study/clip_study_out/",
+    params$sig_to_report,
+    ".pdf"
+  ))
+)
+```
+
+### Exemplar spectra plots
+
+```{r}
+#| label: plot-exemplars
+#| fig-height: 3
+#| results: asis
+
+signum <- 0
+for (p in similar_spectra$plots) {
+  cat("\n\n####", signum, "\n\n")
+  signum <- signum + 1
+  print(p)
+}
+```
+
+## Validate computed spectra vs file spectra
+
+```{r}
+#| label: validate-spectra
+#| output: asis
+
+annot_vcf_list <- list()
+
+spec_num <- 1
+for (raw_id in similar_spectra$top_exemplars$spectrum) {
+  # find_many_similar uses check.names=TRUE so :: becomes ..
+  id <- gsub("\\.\\.", "::", raw_id)
+  cat("### ", spec_num, " Processing ", id, "\n\n")
+  spec_num <- spec_num + 1
+
+  vcf <- read_annotated_vcf(id)
+  if (is.null(vcf)) {
+    next
+  }
+  vcf <- dplyr::filter(vcf, R <= 9)
+
+  FILTER_PASS = !grepl("::SP", id)
+  if (is.null(FILTER_PASS) || is.na(FILTER_PASS)) {
+    stop("Problem with FILTER_PASS")
+  }
+  if (params$indeltype == 476) {
+    computed_spectrum <- ICAMS::annot_vcf_to_476_catalog(
+      vcf,
+      'computed_spectrum',
+      FILTER_PASS = FILTER_PASS
+    )$computed_spectrum
+  } else if (params$indeltype == 89) {
+    computed_spectrum <- ICAMS::annot_vcf_to_89_catalog(
+      vcf,
+      'computed_spectrum',
+      FILTER_PASS = FILTER_PASS
+    )$computed_spectrum
+  } else {
+    stop("unrecognized indeltype: ", params$indeltype)
+  }
+
+  file_spectrum <- spectra[, id]
+
+  computed_total <- sum(computed_spectrum)
+  file_total <- sum(file_spectrum)
+  abs_diff <- sum(abs(computed_spectrum - file_spectrum))
+  cos_sim <- lsa::cosine(computed_spectrum, file_spectrum)[1, 1]
+
+  cat(sprintf(
+    "\n\ncomputed=%d, file=%d, abs_diff=%.1f, cosine=%.6f\n\n",
+    computed_total,
+    file_total,
+    abs_diff,
+    cos_sim
+  ))
+
+  annot_vcf_list[[id]] <- vcf
+}
+```
+
+```{r}
+#| output: asis
+
+annot_vcf <- rbindlist(annot_vcf_list, fill = TRUE)
+cat(sprintf(
+  "\n### Combined VCF has %d rows from %d samples\n",
+  nrow(annot_vcf),
+  length(annot_vcf_list)
+))
+has_vcf_data <- nrow(annot_vcf) > 0
+if (!has_vcf_data) {
+  warning("No annotated VCFs could be read; skipping downstream sections")
+}
+```
+
+## Poly-T and Poly-C tract length distributions for `r params$sig_to_report`
+
+```{r}
+#| label: tract-lengths
+#| fig-height: 4
+#| eval: !expr has_vcf_data
+#| results: asis
+
+patterns <- c(
+  "Del\\(T" = "Del(T)",
+  "Ins\\(T" = "Ins(T)",
+  "Del\\(C" = "Del(C)",
+  "Ins\\(C" = "Ins(C)"
+)
+
+
+for (i in seq_along(patterns)) {
+  pat <- names(patterns)[i]
+  label <- patterns[i]
+
+  counts <- annot_vcf |>
+    dplyr::filter(grepl(pat, Koh_476)) |>
+    dplyr::count(R) |>
+    dplyr::mutate(repeat_count = R)
+
+  if (nrow(counts) == 0) {
+    cat(sprintf("\n\n### %s\n\nNo mutations found.\n\n", label))
+    next
+  }
+
+  cat(sprintf(
+    "\n### %s\n\nMean: %.2f, Median: %.1f, SD: %.2f, prop: %.2f, count: %d\n\n",
+    label,
+    weighted.mean(counts$repeat_count, counts$n),
+    median(rep(counts$repeat_count, counts$n)),
+    sd(rep(counts$repeat_count, counts$n)),
+    sum(counts$n) / nrow(annot_vcf),
+    sum(counts$n)
+  ))
+
+  p <- ggplot(counts, aes(x = repeat_count, weight = n)) +
+    geom_histogram(binwidth = 1, fill = "steelblue", color = "white") +
+    labs(
+      title = paste(label, "repeat count distribution"),
+      x = "Repeat count",
+      y = "Count"
+    ) +
+    theme_minimal()
+  print(p)
+  cat('\n ')
+}
+```
+
+## Investigate types of interest `r params$sig_to_report`
+
+```{r}
+#| label: types-of-interest
+#| fig-height: 4
+#| eval: !expr has_vcf_data
+
+for (indel_type in params$types_of_interest) {
+  cat(sprintf("\n### %s\n\n", indel_type))
+
+  summary_of_type <- annot_vcf |>
+    dplyr::filter(stringr::str_detect(Koh_476, indel_type)) |>
+    dplyr::count(short_visual, R_outside_ins_or_del_seq, R) |>
+    dplyr::rename(rout = R_outside_ins_or_del_seq) |>
+    dplyr::arrange(desc(n))
+
+  if (nrow(summary_of_type) == 0) {
+    cat("No mutations found for this type.\n\n")
+    next
+  }
+
+  print(kable(summary_of_type))
+  cat("\n\n")
+
+  plot_data <- head(summary_of_type, 20)
+  plot_data$short_visual <- factor(
+    plot_data$short_visual,
+    levels = rev(unique(plot_data$short_visual))
+  )
+  p <- ggplot(plot_data, aes(x = n, y = short_visual)) +
+    geom_col(fill = "steelblue") +
+    labs(
+      title = paste("Top contexts for", indel_type),
+      x = "Count",
+      y = NULL
+    ) +
+    theme_minimal()
+  print(p)
+  cat("\n\n")
+}
+```
