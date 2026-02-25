@@ -15,10 +15,9 @@ params:
 
 ```{r}
 #| label: tempfordebug
-#| eval: false
 
 params <- list(
-  sig_to_report = "InsDel_J",
+  sig_to_report = "InsDel7",
   types_of_interest = "Del2:U1:R(5,9)",
   indeltype = "476",
   num_exemplars = 10,
@@ -122,7 +121,7 @@ for (raw_id in similar_spectra$top_exemplars$spectrum) {
   }
   vcf <- dplyr::filter(vcf, R <= 9)
 
-  FILTER_PASS = !grepl("::SP", id)
+  FILTER_PASS = !grepl("^SP", id) # We don't use FILTER_PASS for PCAWG VCFS
   if (is.null(FILTER_PASS) || is.na(FILTER_PASS)) {
     stop("Problem with FILTER_PASS")
   }
