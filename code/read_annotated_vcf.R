@@ -46,7 +46,7 @@ read_annotated_vcf <- function(tumor_id) {
   }
 
   id <- sub("^.*::", "", tumor_id)
-  pattern <- paste0("*", id, "*annotated.indel.vcf.gz")
+  pattern <- paste0("*", id, ".annotated.indel.vcf.gz")
   hits <- Sys.glob(file.path(h_dir, pattern))
   if (length(hits) == 0) {
     warning("No file found for ID ", id, " in ", h_dir)
