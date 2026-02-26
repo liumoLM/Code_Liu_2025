@@ -6,11 +6,11 @@ format:
     code-fold: true
     embed-resources: true
 params:
-  sig_to_report: "C_ID7"
+  sig_to_report: "InsDel7"
   types_of_interest: ["Del2:U1:R(5,9)"]
   cosine_cutoff: 0
-  num_exemplars: 30
-  indeltype: 83
+  num_exemplars: 100
+  indeltype: 476
 ---
 
 ```{r}
