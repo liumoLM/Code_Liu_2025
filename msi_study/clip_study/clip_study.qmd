@@ -6,10 +6,10 @@ format:
     code-fold: true
     embed-resources: true
 params:
-  sig_to_report: "InsDel7"
-  types_of_interest: ["Del2:U1:R(5,9)"]
+  sig_to_report: "InsDel_J"
+  types_of_interest: ["\\QDel2:U2:R(5,9)\\E", "\\QDel2:U1:R(5,9)\\E"]
   cosine_cutoff: 0
-  num_exemplars: 100
+  num_exemplars: 10
   indeltype: 476
 ---
 
@@ -18,10 +18,10 @@ params:
 
 if (!exists("params") || length(params) == 0) {
   params <- list(
-    sig_to_report = "C_ID7",
-    types_of_interest = "Del2:U1:R(5,9)",
-    indeltype = 83,
-    num_exemplars = 10,
+    sig_to_report = "InsDel_J",
+    types_of_interest = c("\\QDel2:U2:R(5,9)\\E", "\\QDel2:U1:R(5,9)\\E"),
+    indeltype = 476,
+    num_exemplars = 30,
     cosine_cutoff = 0
   )
 }
