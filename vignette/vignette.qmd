@@ -64,7 +64,7 @@ data_dir <- here::here("Manuscript_data")
 COSMIC_min_cosine <- 0.9
 
 # Minimum cosine similarity to show matching Jin signatures
-Jin_min_cosine <- 0.9
+Jin_min_cosine <- 0.
 
 # Minimum cosine similarity to show matching Koh signatures
 koh_min_cosine <- 0.9
