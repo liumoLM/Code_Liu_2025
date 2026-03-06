@@ -32,10 +32,12 @@ for (ds in c("Koh89", "Koh476")) {
 
 # Liu signature names for each dataset type
 liu_sig_names <- list(
-  Koh89  = colnames(all_data[["Koh89"]]$combined)[
-    all_data[["Koh89"]]$source_vec == "Liu"],
+  Koh89 = colnames(all_data[["Koh89"]]$combined)[
+    all_data[["Koh89"]]$source_vec == "Liu"
+  ],
   Koh476 = colnames(all_data[["Koh476"]]$combined)[
-    all_data[["Koh476"]]$source_vec == "Liu"]
+    all_data[["Koh476"]]$source_vec == "Liu"
+  ]
 )
 ```
 
@@ -55,19 +57,25 @@ the seed are shown in the dendrogram.
 #| panel: input
 
 selectInput(
-  "dataset", "Dataset:",
+  "dataset",
+  "Dataset:",
   choices = c("Koh89" = "Koh89", "Koh476" = "Koh476"),
   selected = "Koh89"
 )
 
 selectInput(
-  "seed_signature", "Seed (Liu) Signature:",
+  "seed_signature",
+  "Seed (Liu) Signature:",
   choices = liu_sig_names[["Koh89"]]
 )
 
 numericInput(
-  "cosine_sim_to_seed", "Min Cosine Similarity to Seed:",
-  value = 0.8, min = 0, max = 1, step = 0.05
+  "cosine_sim_to_seed",
+  "Min Cosine Similarity to Seed:",
+  value = 0.8,
+  min = 0,
+  max = 1,
+  step = 0.05
 )
 
 actionButton("update_dendro", "Update Dendrogram")
@@ -83,7 +91,8 @@ uiOutput("selection_display")
 # Update seed dropdown when dataset changes
 observeEvent(input$dataset, {
   updateSelectInput(
-    session, "seed_signature",
+    session,
+    "seed_signature",
     choices = liu_sig_names[[input$dataset]]
   )
 })
@@ -92,30 +101,36 @@ observeEvent(input$dataset, {
 selected_sigs <- reactiveVal(character(0))
 
 # Clear selection on dataset switch or dendro update
-observeEvent(input$dataset, { selected_sigs(character(0)) })
+observeEvent(input$dataset, {
+  selected_sigs(character(0))
+})
 
 # Filtered + clustered data, recomputed only on button click
-filtered_result <- eventReactive(input$update_dendro, {
-  ds <- isolate(input$dataset)
-  seed <- isolate(input$seed_signature)
-  threshold <- isolate(input$cosine_sim_to_seed)
+filtered_result <- eventReactive(
+  input$update_dendro,
+  {
+    ds <- isolate(input$dataset)
+    seed <- isolate(input$seed_signature)
+    threshold <- isolate(input$cosine_sim_to_seed)
 
-  combined <- all_data[[ds]]$combined
-  source_vec <- all_data[[ds]]$source_vec
+    combined <- all_data[[ds]]$combined
+    source_vec <- all_data[[ds]]$source_vec
 
-  filtered <- filter_by_seed(combined, seed, threshold)
-  filtered_source <- source_vec[colnames(filtered)]
+    filtered <- filter_by_seed(combined, seed, threshold)
+    filtered_source <- source_vec[colnames(filtered)]
 
-  dendro <- compute_dendrogram(filtered)
+    dendro <- compute_dendrogram(filtered)
 
-  selected_sigs(character(0))
+    selected_sigs(character(0))
 
-  list(
-    combined = filtered,
-    source_vec = filtered_source,
-    dendro = dendro
-  )
-}, ignoreNULL = FALSE)
+    list(
+      combined = filtered,
+      source_vec = filtered_source,
+      dendro = dendro
+    )
+  },
+  ignoreNULL = FALSE
+)
 
 # Render selection badges
 output$selection_display <- renderUI({
@@ -136,16 +151,16 @@ output$selection_display <- renderUI({
       style = paste0(
         "display: inline-block; margin: 2px 4px; padding: 3px 8px; ",
         "border-radius: 4px; color: white; font-size: 0.85em; ",
-        "background-color: ", col, ";"
+        "background-color: ",
+        col,
+        ";"
       )
     )
   })
 
   tagList(
-    tags$p(tags$strong(paste0("Selected (", length(sigs), "): ")),
-           badges),
-    actionButton("clear_selection", "Clear All",
-                 style = "margin-top: 4px;")
+    tags$p(tags$strong(paste0("Selected (", length(sigs), "): ")), badges),
+    actionButton("clear_selection", "Clear All", style = "margin-top: 4px;")
   )
 })
 
@@ -158,8 +173,6 @@ observeEvent(input$select_all, {
   selected_sigs(colnames(res$combined))
 })
 ```
-
-## Dendrogram
 
 ```{r}
 #| label: dendrogram-plot
@@ -185,7 +198,9 @@ observeEvent(event_data("plotly_click", source = "dendrogram"), {
   click <- event_data("plotly_click", source = "dendrogram")
   if (!is.null(click)) {
     sig_name <- click$customdata
-    if (is.list(sig_name)) sig_name <- sig_name[[1]]
+    if (is.list(sig_name)) {
+      sig_name <- sig_name[[1]]
+    }
     if (!is.null(sig_name) && nzchar(sig_name)) {
       current <- selected_sigs()
       if (sig_name %in% current) {
@@ -222,28 +237,41 @@ output$sig_plots_ui <- renderUI({
 
 sig_plots_height <- reactive({
   sigs <- selected_sigs()
-  if (length(sigs) == 0) return(300)
+  if (length(sigs) == 0) {
+    return(300)
+  }
   height_per <- if (input$dataset == "Koh89") 300 else 400
   length(sigs) * height_per
 })
 
-output$sig_plots <- renderPlot({
-  sigs <- selected_sigs()
-  req(length(sigs) > 0)
+output$sig_plots <- renderPlot(
+  {
+    sigs <- selected_sigs()
+    req(length(sigs) > 0)
 
-  res <- filtered_result()
-  combined <- res$combined
-  plot_fn <- if (input$dataset == "Koh89") mSigPlot::plot_89 else mSigPlot::plot_476
+    res <- filtered_result()
+    combined <- res$combined
+    plot_fn <- if (input$dataset == "Koh89") {
+      mSigPlot::plot_89
+    } else {
+      mSigPlot::plot_476
+    }
 
-  plots <- lapply(sigs, function(s) {
-    sig_data <- combined[, s, drop = FALSE]
-    plot_fn(sig_data, plot_title = s)
-  })
+    plots <- lapply(sigs, function(s) {
+      sig_data <- combined[, s, drop = FALSE]
+      plot_fn(sig_data, plot_title = s)
+    })
 
-  gridExtra::grid.arrange(grobs = plots, ncol = 1)
-}, res = 100,
-   width = function() { if (input$dataset == "Koh476") 1400 else 900 },
-   height = function() { sig_plots_height() })
+    gridExtra::grid.arrange(grobs = plots, ncol = 1)
+  },
+  res = 100,
+  width = function() {
+    if (input$dataset == "Koh476") 1400 else 900
+  },
+  height = function() {
+    sig_plots_height()
+  }
+)
 ```
 
 ## Cosine Similarity
@@ -261,7 +289,9 @@ uiOutput("cosine_table")
 output$cosine_table <- renderUI({
   sigs <- selected_sigs()
   if (length(sigs) < 2) {
-    return(tags$p(tags$em("Select at least 2 signatures to see cosine similarity.")))
+    return(tags$p(tags$em(
+      "Select at least 2 signatures to see cosine similarity."
+    )))
   }
 
   res <- filtered_result()
@@ -271,10 +301,13 @@ output$cosine_table <- renderUI({
   # Build header row with vertical column labels (skip last sig — it's only a row)
   header_cells <- list(tags$th(""))
   for (j in seq_len(n - 1)) {
-    header_cells <- c(header_cells, list(tags$th(
-      style = "writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; padding: 4px; font-size: 0.85em;",
-      sigs[j]
-    )))
+    header_cells <- c(
+      header_cells,
+      list(tags$th(
+        style = "writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; padding: 4px; font-size: 0.85em;",
+        sigs[j]
+      ))
+    )
   }
   header_row <- do.call(tags$tr, header_cells)
 
@@ -286,13 +319,24 @@ output$cosine_table <- renderUI({
     ))
     for (j in seq_len(i - 1)) {
       val <- cos_mat[i, j]
-      bg <- if (val >= 0.9) "#ffcccc"
-            else if (val >= 0.8) "#ffe0cc"
-            else "#ffffff"
-      cells <- c(cells, list(tags$td(
-        style = paste0("text-align: center; padding: 4px; font-size: 0.85em; background-color: ", bg, ";"),
-        sprintf("%.3f", val)
-      )))
+      bg <- if (val >= 0.9) {
+        "#ffcccc"
+      } else if (val >= 0.8) {
+        "#ffe0cc"
+      } else {
+        "#ffffff"
+      }
+      cells <- c(
+        cells,
+        list(tags$td(
+          style = paste0(
+            "text-align: center; padding: 4px; font-size: 0.85em; background-color: ",
+            bg,
+            ";"
+          ),
+          sprintf("%.3f", val)
+        ))
+      )
     }
     do.call(tags$tr, cells)
   })
