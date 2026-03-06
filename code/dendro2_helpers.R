@@ -63,6 +63,7 @@ rename_sigs2 <- function(file_path) {
 load_all_signatures <- function(
     dataset_type,
     sig_dir = "../Manuscript_data/Mo_CAP9_analysis/Signatures",
+    catalog_dir = "../Manuscript_data/Mo_CAP9_analysis/Catalogs",
     data_dir = "../Manuscript_data") {
 
   sig_files <- Sys.glob(file.path(sig_dir, dataset_type, "*.txt"))
@@ -73,6 +74,16 @@ load_all_signatures <- function(
   nrows <- sapply(all_sigs, nrow)
   expected <- max(nrows)
   all_sigs <- all_sigs[nrows == expected]
+
+  # Get mutation type row names from a catalog file (extraction files lack them)
+  cat_files <- Sys.glob(file.path(catalog_dir, paste0("*", dataset_type, "*.txt")))
+  cat_rownames <- rownames(read.table(cat_files[1], header = TRUE, sep = "\t",
+                                       row.names = 1, check.names = FALSE))
+
+  # Assign row names to extraction sigs
+  for (i in seq_along(all_sigs)) {
+    rownames(all_sigs[[i]]) <- cat_rownames
+  }
 
   # Build source vector
   source_vec <- character(0)
@@ -88,6 +99,9 @@ load_all_signatures <- function(
   liu_suffix <- if (dataset_type == "Koh89") "89" else "476"
   liu_file <- file.path(data_dir, paste0("Liu_et_al_final_", liu_suffix, "_type_signatures.tsv"))
   liu_sigs <- read.table(liu_file, header = TRUE, sep = "\t", row.names = 1, check.names = FALSE)
+
+  # Reorder extraction sigs to match Liu row order
+  cap9_combined <- cap9_combined[rownames(liu_sigs), ]
 
   source_vec <- c(source_vec, setNames(rep("Liu", ncol(liu_sigs)), colnames(liu_sigs)))
 
@@ -180,7 +194,7 @@ build_plotly_dendrogram <- function(dend_data, source_vec,
       xref = "x", yref = "y",
       showarrow = FALSE,
       font = list(size = 9, color = label_df$color[i]),
-      xanchor = "right",
+      xanchor = "center",
       yanchor = "top"
     )
   })
