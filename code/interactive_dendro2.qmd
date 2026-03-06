@@ -71,6 +71,7 @@ numericInput(
 )
 
 actionButton("update_dendro", "Update Dendrogram")
+actionButton("select_all", "Select All Leaves")
 
 uiOutput("selection_display")
 ```
@@ -121,7 +122,7 @@ output$selection_display <- renderUI({
   sigs <- selected_sigs()
   if (length(sigs) == 0) {
     return(tags$p(
-      tags$em("Click leaves in the dendrogram to select signatures (max 10).")
+      tags$em("Click leaves in the dendrogram to select signatures.")
     ))
   }
 
@@ -141,7 +142,7 @@ output$selection_display <- renderUI({
   })
 
   tagList(
-    tags$p(tags$strong(paste0("Selected (", length(sigs), "/10): ")),
+    tags$p(tags$strong(paste0("Selected (", length(sigs), "): ")),
            badges),
     actionButton("clear_selection", "Clear All",
                  style = "margin-top: 4px;")
@@ -150,6 +151,11 @@ output$selection_display <- renderUI({
 
 observeEvent(input$clear_selection, {
   selected_sigs(character(0))
+})
+
+observeEvent(input$select_all, {
+  res <- filtered_result()
+  selected_sigs(colnames(res$combined))
 })
 ```
 
@@ -184,7 +190,7 @@ observeEvent(event_data("plotly_click", source = "dendrogram"), {
       current <- selected_sigs()
       if (sig_name %in% current) {
         selected_sigs(setdiff(current, sig_name))
-      } else if (length(current) < 10) {
+      } else {
         selected_sigs(c(current, sig_name))
       }
     }
@@ -243,51 +249,59 @@ output$sig_plots <- renderPlot({
 ## Cosine Similarity
 
 ```{r}
-#| label: cosine-heatmap
+#| label: cosine-table
 
-plotlyOutput("cosine_heatmap", height = "500px")
+uiOutput("cosine_table")
 ```
 
 ```{r}
-#| label: cosine-heatmap-server
+#| label: cosine-table-server
 #| context: server
 
-output$cosine_heatmap <- renderPlotly({
+output$cosine_table <- renderUI({
   sigs <- selected_sigs()
   if (length(sigs) < 2) {
-    return(
-      plot_ly(type = "scatter", mode = "markers") |>
-        layout(
-          title = "Select at least 2 signatures to see cosine similarity.",
-          xaxis = list(visible = FALSE),
-          yaxis = list(visible = FALSE)
-        )
-    )
+    return(tags$p(tags$em("Select at least 2 signatures to see cosine similarity.")))
   }
 
   res <- filtered_result()
   cos_mat <- res$dendro$cosine_sim[sigs, sigs]
+  n <- length(sigs)
 
-  text_mat <- matrix(
-    sprintf("%.3f", cos_mat),
-    nrow = nrow(cos_mat)
+  # Build header row with vertical column labels (skip last sig — it's only a row)
+  header_cells <- list(tags$th(""))
+  for (j in seq_len(n - 1)) {
+    header_cells <- c(header_cells, list(tags$th(
+      style = "writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; padding: 4px; font-size: 0.85em;",
+      sigs[j]
+    )))
+  }
+  header_row <- do.call(tags$tr, header_cells)
+
+  # Build body rows (lower triangle: row i shows columns 1..i-1)
+  body_rows <- lapply(2:n, function(i) {
+    cells <- list(tags$td(
+      style = "font-weight: bold; white-space: nowrap; padding: 4px; font-size: 0.85em;",
+      sigs[i]
+    ))
+    for (j in seq_len(i - 1)) {
+      val <- cos_mat[i, j]
+      bg <- if (val >= 0.9) "#ffcccc"
+            else if (val >= 0.8) "#ffe0cc"
+            else "#ffffff"
+      cells <- c(cells, list(tags$td(
+        style = paste0("text-align: center; padding: 4px; font-size: 0.85em; background-color: ", bg, ";"),
+        sprintf("%.3f", val)
+      )))
+    }
+    do.call(tags$tr, cells)
+  })
+
+  tags$table(
+    style = "border-collapse: collapse; border: 1px solid #ddd;",
+    tags$thead(header_row),
+    do.call(tags$tbody, body_rows)
   )
-
-  plot_ly(
-    x = sigs, y = sigs,
-    z = cos_mat,
-    text = text_mat,
-    type = "heatmap",
-    colorscale = list(c(0, "#FFFFFF"), c(1, "#FF0000")),
-    zmin = 0, zmax = 1,
-    hovertemplate = "%{y} vs %{x}<br>Cosine: %{text}<extra></extra>"
-  ) |>
-    layout(
-      title = "Pairwise Cosine Similarity",
-      xaxis = list(title = "", tickangle = -45),
-      yaxis = list(title = "", autorange = "reversed"),
-      margin = list(l = 120, b = 120)
-    )
 })
 ```
 
@@ -298,4 +312,4 @@ output$cosine_heatmap <- renderPlotly({
 - **Click** a leaf marker to select/deselect it (shown in badges above)
 - **Zoom** into crowded regions using plotly's built-in zoom
 - Signature profiles are rendered with mSigPlot (`plot_89` or `plot_476`)
-- Max 10 signatures can be selected at once
+- No limit on the number of signatures that can be selected
