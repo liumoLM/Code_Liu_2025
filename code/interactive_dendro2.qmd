@@ -211,6 +211,18 @@ observeEvent(event_data("plotly_click", source = "dendrogram"), {
     }
   }
 })
+
+# Handle lasso/box selection of leaf markers
+observeEvent(event_data("plotly_selected", source = "dendrogram"), {
+  sel <- event_data("plotly_selected", source = "dendrogram")
+  if (!is.null(sel) && !is.null(sel$customdata)) {
+    sig_names <- unlist(sel$customdata)
+    sig_names <- sig_names[!is.na(sig_names) & nzchar(sig_names)]
+    if (length(sig_names) > 0) {
+      selected_sigs(unique(sig_names))
+    }
+  }
+})
 ```
 
 ## Signature Profiles

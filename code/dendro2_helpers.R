@@ -220,8 +220,9 @@ build_plotly_dendrogram <- function(dend_data, source_vec,
       )
     ),
     hovermode = "closest",
-    dragmode = "zoom"
+    dragmode = "select"
   ) |>
     config(displayModeBar = TRUE, displaylogo = FALSE) |>
-    event_register("plotly_click")
+    event_register("plotly_click") |>
+    event_register("plotly_selected")
 }
