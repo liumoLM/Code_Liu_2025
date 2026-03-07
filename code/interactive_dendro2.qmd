@@ -30,15 +30,12 @@ for (ds in c("Koh89", "Koh476")) {
   all_data[[ds]] <- load_all_signatures(ds)
 }
 
-# Liu signature names for each dataset type
-liu_sig_names <- list(
-  Koh89 = colnames(all_data[["Koh89"]]$combined)[
-    all_data[["Koh89"]]$source_vec == "Liu"
-  ],
-  Koh476 = colnames(all_data[["Koh476"]]$combined)[
-    all_data[["Koh476"]]$source_vec == "Liu"
-  ]
-)
+# Signature names grouped by dataset and source group
+sig_names_by_source <- list()
+for (ds in c("Koh89", "Koh476")) {
+  sv <- all_data[[ds]]$source_vec
+  sig_names_by_source[[ds]] <- split(names(sv), sv)
+}
 ```
 
 ```{r}
@@ -47,7 +44,7 @@ tags$style(".container-fluid { max-width: 100% !important; padding: 0 15px; }")
 ```
 
 This interactive dendrogram loads **all** CAP9/NoCAP signature extractions and lets you
-pick a seed Liu signature. Only signatures with cosine similarity >= threshold to
+pick a seed signature from any source group. Only signatures with cosine similarity >= threshold to
 the seed are shown in the dendrogram.
 
 ## Controls
@@ -64,9 +61,16 @@ selectInput(
 )
 
 selectInput(
+  "seed_source",
+  "Seed Source:",
+  choices = names(sig_names_by_source[["Koh89"]]),
+  selected = "Liu"
+)
+
+selectInput(
   "seed_signature",
-  "Seed (Liu) Signature:",
-  choices = liu_sig_names[["Koh89"]]
+  "Seed Signature:",
+  choices = sig_names_by_source[["Koh89"]][["Liu"]]
 )
 
 numericInput(
@@ -88,13 +92,18 @@ uiOutput("selection_display")
 #| label: server-logic
 #| context: server
 
-# Update seed dropdown when dataset changes
+# Update source group dropdown when dataset changes
 observeEvent(input$dataset, {
-  updateSelectInput(
-    session,
-    "seed_signature",
-    choices = liu_sig_names[[input$dataset]]
-  )
+  sources <- names(sig_names_by_source[[input$dataset]])
+  updateSelectInput(session, "seed_source", choices = sources, selected = "Liu")
+})
+
+# Update seed signature dropdown when dataset or source group changes
+observeEvent(list(input$dataset, input$seed_source), {
+  ds <- input$dataset
+  src <- input$seed_source
+  sigs <- sig_names_by_source[[ds]][[src]]
+  updateSelectInput(session, "seed_signature", choices = sigs)
 })
 
 # Reactive: selected signatures (max 10)
@@ -310,19 +319,6 @@ output$cosine_table <- renderUI({
   cos_mat <- res$dendro$cosine_sim[sigs, sigs]
   n <- length(sigs)
 
-  # Build header row with vertical column labels (skip last sig — it's only a row)
-  header_cells <- list(tags$th(""))
-  for (j in seq_len(n - 1)) {
-    header_cells <- c(
-      header_cells,
-      list(tags$th(
-        style = "writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; padding: 4px; font-size: 0.85em;",
-        sigs[j]
-      ))
-    )
-  }
-  header_row <- do.call(tags$tr, header_cells)
-
   # Build body rows (lower triangle: row i shows columns 1..i-1)
   body_rows <- lapply(2:n, function(i) {
     cells <- list(tags$td(
@@ -353,10 +349,23 @@ output$cosine_table <- renderUI({
     do.call(tags$tr, cells)
   })
 
+  # Build footer row with vertical column labels (skip last sig — it's only a row)
+  footer_cells <- list(tags$td(""))
+  for (j in seq_len(n - 1)) {
+    footer_cells <- c(
+      footer_cells,
+      list(tags$td(
+        style = "writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; padding: 4px; font-size: 0.85em; font-weight: bold;",
+        sigs[j]
+      ))
+    )
+  }
+  footer_row <- do.call(tags$tr, footer_cells)
+
   tags$table(
     style = "border-collapse: collapse; border: 1px solid #ddd;",
-    tags$thead(header_row),
-    do.call(tags$tbody, body_rows)
+    do.call(tags$tbody, body_rows),
+    tags$tfoot(footer_row)
   )
 })
 ```
@@ -364,7 +373,7 @@ output$cosine_table <- renderUI({
 ## About
 
 - **Source colors**: Liu (red), C.H = CAP9 Hartwig (green), C.P = CAP9 PCAWG (purple), C.PH = CAP9 PCAWG+Hartwig (orange), N.H = NoCAP Hartwig (blue)
-- **Workflow**: Select a dataset, pick a seed Liu signature, set cosine similarity threshold, click "Update Dendrogram"
+- **Workflow**: Select a dataset, pick a seed source and signature, set cosine similarity threshold, click "Update Dendrogram"
 - **Click** a leaf marker to select/deselect it (shown in badges above)
 - **Zoom** into crowded regions using plotly's built-in zoom
 - Signature profiles are rendered with mSigPlot (`plot_89` or `plot_476`)
