@@ -1,22 +1,18 @@
-All files are tab-separated. Some have rownames columns, some do not.
+All files are tab-separated.
+All have rownames in the first column.
+Rowname orders should be as in ICAMS::catalog.row.order, slots ID (for the 83-type classifictaion) ID89, ID476
 
 ## in folder `Manuscript_data/`
 
 files `Liu_et_al_final_{476,89,38}_type_signatures.tsv` contain current signatures as of Jan 1, 2026
 
-these files have a rownames column
-
 ## in folder `Manuscript_data/Mo_CAP9_analysis/Catalogs/`
-
-these files hava a rownames column
 
 files `CAP9.{Hartwig,PCAWG}.{Koh476,Koh89,CSOMIC83}.catalog.txt` contain spectra from Hartwig or PCAWG, with all indels with R > 9 removed (CAP9).
 
 files `nonclip.Hartwig{Koh476,Koh89,CSOMIC83}` contain spectra from Hartwig with all indels included (no clipping / no cap9)
 
 ## in folder `Manuscript_data/Mo_CAP9_analysis/Signatures/`
-
-These files do not have rownames columns.
 
 File names have 6 parts separated by "."
 

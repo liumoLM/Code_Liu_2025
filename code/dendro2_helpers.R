@@ -75,14 +75,35 @@ load_all_signatures <- function(
   expected <- max(nrows)
   all_sigs <- all_sigs[nrows == expected]
 
-  # Get mutation type row names from a catalog file (extraction files lack them)
+  # ICAMS canonical row order for this dataset type
+  icams_order <- if (dataset_type == "Koh476") {
+    ICAMS::catalog.row.order$ID476
+  } else {
+    ICAMS::catalog.row.order$ID89
+  }
+
+  # Get mutation type row names from a catalog file
   cat_files <- Sys.glob(file.path(catalog_dir, paste0("*", dataset_type, "*.txt")))
   cat_rownames <- rownames(read.table(cat_files[1], header = TRUE, sep = "\t",
                                        row.names = 1, check.names = FALSE))
 
-  # Assign row names to extraction sigs
+  # Validate catalog row order against ICAMS
+  stopifnot(
+    "Catalog rownames do not match ICAMS::catalog.row.order" =
+      identical(cat_rownames, icams_order)
+  )
+
+  # Validate/assign row names to extraction sigs
   for (i in seq_along(all_sigs)) {
-    rownames(all_sigs[[i]]) <- cat_rownames
+    if (dataset_type == "Koh476") {
+      stopifnot(
+        "Koh476 signature rownames do not match ICAMS::catalog.row.order$ID476" =
+          identical(rownames(all_sigs[[i]]), icams_order)
+      )
+    } else {
+      # Koh89 signature files lack rownames; assign from validated catalog
+      rownames(all_sigs[[i]]) <- cat_rownames
+    }
   }
 
   # Build source vector
@@ -100,8 +121,11 @@ load_all_signatures <- function(
   liu_file <- file.path(data_dir, paste0("Liu_et_al_final_", liu_suffix, "_type_signatures.tsv"))
   liu_sigs <- read.table(liu_file, header = TRUE, sep = "\t", row.names = 1, check.names = FALSE)
 
-  # Reorder extraction sigs to match Liu row order
-  cap9_combined <- cap9_combined[rownames(liu_sigs), ]
+  # Validate Liu reference row order against ICAMS
+  stopifnot(
+    "Liu signature rownames do not match ICAMS::catalog.row.order" =
+      identical(rownames(liu_sigs), icams_order)
+  )
 
   source_vec <- c(source_vec, setNames(rep("Liu", ncol(liu_sigs)), colnames(liu_sigs)))
 
