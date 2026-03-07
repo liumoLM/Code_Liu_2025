@@ -5,6 +5,8 @@ library(ggdendro)
 library(lsa)
 library(plotly)
 
+source(here::here("code", "map_476_to_other.R"))
+
 # Colors for source groups
 dendro2_colors <- c(
   Liu  = "#FF0000",
@@ -62,9 +64,9 @@ rename_sigs2 <- function(file_path) {
 #' @return List with: combined (features-as-rows data.frame), source_vec (named character vector)
 load_all_signatures <- function(
     dataset_type,
-    sig_dir = "../Manuscript_data/Mo_CAP9_analysis/Signatures",
-    catalog_dir = "../Manuscript_data/Mo_CAP9_analysis/Catalogs",
-    data_dir = "../Manuscript_data") {
+    sig_dir = here::here("Manuscript_data", "Mo_CAP9_analysis", "Signatures"),
+    catalog_dir = here::here("Manuscript_data", "Mo_CAP9_analysis", "Catalogs"),
+    data_dir = here::here("Manuscript_data")) {
 
   sig_files <- Sys.glob(file.path(sig_dir, dataset_type, "*.txt"))
 
@@ -130,6 +132,45 @@ load_all_signatures <- function(
   source_vec <- c(source_vec, setNames(rep("Liu", ncol(liu_sigs)), colnames(liu_sigs)))
 
   combined <- cbind(cap9_combined, liu_sigs)
+
+  # For Koh89: also load Koh476 signatures, map to 89-type, and include with '.m' suffix
+  if (dataset_type == "Koh89") {
+    # Load all Koh476 extraction signatures
+    sig_files_476 <- Sys.glob(file.path(sig_dir, "Koh476", "*.txt"))
+    all_sigs_476 <- lapply(sig_files_476, rename_sigs2)
+    nrows_476 <- sapply(all_sigs_476, nrow)
+    expected_476 <- max(nrows_476)
+    all_sigs_476 <- all_sigs_476[nrows_476 == expected_476]
+    cap9_476 <- do.call(cbind, all_sigs_476)
+
+    # Load Liu 476-type signatures
+    liu_file_476 <- file.path(data_dir, "Liu_et_al_final_476_type_signatures.tsv")
+    liu_476 <- read.table(liu_file_476, header = TRUE, sep = "\t",
+                          row.names = 1, check.names = FALSE)
+
+    all_476 <- cbind(cap9_476, liu_476)
+
+    # Map 476 -> 89
+    mapped_89 <- t476_to_89(all_476)
+
+    # Rename columns: append '.m' and strip '_converted' suffix from t476_to_89
+    colnames(mapped_89) <- sub("_converted$", ".m", colnames(mapped_89))
+
+    # Build source vector for mapped sigs
+    mapped_source <- character(0)
+    for (s in all_sigs_476) {
+      grp <- attr(s, "source_group")
+      mapped_source <- c(mapped_source,
+                         setNames(rep(grp, ncol(s)),
+                                  paste0(colnames(s), ".m")))
+    }
+    mapped_source <- c(mapped_source,
+                       setNames(rep("Liu", ncol(liu_476)),
+                                paste0(colnames(liu_476), ".m")))
+
+    source_vec <- c(source_vec, mapped_source)
+    combined <- cbind(combined, mapped_89)
+  }
 
   list(combined = combined, source_vec = source_vec)
 }
