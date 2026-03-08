@@ -214,46 +214,47 @@ load_all_signatures <- function(
   }
 
   # Find best-matching spectra for each signature and write to disk
-  if (find_similar && dataset_type == "Koh89") {
+  if (find_similar) {
     spectra_dir <- file.path(data_dir, "Mo_CAP9_analysis", "selected_spectra")
     dir.create(spectra_dir, showWarnings = FALSE, recursive = TRUE)
 
     # CAP9-searchable: all groups except N.H (and its mapped variant N.H.m)
-    cap9_groups <- c("C.H", "C.P", "C.PH", "Liu", "Koh",
-                     "C.H.m", "C.P.m", "C.PH.m", "Liu.m")
+    cap9_groups <- c("C.H", "C.P", "C.PH", "Liu",
+                     if (dataset_type == "Koh89") c("Koh", "C.H.m", "C.P.m", "C.PH.m", "Liu.m"))
     cap9_cols <- names(source_vec)[source_vec %in% cap9_groups]
     cap9_sigs <- combined[, cap9_cols, drop = FALSE]
 
+    cat_suffix <- paste0(dataset_type, ".catalog.txt")
     cap9_pcawg <- find_best_match_spectra(
-      cap9_sigs, file.path(catalog_dir, "CAP9.PCAWG.Koh89.catalog.txt"))
+      cap9_sigs, file.path(catalog_dir, paste0("CAP9.PCAWG.", cat_suffix)))
     cap9_hartwig <- find_best_match_spectra(
-      cap9_sigs, file.path(catalog_dir, "CAP9.Hartwig.Koh89.catalog.txt"))
+      cap9_sigs, file.path(catalog_dir, paste0("CAP9.Hartwig.", cat_suffix)))
     cap9_spectra <- cbind(cap9_pcawg, cap9_hartwig)
     cap9_spectra <- cap9_spectra[, !duplicated(colnames(cap9_spectra)), drop = FALSE]
 
-    # nonclip-searchable: N.H (and N.H.m)
-    nonclip_groups <- c("N.H", "N.H.m")
+    # nonclip-searchable: N.H (and N.H.m if Koh89)
+    nonclip_groups <- c("N.H", if (dataset_type == "Koh89") "N.H.m")
     nonclip_cols <- names(source_vec)[source_vec %in% nonclip_groups]
     nonclip_sigs <- combined[, nonclip_cols, drop = FALSE]
 
     nonclip_spectra <- find_best_match_spectra(
-      nonclip_sigs, file.path(catalog_dir, "nonclip.Hartwig.Koh89.catalog.txt"))
+      nonclip_sigs, file.path(catalog_dir, paste0("nonclip.Hartwig.", cat_suffix)))
 
     write.table(cap9_spectra,
-                file.path(spectra_dir, "CAP9.selected_spectra.Koh89.tsv"),
+                file.path(spectra_dir, paste0("CAP9.selected_spectra.", dataset_type, ".tsv")),
                 sep = "\t", quote = FALSE, col.names = NA)
     write.table(nonclip_spectra,
-                file.path(spectra_dir, "nonclip.selected_spectra.Koh89.tsv"),
+                file.path(spectra_dir, paste0("nonclip.selected_spectra.", dataset_type, ".tsv")),
                 sep = "\t", quote = FALSE, col.names = NA)
 
     message("Wrote selected spectra to ", spectra_dir)
   }
 
   # Load previously-saved selected spectra if they exist
-  if (dataset_type == "Koh89") {
+  {
     spectra_dir <- file.path(data_dir, "Mo_CAP9_analysis", "selected_spectra")
 
-    cap9_sp_file <- file.path(spectra_dir, "CAP9.selected_spectra.Koh89.tsv")
+    cap9_sp_file <- file.path(spectra_dir, paste0("CAP9.selected_spectra.", dataset_type, ".tsv"))
     if (file.exists(cap9_sp_file)) {
       cap9_sp <- read.table(cap9_sp_file, header = TRUE, sep = "\t",
                             row.names = 1, check.names = FALSE)
@@ -263,7 +264,7 @@ load_all_signatures <- function(
       combined <- cbind(combined, cap9_sp)
     }
 
-    nonclip_sp_file <- file.path(spectra_dir, "nonclip.selected_spectra.Koh89.tsv")
+    nonclip_sp_file <- file.path(spectra_dir, paste0("nonclip.selected_spectra.", dataset_type, ".tsv"))
     if (file.exists(nonclip_sp_file)) {
       nonclip_sp <- read.table(nonclip_sp_file, header = TRUE, sep = "\t",
                                row.names = 1, check.names = FALSE)
