@@ -417,7 +417,7 @@ output$cosine_table <- renderUI({
 
 ## About
 
-- **Source colors**: Liu (red), C.H = CAP9 Hartwig (green), C.P = CAP9 PCAWG (purple), C.PH = CAP9 PCAWG+Hartwig (orange), N.H = NoCAP Hartwig (blue)
+- **Source colors**: Liu (red), C.H = CAP9 Hartwig (green), C.P = CAP9 PCAWG (purple), C.PH = CAP9 PCAWG+Hartwig (orange), N.H = NoCAP Hartwig (blue), Koh = Koh et al. (brown); `.m` suffixed groups are 476→89 mapped versions (lighter shades)
 - **Workflow**: Select a dataset, pick a seed source and signature, set cosine similarity threshold, click "Update Dendrogram"
 - **Click** a leaf marker to select/deselect it (shown in badges above)
 - **Zoom** into crowded regions using plotly's built-in zoom

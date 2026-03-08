@@ -18,7 +18,8 @@ dendro2_colors <- c(
   C.H.m  = "#66B266",
   C.P.m  = "#CC66CC",
   C.PH.m = "#FFB366",
-  N.H.m  = "#809FFF"
+  N.H.m  = "#809FFF",
+  Koh    = "#8B4513"
 )
 
 #' Parse new-format signature file and rename columns
@@ -137,6 +138,19 @@ load_all_signatures <- function(
   source_vec <- c(source_vec, setNames(rep("Liu", ncol(liu_sigs)), colnames(liu_sigs)))
 
   combined <- cbind(cap9_combined, liu_sigs)
+
+  # For Koh89: also load Koh et al. reference signatures
+  if (dataset_type == "Koh89") {
+    koh_file <- file.path(data_dir, "Koh_signatures.tsv")
+    koh_sigs <- read.table(koh_file, header = TRUE, sep = "\t",
+                           row.names = 1, check.names = FALSE)
+    stopifnot(
+      "Koh signature rownames do not match ICAMS::catalog.row.order$ID89" =
+        identical(rownames(koh_sigs), icams_order)
+    )
+    source_vec <- c(source_vec, setNames(rep("Koh", ncol(koh_sigs)), colnames(koh_sigs)))
+    combined <- cbind(combined, koh_sigs)
+  }
 
   # For Koh89: also load Koh476 signatures, map to 89-type, and include with '.m' suffix
   if (dataset_type == "Koh89") {
