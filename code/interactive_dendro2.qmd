@@ -93,6 +93,8 @@ numericInput(
   step = 0.05
 )
 
+uiOutput("source_type_checkboxes")
+
 actionButton("update_dendro", "Update Dendrogram")
 actionButton("select_all", "Select All Leaves")
 
@@ -117,6 +119,22 @@ observeEvent(list(input$dataset, input$seed_source), {
   updateSelectInput(session, "seed_signature", choices = sigs)
 })
 
+# Render source type checkboxes dynamically based on dataset
+output$source_type_checkboxes <- renderUI({
+  ds <- input$dataset
+  all_sources <- unique(all_data[[ds]]$source_vec)
+  native_sources <- all_sources[!grepl("\\.m$", all_sources)]
+  mapped_sources <- all_sources[grepl("\\.m$", all_sources)]
+  # Native sources checked by default, mapped unchecked
+  checkboxGroupInput(
+    "source_types",
+    "Source Types:",
+    choices = c(native_sources, mapped_sources),
+    selected = native_sources,
+    inline = TRUE
+  )
+})
+
 # Reactive: selected signatures (max 10)
 selected_sigs <- reactiveVal(character(0))
 
@@ -132,9 +150,18 @@ filtered_result <- eventReactive(
     ds <- isolate(input$dataset)
     seed <- isolate(input$seed_signature)
     threshold <- isolate(input$cosine_sim_to_seed)
+    active_sources <- isolate(input$source_types)
 
     combined <- all_data[[ds]]$combined
     source_vec <- all_data[[ds]]$source_vec
+
+    # Filter to active source types (always keep the seed signature)
+    if (!is.null(active_sources)) {
+      keep_cols <- names(source_vec)[source_vec %in% active_sources]
+      if (!(seed %in% keep_cols)) keep_cols <- c(seed, keep_cols)
+      combined <- combined[, keep_cols, drop = FALSE]
+      source_vec <- source_vec[keep_cols]
+    }
 
     filtered <- filter_by_seed(combined, seed, threshold)
     filtered_source <- source_vec[colnames(filtered)]
