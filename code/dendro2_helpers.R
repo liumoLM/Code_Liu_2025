@@ -21,7 +21,9 @@ dendro2_colors <- c(
   N.H.m  = "#809FFF",
   Koh    = "#8B4513",
   Sp.C   = "#20B2AA",
-  Sp.N   = "#DC143C"
+  Sp.N   = "#DC143C",
+  `~Sp.C` = "gray50",
+  `~Sp.N` = "gray50"
 )
 
 #' Parse new-format signature file and rename columns
@@ -81,6 +83,56 @@ find_best_match_spectra <- function(signatures, catalog_path) {
   }
   unique_samples <- unique(best_samples)
   catalog[, unique_samples, drop = FALSE]
+}
+
+#' Strip CancerType:: prefix from sample names
+#'
+#' Koh89 catalogs/spectra use "CancerType::SampleName" format while
+#' Koh476 uses plain "SampleName". This extracts the bare sample ID.
+bare_sample_name <- function(x) sub("^.*::", "", x)
+
+#' Load cross-type spectra from the other classification's selected spectra
+#'
+#' Reads sample names from the other type's selected spectra file, finds
+#' samples not already present, and looks them up in current-type catalogs.
+#' Handles CancerType::SampleName vs plain name mismatches.
+#'
+#' @param cross_spectra_file Path to the other type's selected spectra file
+#' @param existing_bare_names Bare sample names already present in combined
+#' @param catalog_paths Paths to current-type catalog files to look up samples
+#' @return Data frame of spectra for new samples, or NULL
+load_cross_type_spectra <- function(cross_spectra_file, existing_bare_names,
+                                    catalog_paths) {
+  if (!file.exists(cross_spectra_file)) return(NULL)
+  cross_sp <- read.table(cross_spectra_file, header = TRUE, sep = "\t",
+                         row.names = 1, check.names = FALSE)
+  # Compare bare names to find truly new samples
+  cross_bare <- bare_sample_name(colnames(cross_sp))
+  new_bare <- setdiff(cross_bare, existing_bare_names)
+  if (length(new_bare) == 0) return(NULL)
+
+  # Look up new samples in current-type catalogs (by bare name matching)
+  result <- NULL
+  remaining <- new_bare
+  for (cat_path in catalog_paths) {
+    if (length(remaining) == 0) break
+    if (!file.exists(cat_path)) next
+    cat <- read.table(cat_path, header = TRUE, sep = "\t",
+                      row.names = 1, check.names = FALSE)
+    cat_bare <- bare_sample_name(colnames(cat))
+    # Match remaining bare names to catalog columns
+    matched_idx <- which(cat_bare %in% remaining)
+    if (length(matched_idx) > 0) {
+      found_cols <- colnames(cat)[matched_idx]
+      found_bare <- cat_bare[matched_idx]
+      chunk <- cat[, found_cols, drop = FALSE]
+      # Rename to bare names for consistent output
+      colnames(chunk) <- found_bare
+      result <- if (is.null(result)) chunk else cbind(result, chunk)
+      remaining <- setdiff(remaining, found_bare)
+    }
+  }
+  result
 }
 
 #' Load all signatures for a dataset type + Liu reference
@@ -272,6 +324,46 @@ load_all_signatures <- function(
       source_vec <- c(source_vec,
                       setNames(rep("Sp.N", ncol(nonclip_sp)), colnames(nonclip_sp)))
       combined <- cbind(combined, nonclip_sp)
+    }
+  }
+
+  # Load cross-type spectra (from the other classification's selected spectra)
+  {
+    other_type <- if (dataset_type == "Koh89") "Koh476" else "Koh89"
+
+    # Collect existing bare sample names (strip Sp.C./Sp.N. prefix and CancerType::)
+    existing_sp_names <- bare_sample_name(
+      sub("^Sp\\.[CN]\\.", "", grep("^Sp\\.", names(source_vec), value = TRUE))
+    )
+
+    # CAP9 cross-type
+    cap9_cross_file <- file.path(spectra_dir,
+                                 paste0("CAP9.selected_spectra.", other_type, ".tsv"))
+    cap9_cat_paths <- c(
+      file.path(catalog_dir, paste0("CAP9.PCAWG.", dataset_type, ".catalog.txt")),
+      file.path(catalog_dir, paste0("CAP9.Hartwig.", dataset_type, ".catalog.txt"))
+    )
+    cap9_cross <- load_cross_type_spectra(cap9_cross_file, existing_sp_names,
+                                          cap9_cat_paths)
+    if (!is.null(cap9_cross)) {
+      colnames(cap9_cross) <- paste0("~Sp.C.", colnames(cap9_cross))
+      source_vec <- c(source_vec,
+                      setNames(rep("~Sp.C", ncol(cap9_cross)), colnames(cap9_cross)))
+      combined <- cbind(combined, cap9_cross)
+    }
+
+    # nonclip cross-type
+    nonclip_cross_file <- file.path(spectra_dir,
+                                    paste0("nonclip.selected_spectra.", other_type, ".tsv"))
+    nonclip_cat_paths <- file.path(catalog_dir,
+                                   paste0("nonclip.Hartwig.", dataset_type, ".catalog.txt"))
+    nonclip_cross <- load_cross_type_spectra(nonclip_cross_file, existing_sp_names,
+                                             nonclip_cat_paths)
+    if (!is.null(nonclip_cross)) {
+      colnames(nonclip_cross) <- paste0("~Sp.N.", colnames(nonclip_cross))
+      source_vec <- c(source_vec,
+                      setNames(rep("~Sp.N", ncol(nonclip_cross)), colnames(nonclip_cross)))
+      combined <- cbind(combined, nonclip_cross)
     }
   }
 
