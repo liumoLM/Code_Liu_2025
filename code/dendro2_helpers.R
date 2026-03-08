@@ -9,11 +9,16 @@ source(here::here("code", "map_476_to_other.R"))
 
 # Colors for source groups
 dendro2_colors <- c(
-  Liu  = "#FF0000",
-  C.H  = "#006400",
-  C.P  = "#8B008B",
-  C.PH = "#FF8C00",
-  N.H  = "#4169E1"
+  Liu    = "#FF0000",
+  C.H    = "#006400",
+  C.P    = "#8B008B",
+  C.PH   = "#FF8C00",
+  N.H    = "#4169E1",
+  Liu.m  = "#FF6666",
+  C.H.m  = "#66B266",
+  C.P.m  = "#CC66CC",
+  C.PH.m = "#FFB366",
+  N.H.m  = "#809FFF"
 )
 
 #' Parse new-format signature file and rename columns
@@ -156,16 +161,16 @@ load_all_signatures <- function(
     # Rename columns: append '.m' and strip '_converted' suffix from t476_to_89
     colnames(mapped_89) <- sub("_converted$", ".m", colnames(mapped_89))
 
-    # Build source vector for mapped sigs
+    # Build source vector for mapped sigs (with .m source groups)
     mapped_source <- character(0)
     for (s in all_sigs_476) {
-      grp <- attr(s, "source_group")
+      grp <- paste0(attr(s, "source_group"), ".m")
       mapped_source <- c(mapped_source,
                          setNames(rep(grp, ncol(s)),
                                   paste0(colnames(s), ".m")))
     }
     mapped_source <- c(mapped_source,
-                       setNames(rep("Liu", ncol(liu_476)),
+                       setNames(rep("Liu.m", ncol(liu_476)),
                                 paste0(colnames(liu_476), ".m")))
 
     source_vec <- c(source_vec, mapped_source)
