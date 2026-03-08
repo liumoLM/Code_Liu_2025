@@ -1,6 +1,21 @@
 ---
-title: "Interactive Dendrogram v2: Seed-filtered Signatures"
-format: html
+title: "Interactive Dendrogram"
+format: 
+  html:
+    page-layout: full
+    include-in-header:
+      text: |
+        <style>
+          /* This allows the .column-screen class to work in Shiny mode */
+          .quarto-container, .page-columns, .main-container {
+            max-width: 100% !important;
+          }
+          /* Ensure the plot container itself isn't padded */
+          .column-screen {
+            width: 100% !important;
+            margin: 0 !important;
+          }
+        </style>
 server: shiny
 date: now
 date-format: "YYYY-MM-DD HH:mm"
@@ -38,10 +53,6 @@ for (ds in c("Koh89", "Koh476")) {
 }
 ```
 
-```{r}
-#| label: wide-layout
-tags$style(".container-fluid { max-width: none !important; width: fit-content; padding: 0 15px; }")
-```
 
 This interactive dendrogram loads **all** CAP9/NoCAP signature extractions and lets you
 pick a seed signature from any source group. Only signatures with cosine similarity >= threshold to
@@ -146,7 +157,9 @@ output$selection_display <- renderUI({
   sigs <- selected_sigs()
   if (length(sigs) == 0) {
     return(tags$p(
-      tags$em("Click leaves in the dendrogram to select signatures.")
+      tags$em(
+        "Click leaves in the dendrogram or use the rectangle or lasso select tool to select signatures."
+      )
     ))
   }
 
@@ -183,11 +196,16 @@ observeEvent(input$select_all, {
 })
 ```
 
+
+::: {.column-screen}
+
 ```{r}
 #| label: dendrogram-plot
 
-plotlyOutput("dendrogram", height = "400px", width = "1400px")
+plotlyOutput("dendrogram", height = "500px", width = "100%")
 ```
+
+:::
 
 ```{r}
 #| label: dendrogram-server

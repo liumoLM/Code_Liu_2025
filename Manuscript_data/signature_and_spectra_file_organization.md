@@ -1,5 +1,7 @@
 All files are tab-separated.
-All have rownames in the first column.
+All 476 catalogs/spectra and signatures have rownames in the first column.
+89 catalogs/spectra have rownames in the first column
+89 signatures to not, Assume the row order for type89 signatures is correct.
 Rowname orders should be as in ICAMS::catalog.row.order, slots ID (for the 83-type classifictaion) ID89, ID476
 
 ## in folder `Manuscript_data/`
