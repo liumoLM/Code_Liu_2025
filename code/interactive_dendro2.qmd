@@ -40,7 +40,7 @@ for (ds in c("Koh89", "Koh476")) {
 
 ```{r}
 #| label: wide-layout
-tags$style(".container-fluid { max-width: 100% !important; padding: 0 15px; }")
+tags$style(".container-fluid { max-width: none !important; width: fit-content; padding: 0 15px; }")
 ```
 
 This interactive dendrogram loads **all** CAP9/NoCAP signature extractions and lets you
@@ -186,7 +186,7 @@ observeEvent(input$select_all, {
 ```{r}
 #| label: dendrogram-plot
 
-plotlyOutput("dendrogram", height = "400px", width = "100%")
+plotlyOutput("dendrogram", height = "400px", width = "1400px")
 ```
 
 ```{r}
