@@ -1,6 +1,18 @@
 ---
-title: "Interactive Dendrogram: CAP9 Signature Clustering"
-format: html
+title: "Interactive Dendrogram"
+format: 
+  html:
+    page-layout: full
+    include-in-header:
+      text: |
+        <style>
+          /* Remove max-width limits from all potential containers */
+          .container-fluid, .main-container, .page-columns {
+            max-width: 100% !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+          }
+        </style>
 server: shiny
 date: now
 date-format: "YYYY-MM-DD HH:mm"
@@ -107,11 +119,16 @@ observeEvent(input$clear_selection, {
 })
 ```
 
+
+::: {.column-screen}
+
 ```{r}
 #| label: dendrogram-plot
 
-plotlyOutput("dendrogram", height = "400px", width = "100%")
+plotlyOutput("dendrogram", height = "500px", width = "100vw")
 ```
+
+:::
 
 ```{r}
 #| label: dendrogram-server
