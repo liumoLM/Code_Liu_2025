@@ -123,14 +123,13 @@ observeEvent(list(input$dataset, input$seed_source), {
 output$source_type_checkboxes <- renderUI({
   ds <- input$dataset
   all_sources <- unique(all_data[[ds]]$source_vec)
-  native_sources <- all_sources[!grepl("\\.m$", all_sources)]
-  mapped_sources <- all_sources[grepl("\\.m$", all_sources)]
-  # Native sources checked by default, mapped unchecked
+  default_off <- grepl("\\.m$", all_sources) | grepl("^Sp\\.", all_sources)
+  selected <- all_sources[!default_off]
   checkboxGroupInput(
     "source_types",
     "Source Types:",
-    choices = c(native_sources, mapped_sources),
-    selected = native_sources,
+    choices = all_sources,
+    selected = selected,
     inline = TRUE
   )
 })
@@ -156,12 +155,16 @@ filtered_result <- eventReactive(
     source_vec <- all_data[[ds]]$source_vec
 
     # Filter to active source types (always keep the seed signature)
-    if (!is.null(active_sources)) {
-      keep_cols <- names(source_vec)[source_vec %in% active_sources]
-      if (!(seed %in% keep_cols)) keep_cols <- c(seed, keep_cols)
-      combined <- combined[, keep_cols, drop = FALSE]
-      source_vec <- source_vec[keep_cols]
+    # When NULL (initial render before UI exists), use defaults: exclude .m and Sp. groups
+    if (is.null(active_sources)) {
+      all_sources <- unique(source_vec)
+      default_off <- grepl("\\.m$", all_sources) | grepl("^Sp\\.", all_sources)
+      active_sources <- all_sources[!default_off]
     }
+    keep_cols <- names(source_vec)[source_vec %in% active_sources]
+    if (!(seed %in% keep_cols)) keep_cols <- c(seed, keep_cols)
+    combined <- combined[, keep_cols, drop = FALSE]
+    source_vec <- source_vec[keep_cols]
 
     filtered <- filter_by_seed(combined, seed, threshold)
     filtered_source <- source_vec[colnames(filtered)]
@@ -417,7 +420,7 @@ output$cosine_table <- renderUI({
 
 ## About
 
-- **Source colors**: Liu (red), C.H = CAP9 Hartwig (green), C.P = CAP9 PCAWG (purple), C.PH = CAP9 PCAWG+Hartwig (orange), N.H = NoCAP Hartwig (blue), Koh = Koh et al. (brown); `.m` suffixed groups are 476→89 mapped versions (lighter shades)
+- **Source colors**: Liu (red), C.H = CAP9 Hartwig (green), C.P = CAP9 PCAWG (purple), C.PH = CAP9 PCAWG+Hartwig (orange), N.H = NoCAP Hartwig (blue), Koh = Koh et al. (brown); `.m` suffixed groups are 476→89 mapped versions (lighter shades); Sp.C = CAP9 best-match spectra (teal), Sp.N = nonclip best-match spectra (crimson)
 - **Workflow**: Select a dataset, pick a seed source and signature, set cosine similarity threshold, click "Update Dendrogram"
 - **Click** a leaf marker to select/deselect it (shown in badges above)
 - **Zoom** into crowded regions using plotly's built-in zoom

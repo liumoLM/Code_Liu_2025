@@ -19,7 +19,9 @@ dendro2_colors <- c(
   C.P.m  = "#CC66CC",
   C.PH.m = "#FFB366",
   N.H.m  = "#809FFF",
-  Koh    = "#8B4513"
+  Koh    = "#8B4513",
+  Sp.C   = "#20B2AA",
+  Sp.N   = "#DC143C"
 )
 
 #' Parse new-format signature file and rename columns
@@ -62,6 +64,25 @@ rename_sigs2 <- function(file_path) {
   sigs
 }
 
+#' Find the best-matching spectrum for each signature from a catalog
+#'
+#' @param signatures Matrix with 89 rows (mutation types) x N signature columns
+#' @param catalog_path Path to a TSV catalog file (mutation types as rows, samples as columns)
+#' @return Subset of the catalog containing only the unique best-match columns (raw counts)
+find_best_match_spectra <- function(signatures, catalog_path) {
+  catalog <- read.table(catalog_path, header = TRUE, sep = "\t",
+                        row.names = 1, check.names = FALSE)
+  cat_mat <- as.matrix(catalog)
+  best_samples <- character(0)
+  for (i in seq_len(ncol(signatures))) {
+    sig_vec <- signatures[, i]
+    cos_sims <- apply(cat_mat, 2, function(x) lsa::cosine(sig_vec, x))
+    best_samples <- c(best_samples, names(which.max(cos_sims)))
+  }
+  unique_samples <- unique(best_samples)
+  catalog[, unique_samples, drop = FALSE]
+}
+
 #' Load all signatures for a dataset type + Liu reference
 #'
 #' @param dataset_type "Koh89" or "Koh476"
@@ -70,6 +91,7 @@ rename_sigs2 <- function(file_path) {
 #' @return List with: combined (features-as-rows data.frame), source_vec (named character vector)
 load_all_signatures <- function(
     dataset_type,
+    find_similar = FALSE,
     sig_dir = here::here("Manuscript_data", "Mo_CAP9_analysis", "Signatures"),
     catalog_dir = here::here("Manuscript_data", "Mo_CAP9_analysis", "Catalogs"),
     data_dir = here::here("Manuscript_data")) {
@@ -189,6 +211,67 @@ load_all_signatures <- function(
 
     source_vec <- c(source_vec, mapped_source)
     combined <- cbind(combined, mapped_89)
+  }
+
+  # Find best-matching spectra for each signature and write to disk
+  if (find_similar && dataset_type == "Koh89") {
+    spectra_dir <- file.path(data_dir, "Mo_CAP9_analysis", "selected_spectra")
+    dir.create(spectra_dir, showWarnings = FALSE, recursive = TRUE)
+
+    # CAP9-searchable: all groups except N.H (and its mapped variant N.H.m)
+    cap9_groups <- c("C.H", "C.P", "C.PH", "Liu", "Koh",
+                     "C.H.m", "C.P.m", "C.PH.m", "Liu.m")
+    cap9_cols <- names(source_vec)[source_vec %in% cap9_groups]
+    cap9_sigs <- combined[, cap9_cols, drop = FALSE]
+
+    cap9_pcawg <- find_best_match_spectra(
+      cap9_sigs, file.path(catalog_dir, "CAP9.PCAWG.Koh89.catalog.txt"))
+    cap9_hartwig <- find_best_match_spectra(
+      cap9_sigs, file.path(catalog_dir, "CAP9.Hartwig.Koh89.catalog.txt"))
+    cap9_spectra <- cbind(cap9_pcawg, cap9_hartwig)
+    cap9_spectra <- cap9_spectra[, !duplicated(colnames(cap9_spectra)), drop = FALSE]
+
+    # nonclip-searchable: N.H (and N.H.m)
+    nonclip_groups <- c("N.H", "N.H.m")
+    nonclip_cols <- names(source_vec)[source_vec %in% nonclip_groups]
+    nonclip_sigs <- combined[, nonclip_cols, drop = FALSE]
+
+    nonclip_spectra <- find_best_match_spectra(
+      nonclip_sigs, file.path(catalog_dir, "nonclip.Hartwig.Koh89.catalog.txt"))
+
+    write.table(cap9_spectra,
+                file.path(spectra_dir, "CAP9.selected_spectra.Koh89.tsv"),
+                sep = "\t", quote = FALSE, col.names = NA)
+    write.table(nonclip_spectra,
+                file.path(spectra_dir, "nonclip.selected_spectra.Koh89.tsv"),
+                sep = "\t", quote = FALSE, col.names = NA)
+
+    message("Wrote selected spectra to ", spectra_dir)
+  }
+
+  # Load previously-saved selected spectra if they exist
+  if (dataset_type == "Koh89") {
+    spectra_dir <- file.path(data_dir, "Mo_CAP9_analysis", "selected_spectra")
+
+    cap9_sp_file <- file.path(spectra_dir, "CAP9.selected_spectra.Koh89.tsv")
+    if (file.exists(cap9_sp_file)) {
+      cap9_sp <- read.table(cap9_sp_file, header = TRUE, sep = "\t",
+                            row.names = 1, check.names = FALSE)
+      colnames(cap9_sp) <- paste0("Sp.C.", colnames(cap9_sp))
+      source_vec <- c(source_vec,
+                      setNames(rep("Sp.C", ncol(cap9_sp)), colnames(cap9_sp)))
+      combined <- cbind(combined, cap9_sp)
+    }
+
+    nonclip_sp_file <- file.path(spectra_dir, "nonclip.selected_spectra.Koh89.tsv")
+    if (file.exists(nonclip_sp_file)) {
+      nonclip_sp <- read.table(nonclip_sp_file, header = TRUE, sep = "\t",
+                               row.names = 1, check.names = FALSE)
+      colnames(nonclip_sp) <- paste0("Sp.N.", colnames(nonclip_sp))
+      source_vec <- c(source_vec,
+                      setNames(rep("Sp.N", ncol(nonclip_sp)), colnames(nonclip_sp)))
+      combined <- cbind(combined, nonclip_sp)
+    }
   }
 
   list(combined = combined, source_vec = source_vec)
