@@ -20,6 +20,7 @@ dendro2_colors <- c(
   C.PH.m = "#FFB366",
   N.H.m = "#809FFF",
   Koh = "#8B4513",
+  COSMIC = "#FF1493",
   Sp.C = "#20B2AA",
   Sp.N = "#DC143C",
   `~Sp.C` = "gray50",
@@ -41,17 +42,17 @@ rename_sigs2 <- function(file_path) {
 
   cap <- if (cap_raw == "CAP9") "C" else "N"
 
-  # Find Koh89 or Koh476 to split dataset from cancertype
-  koh_match <- regexpr("Koh(89|476)", remainder)
-  koh_str <- regmatches(remainder, koh_match) # "Koh89" or "Koh476"
-  koh_pos <- koh_match[1]
+  # Find dataset token (Koh89, Koh476, or COSMIC83) to split from cancertype
+  ds_match <- regexpr("(Koh(89|476)|COSMIC83)", remainder)
+  ds_str <- regmatches(remainder, ds_match) # "Koh89", "Koh476", or "COSMIC83"
+  ds_pos <- ds_match[1]
 
-  # Dataset is everything before the Koh token (minus trailing dot)
-  dataset_raw <- substr(remainder, 1, koh_pos - 2) # e.g. "PH", "Hartwig", "PCAWG"
+  # Dataset is everything before the token (minus trailing dot)
+  dataset_raw <- substr(remainder, 1, ds_pos - 2) # e.g. "PH", "Hartwig", "PCAWG"
   dataset <- switch(dataset_raw, Hartwig = "H", PCAWG = "P", PH = "PH")
 
-  # Cancertype is everything after "Koh{89,476}."
-  cancertype <- sub(paste0(".*", koh_str, "\\."), "", remainder)
+  # Cancertype is everything after the dataset token and a dot
+  cancertype <- sub(paste0(".*", ds_str, "\\."), "", remainder)
 
   # Build column names
   clean_names <- gsub("hdp\\.", "", colnames(sigs))
@@ -184,6 +185,8 @@ load_all_signatures <- function(
   # ICAMS canonical row order for this dataset type
   icams_order <- if (dataset_type == "Koh476") {
     ICAMS::catalog.row.order$ID476
+  } else if (dataset_type == "COSMIC83") {
+    ICAMS::catalog.row.order$ID
   } else {
     ICAMS::catalog.row.order$ID89
   }
@@ -235,7 +238,7 @@ load_all_signatures <- function(
   cap9_combined <- do.call(cbind, all_sigs)
 
   # Read Liu reference
-  liu_suffix <- if (dataset_type == "Koh89") "89" else "476"
+  liu_suffix <- if (dataset_type == "Koh89") "89" else if (dataset_type == "Koh476") "476" else "83"
   liu_file <- file.path(
     data_dir,
     paste0("Liu_et_al_final_", liu_suffix, "_type_signatures.tsv")
@@ -284,6 +287,29 @@ load_all_signatures <- function(
       setNames(rep("Koh", ncol(koh_sigs)), colnames(koh_sigs))
     )
     combined <- cbind(combined, koh_sigs)
+  }
+
+  # For COSMIC83: load COSMIC v3.5 reference signatures
+  if (dataset_type == "COSMIC83") {
+    cosmic_file <- file.path(data_dir, "COSMIC_v3.5_ID_GRCh37_signatures.tsv")
+    cosmic_sigs <- read.table(
+      cosmic_file,
+      header = TRUE,
+      sep = "\t",
+      row.names = 1,
+      check.names = FALSE
+    )
+    stopifnot(
+      "COSMIC signature rownames do not match ICAMS::catalog.row.order$ID" = identical(
+        rownames(cosmic_sigs),
+        icams_order
+      )
+    )
+    source_vec <- c(
+      source_vec,
+      setNames(rep("COSMIC", ncol(cosmic_sigs)), colnames(cosmic_sigs))
+    )
+    combined <- cbind(combined, cosmic_sigs)
   }
 
   # For Koh89: also load Koh476 signatures, map to 89-type, and include with '.m' suffix
@@ -346,7 +372,8 @@ load_all_signatures <- function(
       "C.P",
       "C.PH",
       "Liu",
-      if (dataset_type == "Koh89") c("Koh", "C.H.m", "C.P.m", "C.PH.m", "Liu.m")
+      if (dataset_type == "Koh89") c("Koh", "C.H.m", "C.P.m", "C.PH.m", "Liu.m"),
+      if (dataset_type == "COSMIC83") "COSMIC"
     )
     cap9_cols <- names(source_vec)[source_vec %in% cap9_groups]
     cap9_sigs <- combined[, cap9_cols, drop = FALSE]
@@ -366,15 +393,9 @@ load_all_signatures <- function(
       drop = FALSE
     ]
 
-    # nonclip-searchable: N.H (and N.H.m if Koh89)
+    # nonclip-searchable: N.H (and N.H.m if Koh89); COSMIC83 has no NoCAP sigs
     nonclip_groups <- c("N.H", if (dataset_type == "Koh89") "N.H.m")
     nonclip_cols <- names(source_vec)[source_vec %in% nonclip_groups]
-    nonclip_sigs <- combined[, nonclip_cols, drop = FALSE]
-
-    nonclip_spectra <- find_best_match_spectra(
-      nonclip_sigs,
-      file.path(catalog_dir, paste0("nonclip.Hartwig.", cat_suffix))
-    )
 
     write.table(
       cap9_spectra,
@@ -386,16 +407,24 @@ load_all_signatures <- function(
       quote = FALSE,
       col.names = NA
     )
-    write.table(
-      nonclip_spectra,
-      file.path(
-        spectra_dir,
-        paste0("nonclip.selected_spectra.", dataset_type, ".tsv")
-      ),
-      sep = "\t",
-      quote = FALSE,
-      col.names = NA
-    )
+
+    if (length(nonclip_cols) > 0) {
+      nonclip_sigs <- combined[, nonclip_cols, drop = FALSE]
+      nonclip_spectra <- find_best_match_spectra(
+        nonclip_sigs,
+        file.path(catalog_dir, paste0("nonclip.Hartwig.", cat_suffix))
+      )
+      write.table(
+        nonclip_spectra,
+        file.path(
+          spectra_dir,
+          paste0("nonclip.selected_spectra.", dataset_type, ".tsv")
+        ),
+        sep = "\t",
+        quote = FALSE,
+        col.names = NA
+      )
+    }
 
     message("Wrote selected spectra to ", spectra_dir)
   }
@@ -446,7 +475,8 @@ load_all_signatures <- function(
   }
 
   # Load cross-type spectra (from the other classification's selected spectra)
-  {
+  # Only applies to Koh89/Koh476 (they share the same samples in different classifications)
+  if (dataset_type %in% c("Koh89", "Koh476")) {
     other_type <- if (dataset_type == "Koh89") "Koh476" else "Koh89"
 
     # Collect existing bare sample names (strip Sp.C./Sp.N. prefix and CancerType::)
@@ -505,7 +535,7 @@ load_all_signatures <- function(
       )
       combined <- cbind(combined, nonclip_cross)
     }
-  }
+  } # end cross-type spectra (Koh89/Koh476 only)
 
   list(combined = combined, source_vec = source_vec)
 }
