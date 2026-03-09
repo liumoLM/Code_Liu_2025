@@ -41,13 +41,13 @@ source("dendro2_helpers.R")
 
 # Pre-load both full datasets
 all_data <- list()
-for (ds in c("Koh89", "Koh476")) {
+for (ds in c("Koh89", "Koh476", "COSMIC83")) {
   all_data[[ds]] <- load_all_signatures(ds)
 }
 
 # Signature names grouped by dataset and source group
 sig_names_by_source <- list()
-for (ds in c("Koh89", "Koh476")) {
+for (ds in c("Koh89", "Koh476", "COSMIC83")) {
   sv <- all_data[[ds]]$source_vec
   sig_names_by_source[[ds]] <- split(names(sv), sv)
 }
@@ -67,7 +67,7 @@ the seed are shown in the dendrogram.
 selectInput(
   "dataset",
   "Dataset:",
-  choices = c("Koh89" = "Koh89", "Koh476" = "Koh476"),
+  choices = c("Koh89" = "Koh89", "Koh476" = "Koh476", "COSMIC83" = "COSMIC83"),
   selected = "Koh89"
 )
 
@@ -127,6 +127,7 @@ source_display_labels <- c(
   C.PH = "PCAWG+FMH",
   N.H = "FMH",
   Koh = "Koh",
+  COSMIC = "COSMIC v3.5",
   Liu.m = "Liu (mapped from 476)",
   C.H.m = "FMH (mapped from 476)",
   C.P.m = "PCAWG (mapped from 476)",
@@ -161,6 +162,7 @@ output$source_type_checkboxes <- renderUI({
   capped_order <- c(
     "Liu",
     "Koh",
+    "COSMIC",
     "C.H",
     "C.P",
     "C.PH",
@@ -368,7 +370,7 @@ output$sig_plots_ui <- renderUI({
   if (length(sigs) == 0) {
     return(tags$p(tags$em("Select signatures above to view their profiles.")))
   }
-  height_per <- if (input$dataset == "Koh89") 300 else 400
+  height_per <- if (input$dataset == "Koh476") 400 else 300
   total_height <- paste0(length(sigs) * height_per, "px")
   plotOutput("sig_plots", height = total_height, width = "100%")
 })
@@ -378,7 +380,7 @@ sig_plots_height <- reactive({
   if (length(sigs) == 0) {
     return(300)
   }
-  height_per <- if (input$dataset == "Koh89") 300 else 400
+  height_per <- if (input$dataset == "Koh476") 400 else 300
   length(sigs) * height_per
 })
 
@@ -393,6 +395,8 @@ output$sig_plots <- renderPlot(
     combined <- res$combined
     plot_fn <- if (input$dataset == "Koh89") {
       mSigPlot::plot_89
+    } else if (input$dataset == "COSMIC83") {
+      mSigPlot::plot_83
     } else {
       mSigPlot::plot_476
     }
@@ -406,7 +410,7 @@ output$sig_plots <- renderPlot(
   },
   res = 100,
   width = function() {
-    if (input$dataset == "Koh476") 1400 else 900
+    if (input$dataset == "Koh476") 1400 else 900 # Koh89 and COSMIC83 both use 900
   },
   height = function() {
     sig_plots_height()
