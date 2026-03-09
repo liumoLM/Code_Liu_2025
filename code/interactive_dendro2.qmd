@@ -388,6 +388,8 @@ output$sig_plots <- renderPlot(
     req(length(sigs) > 0)
 
     res <- filtered_result()
+    leaf_order <- res$dendro$hc$labels[res$dendro$hc$order]
+    sigs <- sigs[order(match(sigs, leaf_order))]
     combined <- res$combined
     plot_fn <- if (input$dataset == "Koh89") {
       mSigPlot::plot_89
@@ -433,6 +435,8 @@ output$cosine_table <- renderUI({
   }
 
   res <- filtered_result()
+  leaf_order <- res$dendro$hc$labels[res$dendro$hc$order]
+  sigs <- sigs[order(match(sigs, leaf_order))]
   cos_mat <- res$dendro$cosine_sim[sigs, sigs]
   n <- length(sigs)
 
