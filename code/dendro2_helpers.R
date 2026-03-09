@@ -9,19 +9,19 @@ source(here::here("code", "map_476_to_other.R"))
 
 # Colors for source groups
 dendro2_colors <- c(
-  Liu    = "#FF0000",
-  C.H    = "#006400",
-  C.P    = "#8B008B",
-  C.PH   = "#FF8C00",
-  N.H    = "#4169E1",
-  Liu.m  = "#FF6666",
-  C.H.m  = "#66B266",
-  C.P.m  = "#CC66CC",
+  Liu = "#FF0000",
+  C.H = "#006400",
+  C.P = "#8B008B",
+  C.PH = "#FF8C00",
+  N.H = "#4169E1",
+  Liu.m = "#FF6666",
+  C.H.m = "#66B266",
+  C.P.m = "#CC66CC",
   C.PH.m = "#FFB366",
-  N.H.m  = "#809FFF",
-  Koh    = "#8B4513",
-  Sp.C   = "#20B2AA",
-  Sp.N   = "#DC143C",
+  N.H.m = "#809FFF",
+  Koh = "#8B4513",
+  Sp.C = "#20B2AA",
+  Sp.N = "#DC143C",
   `~Sp.C` = "gray50",
   `~Sp.N` = "gray50"
 )
@@ -36,23 +36,19 @@ rename_sigs2 <- function(file_path) {
 
   # Split on ".mSigHdp." to get cap prefix and remainder
   parts <- strsplit(fname, "\\.mSigHdp\\.")[[1]]
-  cap_raw <- parts[1]  # "CAP9" or "NoCAP"
-  remainder <- parts[2]  # e.g. "PH.Koh89.Bone.SoftTissue"
+  cap_raw <- parts[1] # "CAP9" or "NoCAP"
+  remainder <- parts[2] # e.g. "PH.Koh89.Bone.SoftTissue"
 
   cap <- if (cap_raw == "CAP9") "C" else "N"
 
   # Find Koh89 or Koh476 to split dataset from cancertype
   koh_match <- regexpr("Koh(89|476)", remainder)
-  koh_str <- regmatches(remainder, koh_match)  # "Koh89" or "Koh476"
+  koh_str <- regmatches(remainder, koh_match) # "Koh89" or "Koh476"
   koh_pos <- koh_match[1]
 
   # Dataset is everything before the Koh token (minus trailing dot)
-  dataset_raw <- substr(remainder, 1, koh_pos - 2)  # e.g. "PH", "Hartwig", "PCAWG"
-  dataset <- switch(dataset_raw,
-    Hartwig = "H",
-    PCAWG   = "P",
-    PH      = "PH"
-  )
+  dataset_raw <- substr(remainder, 1, koh_pos - 2) # e.g. "PH", "Hartwig", "PCAWG"
+  dataset <- switch(dataset_raw, Hartwig = "H", PCAWG = "P", PH = "PH")
 
   # Cancertype is everything after "Koh{89,476}."
   cancertype <- sub(paste0(".*", koh_str, "\\."), "", remainder)
@@ -72,8 +68,13 @@ rename_sigs2 <- function(file_path) {
 #' @param catalog_path Path to a TSV catalog file (mutation types as rows, samples as columns)
 #' @return Subset of the catalog containing only the unique best-match columns (raw counts)
 find_best_match_spectra <- function(signatures, catalog_path) {
-  catalog <- read.table(catalog_path, header = TRUE, sep = "\t",
-                        row.names = 1, check.names = FALSE)
+  catalog <- read.table(
+    catalog_path,
+    header = TRUE,
+    sep = "\t",
+    row.names = 1,
+    check.names = FALSE
+  )
   cat_mat <- as.matrix(catalog)
   best_samples <- character(0)
   for (i in seq_len(ncol(signatures))) {
@@ -101,24 +102,45 @@ bare_sample_name <- function(x) sub("^.*::", "", x)
 #' @param existing_bare_names Bare sample names already present in combined
 #' @param catalog_paths Paths to current-type catalog files to look up samples
 #' @return Data frame of spectra for new samples, or NULL
-load_cross_type_spectra <- function(cross_spectra_file, existing_bare_names,
-                                    catalog_paths) {
-  if (!file.exists(cross_spectra_file)) return(NULL)
-  cross_sp <- read.table(cross_spectra_file, header = TRUE, sep = "\t",
-                         row.names = 1, check.names = FALSE)
+load_cross_type_spectra <- function(
+  cross_spectra_file,
+  existing_bare_names,
+  catalog_paths
+) {
+  if (!file.exists(cross_spectra_file)) {
+    return(NULL)
+  }
+  cross_sp <- read.table(
+    cross_spectra_file,
+    header = TRUE,
+    sep = "\t",
+    row.names = 1,
+    check.names = FALSE
+  )
   # Compare bare names to find truly new samples
   cross_bare <- bare_sample_name(colnames(cross_sp))
   new_bare <- setdiff(cross_bare, existing_bare_names)
-  if (length(new_bare) == 0) return(NULL)
+  if (length(new_bare) == 0) {
+    return(NULL)
+  }
 
   # Look up new samples in current-type catalogs (by bare name matching)
   result <- NULL
   remaining <- new_bare
   for (cat_path in catalog_paths) {
-    if (length(remaining) == 0) break
-    if (!file.exists(cat_path)) next
-    cat <- read.table(cat_path, header = TRUE, sep = "\t",
-                      row.names = 1, check.names = FALSE)
+    if (length(remaining) == 0) {
+      break
+    }
+    if (!file.exists(cat_path)) {
+      next
+    }
+    cat <- read.table(
+      cat_path,
+      header = TRUE,
+      sep = "\t",
+      row.names = 1,
+      check.names = FALSE
+    )
     cat_bare <- bare_sample_name(colnames(cat))
     # Match remaining bare names to catalog columns
     matched_idx <- which(cat_bare %in% remaining)
@@ -138,16 +160,18 @@ load_cross_type_spectra <- function(cross_spectra_file, existing_bare_names,
 #' Load all signatures for a dataset type + Liu reference
 #'
 #' @param dataset_type "Koh89" or "Koh476"
+#' @param find_similar If TRUE, search for spectra similar to signatures, and store these
+#'    in `file.path(data_dir, "Mo_CAP9_analysis", "selected_spectra")`
 #' @param sig_dir Base directory containing Koh89/ and Koh476/ subdirs
 #' @param data_dir Directory containing Liu reference signatures
 #' @return List with: combined (features-as-rows data.frame), source_vec (named character vector)
 load_all_signatures <- function(
-    dataset_type,
-    find_similar = FALSE,
-    sig_dir = here::here("Manuscript_data", "Mo_CAP9_analysis", "Signatures"),
-    catalog_dir = here::here("Manuscript_data", "Mo_CAP9_analysis", "Catalogs"),
-    data_dir = here::here("Manuscript_data")) {
-
+  dataset_type,
+  find_similar = FALSE,
+  sig_dir = here::here("Manuscript_data", "Mo_CAP9_analysis", "Signatures"),
+  catalog_dir = here::here("Manuscript_data", "Mo_CAP9_analysis", "Catalogs"),
+  data_dir = here::here("Manuscript_data")
+) {
   sig_files <- Sys.glob(file.path(sig_dir, dataset_type, "*.txt"))
 
   all_sigs <- lapply(sig_files, rename_sigs2)
@@ -165,22 +189,34 @@ load_all_signatures <- function(
   }
 
   # Get mutation type row names from a catalog file
-  cat_files <- Sys.glob(file.path(catalog_dir, paste0("*", dataset_type, "*.txt")))
-  cat_rownames <- rownames(read.table(cat_files[1], header = TRUE, sep = "\t",
-                                       row.names = 1, check.names = FALSE))
+  cat_files <- Sys.glob(file.path(
+    catalog_dir,
+    paste0("*", dataset_type, "*.txt")
+  ))
+  cat_rownames <- rownames(read.table(
+    cat_files[1],
+    header = TRUE,
+    sep = "\t",
+    row.names = 1,
+    check.names = FALSE
+  ))
 
   # Validate catalog row order against ICAMS
   stopifnot(
-    "Catalog rownames do not match ICAMS::catalog.row.order" =
-      identical(cat_rownames, icams_order)
+    "Catalog rownames do not match ICAMS::catalog.row.order" = identical(
+      cat_rownames,
+      icams_order
+    )
   )
 
   # Validate/assign row names to extraction sigs
   for (i in seq_along(all_sigs)) {
     if (dataset_type == "Koh476") {
       stopifnot(
-        "Koh476 signature rownames do not match ICAMS::catalog.row.order$ID476" =
-          identical(rownames(all_sigs[[i]]), icams_order)
+        "Koh476 signature rownames do not match ICAMS::catalog.row.order$ID476" = identical(
+          rownames(all_sigs[[i]]),
+          icams_order
+        )
       )
     } else {
       # Koh89 signature files lack rownames; assign from validated catalog
@@ -200,29 +236,53 @@ load_all_signatures <- function(
 
   # Read Liu reference
   liu_suffix <- if (dataset_type == "Koh89") "89" else "476"
-  liu_file <- file.path(data_dir, paste0("Liu_et_al_final_", liu_suffix, "_type_signatures.tsv"))
-  liu_sigs <- read.table(liu_file, header = TRUE, sep = "\t", row.names = 1, check.names = FALSE)
+  liu_file <- file.path(
+    data_dir,
+    paste0("Liu_et_al_final_", liu_suffix, "_type_signatures.tsv")
+  )
+  liu_sigs <- read.table(
+    liu_file,
+    header = TRUE,
+    sep = "\t",
+    row.names = 1,
+    check.names = FALSE
+  )
 
   # Validate Liu reference row order against ICAMS
   stopifnot(
-    "Liu signature rownames do not match ICAMS::catalog.row.order" =
-      identical(rownames(liu_sigs), icams_order)
+    "Liu signature rownames do not match ICAMS::catalog.row.order" = identical(
+      rownames(liu_sigs),
+      icams_order
+    )
   )
 
-  source_vec <- c(source_vec, setNames(rep("Liu", ncol(liu_sigs)), colnames(liu_sigs)))
+  source_vec <- c(
+    source_vec,
+    setNames(rep("Liu", ncol(liu_sigs)), colnames(liu_sigs))
+  )
 
   combined <- cbind(cap9_combined, liu_sigs)
 
   # For Koh89: also load Koh et al. reference signatures
   if (dataset_type == "Koh89") {
     koh_file <- file.path(data_dir, "Koh_signatures.tsv")
-    koh_sigs <- read.table(koh_file, header = TRUE, sep = "\t",
-                           row.names = 1, check.names = FALSE)
-    stopifnot(
-      "Koh signature rownames do not match ICAMS::catalog.row.order$ID89" =
-        identical(rownames(koh_sigs), icams_order)
+    koh_sigs <- read.table(
+      koh_file,
+      header = TRUE,
+      sep = "\t",
+      row.names = 1,
+      check.names = FALSE
     )
-    source_vec <- c(source_vec, setNames(rep("Koh", ncol(koh_sigs)), colnames(koh_sigs)))
+    stopifnot(
+      "Koh signature rownames do not match ICAMS::catalog.row.order$ID89" = identical(
+        rownames(koh_sigs),
+        icams_order
+      )
+    )
+    source_vec <- c(
+      source_vec,
+      setNames(rep("Koh", ncol(koh_sigs)), colnames(koh_sigs))
+    )
     combined <- cbind(combined, koh_sigs)
   }
 
@@ -237,9 +297,17 @@ load_all_signatures <- function(
     cap9_476 <- do.call(cbind, all_sigs_476)
 
     # Load Liu 476-type signatures
-    liu_file_476 <- file.path(data_dir, "Liu_et_al_final_476_type_signatures.tsv")
-    liu_476 <- read.table(liu_file_476, header = TRUE, sep = "\t",
-                          row.names = 1, check.names = FALSE)
+    liu_file_476 <- file.path(
+      data_dir,
+      "Liu_et_al_final_476_type_signatures.tsv"
+    )
+    liu_476 <- read.table(
+      liu_file_476,
+      header = TRUE,
+      sep = "\t",
+      row.names = 1,
+      check.names = FALSE
+    )
 
     all_476 <- cbind(cap9_476, liu_476)
 
@@ -253,13 +321,15 @@ load_all_signatures <- function(
     mapped_source <- character(0)
     for (s in all_sigs_476) {
       grp <- paste0(attr(s, "source_group"), ".m")
-      mapped_source <- c(mapped_source,
-                         setNames(rep(grp, ncol(s)),
-                                  paste0(colnames(s), ".m")))
+      mapped_source <- c(
+        mapped_source,
+        setNames(rep(grp, ncol(s)), paste0(colnames(s), ".m"))
+      )
     }
-    mapped_source <- c(mapped_source,
-                       setNames(rep("Liu.m", ncol(liu_476)),
-                                paste0(colnames(liu_476), ".m")))
+    mapped_source <- c(
+      mapped_source,
+      setNames(rep("Liu.m", ncol(liu_476)), paste0(colnames(liu_476), ".m"))
+    )
 
     source_vec <- c(source_vec, mapped_source)
     combined <- cbind(combined, mapped_89)
@@ -271,18 +341,30 @@ load_all_signatures <- function(
     dir.create(spectra_dir, showWarnings = FALSE, recursive = TRUE)
 
     # CAP9-searchable: all groups except N.H (and its mapped variant N.H.m)
-    cap9_groups <- c("C.H", "C.P", "C.PH", "Liu",
-                     if (dataset_type == "Koh89") c("Koh", "C.H.m", "C.P.m", "C.PH.m", "Liu.m"))
+    cap9_groups <- c(
+      "C.H",
+      "C.P",
+      "C.PH",
+      "Liu",
+      if (dataset_type == "Koh89") c("Koh", "C.H.m", "C.P.m", "C.PH.m", "Liu.m")
+    )
     cap9_cols <- names(source_vec)[source_vec %in% cap9_groups]
     cap9_sigs <- combined[, cap9_cols, drop = FALSE]
 
     cat_suffix <- paste0(dataset_type, ".catalog.txt")
     cap9_pcawg <- find_best_match_spectra(
-      cap9_sigs, file.path(catalog_dir, paste0("CAP9.PCAWG.", cat_suffix)))
+      cap9_sigs,
+      file.path(catalog_dir, paste0("CAP9.PCAWG.", cat_suffix))
+    )
     cap9_hartwig <- find_best_match_spectra(
-      cap9_sigs, file.path(catalog_dir, paste0("CAP9.Hartwig.", cat_suffix)))
+      cap9_sigs,
+      file.path(catalog_dir, paste0("CAP9.Hartwig.", cat_suffix))
+    )
     cap9_spectra <- cbind(cap9_pcawg, cap9_hartwig)
-    cap9_spectra <- cap9_spectra[, !duplicated(colnames(cap9_spectra)), drop = FALSE]
+    cap9_spectra <- cap9_spectra[,
+      !duplicated(colnames(cap9_spectra)),
+      drop = FALSE
+    ]
 
     # nonclip-searchable: N.H (and N.H.m if Koh89)
     nonclip_groups <- c("N.H", if (dataset_type == "Koh89") "N.H.m")
@@ -290,14 +372,30 @@ load_all_signatures <- function(
     nonclip_sigs <- combined[, nonclip_cols, drop = FALSE]
 
     nonclip_spectra <- find_best_match_spectra(
-      nonclip_sigs, file.path(catalog_dir, paste0("nonclip.Hartwig.", cat_suffix)))
+      nonclip_sigs,
+      file.path(catalog_dir, paste0("nonclip.Hartwig.", cat_suffix))
+    )
 
-    write.table(cap9_spectra,
-                file.path(spectra_dir, paste0("CAP9.selected_spectra.", dataset_type, ".tsv")),
-                sep = "\t", quote = FALSE, col.names = NA)
-    write.table(nonclip_spectra,
-                file.path(spectra_dir, paste0("nonclip.selected_spectra.", dataset_type, ".tsv")),
-                sep = "\t", quote = FALSE, col.names = NA)
+    write.table(
+      cap9_spectra,
+      file.path(
+        spectra_dir,
+        paste0("CAP9.selected_spectra.", dataset_type, ".tsv")
+      ),
+      sep = "\t",
+      quote = FALSE,
+      col.names = NA
+    )
+    write.table(
+      nonclip_spectra,
+      file.path(
+        spectra_dir,
+        paste0("nonclip.selected_spectra.", dataset_type, ".tsv")
+      ),
+      sep = "\t",
+      quote = FALSE,
+      col.names = NA
+    )
 
     message("Wrote selected spectra to ", spectra_dir)
   }
@@ -306,23 +404,43 @@ load_all_signatures <- function(
   {
     spectra_dir <- file.path(data_dir, "Mo_CAP9_analysis", "selected_spectra")
 
-    cap9_sp_file <- file.path(spectra_dir, paste0("CAP9.selected_spectra.", dataset_type, ".tsv"))
+    cap9_sp_file <- file.path(
+      spectra_dir,
+      paste0("CAP9.selected_spectra.", dataset_type, ".tsv")
+    )
     if (file.exists(cap9_sp_file)) {
-      cap9_sp <- read.table(cap9_sp_file, header = TRUE, sep = "\t",
-                            row.names = 1, check.names = FALSE)
+      cap9_sp <- read.table(
+        cap9_sp_file,
+        header = TRUE,
+        sep = "\t",
+        row.names = 1,
+        check.names = FALSE
+      )
       colnames(cap9_sp) <- paste0("Sp.C.", colnames(cap9_sp))
-      source_vec <- c(source_vec,
-                      setNames(rep("Sp.C", ncol(cap9_sp)), colnames(cap9_sp)))
+      source_vec <- c(
+        source_vec,
+        setNames(rep("Sp.C", ncol(cap9_sp)), colnames(cap9_sp))
+      )
       combined <- cbind(combined, cap9_sp)
     }
 
-    nonclip_sp_file <- file.path(spectra_dir, paste0("nonclip.selected_spectra.", dataset_type, ".tsv"))
+    nonclip_sp_file <- file.path(
+      spectra_dir,
+      paste0("nonclip.selected_spectra.", dataset_type, ".tsv")
+    )
     if (file.exists(nonclip_sp_file)) {
-      nonclip_sp <- read.table(nonclip_sp_file, header = TRUE, sep = "\t",
-                               row.names = 1, check.names = FALSE)
+      nonclip_sp <- read.table(
+        nonclip_sp_file,
+        header = TRUE,
+        sep = "\t",
+        row.names = 1,
+        check.names = FALSE
+      )
       colnames(nonclip_sp) <- paste0("Sp.N.", colnames(nonclip_sp))
-      source_vec <- c(source_vec,
-                      setNames(rep("Sp.N", ncol(nonclip_sp)), colnames(nonclip_sp)))
+      source_vec <- c(
+        source_vec,
+        setNames(rep("Sp.N", ncol(nonclip_sp)), colnames(nonclip_sp))
+      )
       combined <- cbind(combined, nonclip_sp)
     }
   }
@@ -337,32 +455,54 @@ load_all_signatures <- function(
     )
 
     # CAP9 cross-type
-    cap9_cross_file <- file.path(spectra_dir,
-                                 paste0("CAP9.selected_spectra.", other_type, ".tsv"))
-    cap9_cat_paths <- c(
-      file.path(catalog_dir, paste0("CAP9.PCAWG.", dataset_type, ".catalog.txt")),
-      file.path(catalog_dir, paste0("CAP9.Hartwig.", dataset_type, ".catalog.txt"))
+    cap9_cross_file <- file.path(
+      spectra_dir,
+      paste0("CAP9.selected_spectra.", other_type, ".tsv")
     )
-    cap9_cross <- load_cross_type_spectra(cap9_cross_file, existing_sp_names,
-                                          cap9_cat_paths)
+    cap9_cat_paths <- c(
+      file.path(
+        catalog_dir,
+        paste0("CAP9.PCAWG.", dataset_type, ".catalog.txt")
+      ),
+      file.path(
+        catalog_dir,
+        paste0("CAP9.Hartwig.", dataset_type, ".catalog.txt")
+      )
+    )
+    cap9_cross <- load_cross_type_spectra(
+      cap9_cross_file,
+      existing_sp_names,
+      cap9_cat_paths
+    )
     if (!is.null(cap9_cross)) {
       colnames(cap9_cross) <- paste0("~Sp.C.", colnames(cap9_cross))
-      source_vec <- c(source_vec,
-                      setNames(rep("~Sp.C", ncol(cap9_cross)), colnames(cap9_cross)))
+      source_vec <- c(
+        source_vec,
+        setNames(rep("~Sp.C", ncol(cap9_cross)), colnames(cap9_cross))
+      )
       combined <- cbind(combined, cap9_cross)
     }
 
     # nonclip cross-type
-    nonclip_cross_file <- file.path(spectra_dir,
-                                    paste0("nonclip.selected_spectra.", other_type, ".tsv"))
-    nonclip_cat_paths <- file.path(catalog_dir,
-                                   paste0("nonclip.Hartwig.", dataset_type, ".catalog.txt"))
-    nonclip_cross <- load_cross_type_spectra(nonclip_cross_file, existing_sp_names,
-                                             nonclip_cat_paths)
+    nonclip_cross_file <- file.path(
+      spectra_dir,
+      paste0("nonclip.selected_spectra.", other_type, ".tsv")
+    )
+    nonclip_cat_paths <- file.path(
+      catalog_dir,
+      paste0("nonclip.Hartwig.", dataset_type, ".catalog.txt")
+    )
+    nonclip_cross <- load_cross_type_spectra(
+      nonclip_cross_file,
+      existing_sp_names,
+      nonclip_cat_paths
+    )
     if (!is.null(nonclip_cross)) {
       colnames(nonclip_cross) <- paste0("~Sp.N.", colnames(nonclip_cross))
-      source_vec <- c(source_vec,
-                      setNames(rep("~Sp.N", ncol(nonclip_cross)), colnames(nonclip_cross)))
+      source_vec <- c(
+        source_vec,
+        setNames(rep("~Sp.N", ncol(nonclip_cross)), colnames(nonclip_cross))
+      )
       combined <- cbind(combined, nonclip_cross)
     }
   }
@@ -382,7 +522,9 @@ filter_by_seed <- function(combined, seed_name, min_cos_sim) {
     lsa::cosine(seed_vec, combined[, s])[1, 1]
   })
   keep <- names(cos_sims)[cos_sims >= min_cos_sim]
-  if (!(seed_name %in% keep)) keep <- c(seed_name, keep)
+  if (!(seed_name %in% keep)) {
+    keep <- c(seed_name, keep)
+  }
   combined[, keep, drop = FALSE]
 }
 
@@ -408,8 +550,11 @@ compute_dendrogram <- function(combined) {
 #' @param source_vec Named vector mapping sig name -> source group
 #' @param colors Named color vector
 #' @return plotly object with source="dendrogram"
-build_plotly_dendrogram <- function(dend_data, source_vec,
-                                    colors = dendro2_colors) {
+build_plotly_dendrogram <- function(
+  dend_data,
+  source_vec,
+  colors = dendro2_colors
+) {
   seg_df <- dend_data$segments
   label_df <- dend_data$labels
   label_df$source <- source_vec[as.character(label_df$label)]
@@ -420,8 +565,10 @@ build_plotly_dendrogram <- function(dend_data, source_vec,
 
   p <- plot_ly(source = "dendrogram") |>
     add_trace(
-      x = seg_x, y = seg_y,
-      type = "scatter", mode = "lines",
+      x = seg_x,
+      y = seg_y,
+      type = "scatter",
+      mode = "lines",
       line = list(color = "gray40", width = 1),
       hoverinfo = "none",
       showlegend = FALSE
@@ -429,20 +576,23 @@ build_plotly_dendrogram <- function(dend_data, source_vec,
 
   for (grp in names(colors)) {
     grp_labels <- label_df[label_df$source == grp, ]
-    if (nrow(grp_labels) == 0) next
+    if (nrow(grp_labels) == 0) {
+      next
+    }
 
-    p <- p |> add_trace(
-      x = grp_labels$x,
-      y = rep(0, nrow(grp_labels)),
-      type = "scatter",
-      mode = "markers",
-      marker = list(size = 7, color = colors[grp], symbol = "circle"),
-      text = as.character(grp_labels$label),
-      customdata = as.character(grp_labels$label),
-      hovertemplate = "%{text}<extra></extra>",
-      name = grp,
-      legendgroup = grp
-    )
+    p <- p |>
+      add_trace(
+        x = grp_labels$x,
+        y = rep(0, nrow(grp_labels)),
+        type = "scatter",
+        mode = "markers",
+        marker = list(size = 7, color = colors[grp], symbol = "circle"),
+        text = as.character(grp_labels$label),
+        customdata = as.character(grp_labels$label),
+        hovertemplate = "%{text}<extra></extra>",
+        name = grp,
+        legendgroup = grp
+      )
   }
 
   annotations <- lapply(seq_len(nrow(label_df)), function(i) {
@@ -451,7 +601,8 @@ build_plotly_dendrogram <- function(dend_data, source_vec,
       y = -0.01,
       text = as.character(label_df$label[i]),
       textangle = -90,
-      xref = "x", yref = "y",
+      xref = "x",
+      yref = "y",
       showarrow = FALSE,
       font = list(size = 9, color = label_df$color[i]),
       xanchor = "center",
@@ -459,29 +610,37 @@ build_plotly_dendrogram <- function(dend_data, source_vec,
     )
   })
 
-  p |> layout(
-    title = "Hierarchical Clustering (Cosine Distance)",
-    xaxis = list(
-      title = "", showticklabels = FALSE, showgrid = FALSE,
-      zeroline = FALSE
-    ),
-    yaxis = list(
-      title = "Cosine Distance", zeroline = FALSE,
-      range = c(-0.12, max(seg_df$y) * 1.05)
-    ),
-    annotations = annotations,
-    margin = list(b = 100, t = 30, l = 50, r = 20),
-    shapes = list(
-      list(
-        type = "line", x0 = 0, x1 = max(label_df$x) + 1,
-        y0 = 0.1, y1 = 0.1,
-        xref = "x", yref = "y",
-        line = list(color = "gray50", dash = "dash", width = 1)
-      )
-    ),
-    hovermode = "closest",
-    dragmode = "select"
-  ) |>
+  p |>
+    layout(
+      title = "Hierarchical Clustering (Cosine Distance)",
+      xaxis = list(
+        title = "",
+        showticklabels = FALSE,
+        showgrid = FALSE,
+        zeroline = FALSE
+      ),
+      yaxis = list(
+        title = "Cosine Distance",
+        zeroline = FALSE,
+        range = c(-0.12, max(seg_df$y) * 1.05)
+      ),
+      annotations = annotations,
+      margin = list(b = 100, t = 30, l = 50, r = 20),
+      shapes = list(
+        list(
+          type = "line",
+          x0 = 0,
+          x1 = max(label_df$x) + 1,
+          y0 = 0.1,
+          y1 = 0.1,
+          xref = "x",
+          yref = "y",
+          line = list(color = "gray50", dash = "dash", width = 1)
+        )
+      ),
+      hovermode = "closest",
+      dragmode = "select"
+    ) |>
     config(displayModeBar = TRUE, displaylogo = FALSE) |>
     event_register("plotly_click") |>
     event_register("plotly_selected")

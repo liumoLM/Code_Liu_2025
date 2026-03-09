@@ -119,18 +119,80 @@ observeEvent(list(input$dataset, input$seed_source), {
   updateSelectInput(session, "seed_signature", choices = sigs)
 })
 
+# Display labels for source groups
+source_display_labels <- c(
+  Liu = "Liu",
+  C.H = "FMH",
+  C.P = "PCAWG",
+  C.PH = "PCAWG+FMH",
+  N.H = "FMH",
+  Koh = "Koh",
+  Liu.m = "Liu (mapped from 476)",
+  C.H.m = "FMH (mapped from 476)",
+  C.P.m = "PCAWG (mapped from 476)",
+  C.PH.m = "PCAWG+FMH (mapped from 476)",
+  N.H.m = "FMH (mapped from 476)",
+  Sp.C = "Spectra",
+  Sp.N = "Spectra",
+  `~Sp.C` = "Spectra (from matches in other indel type)",
+  `~Sp.N` = "Spectra (from matches in other indel type)"
+)
+
 # Render source type checkboxes dynamically based on dataset
 output$source_type_checkboxes <- renderUI({
   ds <- input$dataset
   all_sources <- unique(all_data[[ds]]$source_vec)
-  default_off <- grepl("\\.m$", all_sources) | grepl("^~?Sp\\.", all_sources)
+  default_off <- grepl("\\.m$", all_sources) |
+    grepl("^~?Sp\\.", all_sources) |
+    all_sources == "N.H"
   selected <- all_sources[!default_off]
-  checkboxGroupInput(
-    "source_types",
-    "Source Types:",
-    choices = all_sources,
-    selected = selected,
-    inline = TRUE
+
+  # Build named choices (display label = internal value)
+  make_choices <- function(srcs) {
+    labels <- ifelse(
+      srcs %in% names(source_display_labels),
+      source_display_labels[srcs],
+      srcs
+    )
+    setNames(srcs, labels)
+  }
+
+  # Define ordering: Capped (C.*) + Liu + Koh first, then Uncapped (N.*)
+  capped_order <- c(
+    "Liu",
+    "Koh",
+    "C.H",
+    "C.P",
+    "C.PH",
+    "C.H.m",
+    "C.P.m",
+    "C.PH.m",
+    "Liu.m",
+    "Sp.C",
+    "~Sp.C"
+  )
+  uncapped_order <- c("N.H", "N.H.m", "Sp.N", "~Sp.N")
+
+  capped_sources <- intersect(capped_order, all_sources)
+  uncapped_sources <- intersect(uncapped_order, all_sources)
+
+  tagList(
+    tags$strong("Capped (R ≤ 9):"),
+    checkboxGroupInput(
+      "source_types_capped",
+      label = NULL,
+      choices = make_choices(capped_sources),
+      selected = intersect(capped_sources, selected),
+      inline = TRUE
+    ),
+    tags$strong("Uncapped:"),
+    checkboxGroupInput(
+      "source_types_uncapped",
+      label = NULL,
+      choices = make_choices(uncapped_sources),
+      selected = intersect(uncapped_sources, selected),
+      inline = TRUE
+    )
   )
 })
 
@@ -149,7 +211,10 @@ filtered_result <- eventReactive(
     ds <- isolate(input$dataset)
     seed <- isolate(input$seed_signature)
     threshold <- isolate(input$cosine_sim_to_seed)
-    active_sources <- isolate(input$source_types)
+    active_sources <- c(
+      isolate(input$source_types_capped),
+      isolate(input$source_types_uncapped)
+    )
 
     combined <- all_data[[ds]]$combined
     source_vec <- all_data[[ds]]$source_vec
@@ -158,11 +223,15 @@ filtered_result <- eventReactive(
     # When NULL (initial render before UI exists), use defaults: exclude .m and Sp. groups
     if (is.null(active_sources)) {
       all_sources <- unique(source_vec)
-      default_off <- grepl("\\.m$", all_sources) | grepl("^~?Sp\\.", all_sources)
+      default_off <- grepl("\\.m$", all_sources) |
+        grepl("^~?Sp\\.", all_sources) |
+        all_sources == "N.H"
       active_sources <- all_sources[!default_off]
     }
     keep_cols <- names(source_vec)[source_vec %in% active_sources]
-    if (!(seed %in% keep_cols)) keep_cols <- c(seed, keep_cols)
+    if (!(seed %in% keep_cols)) {
+      keep_cols <- c(seed, keep_cols)
+    }
     combined <- combined[, keep_cols, drop = FALSE]
     source_vec <- source_vec[keep_cols]
 
@@ -188,7 +257,7 @@ output$selection_display <- renderUI({
   if (length(sigs) == 0) {
     return(tags$p(
       tags$em(
-        "Click leaves in the dendrogram or use the rectangle or lasso select tool to select signatures."
+        "Click leaves in the dendrogram or use the rectangle or lasso select tool to select signatures for plotting below."
       )
     ))
   }
@@ -420,7 +489,7 @@ output$cosine_table <- renderUI({
 
 ## About
 
-- **Source colors**: Liu (red), C.H = CAP9 Hartwig (green), C.P = CAP9 PCAWG (purple), C.PH = CAP9 PCAWG+Hartwig (orange), N.H = NoCAP Hartwig (blue), Koh = Koh et al. (brown); `.m` suffixed groups are 476→89 mapped versions (lighter shades); Sp.C = CAP9 best-match spectra (teal), Sp.N = nonclip best-match spectra (crimson)
+- **Source colors**: Liu (red), CAP9 FMH (green), CAP9 PCAWG (purple), CAP9 PCAWG+FMH (orange), NoCAP FMH (blue), Koh (brown); "(mapped)" groups are 476→89 mapped versions (lighter shades); Spectra CAP9 = CAP9 best-match spectra (teal), Spectra NoCAP = NoCAP best-match spectra (crimson)
 - **Workflow**: Select a dataset, pick a seed source and signature, set cosine similarity threshold, click "Update Dendrogram"
 - **Click** a leaf marker to select/deselect it (shown in badges above)
 - **Zoom** into crowded regions using plotly's built-in zoom
