@@ -165,14 +165,20 @@ dend_data <- dendro_data(hc)
 # Compute x-range for cluster 1 to set initial zoom
 cluster1_members <- names(clusters[clusters == 1])
 cluster1_x <- dend_data$labels$x[dend_data$labels$label %in% cluster1_members]
-initial_xrange <- c(min(cluster1_x) - 1, max(cluster1_x) + 1)
+cluster1_span <- max(cluster1_x) - min(cluster1_x)
+center <- mean(range(cluster1_x))
+half_width <- (cluster1_span / 2 + 1) * 12
+initial_xrange <- c(center - half_width, center + half_width)
 
 build_plotly_dendrogram(
   dend_data      = dend_data,
   source_vec     = source_vec,
   cut_height     = cut_height,
   medoids        = names(medoid_names),
-  initial_xrange = initial_xrange
+  initial_xrange = initial_xrange,
+  initial_yrange = c(-0.12, 0.3),
+  clusters       = clusters,
+  strip_prefix   = "C\\."
 )
 ```
 :::
