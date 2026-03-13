@@ -5,10 +5,18 @@ date: now
 date-format: "YYYY-MM-DD HH:mm"
 format:
   html:
+    page-layout: full
     toc: true
     toc-depth: 3
     code-fold: true
     self-contained: true
+    include-in-header:
+      text: |
+        <style>
+          .quarto-container, .page-columns, .main-container {
+            max-width: 100% !important;
+          }
+        </style>
 ---
 
 ```{r setup}
@@ -19,6 +27,7 @@ library(ggdendro)
 library(cluster)
 library(mSigPlot)
 library(DT)
+library(plotly)
 
 source(here::here("code", "dendro2_helpers.R"))
 ```
@@ -95,55 +104,14 @@ cat("Number of clusters at height", cut_height, ":", n_clusters, "\n")
 ## Dendrogram
 
 ```{r dendrogram}
-#| fig-width: 14
-#| fig-height: 7
+#| out-width: "100%"
 dend_data <- dendro_data(hc)
-label_df <- dend_data$labels
-label_df$source <- source_vec[as.character(label_df$label)]
 
-seg_df <- dend_data$segments
-
-p_dend <- ggplot() +
-  geom_segment(
-    data = seg_df,
-    aes(x = x, y = y, xend = xend, yend = yend),
-    linewidth = 0.3
-  ) +
-  geom_hline(
-    yintercept = cut_height,
-    linetype = "dashed", color = "red", linewidth = 0.5
-  ) +
-  annotate(
-    "text",
-    x = nrow(label_df) * 0.95, y = cut_height + 0.005,
-    label = paste0("cos sim = ", min_similarity),
-    color = "red", hjust = 1, size = 3
-  ) +
-  # Color ticks at leaf positions by source
-  geom_point(
-    data = label_df,
-    aes(x = x, y = -0.005, color = source),
-    shape = 15, size = 0.5
-  ) +
-  scale_color_manual(
-    values = dendro2_colors[unique(label_df$source)],
-    name = "Source"
-  ) +
-  scale_y_continuous(
-    name = "Cosine distance (1 - cosine similarity)",
-    expand = expansion(mult = c(0.02, 0.05))
-  ) +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_blank(),
-    axis.ticks.x = element_blank(),
-    axis.title.x = element_blank(),
-    panel.grid.major.x = element_blank(),
-    panel.grid.minor.x = element_blank()
-  ) +
-  ggtitle("Complete linkage dendrogram of CAP9 Koh89 signatures")
-
-print(p_dend)
+build_plotly_dendrogram(
+  dend_data   = dend_data,
+  source_vec  = source_vec,
+  cut_height  = cut_height
+)
 ```
 
 ## Compute medoids and filter clusters
