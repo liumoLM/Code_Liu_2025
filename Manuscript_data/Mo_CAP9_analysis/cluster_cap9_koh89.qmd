@@ -1,0 +1,402 @@
+---
+title: "Clustering CAP9 Koh89 Signatures by Cosine Similarity"
+author: "Steve Rozen (sr110@duke.edu, steverozen@pm.me)"
+date: now
+date-format: "YYYY-MM-DD HH:mm"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    self-contained: true
+---
+
+```{r setup}
+#| message: false
+library(here)
+library(ggplot2)
+library(ggdendro)
+library(cluster)
+library(mSigPlot)
+library(DT)
+
+source(here::here("code", "dendro2_helpers.R"))
+```
+
+## Parameters
+
+```{r params}
+min_similarity   <- 0.95
+min_cluster_size <- 3
+sig_dir <- here::here("Manuscript_data", "Mo_CAP9_analysis", "Signatures", "Koh89")
+catalog_dir <- here::here("Manuscript_data", "Mo_CAP9_analysis", "Catalogs")
+```
+
+## Load and combine signatures
+
+```{r load-sigs}
+sig_files <- Sys.glob(file.path(sig_dir, "CAP9.*.txt"))
+cat("Found", length(sig_files), "CAP9 files\n")
+
+all_sigs <- lapply(sig_files, rename_sigs2)
+
+# Filter to expected row count (89)
+nrows <- sapply(all_sigs, nrow)
+all_sigs <- all_sigs[nrows == 89]
+cat("Files with 89 rows:", length(all_sigs), "\n")
+
+# Assign ICAMS canonical row names
+cat_files <- Sys.glob(file.path(catalog_dir, "*Koh89*.txt"))
+cat_rownames <- rownames(read.table(
+  cat_files[1], header = TRUE, sep = "\t",
+  row.names = 1, check.names = FALSE
+))
+stopifnot(identical(cat_rownames, ICAMS::catalog.row.order$ID89))
+
+for (i in seq_along(all_sigs)) {
+  rownames(all_sigs[[i]]) <- cat_rownames
+}
+
+# Build source vector
+source_vec <- character(0)
+for (s in all_sigs) {
+  grp <- attr(s, "source_group")
+  source_vec <- c(source_vec, setNames(rep(grp, ncol(s)), colnames(s)))
+}
+
+# Combine into one matrix
+combined <- as.matrix(do.call(cbind, all_sigs))
+cat("Combined matrix:", nrow(combined), "rows x", ncol(combined), "columns\n")
+```
+
+## Cosine similarity matrix
+
+```{r cosine-sim}
+combined_t    <- t(combined)
+combined_norm <- combined_t / sqrt(rowSums(combined_t^2))
+cosine_sim    <- combined_norm %*% t(combined_norm)
+cosine_dist   <- as.dist(1 - cosine_sim)
+```
+
+## Hierarchical clustering (complete linkage)
+
+Complete linkage guarantees that all pairs within a cluster have cosine
+similarity $\geq$ `r min_similarity` when we cut at height
+`r 1 - min_similarity`.
+
+```{r clustering}
+hc <- hclust(cosine_dist, method = "complete")
+cut_height <- 1 - min_similarity
+clusters <- cutree(hc, h = cut_height)
+n_clusters <- length(unique(clusters))
+cat("Number of clusters at height", cut_height, ":", n_clusters, "\n")
+```
+
+## Dendrogram
+
+```{r dendrogram}
+#| fig-width: 14
+#| fig-height: 7
+dend_data <- dendro_data(hc)
+label_df <- dend_data$labels
+label_df$source <- source_vec[as.character(label_df$label)]
+
+seg_df <- dend_data$segments
+
+p_dend <- ggplot() +
+  geom_segment(
+    data = seg_df,
+    aes(x = x, y = y, xend = xend, yend = yend),
+    linewidth = 0.3
+  ) +
+  geom_hline(
+    yintercept = cut_height,
+    linetype = "dashed", color = "red", linewidth = 0.5
+  ) +
+  annotate(
+    "text",
+    x = nrow(label_df) * 0.95, y = cut_height + 0.005,
+    label = paste0("cos sim = ", min_similarity),
+    color = "red", hjust = 1, size = 3
+  ) +
+  # Color ticks at leaf positions by source
+  geom_point(
+    data = label_df,
+    aes(x = x, y = -0.005, color = source),
+    shape = 15, size = 0.5
+  ) +
+  scale_color_manual(
+    values = dendro2_colors[unique(label_df$source)],
+    name = "Source"
+  ) +
+  scale_y_continuous(
+    name = "Cosine distance (1 - cosine similarity)",
+    expand = expansion(mult = c(0.02, 0.05))
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.title.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank()
+  ) +
+  ggtitle("Complete linkage dendrogram of CAP9 Koh89 signatures")
+
+print(p_dend)
+```
+
+## Compute medoids and filter clusters
+
+```{r medoids}
+compute_medoid <- function(members, cos_sim_mat) {
+  if (length(members) == 1) return(members)
+  sub_sim <- cos_sim_mat[members, members, drop = FALSE]
+  diag(sub_sim) <- NA
+  avg_sim <- rowMeans(sub_sim, na.rm = TRUE)
+  names(which.max(avg_sim))
+}
+
+cluster_ids <- sort(unique(clusters))
+summary_list <- list()
+medoid_names <- character(0)
+
+for (cid in cluster_ids) {
+  members <- names(clusters[clusters == cid])
+  size <- length(members)
+
+  if (size == 1) {
+    min_cs <- mean_cs <- max_cs <- NA
+  } else {
+    sub_sim <- cosine_sim[members, members, drop = FALSE]
+    pairwise <- sub_sim[lower.tri(sub_sim)]
+    min_cs  <- min(pairwise)
+    mean_cs <- mean(pairwise)
+    max_cs  <- max(pairwise)
+  }
+
+  medoid <- compute_medoid(members, cosine_sim)
+  retained <- size >= min_cluster_size
+
+  summary_list[[length(summary_list) + 1]] <- data.frame(
+    cluster_id   = cid,
+    size         = size,
+    retained     = retained,
+    medoid       = medoid,
+    min_cos_sim  = round(min_cs, 4),
+    mean_cos_sim = round(mean_cs, 4),
+    max_cos_sim  = round(max_cs, 4),
+    members      = paste(members, collapse = "; "),
+    stringsAsFactors = FALSE
+  )
+
+  if (retained) {
+    medoid_names <- c(medoid_names, setNames(cid, medoid))
+  }
+}
+
+summary_df <- do.call(rbind, summary_list)
+retained_df <- summary_df[summary_df$retained, ]
+dropped_df  <- summary_df[!summary_df$retained, ]
+```
+
+## Summary statistics
+
+```{r summary-stats}
+#| results: asis
+cat("- **Total signatures loaded:**", ncol(combined), "\n")
+cat("- **Total clusters:**", n_clusters, "\n")
+cat("- **Retained clusters** (size >=", min_cluster_size, "):",
+    nrow(retained_df), "\n")
+cat("- **Dropped clusters** (size <", min_cluster_size, "):",
+    nrow(dropped_df), "\n")
+cat("- **Signatures in retained clusters:**",
+    sum(retained_df$size), "\n")
+cat("- **Signatures dropped:**",
+    ncol(combined) - sum(retained_df$size), "\n")
+
+if (any(!is.na(retained_df$min_cos_sim))) {
+  cat("- **Global min within-cluster cosine similarity:**",
+      min(retained_df$min_cos_sim, na.rm = TRUE), "\n")
+}
+```
+
+## Cluster summary table
+
+```{r summary-table}
+display_df <- retained_df[, c("cluster_id", "size", "medoid",
+                               "min_cos_sim", "mean_cos_sim", "max_cos_sim")]
+DT::datatable(
+  display_df,
+  rownames = FALSE,
+  options = list(pageLength = 25, scrollX = TRUE),
+  caption = paste("Retained clusters (size >=", min_cluster_size, ")")
+)
+```
+
+## Cosine similarity heatmap
+
+```{r heatmap}
+#| fig-width: 12
+#| fig-height: 11
+# Order by dendrogram
+dend_order <- hc$order
+ordered_sim <- cosine_sim[dend_order, dend_order]
+
+# Convert to long format for ggplot
+n <- nrow(ordered_sim)
+row_idx <- rep(seq_len(n), each = n)
+col_idx <- rep(seq_len(n), times = n)
+# Only lower triangle + diagonal for efficiency
+keep <- col_idx <= row_idx
+heatmap_df <- data.frame(
+  x = col_idx[keep],
+  y = row_idx[keep],
+  sim = ordered_sim[cbind(row_idx[keep], col_idx[keep])]
+)
+
+p_heat <- ggplot(heatmap_df, aes(x = x, y = y, fill = sim)) +
+  geom_raster() +
+  scale_fill_gradient2(
+    low = "white", mid = "orange", high = "red",
+    midpoint = 0.9, limits = c(0.5, 1),
+    name = "Cosine\nsimilarity"
+  ) +
+  coord_equal() +
+  theme_minimal() +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  ) +
+  labs(
+    x = NULL, y = NULL,
+    title = "Pairwise cosine similarity (dendrogram order)"
+  )
+
+print(p_heat)
+```
+
+## Silhouette analysis
+
+```{r silhouette}
+#| fig-width: 10
+#| fig-height: 7
+# Silhouette for retained clusters only
+retained_members <- names(clusters[clusters %in% retained_df$cluster_id])
+if (length(unique(clusters[retained_members])) > 1) {
+  sil <- silhouette(clusters[retained_members], dist = as.dist(
+    (1 - cosine_sim[retained_members, retained_members])
+  ))
+  plot(sil, main = "Silhouette plot (retained clusters)", col = "steelblue",
+       border = NA)
+  sil_summary <- summary(sil)
+  cat("Average silhouette width:", round(sil_summary$avg.width, 4), "\n")
+} else {
+  cat("Only one retained cluster — silhouette not applicable.\n")
+}
+```
+
+## Medoid signature plots
+
+```{r medoid-plots}
+#| fig-width: 10
+#| fig-height: 4
+#| results: asis
+for (i in seq_len(nrow(retained_df))) {
+  row <- retained_df[i, ]
+  medoid_sig <- combined[, row$medoid, drop = FALSE]
+
+  cat("\n\n### Cluster", row$cluster_id,
+      "(n =", row$size,
+      ", min cos sim =", row$min_cos_sim, ")\n\n")
+  cat("**Medoid:**", row$medoid, "\n\n")
+
+  # Plot medoid
+  print(plot_89(medoid_sig, plot_title = paste0(
+    "Cluster ", row$cluster_id, " medoid: ", row$medoid
+  )))
+
+  # If cluster is small enough, show all members overlaid
+  members <- strsplit(row$members, "; ")[[1]]
+  if (length(members) <= 15 && length(members) > 1) {
+    member_mat <- combined[, members, drop = FALSE]
+    # Plot each member as light gray, medoid in black
+    cat("\n\nAll", length(members), "members overlaid:\n\n")
+    # Simple matrix plot showing variation
+    matplot(
+      member_mat, type = "l", lty = 1,
+      col = adjustcolor("gray50", alpha.f = 0.4),
+      xlab = "Mutation type (index)", ylab = "Proportion",
+      main = paste0("Cluster ", row$cluster_id, " — all members")
+    )
+    lines(combined[, row$medoid], col = "red", lwd = 2)
+    legend("topright", legend = c("Members", "Medoid"),
+           col = c("gray50", "red"), lwd = c(1, 2), cex = 0.8)
+  }
+}
+```
+
+## Save outputs
+
+```{r save-outputs}
+out_dir <- here::here("Manuscript_data", "Mo_CAP9_analysis", "clustering_results")
+if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
+
+prefix <- "CAP9_Koh89_clustered"
+
+# Summary table
+write.table(
+  summary_df,
+  file = file.path(out_dir, paste0(prefix, "_summary.tsv")),
+  sep = "\t", row.names = FALSE, quote = FALSE
+)
+
+# Medoid signatures matrix
+medoid_mat <- combined[, names(medoid_names), drop = FALSE]
+write.table(
+  medoid_mat,
+  file = file.path(out_dir, paste0(prefix, "_medoid_signatures.tsv")),
+  sep = "\t", quote = FALSE
+)
+
+# All cluster assignments
+assignments <- data.frame(
+  signature = names(clusters),
+  cluster_id = clusters,
+  retained = clusters %in% retained_df$cluster_id,
+  stringsAsFactors = FALSE
+)
+write.table(
+  assignments,
+  file = file.path(out_dir, paste0(prefix, "_all_cluster_assignments.tsv")),
+  sep = "\t", row.names = FALSE, quote = FALSE
+)
+
+cat("Outputs saved to:", out_dir, "\n")
+```
+
+## Dropped clusters
+
+```{r dropped}
+if (nrow(dropped_df) > 0) {
+  cat("Clusters dropped (size <", min_cluster_size, "):\n\n")
+  DT::datatable(
+    dropped_df[, c("cluster_id", "size", "medoid", "members")],
+    rownames = FALSE,
+    options = list(pageLength = 25, scrollX = TRUE),
+    caption = "Dropped clusters"
+  )
+} else {
+  cat("No clusters were dropped.\n")
+}
+```
+
+::: {.callout-note collapse="true"}
+## Session Info
+
+```{r session-info}
+#| echo: false
+#| comment: ""
+sessioninfo::session_info(info = "all")
+```
+:::
