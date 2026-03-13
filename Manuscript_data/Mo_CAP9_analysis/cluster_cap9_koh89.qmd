@@ -157,6 +157,7 @@ dropped_df  <- summary_df[!summary_df$retained, ]
 
 ## Dendrogram
 
+:::{.column-screen}
 ```{r dendrogram}
 #| out-width: "100%"
 dend_data <- dendro_data(hc)
@@ -174,6 +175,8 @@ build_plotly_dendrogram(
   initial_xrange = initial_xrange
 )
 ```
+:::
+
 
 ## Summary statistics
 
