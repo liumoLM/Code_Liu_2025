@@ -580,12 +580,17 @@ compute_dendrogram <- function(combined) {
 #' @param source_vec Named vector mapping sig name -> source group
 #' @param colors Named color vector
 #' @param cut_height Height at which to draw the dashed cut line
+#' @param medoids Character vector of medoid signature names to highlight
+#'   with bold text and an asterisk
+#' @param initial_xrange Numeric vector of length 2 for initial x-axis zoom
 #' @return plotly object with source="dendrogram"
 build_plotly_dendrogram <- function(
   dend_data,
   source_vec,
   colors = dendro2_colors,
-  cut_height = 0.1
+  cut_height = 0.1,
+  medoids = NULL,
+  initial_xrange = NULL
 ) {
   seg_df <- dend_data$segments
   label_df <- dend_data$labels
@@ -628,15 +633,18 @@ build_plotly_dendrogram <- function(
   }
 
   annotations <- lapply(seq_len(nrow(label_df)), function(i) {
+    lab <- as.character(label_df$label[i])
+    is_medoid <- !is.null(medoids) && lab %in% medoids
+    display_text <- if (is_medoid) paste0("<b>* ", lab, "</b>") else lab
     list(
       x = label_df$x[i],
       y = -0.01,
-      text = as.character(label_df$label[i]),
+      text = display_text,
       textangle = -90,
       xref = "x",
       yref = "y",
       showarrow = FALSE,
-      font = list(size = 9, color = label_df$color[i]),
+      font = list(size = if (is_medoid) 10 else 9, color = label_df$color[i]),
       xanchor = "center",
       yanchor = "top"
     )
@@ -649,7 +657,8 @@ build_plotly_dendrogram <- function(
         title = "",
         showticklabels = FALSE,
         showgrid = FALSE,
-        zeroline = FALSE
+        zeroline = FALSE,
+        range = initial_xrange
       ),
       yaxis = list(
         title = "Cosine Distance",
