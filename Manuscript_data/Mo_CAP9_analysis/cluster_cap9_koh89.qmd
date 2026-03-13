@@ -3,6 +3,8 @@ title: "Clustering CAP9 Koh89 Signatures by Cosine Similarity"
 author: "Steve Rozen (sr110@duke.edu, steverozen@pm.me)"
 date: now
 date-format: "YYYY-MM-DD HH:mm"
+params:
+  min_similarity: 0.95
 format:
   html:
     page-layout: full
@@ -28,6 +30,7 @@ library(cluster)
 library(mSigPlot)
 library(DT)
 library(plotly)
+library(reshape2)
 
 source(here::here("code", "dendro2_helpers.R"))
 ```
@@ -35,7 +38,7 @@ source(here::here("code", "dendro2_helpers.R"))
 ## Parameters
 
 ```{r params}
-min_similarity   <- 0.95
+min_similarity   <- params$min_similarity
 min_cluster_size <- 3
 sig_dir <- here::here("Manuscript_data", "Mo_CAP9_analysis", "Signatures", "Koh89")
 catalog_dir <- here::here("Manuscript_data", "Mo_CAP9_analysis", "Catalogs")
@@ -184,6 +187,86 @@ build_plotly_dendrogram(
 :::
 
 
+## Medoid pairwise cosine similarity heatmap
+
+```{r medoid-heatmap}
+#| fig-width: 12
+#| fig-height: 11
+cosine_cutoff <- 0.9
+
+# Subset cosine similarity matrix to medoids only
+medoid_sigs <- names(medoid_names)
+med_sim <- cosine_sim[medoid_sigs, medoid_sigs]
+
+# Strip "C." prefix from names to match dendrogram labels
+short_names <- sub("^C\\.", "", medoid_sigs)
+rownames(med_sim) <- short_names
+colnames(med_sim) <- short_names
+
+# Lower triangle only (NA for diagonal and upper)
+med_sim_lower <- med_sim
+med_sim_lower[upper.tri(med_sim_lower, diag = TRUE)] <- NA
+
+melted <- reshape2::melt(med_sim_lower, na.rm = TRUE)
+colnames(melted) <- c("Sig1", "Sig2", "Cosine")
+
+melted$Sig1 <- factor(melted$Sig1, levels = short_names)
+melted$Sig2 <- factor(melted$Sig2, levels = short_names)
+
+# Label cells with cosine >= cutoff
+melted$Label <- ifelse(
+  melted$Cosine >= cosine_cutoff,
+  sprintf("%.2f", melted$Cosine),
+  ""
+)
+
+# Vertical line segments from high-similarity cells to x-axis
+high_sim <- melted[melted$Cosine >= cosine_cutoff, ]
+if (nrow(high_sim) > 0) {
+  line_data <- data.frame(
+    x    = as.numeric(high_sim$Sig2),
+    xend = as.numeric(high_sim$Sig2),
+    y    = as.numeric(high_sim$Sig1) - 0.5,
+    yend = 0.5
+  )
+} else {
+  line_data <- data.frame(
+    x = numeric(), xend = numeric(),
+    y = numeric(), yend = numeric()
+  )
+}
+
+p_med_heat <- ggplot(melted, aes(x = Sig2, y = Sig1, fill = Cosine)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = Label), size = 2.5) +
+  scale_fill_gradient(
+    low = "white", high = "red",
+    limits = c(0, 1),
+    name = "Cosine\nSimilarity"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
+    axis.text.y = element_text(size = 8),
+    axis.title  = element_blank(),
+    panel.grid  = element_blank()
+  ) +
+  coord_fixed(clip = "off") +
+  ggtitle("Medoid Pairwise Cosine Similarities (Lower Triangle)")
+
+if (nrow(line_data) > 0) {
+  p_med_heat <- p_med_heat +
+    geom_segment(
+      data = line_data,
+      aes(x = x, xend = xend, y = y, yend = yend),
+      inherit.aes = FALSE,
+      color = "darkred", linetype = "solid", linewidth = 0.5
+    )
+}
+
+print(p_med_heat)
+```
+
 ## Summary statistics
 
 ```{r summary-stats}
@@ -262,16 +345,31 @@ print(p_heat)
 
 ## Silhouette analysis
 
+Each signature's silhouette width measures how well it fits its assigned cluster
+compared to its next-best alternative cluster. Values range from −1 to +1:
+
+- **Near +1**: the signature is well-matched to its cluster and poorly matched to
+  neighboring clusters.
+- **Near 0**: the signature sits on the boundary between two clusters.
+- **Negative**: the signature may be assigned to the wrong cluster.
+
+Signatures are grouped by cluster and sorted by silhouette width within each
+cluster. Alternating colors distinguish adjacent clusters.
+
 ```{r silhouette}
 #| fig-width: 10
-#| fig-height: 7
+#| fig-height: 21
 # Silhouette for retained clusters only
 retained_members <- names(clusters[clusters %in% retained_df$cluster_id])
 if (length(unique(clusters[retained_members])) > 1) {
   sil <- silhouette(clusters[retained_members], dist = as.dist(
     (1 - cosine_sim[retained_members, retained_members])
   ))
-  plot(sil, main = "Silhouette plot (retained clusters)", col = "steelblue",
+  # Alternating colors per cluster (one color per cluster)
+  n_clust <- length(unique(sil[, "cluster"]))
+  palette <- c("steelblue", "tomato")
+  clust_colors <- rep(palette, length.out = n_clust)
+  plot(sil, main = "Silhouette plot (retained clusters)", col = clust_colors,
        border = NA)
   sil_summary <- summary(sil)
   cat("Average silhouette width:", round(sil_summary$avg.width, 4), "\n")
