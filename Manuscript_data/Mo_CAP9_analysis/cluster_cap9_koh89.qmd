@@ -101,19 +101,6 @@ n_clusters <- length(unique(clusters))
 cat("Number of clusters at height", cut_height, ":", n_clusters, "\n")
 ```
 
-## Dendrogram
-
-```{r dendrogram}
-#| out-width: "100%"
-dend_data <- dendro_data(hc)
-
-build_plotly_dendrogram(
-  dend_data   = dend_data,
-  source_vec  = source_vec,
-  cut_height  = cut_height
-)
-```
-
 ## Compute medoids and filter clusters
 
 ```{r medoids}
@@ -166,6 +153,26 @@ for (cid in cluster_ids) {
 summary_df <- do.call(rbind, summary_list)
 retained_df <- summary_df[summary_df$retained, ]
 dropped_df  <- summary_df[!summary_df$retained, ]
+```
+
+## Dendrogram
+
+```{r dendrogram}
+#| out-width: "100%"
+dend_data <- dendro_data(hc)
+
+# Compute x-range for cluster 1 to set initial zoom
+cluster1_members <- names(clusters[clusters == 1])
+cluster1_x <- dend_data$labels$x[dend_data$labels$label %in% cluster1_members]
+initial_xrange <- c(min(cluster1_x) - 1, max(cluster1_x) + 1)
+
+build_plotly_dendrogram(
+  dend_data      = dend_data,
+  source_vec     = source_vec,
+  cut_height     = cut_height,
+  medoids        = names(medoid_names),
+  initial_xrange = initial_xrange
+)
 ```
 
 ## Summary statistics
