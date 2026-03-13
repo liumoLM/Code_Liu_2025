@@ -318,7 +318,7 @@ for (i in seq_len(nrow(retained_df))) {
 
   # If cluster is small enough, show all members overlaid
   members <- strsplit(row$members, "; ")[[1]]
-  if (length(members) <= 15 && length(members) > 1) {
+  if (length(members) > 1) {
     member_mat <- combined[, members, drop = FALSE]
     # Plot each member as light gray, medoid in black
     cat("\n\nAll", length(members), "members overlaid:\n\n")
