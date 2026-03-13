@@ -579,11 +579,13 @@ compute_dendrogram <- function(combined) {
 #' @param dend_data Output from dendro_data()
 #' @param source_vec Named vector mapping sig name -> source group
 #' @param colors Named color vector
+#' @param cut_height Height at which to draw the dashed cut line
 #' @return plotly object with source="dendrogram"
 build_plotly_dendrogram <- function(
   dend_data,
   source_vec,
-  colors = dendro2_colors
+  colors = dendro2_colors,
+  cut_height = 0.1
 ) {
   seg_df <- dend_data$segments
   label_df <- dend_data$labels
@@ -661,8 +663,8 @@ build_plotly_dendrogram <- function(
           type = "line",
           x0 = 0,
           x1 = max(label_df$x) + 1,
-          y0 = 0.1,
-          y1 = 0.1,
+          y0 = cut_height,
+          y1 = cut_height,
           xref = "x",
           yref = "y",
           line = list(color = "gray50", dash = "dash", width = 1)
