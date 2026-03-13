@@ -581,8 +581,12 @@ compute_dendrogram <- function(combined) {
 #' @param colors Named color vector
 #' @param cut_height Height at which to draw the dashed cut line
 #' @param medoids Character vector of medoid signature names to highlight
-#'   with bold text and an asterisk
+#'   with bold text in a box, prepended with cluster ID
 #' @param initial_xrange Numeric vector of length 2 for initial x-axis zoom
+#' @param initial_yrange Numeric vector of length 2 for initial y-axis range
+#' @param clusters Named vector of cluster assignments (names = sig names,
+#'   values = cluster IDs). Used to prepend cluster ID to medoid labels.
+#' @param strip_prefix Character prefix to remove from all labels
 #' @return plotly object with source="dendrogram"
 build_plotly_dendrogram <- function(
   dend_data,
@@ -590,7 +594,10 @@ build_plotly_dendrogram <- function(
   colors = dendro2_colors,
   cut_height = 0.1,
   medoids = NULL,
-  initial_xrange = NULL
+  initial_xrange = NULL,
+  initial_yrange = NULL,
+  clusters = NULL,
+  strip_prefix = NULL
 ) {
   seg_df <- dend_data$segments
   label_df <- dend_data$labels
@@ -632,21 +639,36 @@ build_plotly_dendrogram <- function(
       )
   }
 
+  base_font_size <- 13.5  # 1.5x the original 9
+
   annotations <- lapply(seq_len(nrow(label_df)), function(i) {
     lab <- as.character(label_df$label[i])
+    display_lab <- lab
+    if (!is.null(strip_prefix)) {
+      display_lab <- sub(paste0("^", strip_prefix), "", display_lab)
+    }
     is_medoid <- !is.null(medoids) && lab %in% medoids
-    display_text <- if (is_medoid) paste0("<b>* ", lab, "</b>") else lab
+    if (is_medoid && !is.null(clusters)) {
+      cid <- clusters[lab]
+      display_lab <- paste0("<b>", cid, " ", display_lab, "</b>")
+    }
     list(
       x = label_df$x[i],
       y = -0.01,
-      text = display_text,
+      text = display_lab,
       textangle = -90,
       xref = "x",
       yref = "y",
       showarrow = FALSE,
-      font = list(size = if (is_medoid) 10 else 9, color = label_df$color[i]),
+      font = list(
+        size = if (is_medoid) base_font_size + 1.5 else base_font_size,
+        color = label_df$color[i]
+      ),
       xanchor = "center",
-      yanchor = "top"
+      yanchor = "top",
+      bordercolor = if (is_medoid) label_df$color[i] else NA,
+      borderwidth = if (is_medoid) 1.5 else 0,
+      borderpad = if (is_medoid) 2 else 0
     )
   })
 
@@ -663,7 +685,8 @@ build_plotly_dendrogram <- function(
       yaxis = list(
         title = "Cosine Distance",
         zeroline = FALSE,
-        range = c(-0.12, max(seg_df$y) * 1.05)
+        range = if (!is.null(initial_yrange)) initial_yrange
+                else c(-0.12, max(seg_df$y) * 1.05)
       ),
       annotations = annotations,
       margin = list(b = 100, t = 30, l = 50, r = 20),
