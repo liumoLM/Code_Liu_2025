@@ -7,17 +7,22 @@ patterns <- c(
   "Ins\\(T" = "Ins(T)",
   "Del\\(C" = "Del(C)",
   "Ins\\(C" = "Ins(C)",
-  "^Del2:U1:R\\(5,9\\)$" = "Del2:U1:R(5,9)"
+  "^Del2:U1:R\\(5,9\\)$" = "Del2:U1:R(5,9)",
+  "^Del2:U2:R\\(5,9\\)$" = "Del2:U2:R(5,9)",
+  "^Del3:U1:R\\(5,9\\)$" = "Del3:U1:R(5,9)",
+  "^Del3:U2:R\\(5,9\\)$" = "Del3:U2:R(5,9)",
+  "^Del3:U3:R\\(5,9\\)$" = "Del3:U3:R(5,9)"
 )
 
-max_files = 200
+max_files = 100
 
 run_polyT_analysis <- function(
   vcf_dir,
   dataset_label,
   max_files,
   pdf_path,
-  csv_path
+  csv_path,
+  cap9 = FALSE
 ) {
   all_files <- list.files(
     path.expand(vcf_dir),
@@ -53,6 +58,10 @@ run_polyT_analysis <- function(
     cat("Reading", basename(f), "\n")
     vcf <- fread(f)
     total_indels <- total_indels + nrow(vcf)
+
+    if (cap9) {
+      vcf <- filter(vcf, R <= 9)
+    }
 
     for (i in seq_along(patterns)) {
       pat <- names(patterns)[i]
@@ -109,7 +118,10 @@ run_polyT_analysis <- function(
     ))
     cat(sprintf(
       "  n(R<9)=%d, n(R>=9)=%d, n(R==9)=%d, ratio(R==9 / R>=9)=%.4f\n",
-      n_lt9, n_ge9, n_eq9, ratio_eq9_ge9
+      n_lt9,
+      n_ge9,
+      n_eq9,
+      ratio_eq9_ge9
     ))
 
     p <- ggplot(counts, aes(x = repeat_count, weight = n)) +
@@ -145,7 +157,6 @@ run_polyT_analysis <- function(
   ))
 }
 
-# Run for PCAWG - top 20
 run_polyT_analysis(
   vcf_dir = "~/MEGA/important_mut_sig_data/pcawg_indel_vcfs",
   dataset_label = "PCAWG",
@@ -156,7 +167,6 @@ run_polyT_analysis(
   ))
 )
 
-# Run for FMH - top 20
 run_polyT_analysis(
   vcf_dir = "~/MEGA/important_mut_sig_data/fmh-unfiltered_vcfs",
   dataset_label = "FMH",
@@ -165,4 +175,32 @@ run_polyT_analysis(
   csv_path = here::here(glue::glue(
     "msi_study/check_fmh_top{max_files}_Del2_U1_R5_9.csv"
   ))
+)
+
+## capped, R <= 9
+
+run_polyT_analysis(
+  vcf_dir = "~/MEGA/important_mut_sig_data/pcawg_indel_vcfs",
+  dataset_label = "PCAWG",
+  max_files = max_files,
+  pdf_path = here::here(glue::glue(
+    "msi_study/check_pcawg_top{max_files}_cap9.pdf"
+  )),
+  csv_path = here::here(glue::glue(
+    "msi_study/check_pcawg_top{max_files}_Del2_U1_R5_9.csv"
+  )),
+  cap9 = TRUE
+)
+
+run_polyT_analysis(
+  vcf_dir = "~/MEGA/important_mut_sig_data/fmh-unfiltered_vcfs",
+  dataset_label = "FMH",
+  max_files = max_files,
+  pdf_path = here::here(glue::glue(
+    "msi_study/check_fmh_top{max_files}_cap9.pdf"
+  )),
+  csv_path = here::here(glue::glue(
+    "msi_study/check_fmh_top{max_files}_Del2_U1_R5_9.csv"
+  )),
+  cap9 = TRUE
 )
