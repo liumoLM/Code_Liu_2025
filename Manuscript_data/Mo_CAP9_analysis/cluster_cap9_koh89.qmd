@@ -1,10 +1,11 @@
 ---
-title: "Clustering CAP9 Koh89 Signatures (min similarity = `r params$min_similarity`)"
+title: "Clustering CAP9 Koh`r params$mutation_type` Signatures (min similarity = `r params$min_similarity`)"
 author: "Steve Rozen (sr110@duke.edu, steverozen@pm.me)"
 date: now
 date-format: "YYYY-MM-DD HH:mm"
 params:
   min_similarity: 0.95
+  mutation_type: 89
 format:
   html:
     page-layout: full
@@ -39,8 +40,10 @@ source(here::here("code", "dendro2_helpers.R"))
 
 ```{r params}
 min_similarity   <- params$min_similarity
+mutation_type    <- params$mutation_type
 min_cluster_size <- 3
-sig_dir <- here::here("Manuscript_data", "Mo_CAP9_analysis", "Signatures", "Koh89")
+koh_label <- paste0("Koh", mutation_type)
+sig_dir <- here::here("Manuscript_data", "Mo_CAP9_analysis", "Signatures", koh_label)
 catalog_dir <- here::here("Manuscript_data", "Mo_CAP9_analysis", "Catalogs")
 ```
 
@@ -52,18 +55,19 @@ cat("Found", length(sig_files), "CAP9 files\n")
 
 all_sigs <- lapply(sig_files, rename_sigs2)
 
-# Filter to expected row count (89)
+# Filter to expected row count
 nrows <- sapply(all_sigs, nrow)
-all_sigs <- all_sigs[nrows == 89]
-cat("Files with 89 rows:", length(all_sigs), "\n")
+all_sigs <- all_sigs[nrows == mutation_type]
+cat("Files with", mutation_type, "rows:", length(all_sigs), "\n")
 
 # Assign ICAMS canonical row names
-cat_files <- Sys.glob(file.path(catalog_dir, "*Koh89*.txt"))
+cat_files <- Sys.glob(file.path(catalog_dir, paste0("*", koh_label, "*.txt")))
 cat_rownames <- rownames(read.table(
   cat_files[1], header = TRUE, sep = "\t",
   row.names = 1, check.names = FALSE
 ))
-stopifnot(identical(cat_rownames, ICAMS::catalog.row.order$ID89))
+id_label <- paste0("ID", mutation_type)
+stopifnot(identical(cat_rownames, ICAMS::catalog.row.order[[id_label]]))
 
 for (i in seq_along(all_sigs)) {
   rownames(all_sigs[[i]]) <- cat_rownames
@@ -223,37 +227,49 @@ build_plotly_dendrogram(
 
 ## Medoid + reference dendrogram
 
-Dendrogram of medoid signatures together with Liu et al. and Koh et al.
-reference signatures. Check the box to include all CAP9 extraction signatures.
+Dendrogram of medoid signatures together with Liu et al.
+`r if (mutation_type == 89) "and Koh et al. "` reference signatures.
+Check the box to include all CAP9 extraction signatures.
 
 ```{r medoid-ref-load}
 #| message: false
 # Load Liu reference signatures
 liu_sigs <- read.table(
-  here::here("Manuscript_data", "Liu_et_al_final_89_type_signatures.tsv"),
-  header = TRUE, sep = "\t", row.names = 1, check.names = FALSE
-)
-
-# Load Koh reference signatures
-koh_sigs <- read.table(
-  here::here("Manuscript_data", "Koh_signatures.tsv"),
+  here::here("Manuscript_data",
+             paste0("Liu_et_al_final_", mutation_type, "_type_signatures.tsv")),
   header = TRUE, sep = "\t", row.names = 1, check.names = FALSE
 )
 
 liu_source <- setNames(rep("Liu", ncol(liu_sigs)), colnames(liu_sigs))
-koh_source <- setNames(rep("Koh", ncol(koh_sigs)), colnames(koh_sigs))
+
+# Load Koh reference signatures (only available for 89-type)
+if (mutation_type == 89) {
+  koh_sigs <- read.table(
+    here::here("Manuscript_data", "Koh_signatures.tsv"),
+    header = TRUE, sep = "\t", row.names = 1, check.names = FALSE
+  )
+  koh_source <- setNames(rep("Koh", ncol(koh_sigs)), colnames(koh_sigs))
+}
 
 # --- Medoids-only version ---
 medoid_mat_ref <- combined[, names(medoid_names), drop = FALSE]
-ref_combined_med <- cbind(medoid_mat_ref, as.matrix(liu_sigs), as.matrix(koh_sigs))
+ref_combined_med <- cbind(medoid_mat_ref, as.matrix(liu_sigs))
 ref_source_med <- c(
   setNames(source_vec[names(medoid_names)], names(medoid_names)),
-  liu_source, koh_source
+  liu_source
 )
+if (mutation_type == 89) {
+  ref_combined_med <- cbind(ref_combined_med, as.matrix(koh_sigs))
+  ref_source_med <- c(ref_source_med, koh_source)
+}
 
 # --- All-signatures version ---
-ref_combined_all <- cbind(combined, as.matrix(liu_sigs), as.matrix(koh_sigs))
-ref_source_all <- c(source_vec, liu_source, koh_source)
+ref_combined_all <- cbind(combined, as.matrix(liu_sigs))
+ref_source_all <- c(source_vec, liu_source)
+if (mutation_type == 89) {
+  ref_combined_all <- cbind(ref_combined_all, as.matrix(koh_sigs))
+  ref_source_all <- c(ref_source_all, koh_source)
+}
 ```
 
 :::{.column-screen}
@@ -542,13 +558,13 @@ if (length(unique(clusters[retained_members])) > 1) {
 # Load CAP9 catalogs for best-matching spectrum lookup
 cap9_pcawg_cat <- as.matrix(read.table(
   here::here("Manuscript_data", "Mo_CAP9_analysis", "Catalogs",
-             "CAP9.PCAWG.Koh89.catalog.txt"),
+             paste0("CAP9.PCAWG.", koh_label, ".catalog.txt")),
   header = TRUE, sep = "\t", row.names = 1, check.names = FALSE
 ))
 
 cap9_hartwig_cat <- as.matrix(read.table(
   here::here("Manuscript_data", "Mo_CAP9_analysis", "Catalogs",
-             "CAP9.Hartwig.Koh89.catalog.txt"),
+             paste0("CAP9.Hartwig.", koh_label, ".catalog.txt")),
   header = TRUE, sep = "\t", row.names = 1, check.names = FALSE
 ))
 
@@ -571,7 +587,8 @@ for (i in seq_len(nrow(retained_df))) {
   cat("**Medoid:**", row$medoid, "\n\n")
 
   # Plot medoid
-  print(plot_89(medoid_sig, plot_title = paste0(
+  plot_fn <- if (mutation_type == 89) plot_89 else plot_476
+  print(plot_fn(medoid_sig, plot_title = paste0(
     "Cluster ", row$cluster_id, " medoid: ", row$medoid
   )))
 
@@ -608,7 +625,7 @@ for (i in seq_len(nrow(retained_df))) {
         "(cosine similarity =", round(spec_cos, 4), ")\n\n")
 
     spec <- all_catalogs[, spec_name, drop = FALSE]
-    print(plot_89(spec, plot_title = paste0(
+    print(plot_fn(spec, plot_title = paste0(
       "Best-matching spectrum ", rank, ": ", spec_name,
       " (cos sim = ", round(spec_cos, 4), ")"
     )))
@@ -622,7 +639,7 @@ for (i in seq_len(nrow(retained_df))) {
 out_dir <- here::here("Manuscript_data", "Mo_CAP9_analysis", "clustering_results")
 if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
 
-prefix <- "CAP9_Koh89_clustered"
+prefix <- paste0("CAP9_", koh_label, "_clustered")
 
 # Summary table
 write.table(
