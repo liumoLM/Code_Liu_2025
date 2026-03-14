@@ -1,5 +1,5 @@
 ---
-title: "Clustering CAP9 Koh89 Signatures by Cosine Similarity"
+title: "Clustering CAP9 Koh89 Signatures (min similarity = `r params$min_similarity`)"
 author: "Steve Rozen (sr110@duke.edu, steverozen@pm.me)"
 date: now
 date-format: "YYYY-MM-DD HH:mm"
@@ -158,6 +158,40 @@ retained_df <- summary_df[summary_df$retained, ]
 dropped_df  <- summary_df[!summary_df$retained, ]
 ```
 
+## Summary statistics
+
+```{r summary-stats}
+#| results: asis
+cat("- **Total signatures loaded:**", ncol(combined), "\n")
+cat("- **Total clusters:**", n_clusters, "\n")
+cat("- **Retained clusters** (size >=", min_cluster_size, "):",
+    nrow(retained_df), "\n")
+cat("- **Dropped clusters** (size <", min_cluster_size, "):",
+    nrow(dropped_df), "\n")
+cat("- **Signatures in retained clusters:**",
+    sum(retained_df$size), "\n")
+cat("- **Signatures dropped:**",
+    ncol(combined) - sum(retained_df$size), "\n")
+
+if (any(!is.na(retained_df$min_cos_sim))) {
+  cat("- **Global min within-cluster cosine similarity:**",
+      min(retained_df$min_cos_sim, na.rm = TRUE), "\n")
+}
+```
+
+## Cluster summary table
+
+```{r summary-table}
+display_df <- retained_df[, c("cluster_id", "size", "medoid",
+                               "min_cos_sim", "mean_cos_sim", "max_cos_sim")]
+DT::datatable(
+  display_df,
+  rownames = FALSE,
+  options = list(pageLength = 25, scrollX = TRUE),
+  caption = paste("Retained clusters (size >=", min_cluster_size, ")")
+)
+```
+
 ## Dendrogram
 
 :::{.column-screen}
@@ -186,6 +220,110 @@ build_plotly_dendrogram(
 ```
 :::
 
+
+## Medoid + reference dendrogram
+
+Dendrogram of medoid signatures together with Liu et al. and Koh et al.
+reference signatures. Check the box to include all CAP9 extraction signatures.
+
+```{r medoid-ref-load}
+#| message: false
+# Load Liu reference signatures
+liu_sigs <- read.table(
+  here::here("Manuscript_data", "Liu_et_al_final_89_type_signatures.tsv"),
+  header = TRUE, sep = "\t", row.names = 1, check.names = FALSE
+)
+
+# Load Koh reference signatures
+koh_sigs <- read.table(
+  here::here("Manuscript_data", "Koh_signatures.tsv"),
+  header = TRUE, sep = "\t", row.names = 1, check.names = FALSE
+)
+
+liu_source <- setNames(rep("Liu", ncol(liu_sigs)), colnames(liu_sigs))
+koh_source <- setNames(rep("Koh", ncol(koh_sigs)), colnames(koh_sigs))
+
+# --- Medoids-only version ---
+medoid_mat_ref <- combined[, names(medoid_names), drop = FALSE]
+ref_combined_med <- cbind(medoid_mat_ref, as.matrix(liu_sigs), as.matrix(koh_sigs))
+ref_source_med <- c(
+  setNames(source_vec[names(medoid_names)], names(medoid_names)),
+  liu_source, koh_source
+)
+
+# --- All-signatures version ---
+ref_combined_all <- cbind(combined, as.matrix(liu_sigs), as.matrix(koh_sigs))
+ref_source_all <- c(source_vec, liu_source, koh_source)
+```
+
+:::{.column-screen}
+
+```{=html}
+<div style="margin-bottom: 8px;">
+  <label style="font-size: 1.1em; cursor: pointer;">
+    <input type="checkbox" id="toggle-all-sigs"
+           onchange="
+             document.getElementById('dend-medoids-only').style.display =
+               this.checked ? 'none' : '';
+             document.getElementById('dend-all-sigs').style.display =
+               this.checked ? '' : 'none';
+             /* Trigger plotly relayout so the revealed plot sizes correctly */
+             var el = document.getElementById('dend-all-sigs');
+             if (this.checked && el.querySelector('.plotly')) {
+               window.dispatchEvent(new Event('resize'));
+             }
+           ">
+    Include all extraction signatures
+  </label>
+</div>
+```
+
+::: {#dend-medoids-only}
+```{r medoid-ref-dendrogram-med}
+#| out-width: "100%"
+ref_dend_med <- compute_dendrogram(ref_combined_med)
+
+build_plotly_dendrogram(
+  dend_data      = ref_dend_med$dend_data,
+  source_vec     = ref_source_med,
+  cut_height     = cut_height,
+  medoids        = names(medoid_names),
+  initial_yrange = c(-0.12, 0.2),
+  clusters       = clusters,
+  strip_prefix   = "C\\."
+) |> layout(height = 900)
+```
+:::
+
+::: {#dend-all-sigs style="display:none;"}
+```{r medoid-ref-dendrogram-all}
+#| out-width: "100%"
+ref_dend_all <- compute_dendrogram(ref_combined_all)
+
+# Compute initial x-range for cluster 1 (same logic as first dendrogram)
+c1_members_all <- names(clusters[clusters == 1])
+c1_x_all <- ref_dend_all$dend_data$labels$x[
+  ref_dend_all$dend_data$labels$label %in% c1_members_all
+]
+c1_span_all <- max(c1_x_all) - min(c1_x_all)
+c1_center_all <- mean(range(c1_x_all))
+c1_half_all <- (c1_span_all / 2 + 1) * 12
+initial_xrange_all <- c(c1_center_all - c1_half_all, c1_center_all + c1_half_all)
+
+build_plotly_dendrogram(
+  dend_data      = ref_dend_all$dend_data,
+  source_vec     = ref_source_all,
+  cut_height     = cut_height,
+  medoids        = names(medoid_names),
+  initial_xrange = initial_xrange_all,
+  initial_yrange = c(-0.12, 0.2),
+  clusters       = clusters,
+  strip_prefix   = "C\\."
+) |> layout(height = 900)
+```
+:::
+
+:::
 
 ## Medoid pairwise cosine similarity heatmap
 
@@ -267,40 +405,6 @@ if (nrow(line_data) > 0) {
 print(p_med_heat)
 ```
 
-## Summary statistics
-
-```{r summary-stats}
-#| results: asis
-cat("- **Total signatures loaded:**", ncol(combined), "\n")
-cat("- **Total clusters:**", n_clusters, "\n")
-cat("- **Retained clusters** (size >=", min_cluster_size, "):",
-    nrow(retained_df), "\n")
-cat("- **Dropped clusters** (size <", min_cluster_size, "):",
-    nrow(dropped_df), "\n")
-cat("- **Signatures in retained clusters:**",
-    sum(retained_df$size), "\n")
-cat("- **Signatures dropped:**",
-    ncol(combined) - sum(retained_df$size), "\n")
-
-if (any(!is.na(retained_df$min_cos_sim))) {
-  cat("- **Global min within-cluster cosine similarity:**",
-      min(retained_df$min_cos_sim, na.rm = TRUE), "\n")
-}
-```
-
-## Cluster summary table
-
-```{r summary-table}
-display_df <- retained_df[, c("cluster_id", "size", "medoid",
-                               "min_cos_sim", "mean_cos_sim", "max_cos_sim")]
-DT::datatable(
-  display_df,
-  rownames = FALSE,
-  options = list(pageLength = 25, scrollX = TRUE),
-  caption = paste("Retained clusters (size >=", min_cluster_size, ")")
-)
-```
-
 ## Cosine similarity heatmap
 
 ```{r heatmap}
@@ -358,27 +462,100 @@ cluster. Alternating colors distinguish adjacent clusters.
 
 ```{r silhouette}
 #| fig-width: 10
-#| fig-height: 21
+#| fig-height: 75
 # Silhouette for retained clusters only
 retained_members <- names(clusters[clusters %in% retained_df$cluster_id])
 if (length(unique(clusters[retained_members])) > 1) {
   sil <- silhouette(clusters[retained_members], dist = as.dist(
     (1 - cosine_sim[retained_members, retained_members])
   ))
-  # Alternating colors per cluster (one color per cluster)
-  n_clust <- length(unique(sil[, "cluster"]))
-  palette <- c("steelblue", "tomato")
-  clust_colors <- rep(palette, length.out = n_clust)
-  plot(sil, main = "Silhouette plot (retained clusters)", col = clust_colors,
-       border = NA)
   sil_summary <- summary(sil)
-  cat("Average silhouette width:", round(sil_summary$avg.width, 4), "\n")
+
+  # Build data frame: sort by cluster, then by silhouette width within cluster
+  sil_df <- data.frame(
+    cluster = factor(sil[, "cluster"]),
+    sil_width = sil[, "sil_width"]
+  )
+  sil_df <- sil_df[order(sil_df$cluster, -sil_df$sil_width), ]
+  sil_df$y <- seq_len(nrow(sil_df))
+
+  # Alternating colors per cluster
+  clust_ids <- levels(sil_df$cluster)
+  palette <- c("steelblue", "tomato")
+  clust_color_map <- setNames(
+    rep(palette, length.out = length(clust_ids)), clust_ids
+  )
+  sil_df$color <- clust_color_map[as.character(sil_df$cluster)]
+
+  # Cluster label positions (midpoint of each cluster's y range)
+  label_df <- do.call(rbind, lapply(clust_ids, function(cid) {
+    rows <- sil_df[sil_df$cluster == cid, ]
+    avg_sil <- mean(rows$sil_width)
+    data.frame(
+      cluster = cid,
+      y = mean(range(rows$y)),
+      label = sprintf("%s : %d | %.2f", cid, nrow(rows), avg_sil)
+    )
+  }))
+
+  # Reverse y so cluster 1 is at the top (like base R silhouette)
+  sil_df$y <- rev(sil_df$y)
+  label_df$y <- sapply(clust_ids, function(cid) {
+    mean(range(sil_df$y[sil_df$cluster == cid]))
+  })
+
+  p_sil <- ggplot(sil_df, aes(x = y, y = sil_width, fill = color)) +
+    geom_col(width = 1, show.legend = FALSE) +
+    scale_fill_identity() +
+    scale_x_continuous(
+      breaks = label_df$y,
+      labels = label_df$label,
+      expand = c(0.005, 0.005)
+    ) +
+    geom_hline(yintercept = sil_summary$avg.width, linetype = "dashed",
+               color = "red") +
+    coord_flip() +
+    labs(
+      y = "Silhouette width",
+      x = NULL,
+      title = "Silhouette plot (retained clusters)",
+      subtitle = sprintf(
+        "Average silhouette width: %.4f", sil_summary$avg.width
+      )
+    ) +
+    theme_minimal() +
+    theme(
+      axis.text.y = element_text(size = 12, family = "mono"),
+      panel.grid.major.y = element_blank(),
+      panel.grid.minor.y = element_blank()
+    )
+  print(p_sil)
 } else {
   cat("Only one retained cluster — silhouette not applicable.\n")
 }
 ```
 
 ## Medoid signature plots
+
+```{r load-catalogs}
+#| message: false
+# Load CAP9 catalogs for best-matching spectrum lookup
+cap9_pcawg_cat <- as.matrix(read.table(
+  here::here("Manuscript_data", "Mo_CAP9_analysis", "Catalogs",
+             "CAP9.PCAWG.Koh89.catalog.txt"),
+  header = TRUE, sep = "\t", row.names = 1, check.names = FALSE
+))
+
+cap9_hartwig_cat <- as.matrix(read.table(
+  here::here("Manuscript_data", "Mo_CAP9_analysis", "Catalogs",
+             "CAP9.Hartwig.Koh89.catalog.txt"),
+  header = TRUE, sep = "\t", row.names = 1, check.names = FALSE
+))
+
+all_catalogs <- cbind(cap9_pcawg_cat, cap9_hartwig_cat)
+cat("Combined catalog:", nrow(all_catalogs), "rows x",
+    ncol(all_catalogs), "columns\n")
+```
 
 ```{r medoid-plots}
 #| fig-width: 10
@@ -414,6 +591,27 @@ for (i in seq_len(nrow(retained_df))) {
     lines(combined[, row$medoid], col = "red", lwd = 2)
     legend("topright", legend = c("Members", "Medoid"),
            col = c("gray50", "red"), lwd = c(1, 2), cex = 0.8)
+  }
+
+  # Find and plot top 3 best-matching spectra from catalogs
+  cos_sims <- apply(all_catalogs, 2, function(x) {
+    lsa::cosine(medoid_sig[, 1], x)
+  })
+  top3_idx <- order(cos_sims, decreasing = TRUE)[1:min(3, length(cos_sims))]
+
+  for (rank in seq_along(top3_idx)) {
+    idx <- top3_idx[rank]
+    spec_name <- names(cos_sims)[idx]
+    spec_cos  <- cos_sims[idx]
+
+    cat("\n\n**Best-matching spectrum", rank, ":**", spec_name,
+        "(cosine similarity =", round(spec_cos, 4), ")\n\n")
+
+    spec <- all_catalogs[, spec_name, drop = FALSE]
+    print(plot_89(spec, plot_title = paste0(
+      "Best-matching spectrum ", rank, ": ", spec_name,
+      " (cos sim = ", round(spec_cos, 4), ")"
+    )))
   }
 }
 ```
