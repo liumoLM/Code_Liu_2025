@@ -5,7 +5,7 @@ library(ggdendro)
 library(lsa)
 library(plotly)
 
-source(here::here("code", "map_476_to_other.R"))
+source(here::here("code", "collapse_476_to_89.R"))
 
 # Colors for source groups
 dendro2_colors <- c(
@@ -23,6 +23,7 @@ dendro2_colors <- c(
   COSMIC = "#FF1493",
   Sp.C = "#20B2AA",
   Sp.N = "#DC143C",
+  CV476 = "#00CED1",
   `~Sp.C` = "gray50",
   `~Sp.N` = "gray50"
 )
@@ -587,6 +588,12 @@ compute_dendrogram <- function(combined) {
 #' @param clusters Named vector of cluster assignments (names = sig names,
 #'   values = cluster IDs). Used to prepend cluster ID to medoid labels.
 #' @param strip_prefix Character prefix to remove from all labels
+#' @param label_filter Character vector of leaf names to annotate with text
+#'   labels. NULL (default) shows all labels. Markers and hover remain for
+#'   all leaves regardless.
+#' @param cluster_dropdown If TRUE and medoids/clusters are provided, add a
+#'   dropdown menu to jump to each cluster's position in the dendrogram.
+#' @param height Plot height in pixels. NULL uses plotly default.
 #' @return plotly object with source="dendrogram"
 build_plotly_dendrogram <- function(
   dend_data,
@@ -597,7 +604,10 @@ build_plotly_dendrogram <- function(
   initial_xrange = NULL,
   initial_yrange = NULL,
   clusters = NULL,
-  strip_prefix = NULL
+  strip_prefix = NULL,
+  label_filter = NULL,
+  cluster_dropdown = FALSE,
+  height = NULL
 ) {
   seg_df <- dend_data$segments
   label_df <- dend_data$labels
@@ -607,7 +617,7 @@ build_plotly_dendrogram <- function(
   seg_x <- as.vector(rbind(seg_df$x, seg_df$xend, NA))
   seg_y <- as.vector(rbind(seg_df$y, seg_df$yend, NA))
 
-  p <- plot_ly(source = "dendrogram") |>
+  p <- plot_ly(source = "dendrogram", height = height) |>
     add_trace(
       x = seg_x,
       y = seg_y,
@@ -641,7 +651,13 @@ build_plotly_dendrogram <- function(
 
   base_font_size <- 13.5  # 1.5x the original 9
 
-  annotations <- lapply(seq_len(nrow(label_df)), function(i) {
+  # Filter annotations to only labeled leaves if label_filter is set
+  label_indices <- seq_len(nrow(label_df))
+  if (!is.null(label_filter)) {
+    label_indices <- which(as.character(label_df$label) %in% label_filter)
+  }
+
+  annotations <- lapply(label_indices, function(i) {
     lab <- as.character(label_df$label[i])
     display_lab <- lab
     if (!is.null(strip_prefix)) {
@@ -672,6 +688,63 @@ build_plotly_dendrogram <- function(
     )
   })
 
+  # Build cluster dropdown menu if requested
+  dropdown_menu <- NULL
+  top_margin <- 30
+  if (cluster_dropdown && !is.null(medoids) && !is.null(clusters)) {
+    top_margin <- 60
+    # Build one button per cluster
+    cluster_ids <- sort(unique(clusters[medoids]))
+    buttons <- list()
+
+    # "Show All" button
+    buttons[[1]] <- list(
+      method = "relayout",
+      args = list(list(`xaxis.range` = list(
+        min(label_df$x) - 1, max(label_df$x) + 1
+      ))),
+      label = "Show All"
+    )
+
+    for (cid in cluster_ids) {
+      members <- names(clusters[clusters == cid])
+      member_x <- label_df$x[label_df$label %in% members]
+      if (length(member_x) == 0) next
+      span <- max(member_x) - min(member_x)
+      center <- mean(range(member_x))
+      padding <- max(span * 0.15, 2)
+      x_lo <- center - span / 2 - padding
+      x_hi <- center + span / 2 + padding
+
+      # Find medoid name for this cluster
+      cluster_medoid <- intersect(medoids, members)
+      medoid_label <- if (length(cluster_medoid) > 0) {
+        ml <- cluster_medoid[1]
+        if (!is.null(strip_prefix)) ml <- sub(paste0("^", strip_prefix), "", ml)
+        ml
+      } else {
+        ""
+      }
+
+      buttons[[length(buttons) + 1]] <- list(
+        method = "relayout",
+        args = list(list(`xaxis.range` = list(x_lo, x_hi))),
+        label = paste0(cid, " ", medoid_label)
+      )
+    }
+
+    dropdown_menu <- list(list(
+      type = "dropdown",
+      active = -1,
+      buttons = buttons,
+      x = 0,
+      y = 1.15,
+      xanchor = "left",
+      yanchor = "top",
+      showactive = TRUE
+    ))
+  }
+
   p |>
     layout(
       title = "Hierarchical Clustering (Cosine Distance)",
@@ -689,7 +762,7 @@ build_plotly_dendrogram <- function(
                 else c(-0.12, max(seg_df$y) * 1.05)
       ),
       annotations = annotations,
-      margin = list(b = 100, t = 30, l = 50, r = 20),
+      margin = list(b = 100, t = top_margin, l = 50, r = 20),
       shapes = list(
         list(
           type = "line",
@@ -702,6 +775,7 @@ build_plotly_dendrogram <- function(
           line = list(color = "gray50", dash = "dash", width = 1)
         )
       ),
+      updatemenus = dropdown_menu,
       hovermode = "closest",
       dragmode = "select"
     ) |>

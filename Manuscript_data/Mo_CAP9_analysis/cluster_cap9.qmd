@@ -212,14 +212,17 @@ half_width <- (cluster1_span / 2 + 1) * 12
 initial_xrange <- c(center - half_width, center + half_width)
 
 build_plotly_dendrogram(
-  dend_data      = dend_data,
-  source_vec     = source_vec,
-  cut_height     = cut_height,
-  medoids        = names(medoid_names),
-  initial_xrange = initial_xrange,
-  initial_yrange = c(-0.12, 0.3),
-  clusters       = clusters,
-  strip_prefix   = "C\\."
+  dend_data        = dend_data,
+  source_vec       = source_vec,
+  cut_height       = cut_height,
+  medoids          = names(medoid_names),
+  initial_xrange   = initial_xrange,
+  initial_yrange   = c(-0.12, 0.3),
+  clusters         = clusters,
+  strip_prefix     = "C\\.",
+  label_filter     = names(medoid_names),
+  cluster_dropdown = TRUE,
+  height           = 1350
 )
 ```
 :::
@@ -228,7 +231,7 @@ build_plotly_dendrogram(
 ## Medoid + reference dendrogram
 
 Dendrogram of medoid signatures together with Liu et al.
-`r if (mutation_type == 89) "and Koh et al. "` reference signatures.
+`r if (mutation_type == 89) ", Koh et al., and converted 476-type medoid "` reference signatures.
 Check the box to include all CAP9 extraction signatures.
 
 ```{r medoid-ref-load}
@@ -249,6 +252,14 @@ if (mutation_type == 89) {
     header = TRUE, sep = "\t", row.names = 1, check.names = FALSE
   )
   koh_source <- setNames(rep("Koh", ncol(koh_sigs)), colnames(koh_sigs))
+
+  # Load 476-type medoids converted to 89-type
+  cv476_sigs <- read.table(
+    here::here("Manuscript_data", "Mo_CAP9_analysis",
+               "cluster_cap9_results", "CAP9_476_converted_to_89.tsv"),
+    header = TRUE, sep = "\t", row.names = 1, check.names = FALSE
+  )
+  cv476_source <- setNames(rep("CV476", ncol(cv476_sigs)), colnames(cv476_sigs))
 }
 
 # --- Medoids-only version ---
@@ -261,6 +272,8 @@ ref_source_med <- c(
 if (mutation_type == 89) {
   ref_combined_med <- cbind(ref_combined_med, as.matrix(koh_sigs))
   ref_source_med <- c(ref_source_med, koh_source)
+  ref_combined_med <- cbind(ref_combined_med, as.matrix(cv476_sigs))
+  ref_source_med <- c(ref_source_med, cv476_source)
 }
 
 # --- All-signatures version ---
@@ -269,6 +282,8 @@ ref_source_all <- c(source_vec, liu_source)
 if (mutation_type == 89) {
   ref_combined_all <- cbind(ref_combined_all, as.matrix(koh_sigs))
   ref_source_all <- c(ref_source_all, koh_source)
+  ref_combined_all <- cbind(ref_combined_all, as.matrix(cv476_sigs))
+  ref_source_all <- c(ref_source_all, cv476_source)
 }
 ```
 
@@ -300,14 +315,16 @@ if (mutation_type == 89) {
 ref_dend_med <- compute_dendrogram(ref_combined_med)
 
 build_plotly_dendrogram(
-  dend_data      = ref_dend_med$dend_data,
-  source_vec     = ref_source_med,
-  cut_height     = cut_height,
-  medoids        = names(medoid_names),
-  initial_yrange = c(-0.12, 0.2),
-  clusters       = clusters,
-  strip_prefix   = "C\\."
-) |> layout(height = 900)
+  dend_data        = ref_dend_med$dend_data,
+  source_vec       = ref_source_med,
+  cut_height       = cut_height,
+  medoids          = names(medoid_names),
+  initial_yrange   = c(-0.12, 0.2),
+  clusters         = clusters,
+  strip_prefix     = "C\\.",
+  cluster_dropdown = TRUE,
+  height           = 1350
+)
 ```
 :::
 
@@ -327,15 +344,18 @@ c1_half_all <- (c1_span_all / 2 + 1) * 12
 initial_xrange_all <- c(c1_center_all - c1_half_all, c1_center_all + c1_half_all)
 
 build_plotly_dendrogram(
-  dend_data      = ref_dend_all$dend_data,
-  source_vec     = ref_source_all,
-  cut_height     = cut_height,
-  medoids        = names(medoid_names),
-  initial_xrange = initial_xrange_all,
-  initial_yrange = c(-0.12, 0.2),
-  clusters       = clusters,
-  strip_prefix   = "C\\."
-) |> layout(height = 900)
+  dend_data        = ref_dend_all$dend_data,
+  source_vec       = ref_source_all,
+  cut_height       = cut_height,
+  medoids          = names(medoid_names),
+  initial_xrange   = initial_xrange_all,
+  initial_yrange   = c(-0.12, 0.2),
+  clusters         = clusters,
+  strip_prefix     = "C\\.",
+  label_filter     = NULL,
+  cluster_dropdown = TRUE,
+  height           = 1350
+)
 ```
 :::
 
@@ -630,13 +650,32 @@ for (i in seq_len(nrow(retained_df))) {
       " (cos sim = ", round(spec_cos, 4), ")"
     )))
   }
+
+  # Show best-matching converted-476 signature (89-type only)
+  if (mutation_type == 89) {
+    cv476_cos <- apply(cv476_sigs, 2, function(x) {
+      lsa::cosine(medoid_sig[, 1], x)
+    })
+    best_idx <- which.max(cv476_cos)
+    best_name <- names(cv476_cos)[best_idx]
+    best_cos <- cv476_cos[best_idx]
+
+    cat("\n\n**Best-matching converted-476 signature:**", best_name,
+        "(cosine similarity =", round(best_cos, 4), ")\n\n")
+
+    best_cv476 <- cv476_sigs[, best_name, drop = FALSE]
+    print(plot_89(best_cv476, plot_title = paste0(
+      "Best-matching CV476 sig: ", best_name,
+      " (cos sim = ", round(best_cos, 4), ")"
+    )))
+  }
 }
 ```
 
 ## Save outputs
 
 ```{r save-outputs}
-out_dir <- here::here("Manuscript_data", "Mo_CAP9_analysis", "clustering_results")
+out_dir <- here::here("Manuscript_data", "Mo_CAP9_analysis", "cluster_cap9_results")
 if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
 
 prefix <- paste0("CAP9_", koh_label, "_clustered")
