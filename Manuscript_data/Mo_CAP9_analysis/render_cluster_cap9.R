@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-# Render cluster_cap9_koh89.qmd with parameterized min_similarity and
+# Render cluster_cap9.qmd with parameterized min_similarity and
 # mutation_type, and open the resulting HTML file.
 #
 # Usage:
@@ -8,7 +8,7 @@
 
 library(argparser)
 
-p <- arg_parser("Render cluster_cap9_koh89.qmd with parameterized min_similarity")
+p <- arg_parser("Render cluster_cap9.qmd with parameterized min_similarity")
 p <- add_argument(p, "--min-similarity", type = "numeric", default = 0.95,
                   help = "Minimum cosine similarity for clustering")
 p <- add_argument(p, "--mutation-type", type = "numeric", default = 89,
@@ -16,7 +16,7 @@ p <- add_argument(p, "--mutation-type", type = "numeric", default = 89,
 args <- parse_args(p)
 
 script_dir  <- here::here("Manuscript_data", "Mo_CAP9_analysis")
-qmd_file    <- file.path(script_dir, "cluster_cap9_koh89.qmd")
+qmd_file    <- file.path(script_dir, "cluster_cap9.qmd")
 output_file <- sprintf("cluster_cap9_%g_minsim_%s.html",
                         args$mutation_type, args$min_similarity)
 

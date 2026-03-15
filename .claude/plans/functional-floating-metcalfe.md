@@ -1,59 +1,28 @@
-# Plan: Dendrogram improvements (height, label filtering, cluster dropdown)
+# Plan: Show reference signature labels in medoid-ref-dendrogram-all
 
 ## Context
 
-The dendrograms in `cluster_cap9_koh89.qmd` have too many leaf labels (~621 signatures), making them unreadable. The user wants: (1) 1.5x more vertical space, (2) fewer leaf labels, and (3) a dropdown to jump to specific cluster/medoid positions.
+In the "Medoid + reference dendrogram" section of `cluster_cap9_koh89.qmd`, the `medoid-ref-dendrogram-all` block currently sets `label_filter = names(medoid_names)`, so only medoid extraction signatures get text labels. Reference signatures (Liu, Koh) are present as dots with hover but have no visible text labels. The user wants reference signature names shown as well.
 
-## Files to modify
+## File to modify
 
-- `code/dendro2_helpers.R` — `build_plotly_dendrogram()` function (lines 577-711)
-- `Manuscript_data/Mo_CAP9_analysis/cluster_cap9_koh89.qmd` — three dendrogram blocks
+- `Manuscript_data/Mo_CAP9_analysis/cluster_cap9_koh89.qmd` — `medoid-ref-dendrogram-all` block (line ~334)
 
-## Changes
+## Change
 
-### 1. Add `label_filter` parameter to `build_plotly_dendrogram()`
+In the `medoid-ref-dendrogram-all` block, expand `label_filter` to include reference signature names alongside medoid names:
 
-New parameter: `label_filter = NULL` (character vector of leaf names to annotate; NULL = all).
+```r
+label_filter = c(names(medoid_names), colnames(liu_sigs),
+                 if (mutation_type == 89) colnames(koh_sigs))
+```
 
-In the annotations loop (line 644), filter to only create text annotations for leaves in `label_filter`. Markers (dots) and hover remain for ALL leaves.
+This uses variables already in scope from the `medoid-ref-load` block (line 237): `liu_sigs`, `koh_sigs`, `mutation_type`.
 
-### 2. Add `cluster_dropdown` parameter to `build_plotly_dendrogram()`
-
-New parameter: `cluster_dropdown = FALSE`.
-
-When TRUE and `medoids`/`clusters` are provided:
-- Build plotly `updatemenus` dropdown with one button per cluster: `"<clusterID> <medoidName>"`
-- Each button calls `relayout` to set `xaxis.range` centered on that cluster's member span + padding
-- Include a "Show All" button at the top
-- Sort buttons by cluster ID
-- Position dropdown at top-left (x=0, y=1.15); increase top margin to 60px when dropdown is active
-
-### 3. Increase heights in QMD
-
-| Block | Current | New |
-|-------|---------|-----|
-| dendrogram (line 214) | no explicit height | `\|> layout(height = 1350)` |
-| medoid-ref-dendrogram-med (line 310) | `layout(height = 900)` | `layout(height = 1350)` |
-| medoid-ref-dendrogram-all (line 338) | `layout(height = 900)` | `layout(height = 1350)` |
-
-### 4. Pass new parameters in QMD
-
-| Block | `label_filter` | `cluster_dropdown` |
-|-------|---------------|-------------------|
-| dendrogram (~621 leaves) | `names(medoid_names)` | `TRUE` |
-| medoid-ref-dendrogram-med (few leaves) | omit (show all) | `TRUE` |
-| medoid-ref-dendrogram-all (~621+ leaves) | `names(medoid_names)` | `TRUE` |
-
-## Backward compatibility
-
-Both new parameters default to preserving old behavior (NULL / FALSE), so `interactive_dendro2.qmd` is unaffected.
+No changes needed to `build_plotly_dendrogram()` — the `label_filter` parameter already accepts any character vector of leaf names.
 
 ## Verification
 
 Render with: `Rscript Manuscript_data/Mo_CAP9_analysis/render_cluster.R --min-similarity 0.95 --mutation-type 89`
 
-Check:
-- Dendrograms are taller
-- Only medoid labels shown (with cluster ID prefix) on the all-signatures dendrograms
-- Dropdown navigates to correct cluster positions
-- Medoid-ref dendrogram still shows all labels
+Check that the `medoid-ref-dendrogram-all` dendrogram shows text labels for Liu sigs, Koh sigs, and medoids, but NOT for the ~600 non-medoid extraction signatures.

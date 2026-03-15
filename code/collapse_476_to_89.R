@@ -31,7 +31,8 @@ t476_to_89 <- function(t476) {
   new89
 }
 
-t476_to_83 <- function(t476) {
+do_not_use_t476_to_83 <- function(t476) {
+  # see collapse_476_to_83.R
   mut_type_mapping <- data.table::fread(
     here::here("Manuscript_data", "ID476_ID89_mapping.txt")
   )
