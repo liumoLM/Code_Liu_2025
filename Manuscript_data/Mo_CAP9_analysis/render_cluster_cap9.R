@@ -12,7 +12,7 @@ p <- arg_parser("Render cluster_cap9.qmd with parameterized min_similarity")
 p <- add_argument(p, "--min-similarity", type = "numeric", default = 0.95,
                   help = "Minimum cosine similarity for clustering")
 p <- add_argument(p, "--mutation-type", type = "numeric", default = 89,
-                  help = "Mutation type: 89 or 476")
+                  help = "Mutation type: 83, 89, or 476")
 args <- parse_args(p)
 
 script_dir  <- here::here("Manuscript_data", "Mo_CAP9_analysis")

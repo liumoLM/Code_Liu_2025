@@ -1,5 +1,5 @@
 ---
-title: "Clustering CAP9 Koh`r params$mutation_type` Signatures (min similarity = `r params$min_similarity`)"
+title: "Clustering CAP9 `r if (params$mutation_type == 83) 'COSMIC' else 'Koh'``r params$mutation_type` Signatures (min similarity = `r params$min_similarity`)"
 author: "Steve Rozen (sr110@duke.edu, steverozen@pm.me)"
 date: now
 date-format: "YYYY-MM-DD HH:mm"
@@ -22,7 +22,8 @@ format:
         </style>
 ---
 
-```{r setup}
+```{r}
+#| label: setup
 #| message: false
 library(here)
 library(ggplot2)
@@ -38,18 +39,25 @@ source(here::here("code", "dendro2_helpers.R"))
 
 ## Parameters
 
-```{r params}
-min_similarity   <- params$min_similarity
-mutation_type    <- params$mutation_type
+```{r}
+#| label: params
+min_similarity <- params$min_similarity
+mutation_type <- params$mutation_type
 min_cluster_size <- 3
-koh_label <- paste0("Koh", mutation_type)
-sig_dir <- here::here("Manuscript_data", "Mo_CAP9_analysis", "Signatures", koh_label)
+sig_label <- if (mutation_type == 83) "COSMIC83" else paste0("Koh", mutation_type)
+sig_dir <- here::here(
+  "Manuscript_data",
+  "Mo_CAP9_analysis",
+  "Signatures",
+  sig_label
+)
 catalog_dir <- here::here("Manuscript_data", "Mo_CAP9_analysis", "Catalogs")
 ```
 
 ## Load and combine signatures
 
-```{r load-sigs}
+```{r}
+#| label: load-sigs
 sig_files <- Sys.glob(file.path(sig_dir, "CAP9.*.txt"))
 cat("Found", length(sig_files), "CAP9 files\n")
 
@@ -61,12 +69,15 @@ all_sigs <- all_sigs[nrows == mutation_type]
 cat("Files with", mutation_type, "rows:", length(all_sigs), "\n")
 
 # Assign ICAMS canonical row names
-cat_files <- Sys.glob(file.path(catalog_dir, paste0("*", koh_label, "*.txt")))
+cat_files <- Sys.glob(file.path(catalog_dir, paste0("*", sig_label, "*.txt")))
 cat_rownames <- rownames(read.table(
-  cat_files[1], header = TRUE, sep = "\t",
-  row.names = 1, check.names = FALSE
+  cat_files[1],
+  header = TRUE,
+  sep = "\t",
+  row.names = 1,
+  check.names = FALSE
 ))
-id_label <- paste0("ID", mutation_type)
+id_label <- if (mutation_type == 83) "ID" else paste0("ID", mutation_type)
 stopifnot(identical(cat_rownames, ICAMS::catalog.row.order[[id_label]]))
 
 for (i in seq_along(all_sigs)) {
@@ -87,32 +98,82 @@ cat("Combined matrix:", nrow(combined), "rows x", ncol(combined), "columns\n")
 
 ## Cosine similarity matrix
 
-```{r cosine-sim}
-combined_t    <- t(combined)
+```{r}
+#| label: cosine-sim
+combined_t <- t(combined)
 combined_norm <- combined_t / sqrt(rowSums(combined_t^2))
-cosine_sim    <- combined_norm %*% t(combined_norm)
-cosine_dist   <- as.dist(1 - cosine_sim)
+cosine_sim <- combined_norm %*% t(combined_norm)
+cosine_dist <- as.dist(1 - cosine_sim)
 ```
 
-## Hierarchical clustering (complete linkage)
+## Hierarchical clustering (complete linkage) with post-merge
 
-Complete linkage guarantees that all pairs within a cluster have cosine
-similarity $\geq$ `r min_similarity` when we cut at height
-`r 1 - min_similarity`.
-
-```{r clustering}
+```{r}
+#| label: clustering
 hc <- hclust(cosine_dist, method = "complete")
 cut_height <- 1 - min_similarity
 clusters <- cutree(hc, h = cut_height)
+n_before <- length(unique(clusters))
+cat("Clusters before post-merge:", n_before, "\n")
+
+# Post-merge: iteratively merge cluster pairs whose minimum
+# cross-cluster cosine similarity >= min_similarity
+merge_log <- character(0)
+repeat {
+  merged_any <- FALSE
+  cids <- sort(unique(clusters))
+  for (i in seq_along(cids)) {
+    for (j in seq_len(i - 1)) {
+      members_i <- names(clusters[clusters == cids[i]])
+      members_j <- names(clusters[clusters == cids[j]])
+      cross_sim <- cosine_sim[members_i, members_j, drop = FALSE]
+      min_cross <- min(cross_sim)
+      if (min_cross >= min_similarity) {
+        merge_log <- c(merge_log, sprintf(
+          "Merged cluster %d (n=%d) into cluster %d (n=%d), min cross sim = %.4f",
+          cids[i], length(members_i), cids[j], length(members_j), min_cross
+        ))
+        clusters[clusters == cids[i]] <- cids[j]
+        merged_any <- TRUE
+        break
+      }
+    }
+    if (merged_any) break
+  }
+  if (!merged_any) break
+}
+if (length(merge_log) > 0) {
+  cat("Post-merge log:\n")
+  cat(paste(merge_log, collapse = "\n"), "\n")
+}
+
+# Re-label clusters sequentially
+old_ids <- sort(unique(clusters))
+new_ids <- setNames(seq_along(old_ids), old_ids)
+clusters <- new_ids[as.character(clusters)]
+names(clusters) <- names(new_ids[as.character(clusters)])
+# Restore original signature names
+sig_names <- names(cutree(hc, h = cut_height))
+names(clusters) <- sig_names
+
 n_clusters <- length(unique(clusters))
-cat("Number of clusters at height", cut_height, ":", n_clusters, "\n")
+cat(
+  "Clusters after post-merge:",
+  n_clusters,
+  "(merged",
+  n_before - n_clusters,
+  ")\n"
+)
 ```
 
 ## Compute medoids and filter clusters
 
-```{r medoids}
+```{r}
+#| label: medoids
 compute_medoid <- function(members, cos_sim_mat) {
-  if (length(members) == 1) return(members)
+  if (length(members) == 1) {
+    return(members)
+  }
   sub_sim <- cos_sim_mat[members, members, drop = FALSE]
   diag(sub_sim) <- NA
   avg_sim <- rowMeans(sub_sim, na.rm = TRUE)
@@ -132,23 +193,23 @@ for (cid in cluster_ids) {
   } else {
     sub_sim <- cosine_sim[members, members, drop = FALSE]
     pairwise <- sub_sim[lower.tri(sub_sim)]
-    min_cs  <- min(pairwise)
+    min_cs <- min(pairwise)
     mean_cs <- mean(pairwise)
-    max_cs  <- max(pairwise)
+    max_cs <- max(pairwise)
   }
 
   medoid <- compute_medoid(members, cosine_sim)
   retained <- size >= min_cluster_size
 
   summary_list[[length(summary_list) + 1]] <- data.frame(
-    cluster_id   = cid,
-    size         = size,
-    retained     = retained,
-    medoid       = medoid,
-    min_cos_sim  = round(min_cs, 4),
+    cluster_id = cid,
+    size = size,
+    retained = retained,
+    medoid = medoid,
+    min_cos_sim = round(min_cs, 4),
     mean_cos_sim = round(mean_cs, 4),
-    max_cos_sim  = round(max_cs, 4),
-    members      = paste(members, collapse = "; "),
+    max_cos_sim = round(max_cs, 4),
+    members = paste(members, collapse = "; "),
     stringsAsFactors = FALSE
   )
 
@@ -159,35 +220,54 @@ for (cid in cluster_ids) {
 
 summary_df <- do.call(rbind, summary_list)
 retained_df <- summary_df[summary_df$retained, ]
-dropped_df  <- summary_df[!summary_df$retained, ]
+dropped_df <- summary_df[!summary_df$retained, ]
 ```
 
 ## Summary statistics
 
-```{r summary-stats}
+```{r}
+#| label: summary-stats
 #| results: asis
 cat("- **Total signatures loaded:**", ncol(combined), "\n")
 cat("- **Total clusters:**", n_clusters, "\n")
-cat("- **Retained clusters** (size >=", min_cluster_size, "):",
-    nrow(retained_df), "\n")
-cat("- **Dropped clusters** (size <", min_cluster_size, "):",
-    nrow(dropped_df), "\n")
-cat("- **Signatures in retained clusters:**",
-    sum(retained_df$size), "\n")
-cat("- **Signatures dropped:**",
-    ncol(combined) - sum(retained_df$size), "\n")
+cat(
+  "- **Retained clusters** (size >=",
+  min_cluster_size,
+  "):",
+  nrow(retained_df),
+  "\n"
+)
+cat(
+  "- **Dropped clusters** (size <",
+  min_cluster_size,
+  "):",
+  nrow(dropped_df),
+  "\n"
+)
+cat("- **Signatures in retained clusters:**", sum(retained_df$size), "\n")
+cat("- **Signatures dropped:**", ncol(combined) - sum(retained_df$size), "\n")
 
 if (any(!is.na(retained_df$min_cos_sim))) {
-  cat("- **Global min within-cluster cosine similarity:**",
-      min(retained_df$min_cos_sim, na.rm = TRUE), "\n")
+  cat(
+    "- **Global min within-cluster cosine similarity:**",
+    min(retained_df$min_cos_sim, na.rm = TRUE),
+    "\n"
+  )
 }
 ```
 
 ## Cluster summary table
 
-```{r summary-table}
-display_df <- retained_df[, c("cluster_id", "size", "medoid",
-                               "min_cos_sim", "mean_cos_sim", "max_cos_sim")]
+```{r}
+#| label: summary-table
+display_df <- retained_df[, c(
+  "cluster_id",
+  "size",
+  "medoid",
+  "min_cos_sim",
+  "mean_cos_sim",
+  "max_cos_sim"
+)]
 DT::datatable(
   display_df,
   rownames = FALSE,
@@ -199,7 +279,8 @@ DT::datatable(
 ## Dendrogram
 
 :::{.column-screen}
-```{r dendrogram}
+```{r}
+#| label: dendrogram
 #| out-width: "100%"
 dend_data <- dendro_data(hc)
 
@@ -212,17 +293,17 @@ half_width <- (cluster1_span / 2 + 1) * 12
 initial_xrange <- c(center - half_width, center + half_width)
 
 build_plotly_dendrogram(
-  dend_data        = dend_data,
-  source_vec       = source_vec,
-  cut_height       = cut_height,
-  medoids          = names(medoid_names),
-  initial_xrange   = initial_xrange,
-  initial_yrange   = c(-0.12, 0.3),
-  clusters         = clusters,
-  strip_prefix     = "C\\.",
-  label_filter     = names(medoid_names),
+  dend_data = dend_data,
+  source_vec = source_vec,
+  cut_height = cut_height,
+  medoids = names(medoid_names),
+  initial_xrange = initial_xrange,
+  initial_yrange = c(-0.12, 0.3),
+  clusters = clusters,
+  strip_prefix = "C\\.",
+  label_filter = names(medoid_names),
   cluster_dropdown = TRUE,
-  height           = 1350
+  height = 1350
 )
 ```
 :::
@@ -231,16 +312,22 @@ build_plotly_dendrogram(
 ## Medoid + reference dendrogram
 
 Dendrogram of medoid signatures together with Liu et al.
-`r if (mutation_type == 89) ", Koh et al., and converted 476-type medoid "` reference signatures.
+`r if (mutation_type == 89) ", Koh et al., and converted 476-type medoid "``r if (mutation_type == 83) " and COSMIC "` reference signatures.
 Check the box to include all CAP9 extraction signatures.
 
-```{r medoid-ref-load}
+```{r}
+#| label: medoid-ref-load
 #| message: false
 # Load Liu reference signatures
 liu_sigs <- read.table(
-  here::here("Manuscript_data",
-             paste0("Liu_et_al_final_", mutation_type, "_type_signatures.tsv")),
-  header = TRUE, sep = "\t", row.names = 1, check.names = FALSE
+  here::here(
+    "Manuscript_data",
+    paste0("Liu_et_al_final_", mutation_type, "_type_signatures.tsv")
+  ),
+  header = TRUE,
+  sep = "\t",
+  row.names = 1,
+  check.names = FALSE
 )
 
 liu_source <- setNames(rep("Liu", ncol(liu_sigs)), colnames(liu_sigs))
@@ -249,17 +336,39 @@ liu_source <- setNames(rep("Liu", ncol(liu_sigs)), colnames(liu_sigs))
 if (mutation_type == 89) {
   koh_sigs <- read.table(
     here::here("Manuscript_data", "Koh_signatures.tsv"),
-    header = TRUE, sep = "\t", row.names = 1, check.names = FALSE
+    header = TRUE,
+    sep = "\t",
+    row.names = 1,
+    check.names = FALSE
   )
   koh_source <- setNames(rep("Koh", ncol(koh_sigs)), colnames(koh_sigs))
 
   # Load 476-type medoids converted to 89-type
   cv476_sigs <- read.table(
-    here::here("Manuscript_data", "Mo_CAP9_analysis",
-               "cluster_cap9_results", "CAP9_476_converted_to_89.tsv"),
-    header = TRUE, sep = "\t", row.names = 1, check.names = FALSE
+    here::here(
+      "Manuscript_data",
+      "Mo_CAP9_analysis",
+      "cluster_cap9_results",
+      "CAP9_476_converted_to_89.tsv"
+    ),
+    header = TRUE,
+    sep = "\t",
+    row.names = 1,
+    check.names = FALSE
   )
   cv476_source <- setNames(rep("CV476", ncol(cv476_sigs)), colnames(cv476_sigs))
+}
+
+# Load COSMIC reference signatures (only for 83-type)
+if (mutation_type == 83) {
+  cosmic_sigs <- read.table(
+    here::here("Manuscript_data", "COSMIC_v3.5_ID_GRCh37_signatures.tsv"),
+    header = TRUE,
+    sep = "\t",
+    row.names = 1,
+    check.names = FALSE
+  )
+  cosmic_source <- setNames(rep("COSMIC", ncol(cosmic_sigs)), colnames(cosmic_sigs))
 }
 
 # --- Medoids-only version ---
@@ -275,6 +384,10 @@ if (mutation_type == 89) {
   ref_combined_med <- cbind(ref_combined_med, as.matrix(cv476_sigs))
   ref_source_med <- c(ref_source_med, cv476_source)
 }
+if (mutation_type == 83) {
+  ref_combined_med <- cbind(ref_combined_med, as.matrix(cosmic_sigs))
+  ref_source_med <- c(ref_source_med, cosmic_source)
+}
 
 # --- All-signatures version ---
 ref_combined_all <- cbind(combined, as.matrix(liu_sigs))
@@ -284,6 +397,10 @@ if (mutation_type == 89) {
   ref_source_all <- c(ref_source_all, koh_source)
   ref_combined_all <- cbind(ref_combined_all, as.matrix(cv476_sigs))
   ref_source_all <- c(ref_source_all, cv476_source)
+}
+if (mutation_type == 83) {
+  ref_combined_all <- cbind(ref_combined_all, as.matrix(cosmic_sigs))
+  ref_source_all <- c(ref_source_all, cosmic_source)
 }
 ```
 
@@ -310,26 +427,29 @@ if (mutation_type == 89) {
 ```
 
 ::: {#dend-medoids-only}
-```{r medoid-ref-dendrogram-med}
+```{r}
+#| label: medoid-ref-dendrogram-med
 #| out-width: "100%"
 ref_dend_med <- compute_dendrogram(ref_combined_med)
 
 build_plotly_dendrogram(
-  dend_data        = ref_dend_med$dend_data,
-  source_vec       = ref_source_med,
-  cut_height       = cut_height,
-  medoids          = names(medoid_names),
-  initial_yrange   = c(-0.12, 0.2),
-  clusters         = clusters,
-  strip_prefix     = "C\\.",
+  dend_data = ref_dend_med$dend_data,
+  source_vec = ref_source_med,
+  cut_height = cut_height,
+  medoids = names(medoid_names),
+  initial_yrange = c(-0.12, 0.2),
+  clusters = clusters,
+  strip_prefix = "C\\.",
   cluster_dropdown = TRUE,
-  height           = 1350
+  height = 1350
 )
 ```
 :::
 
 ::: {#dend-all-sigs style="display:none;"}
-```{r medoid-ref-dendrogram-all}
+
+```{r}
+#| label: medoid-ref-dendrogram-all
 #| out-width: "100%"
 ref_dend_all <- compute_dendrogram(ref_combined_all)
 
@@ -341,20 +461,23 @@ c1_x_all <- ref_dend_all$dend_data$labels$x[
 c1_span_all <- max(c1_x_all) - min(c1_x_all)
 c1_center_all <- mean(range(c1_x_all))
 c1_half_all <- (c1_span_all / 2 + 1) * 12
-initial_xrange_all <- c(c1_center_all - c1_half_all, c1_center_all + c1_half_all)
+initial_xrange_all <- c(
+  c1_center_all - c1_half_all,
+  c1_center_all + c1_half_all
+)
 
 build_plotly_dendrogram(
-  dend_data        = ref_dend_all$dend_data,
-  source_vec       = ref_source_all,
-  cut_height       = cut_height,
-  medoids          = names(medoid_names),
-  initial_xrange   = initial_xrange_all,
-  initial_yrange   = c(-0.12, 0.2),
-  clusters         = clusters,
-  strip_prefix     = "C\\.",
-  label_filter     = NULL,
+  dend_data = ref_dend_all$dend_data,
+  source_vec = ref_source_all,
+  cut_height = cut_height,
+  medoids = names(medoid_names),
+  initial_xrange = initial_xrange_all,
+  initial_yrange = c(-0.12, 0.2),
+  clusters = clusters,
+  strip_prefix = "C\\.",
+  label_filter = NULL,
   cluster_dropdown = TRUE,
-  height           = 1350
+  height = 1350
 )
 ```
 :::
@@ -363,7 +486,8 @@ build_plotly_dendrogram(
 
 ## Medoid pairwise cosine similarity heatmap
 
-```{r medoid-heatmap}
+```{r}
+#| label: medoid-heatmap
 #| fig-width: 12
 #| fig-height: 11
 cosine_cutoff <- 0.9
@@ -443,7 +567,8 @@ print(p_med_heat)
 
 ## Cosine similarity heatmap
 
-```{r heatmap}
+```{r}
+#| label: heatmap
 #| fig-width: 12
 #| fig-height: 11
 # Order by dendrogram
@@ -496,7 +621,8 @@ compared to its next-best alternative cluster. Values range from −1 to +1:
 Signatures are grouped by cluster and sorted by silhouette width within each
 cluster. Alternating colors distinguish adjacent clusters.
 
-```{r silhouette}
+```{r}
+#| label: silhouette
 #| fig-width: 10
 #| fig-height: 75
 # Silhouette for retained clusters only
@@ -573,18 +699,19 @@ if (length(unique(clusters[retained_members])) > 1) {
 
 ## Medoid signature plots
 
-```{r load-catalogs}
+```{r}
+#| label: load-catalogs
 #| message: false
 # Load CAP9 catalogs for best-matching spectrum lookup
 cap9_pcawg_cat <- as.matrix(read.table(
   here::here("Manuscript_data", "Mo_CAP9_analysis", "Catalogs",
-             paste0("CAP9.PCAWG.", koh_label, ".catalog.txt")),
+             paste0("CAP9.PCAWG.", sig_label, ".catalog.txt")),
   header = TRUE, sep = "\t", row.names = 1, check.names = FALSE
 ))
 
 cap9_hartwig_cat <- as.matrix(read.table(
   here::here("Manuscript_data", "Mo_CAP9_analysis", "Catalogs",
-             paste0("CAP9.Hartwig.", koh_label, ".catalog.txt")),
+             paste0("CAP9.Hartwig.", sig_label, ".catalog.txt")),
   header = TRUE, sep = "\t", row.names = 1, check.names = FALSE
 ))
 
@@ -593,7 +720,8 @@ cat("Combined catalog:", nrow(all_catalogs), "rows x",
     ncol(all_catalogs), "columns\n")
 ```
 
-```{r medoid-plots}
+```{r}
+#| label: medoid-plots
 #| fig-width: 10
 #| fig-height: 4
 #| results: asis
@@ -607,7 +735,11 @@ for (i in seq_len(nrow(retained_df))) {
   cat("**Medoid:**", row$medoid, "\n\n")
 
   # Plot medoid
-  plot_fn <- if (mutation_type == 89) plot_89 else plot_476
+  plot_fn <- switch(as.character(mutation_type),
+    "83"  = plot_83,
+    "89"  = plot_89,
+    "476" = plot_476
+  )
   print(plot_fn(medoid_sig, plot_title = paste0(
     "Cluster ", row$cluster_id, " medoid: ", row$medoid
   )))
@@ -674,11 +806,12 @@ for (i in seq_len(nrow(retained_df))) {
 
 ## Save outputs
 
-```{r save-outputs}
+```{r}
+#| label: save-outputs
 out_dir <- here::here("Manuscript_data", "Mo_CAP9_analysis", "cluster_cap9_results")
 if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
 
-prefix <- paste0("CAP9_", koh_label, "_clustered")
+prefix <- paste0("CAP9_", sig_label, "_clustered")
 
 # Summary table
 write.table(
@@ -713,7 +846,8 @@ cat("Outputs saved to:", out_dir, "\n")
 
 ## Dropped clusters
 
-```{r dropped}
+```{r}
+#| label: dropped
 if (nrow(dropped_df) > 0) {
   cat("Clusters dropped (size <", min_cluster_size, "):\n\n")
   DT::datatable(
@@ -730,7 +864,8 @@ if (nrow(dropped_df) > 0) {
 ::: {.callout-note collapse="true"}
 ## Session Info
 
-```{r session-info}
+```{r}
+#| label: session-info
 #| echo: false
 #| comment: ""
 sessioninfo::session_info(info = "all")
