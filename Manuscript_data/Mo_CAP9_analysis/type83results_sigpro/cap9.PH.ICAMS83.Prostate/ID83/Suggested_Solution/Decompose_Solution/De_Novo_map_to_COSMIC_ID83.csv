@@ -1,0 +1,8 @@
+De novo extracted, Global NMF Signatures, L1 Error %, L2 Error %, KL Divergence, Cosine Similarity, Correlation
+Signature 83-ID83A, Signature ID1 (14.22%) & Signature ID2 (85.78%), 17.18,  4.83, 0.694, 1.00, 1.00
+Signature 83-ID83B, Signature ID1 (100.00%), 31.74,  7.56, 2.324, 1.00, 1.00
+Signature 83-ID83C, Signature ID1 (13.20%) & Signature ID4 (9.66%) & Signature ID5 (42.10%) & Signature ID8 (20.10%) & Signature ID9 (14.94%), 24.24,  17.89, 0.083, 0.98, 0.98
+Signature 83-ID83D, Signature ID6 (77.54%) & Signature ID8 (22.46%), 14.09,  9.92, 0.048, 1.00, 0.99
+Signature 83-ID83E, Signature ID4 (28.44%) & Signature ID5 (26.56%) & Signature ID12 (16.52%) & Signature ID14 (8.68%) & Signature ID21 (19.80%), 35.02,  29.40, 0.147, 0.96, 0.93
+Signature 83-ID83F, Signature ID8 (22.66%) & Signature ID19 (77.34%), 61.10,  33.74, 0.312, 0.94, 0.94
+Signature 83-ID83G, Signature ID3 (78.78%) & Signature ID9 (21.22%), 43.06,  23.26, 0.602, 0.97, 0.98
