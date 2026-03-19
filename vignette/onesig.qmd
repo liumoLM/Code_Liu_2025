@@ -130,7 +130,7 @@ if (sig_data$has_476_signature) {
       sig_data$type89_sig_id,
       ' was not found by de novo extraction. ',
       'This is the 476-Type spectrum of ',
-      sig_data$exemplar_id
+      sig_data$exemplar_89
     ),
     style = ".callout-note"
   )
@@ -151,18 +151,32 @@ if (!is.null(plot_paths$id476_sig)) {
 #| echo: false
 #| output: asis
 
-# ID476 catalog plot (only if signature exists)
-if (!is.null(plot_paths$id476_catalog) && !is.null(sig_data$cosine476)) {
+# ID476 catalog plot: BestMatch89_1 (linking tumor)
+if (!is.null(plot_paths$id476_catalog) && !is.na(sig_data$cosine476_linking)) {
   cat(
     '\n\n476-type spectrum of the linking tumor ',
-    sig_data$exemplar_id,
+    sig_data$exemplar_89,
+    "; cosine similarity to the extracted 476-type signature is ",
+    format(sig_data$cosine476_linking, digits = getp("cosine_digits")),
+    '\n\n',
+    sep = ""
+  )
+
+  displayplot(plot_paths$id476_catalog)
+}
+
+# ID476 catalog plot: BestMatch476_1 (type-specific best match)
+if (!is.null(plot_paths$id476_catalog_476match) && !is.na(sig_data$cosine476)) {
+  cat(
+    '\n\n476-type spectrum of best 476-type matching tumor ',
+    sig_data$exemplar_476,
     "; cosine similarity to the extracted 476-type signature is ",
     format(sig_data$cosine476, digits = getp("cosine_digits")),
     '\n\n',
     sep = ""
   )
 
-  displayplot(plot_paths$id476_catalog)
+  displayplot(plot_paths$id476_catalog_476match)
 }
 ```
 
@@ -309,12 +323,11 @@ if (sig_data$is_polyT_removed) {
 
 cat(paste0(
   '\n\n83-type spectrum of the linking tumor ',
-  sig_data$exemplar_id,
-  " | cosine similarly to ",
+  sig_data$exemplar_89,
+  " | cosine similarity to ",
   sig_data$ID83signature,
   ": ",
-  format(sig_data$cosine83, digits = getp("cosine_digits")),
-
+  format(sig_data$cosine83_linking, digits = getp("cosine_digits")),
   '\n\n'
 ))
 
@@ -325,12 +338,31 @@ cat(paste0(
 #| echo: false
 #| output: asis
 
-# ID83 exemplar spectrum (always shown)
+# ID83 exemplar spectrum: BestMatch89_1 (linking tumor, always shown)
 displayplot(plot_paths$id83_catalog, getp("hw83"))
 if (!is.null(plot_paths$id83_catalog_ablated)) {
   cat(suppressed_t_details)
   displayplot(plot_paths$id83_catalog_ablated, getp("hw83"))
   cat('\n\n</details>\n\n')
+}
+
+# ID83 exemplar spectrum: BestMatch83_1 (type-specific best match)
+if (!is.null(plot_paths$id83_catalog_83match) && !is.na(sig_data$cosine83)) {
+  cat(paste0(
+    '\n\n83-type spectrum of best 83-type matching tumor ',
+    sig_data$exemplar_83,
+    " | cosine similarity to ",
+    sig_data$ID83signature,
+    ": ",
+    format(sig_data$cosine83, digits = getp("cosine_digits")),
+    '\n\n'
+  ))
+  displayplot(plot_paths$id83_catalog_83match, getp("hw83"))
+  if (!is.null(plot_paths$id83_catalog_83match_ablated)) {
+    cat(suppressed_t_details)
+    displayplot(plot_paths$id83_catalog_83match_ablated, getp("hw83"))
+    cat('\n\n</details>\n\n')
+  }
 }
 ```
 

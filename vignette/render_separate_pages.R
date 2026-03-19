@@ -104,24 +104,20 @@ if (need_rds) {
   koh_min_cosine <- 0.9
   min_ts_to_trigger <- 0.15
 
+  finalized_dir <- file.path(data_dir, "Mo_CAP9_analysis", "Finalized result")
+
   # Load connection file
   connect_89_to_83 <- read.delim(
-    file.path(data_dir, "89type_to_83type_connection.tsv"),
-    sep = "\t"
-  )
-  colnames(connect_89_to_83) <- c(
-    "ID89_signature",
-    "example_catalog",
-    "ID83_signature",
-    "type746_signature_id",
-    "type476_where_extracted"
+    file.path(finalized_dir, "connection_table.tsv"),
+    sep = "\t",
+    check.names = FALSE
   )
 
   # Load all data files
   message("Loading data files...")
 
   type83_spectra <- read.delim(
-    file.path(data_dir, "Liu_et_al_83_type_spectra.tsv"),
+    file.path(finalized_dir, "liu_et_al_83_spectra.tsv"),
     sep = "\t",
     row.names = 1,
     check.names = FALSE
@@ -130,7 +126,7 @@ if (need_rds) {
   type83_spectra.no.polyT[c("DEL:T:1:5+", "INS:T:1:5+"), ] <- 0
 
   type83_sigs <- read.delim(
-    file.path(data_dir, "Liu_et_al_final_83_type_signatures.tsv"),
+    file.path(finalized_dir, "liu_et_al_83_signatures.tsv"),
     sep = "\t",
     row.names = 1,
     check.names = FALSE
@@ -150,18 +146,19 @@ if (need_rds) {
     check.names = FALSE
   )
 
-  type89_sigs <- as.data.frame(fread(file.path(
-    data_dir,
-    "Liu_et_al_final_89_type_signatures.tsv"
-  )))
-  row.names(type89_sigs) <- type89_sigs[, 1]
-  type89_sigs <- type89_sigs[, -1]
+  type89_sigs <- read.delim(
+    file.path(finalized_dir, "liu_et_al_89_signatures.tsv"),
+    sep = "\t",
+    row.names = 1,
+    check.names = FALSE
+  )
 
-  type89_spectra <- as.data.frame(fread(
-    file.path(data_dir, "Liu_et_al_89_type_spectra.tsv")
-  ))
-  row.names(type89_spectra) <- type89_spectra[, 1]
-  type89_spectra <- type89_spectra[, -1]
+  type89_spectra <- read.delim(
+    file.path(finalized_dir, "liu_et_al_89_spectra.tsv"),
+    sep = "\t",
+    row.names = 1,
+    check.names = FALSE
+  )
 
   koh_sigs <- read.delim(
     file.path(data_dir, "Koh_signatures.tsv"),
@@ -175,18 +172,22 @@ if (need_rds) {
     row.names = 1,
     check.names = FALSE
   )
+  # Strip cancer-type prefix from column names
+  colnames(ID89.mSigAct.assignment) <- sub("^.*::", "", colnames(ID89.mSigAct.assignment))
 
-  type476_sigs <- as.data.frame(fread(
-    file.path(data_dir, "Liu_et_al_final_476_type_signatures.tsv")
-  ))
-  row.names(type476_sigs) <- type476_sigs[, 1]
-  type476_sigs <- type476_sigs[, -1]
+  type476_sigs <- read.delim(
+    file.path(finalized_dir, "liu_et_al_476_signatures.tsv"),
+    sep = "\t",
+    row.names = 1,
+    check.names = FALSE
+  )
 
-  to.plot.all.ID476.catalogs <- as.data.frame(fread(
-    file.path(data_dir, "Liu_et_al_476_type_spectra.tsv")
-  ))
-  row.names(to.plot.all.ID476.catalogs) <- to.plot.all.ID476.catalogs[, 1]
-  to.plot.all.ID476.catalogs <- to.plot.all.ID476.catalogs[, -1]
+  to.plot.all.ID476.catalogs <- read.delim(
+    file.path(finalized_dir, "liu_et_al_476_spectra.tsv"),
+    sep = "\t",
+    row.names = 1,
+    check.names = FALSE
+  )
 
   ID89_mapped_from_476 <- read.delim(
     "89_mapped_from_476.tsv",
@@ -283,9 +284,11 @@ if (need_rds) {
     seq_len(nrow(connect_89_to_83)),
     function(i) {
       compute_sig_data(
-        type89_sig_id = connect_89_to_83$ID89_signature[i],
-        exemplar_id = connect_89_to_83$example_catalog[i],
-        ID83signature = connect_89_to_83$ID83_signature[i],
+        type89_sig_id = connect_89_to_83$InDel89[i],
+        exemplar_89 = connect_89_to_83$BestMatch89_1[i],
+        exemplar_83 = connect_89_to_83$BestMatch83_1[i],
+        exemplar_476 = connect_89_to_83$BestMatch476_1[i],
+        ID83signature = connect_89_to_83$InDel83[i],
         ID89_signatures = type89_sigs,
         ID89_catalogs = type89_spectra,
         ID83_signatures = type83_sigs,
@@ -302,11 +305,11 @@ if (need_rds) {
       )
     }
   )
-  names(all_sig_data) <- connect_89_to_83$ID89_signature
+  names(all_sig_data) <- connect_89_to_83$InDel89
 
   # Get plot paths (assume plots already exist in cache)
   message("Checking plot cache...")
-  cache_valid <- check_plot_cache(data_dir, plot_dir)
+  cache_valid <- check_plot_cache(data_dir, finalized_dir, plot_dir)
 
   if (cache_valid) {
     message("Using cached plots from: ", plot_dir)
@@ -331,7 +334,7 @@ if (need_rds) {
       min_ts_to_trigger = min_ts_to_trigger,
       n_workers = 10
     )
-    save_plot_cache(data_dir, plot_dir)
+    save_plot_cache(data_dir, finalized_dir, plot_dir)
   }
 
   # Save RDS files

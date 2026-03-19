@@ -5,10 +5,13 @@
 
 library(openxlsx)
 
-source("table_1_col_name_mapping.R")
+source(here::here("vignette/table_1_col_name_mapping.R"))
 
 # Read CSV
-df <- read.csv("prot_table_1.csv", stringsAsFactors = FALSE)
+df <- read.csv(
+  here::here("vignette/prot_table_1.csv"),
+  stringsAsFactors = FALSE
+)
 
 # Replace underscores with spaces in column names
 # names(df) <- gsub("_", " ", names(df))
@@ -207,6 +210,6 @@ footnote <- "** indicates that in the linking tumor's spectrum, insertions of si
 writeData(wb, 1, footnote, startRow = 51, startCol = 1)
 
 # Save workbook
-saveWorkbook(wb, "prot_table_1.xlsx", overwrite = TRUE)
+saveWorkbook(wb, here::here("vignette/prot_table_1.xlsx"), overwrite = TRUE)
 
-message("Saved prot_table_1.xlsx")
+message("Saved ", here::here("vignette/prot_table_1.xlsx"))
