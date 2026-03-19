@@ -66,7 +66,7 @@ finalized_dir <- file.path(data_dir, "Mo_CAP9_analysis", "finalized_cap9")
 COSMIC_min_cosine <- 0.9
 
 # Minimum cosine similarity to show matching Jin signatures
-Jin_min_cosine <- 0.
+Jin_min_cosine <- 0.9
 
 # Minimum cosine similarity to show matching Koh signatures
 koh_min_cosine <- 0.9
