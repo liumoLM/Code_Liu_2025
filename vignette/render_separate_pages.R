@@ -104,7 +104,7 @@ if (need_rds) {
   koh_min_cosine <- 0.9
   min_ts_to_trigger <- 0.15
 
-  finalized_dir <- file.path(data_dir, "Mo_CAP9_analysis", "Finalized result")
+  finalized_dir <- file.path(data_dir, "Mo_CAP9_analysis", "finalized_cap9")
 
   # Load connection file
   connect_89_to_83 <- read.delim(

@@ -1,5 +1,5 @@
 ---
-title: "Repertoire of insertion/deletion mutational signatures based on three classification schemes"
+title: "Unified repertoire of insertion/deletion mutational signatures based on three classification schemes"
 author:
   - Mo Liu
   - Mi Ni Huang
@@ -10,6 +10,7 @@ author:
   - Runxi Shen
   - Steven G. Rozen
 date: today
+date-format: "YYYY-MM-DD HH:mm"
 format:
   html:
     output-file: "repertoire_of_indel_mutational_signatures.html"
@@ -57,9 +58,9 @@ execute:
 # general the detection of changes is not perfect.
 # When in doubt regenerate the plots.
 # ======================================================
-REGENERATE_PLOTS <- T # FALSE
+REGENERATE_PLOTS <- FALSE
 data_dir <- here::here("Manuscript_data")
-finalized_dir <- file.path(data_dir, "Mo_CAP9_analysis", "Finalized result")
+finalized_dir <- file.path(data_dir, "Mo_CAP9_analysis", "finalized_cap9")
 
 # Minimum cosine similarity to show matching COSMIC signatures
 COSMIC_min_cosine <- 0.9
