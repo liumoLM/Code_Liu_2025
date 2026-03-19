@@ -807,7 +807,7 @@ plot_collapse_sankey <- function(result, min_flow = 0.001, title_prefix = "") {
 #' }
 collapse_all_476_to_83_matrix <- function(
   type476_sigs = read.delim(
-    "Manuscript_data/Mo_CAP9_analysis/Finalized result/liu_et_al_476_signatures.tsv",
+    "Manuscript_data/Mo_CAP9_analysis/finalized_cap9/liu_et_al_476_signatures.tsv",
     row.names = 1
   ),
   data_dir = "Manuscript_data",

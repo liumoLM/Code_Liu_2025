@@ -4,7 +4,7 @@ library(lsa)
 source(here::here("code", "find_best_match_spectra.R"))
 
 finalized_dir <- here::here(
-  "Manuscript_data", "Mo_CAP9_analysis", "Finalized result"
+  "Manuscript_data", "Mo_CAP9_analysis", "finalized_cap9"
 )
 
 # Read signature files (mutation types as rows, signatures as columns)
