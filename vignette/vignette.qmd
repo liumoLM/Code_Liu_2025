@@ -59,6 +59,7 @@ execute:
 # ======================================================
 REGENERATE_PLOTS <- T # FALSE
 data_dir <- here::here("Manuscript_data")
+finalized_dir <- file.path(data_dir, "Mo_CAP9_analysis", "Finalized result")
 
 # Minimum cosine similarity to show matching COSMIC signatures
 COSMIC_min_cosine <- 0.9
@@ -107,18 +108,9 @@ plot476_scale <- 1.2
 #| include: false
 
 connect_89_to_83 <- read.delim(
-  file.path(
-    data_dir,
-    "89type_to_83type_connection.tsv"
-  ),
-  sep = "\t"
-)
-colnames(connect_89_to_83) <- c(
-  "ID89_signature",
-  "example_catalog",
-  "ID83_signature",
-  "type746_signature_id",
-  "type476_where_extracted"
+  file.path(finalized_dir, "connection_table.tsv"),
+  sep = "\t",
+  check.names = FALSE
 )
 ```
 
@@ -127,10 +119,7 @@ colnames(connect_89_to_83) <- c(
 #| include: false
 
 type83_spectra <- read.delim(
-  file.path(
-    data_dir,
-    "Liu_et_al_83_type_spectra.tsv"
-  ),
+  file.path(finalized_dir, "liu_et_al_83_spectra.tsv"),
   sep = "\t",
   row.names = 1,
   check.names = FALSE
@@ -150,10 +139,7 @@ type83_spectra.no.polyT[c("DEL:T:1:5+", "INS:T:1:5+"), ] <- 0
 #| include: false
 
 type83_sigs <- read.delim(
-  file.path(
-    data_dir,
-    "Liu_et_al_final_83_type_signatures.tsv"
-  ),
+  file.path(finalized_dir, "liu_et_al_83_signatures.tsv"),
   sep = "\t",
   row.names = 1,
   check.names = FALSE
@@ -260,17 +246,18 @@ names(jin_matches) <- rownames(jin_cosine_matrix)
 #| include: false
 
 type89_sigs <- read.delim(
-  file.path(data_dir, "Liu_et_al_final_89_type_signatures.tsv"),
-  sep = '\t',
-  row.names = 1
+  file.path(finalized_dir, "liu_et_al_89_signatures.tsv"),
+  sep = "\t",
+  row.names = 1,
+  check.names = FALSE
 )
 
-
-type89_spectra <- as.data.frame(data.table::fread(
-  file.path(data_dir, "Liu_et_al_89_type_spectra.tsv")
-))
-row.names(type89_spectra) <- type89_spectra[, 1]
-type89_spectra <- type89_spectra[, -1]
+type89_spectra <- read.delim(
+  file.path(finalized_dir, "liu_et_al_89_spectra.tsv"),
+  sep = "\t",
+  row.names = 1,
+  check.names = FALSE
+)
 ```
 
 
@@ -325,12 +312,15 @@ names(koh_matches) <- rownames(koh_cosine_matrix)
 #| include: false
 
 ID89.mSigAct.assignment <- read.delim(
-  file.path(
-    data_dir,
-    "../Manuscript_data/Liu_et_al_89_type_signature_assignments.tsv"
-  ),
+  file.path(data_dir, "Liu_et_al_89_type_signature_assignments.tsv"),
   row.names = 1,
   check.names = FALSE
+)
+# Strip cancer-type prefix (e.g., "Breast::SP12345" -> "SP12345")
+colnames(ID89.mSigAct.assignment) <- sub(
+  "^.*::",
+  "",
+  colnames(ID89.mSigAct.assignment)
 )
 ```
 
@@ -338,20 +328,19 @@ ID89.mSigAct.assignment <- read.delim(
 #| label: setup5
 #| include: false
 
-type476_sigs <- as.data.frame(data.table::fread(
-  file.path(
-    data_dir,
-    "Liu_et_al_final_476_type_signatures.tsv"
-  )
-))
-row.names(type476_sigs) <- type476_sigs[, 1]
-type476_sigs <- type476_sigs[, -1]
+type476_sigs <- read.delim(
+  file.path(finalized_dir, "liu_et_al_476_signatures.tsv"),
+  sep = "\t",
+  row.names = 1,
+  check.names = FALSE
+)
 
-to.plot.all.ID476.catalogs <- as.data.frame(data.table::fread(
-  file.path(data_dir, "Liu_et_al_476_type_spectra.tsv")
-))
-row.names(to.plot.all.ID476.catalogs) <- to.plot.all.ID476.catalogs[, 1]
-to.plot.all.ID476.catalogs <- to.plot.all.ID476.catalogs[, -1]
+to.plot.all.ID476.catalogs <- read.delim(
+  file.path(finalized_dir, "liu_et_al_476_spectra.tsv"),
+  sep = "\t",
+  row.names = 1,
+  check.names = FALSE
+)
 ```
 
 ```{r}
@@ -360,7 +349,7 @@ to.plot.all.ID476.catalogs <- to.plot.all.ID476.catalogs[, -1]
 
 # Get functions to "collapse" 476 spectra or catalogs to
 # 89-type or 83-type spectra/catalogs
-source(here::here("code", "map_476_to_other.R"))
+source(here::here("code", "collapse_476_to_89.R"))
 
 # Load bipartite matching collapse function for 476-to-83 conversion
 source(here::here("code", "collapse_476_to_83.R"))
@@ -378,6 +367,7 @@ ID89_mapped_from_476 <- t476_to_89(type476_sigs)
 ID83_mapped_from_476 <- collapse_all_476_to_83_matrix(
   type476_sigs,
   data_dir = data_dir,
+  sig_dir = finalized_dir,
   store_flows = TRUE
 )
 
@@ -409,9 +399,11 @@ all_sig_data <- lapply(
   seq_len(nrow(connect_89_to_83)),
   function(i) {
     compute_sig_data(
-      type89_sig_id = connect_89_to_83$ID89_signature[i],
-      exemplar_id = connect_89_to_83$example_catalog[i],
-      ID83signature = connect_89_to_83$ID83_signature[i],
+      type89_sig_id = connect_89_to_83$InDel89[i],
+      exemplar_89 = connect_89_to_83$BestMatch89_1[i],
+      exemplar_83 = connect_89_to_83$BestMatch83_1[i],
+      exemplar_476 = connect_89_to_83$BestMatch476_1[i],
+      ID83signature = connect_89_to_83$InDel83[i],
       ID89_signatures = type89_sigs,
       ID89_catalogs = type89_spectra,
       ID83_signatures = type83_sigs,
@@ -430,7 +422,7 @@ all_sig_data <- lapply(
 )
 
 # Name the list for easier debugging
-names(all_sig_data) <- connect_89_to_83$ID89_signature
+names(all_sig_data) <- connect_89_to_83$InDel89
 ```
 
 ```{r}
@@ -512,7 +504,9 @@ sig_table2 <- sig_table %>%
     sig89_from_476_v_89_cos = cosine89_mapped,
 
     # compare sig89 to exemplar
-    exemplar_id,
+    exemplar_89,
+    exemplar_83,
+    exemplar_476,
     sig89_v_exemplar_cos = cosine89,
 
     # compare to Koh
@@ -521,10 +515,12 @@ sig_table2 <- sig_table %>%
 
     # compare sig476 to exemplar
     sig476_v_exemplar_cos = cosine476,
+    sig476_v_linking_cos = cosine476_linking,
 
     # type 83 section
     type83_sig_id = ID83signature,
     sig83_v_exemplar_cos = cosine83,
+    sig83_v_linking_cos = cosine83_linking,
     best_match_cosmic = best_cosmic_best_match,
     cosine_v_cosmic = best_cosmic_cosine,
     best_match_jin = best_jin_best_match,
@@ -532,10 +528,7 @@ sig_table2 <- sig_table %>%
 
     sig83_from_476_v_83_cos = cosine83_mapped,
 
-    is_polyT_removed #,
-    # is_insdel15_16,
-    #has_476_signature,
-    #has_83_signature
+    is_polyT_removed
   )
 
 write.csv(sig_table2, "prot_table_1.csv", row.names = FALSE)
@@ -564,7 +557,8 @@ create_overview_table(sig_table2)
 # To force regeneration: delete figure/parallel_plots/ or set REGENERATE_PLOTS <- TRtUE
 plot_dir <- "figure/parallel_plots"
 
-cache_valid <- check_plot_cache(data_dir, plot_dir) && !REGENERATE_PLOTS
+cache_valid <- check_plot_cache(data_dir, finalized_dir, plot_dir) &&
+  !REGENERATE_PLOTS
 
 if (cache_valid) {
   warning("Using cached plots from: ", plot_dir)
@@ -593,7 +587,7 @@ if (cache_valid) {
     collapse_flows = collapse_flows,
     n_workers = 10
   )
-  save_plot_cache(data_dir, plot_dir)
+  save_plot_cache(data_dir, finalized_dir, plot_dir)
   message("Plots generated and cache saved in: ", plot_dir)
 }
 ```

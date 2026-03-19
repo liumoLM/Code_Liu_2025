@@ -89,8 +89,12 @@ generate_r9plus_edges <- function() {
 collapse_476_to_83 <- function(
   sig_476_name,
   sig_83_name,
-  data_dir = "Manuscript_data"
+  data_dir = "Manuscript_data",
+  sig_dir = NULL
 ) {
+  # sig_dir: directory containing signature files; defaults to data_dir
+  if (is.null(sig_dir)) sig_dir <- data_dir
+
   # Load edges from unique_pairs.tsv
   # Column 1 (COSMIC_83) becomes b (target)
   # Column 2 (Koh_476) becomes a (source)
@@ -111,7 +115,7 @@ collapse_476_to_83 <- function(
   message(sprintf("Added %d edges for R(9,) types", nrow(r9_edges)))
 
   # Load 476-type signatures (supplies: cA)
-  sig_476_file <- file.path(data_dir, "Liu_et_al_final_476_type_signatures.tsv")
+  sig_476_file <- file.path(sig_dir, "liu_et_al_476_signatures.tsv")
   sig_476_df <- read.delim(sig_476_file, row.names = 1, check.names = FALSE)
 
   if (!sig_476_name %in% colnames(sig_476_df)) {
@@ -142,7 +146,7 @@ collapse_476_to_83 <- function(
   }
 
   # Load 83-type signatures (targets: tB)
-  sig_83_file <- file.path(data_dir, "Liu_et_al_final_83_type_signatures.tsv")
+  sig_83_file <- file.path(sig_dir, "liu_et_al_83_signatures.tsv")
   sig_83_df <- read.delim(sig_83_file, row.names = 1, check.names = FALSE)
 
   if (!sig_83_name %in% colnames(sig_83_df)) {
@@ -200,8 +204,8 @@ collapse_476_to_83 <- function(
 #' @return A data.frame with columns:
 #'   \item{sig_476}{476-type signature name (e.g., "InsDel1a")}
 #'   \item{sig_83}{Corresponding 83-type signature name (e.g., "C_ID1")}
-get_signature_mapping <- function(data_dir = "Manuscript_data") {
-  conn_file <- file.path(data_dir, "89type_to_83type_connection.tsv")
+get_signature_mapping <- function(sig_dir = "Manuscript_data") {
+  conn_file <- file.path(sig_dir, "connection_table.tsv")
   conn <- read.delim(conn_file, stringsAsFactors = FALSE)
 
   # The connection file maps InDel89 -> InDel83
@@ -803,17 +807,21 @@ plot_collapse_sankey <- function(result, min_flow = 0.001, title_prefix = "") {
 #' }
 collapse_all_476_to_83_matrix <- function(
   type476_sigs = read.delim(
-    "Manuscript_data/Liu_et_al_final_476_type_signatures.tsv",
+    "Manuscript_data/Mo_CAP9_analysis/Finalized result/liu_et_al_476_signatures.tsv",
     row.names = 1
   ),
   data_dir = "Manuscript_data",
+  sig_dir = NULL,
   store_flows = FALSE
 ) {
+  # sig_dir: directory containing signature files; defaults to data_dir
+  if (is.null(sig_dir)) sig_dir <- data_dir
+
   # Get the signature mapping (476/89-type name -> 83-type name)
-  mapping <- get_signature_mapping(data_dir)
+  mapping <- get_signature_mapping(sig_dir)
 
   # Load 83-type signatures to get row names and check availability
-  sig_83_file <- file.path(data_dir, "Liu_et_al_final_83_type_signatures.tsv")
+  sig_83_file <- file.path(sig_dir, "liu_et_al_83_signatures.tsv")
   sig_83_df <- read.delim(sig_83_file, row.names = 1, check.names = FALSE)
   available_83 <- colnames(sig_83_df)
   row_names_83 <- rownames(sig_83_df)
@@ -840,7 +848,7 @@ collapse_all_476_to_83_matrix <- function(
       message(sprintf("Collapsing %s -> %s", sig_476, sig_83))
       tryCatch(
         {
-          collapse_result <- collapse_476_to_83(sig_476, sig_83, data_dir)
+          collapse_result <- collapse_476_to_83(sig_476, sig_83, data_dir, sig_dir)
 
           # Add collapsed signature to matrix
           col_name <- paste0(sig_476, "_converted")

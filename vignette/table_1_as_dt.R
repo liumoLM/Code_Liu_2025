@@ -20,8 +20,7 @@ create_overview_table <- function(sig_table) {
   # Remove the last column
   df <- df[, -ncol(df)]
 
-  # Clean up exemplar_id: remove everything up to and including '::'
-  df$exemplar_id <- sub(".*::", "", df$exemplar_id)
+  # exemplar columns already have plain sample IDs (no prefix to strip)
 
   # Clean up best_match_jin: remove 'jin' prefix
   df$best_match_jin <- sub("^jin", "", df$best_match_jin)
