@@ -64,33 +64,46 @@ stopifnot(
 # each of the three spectra files.  The 83-type lookup uses the mapped 83-type
 # signature vector; 89 and 476 use their own signature vectors.
 n <- 3
+min_mutations <- 30
 
 build_row <- function(idx) {
   name89 <- sig89_names[idx]
   name83 <- sig83_names[idx]
 
   top83  <- find_top_n_match_names(
-    sigs_83[, name83, drop = FALSE], spectra_83_path, n = n
+    sigs_83[, name83, drop = FALSE], spectra_83_path,
+    n = n, min_mutations = min_mutations
   )
   top89  <- find_top_n_match_names(
-    sigs_89[, name89, drop = FALSE], spectra_89_path, n = n
+    sigs_89[, name89, drop = FALSE], spectra_89_path,
+    n = n, min_mutations = min_mutations
   )
   top476 <- find_top_n_match_names(
-    sigs_476[, name89, drop = FALSE], spectra_476_path, n = n
+    sigs_476[, name89, drop = FALSE], spectra_476_path,
+    n = n, min_mutations = min_mutations
   )
 
   data.frame(
-    InDel89       = name89,
-    InDel83       = name83,
-    BestMatch83_1 = top83[1, 1],
-    BestMatch83_2 = top83[1, 2],
-    BestMatch83_3 = top83[1, 3],
-    BestMatch89_1 = top89[1, 1],
-    BestMatch89_2 = top89[1, 2],
-    BestMatch89_3 = top89[1, 3],
-    BestMatch476_1 = top476[1, 1],
-    BestMatch476_2 = top476[1, 2],
-    BestMatch476_3 = top476[1, 3],
+    InDel89        = name89,
+    InDel83        = name83,
+    BestMatch83_1  = top83$names[1, 1],
+    CosSim83_1     = top83$cosines[1, 1],
+    BestMatch83_2  = top83$names[1, 2],
+    CosSim83_2     = top83$cosines[1, 2],
+    BestMatch83_3  = top83$names[1, 3],
+    CosSim83_3     = top83$cosines[1, 3],
+    BestMatch89_1  = top89$names[1, 1],
+    CosSim89_1     = top89$cosines[1, 1],
+    BestMatch89_2  = top89$names[1, 2],
+    CosSim89_2     = top89$cosines[1, 2],
+    BestMatch89_3  = top89$names[1, 3],
+    CosSim89_3     = top89$cosines[1, 3],
+    BestMatch476_1 = top476$names[1, 1],
+    CosSim476_1    = top476$cosines[1, 1],
+    BestMatch476_2 = top476$names[1, 2],
+    CosSim476_2    = top476$cosines[1, 2],
+    BestMatch476_3 = top476$names[1, 3],
+    CosSim476_3    = top476$cosines[1, 3],
     stringsAsFactors = FALSE
   )
 }
