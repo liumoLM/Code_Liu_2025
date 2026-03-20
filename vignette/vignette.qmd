@@ -9,7 +9,7 @@ author:
   - Ying Yang
   - Runxi Shen
   - Steven G. Rozen
-date: today
+date: now
 date-format: "YYYY-MM-DD HH:mm"
 format:
   html:

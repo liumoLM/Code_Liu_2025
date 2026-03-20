@@ -50,6 +50,27 @@ for (koh_val in unique_koh) {
   }
 }
 
+# Handle best_match_jin duplicates: add asterisk to best match, track non-best for graying
+best_jin_col <- which(names(df) == "best_match_jin")
+cos_jin_col <- which(names(df) == "cosine_v_jin")
+
+jin_values <- df$`best_match_jin`
+jin_non_na_idx <- which(!is.na(jin_values))
+
+jin_rows_to_gray <- c()
+
+unique_jin <- unique(jin_values[jin_non_na_idx])
+for (jin_val in unique_jin) {
+  matching_rows <- which(jin_values == jin_val)
+  if (length(matching_rows) > 1) {
+    cos_vals <- df$`cosine_v_jin`[matching_rows]
+    best_idx <- matching_rows[which.max(cos_vals)]
+    non_best_idx <- setdiff(matching_rows, best_idx)
+    df$`best_match_jin`[best_idx] <- paste0(df$`best_match_jin`[best_idx], "*")
+    jin_rows_to_gray <- c(jin_rows_to_gray, non_best_idx)
+  }
+}
+
 # Create workbook and worksheet
 wb <- createWorkbook()
 addWorksheet(wb, "Table 1")
@@ -126,6 +147,37 @@ if (length(rows_to_gray) > 0) {
       grayNumericStyle,
       rows = excel_row,
       cols = cos_koh_col,
+      stack = TRUE
+    )
+  }
+}
+
+# Apply gray style to non-best duplicate rows for best_match_jin and cosine_v_jin columns
+if (length(jin_rows_to_gray) > 0) {
+  grayStyle <- createStyle(fontColour = "#B0B0B0", halign = "center")
+  grayNumericStyle <- createStyle(
+    fontColour = "#B0B0B0",
+    numFmt = "0.0000",
+    halign = "center"
+  )
+  for (row_idx in jin_rows_to_gray) {
+    excel_row <- row_idx + 1 # Add 1 for header row
+    # Gray out best_match_jin (text column)
+    addStyle(
+      wb,
+      1,
+      grayStyle,
+      rows = excel_row,
+      cols = best_jin_col,
+      stack = TRUE
+    )
+    # Gray out cosine_v_jin (numeric column)
+    addStyle(
+      wb,
+      1,
+      grayNumericStyle,
+      rows = excel_row,
+      cols = cos_jin_col,
       stack = TRUE
     )
   }

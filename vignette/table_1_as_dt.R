@@ -25,8 +25,9 @@ create_overview_table <- function(sig_table) {
   # Clean up best_match_jin: remove 'jin' prefix
   df$best_match_jin <- sub("^jin", "", df$best_match_jin)
 
-  # Round cos_v_koh first (before any HTML wrapping)
+  # Round cos_v_koh and cosine_v_jin first (before any HTML wrapping)
   df$cos_v_koh <- round(df$cos_v_koh, 4)
+  df$cosine_v_jin <- round(df$cosine_v_jin, 4)
 
   # Handle best_match_koh duplicates: mark best match with asterisk, gray out non-best
   koh_values <- df$best_match_koh
@@ -55,6 +56,33 @@ create_overview_table <- function(sig_table) {
     )
     df$cos_v_koh[rows_to_gray] <- paste0(
       '<span style="color: #B0B0B0;">', df$cos_v_koh[rows_to_gray], '</span>'
+    )
+  }
+
+  # Handle best_match_jin duplicates: mark best match with asterisk, gray out non-best
+  jin_values <- df$best_match_jin
+  jin_non_na_idx <- which(!is.na(jin_values))
+  jin_rows_to_gray <- c()
+
+  unique_jin <- unique(jin_values[jin_non_na_idx])
+  for (jin_val in unique_jin) {
+    matching_rows <- which(jin_values == jin_val)
+    if (length(matching_rows) > 1) {
+      cos_vals <- df$cosine_v_jin[matching_rows]
+      best_idx <- matching_rows[which.max(cos_vals)]
+      non_best_idx <- setdiff(matching_rows, best_idx)
+      df$best_match_jin[best_idx] <- paste0(df$best_match_jin[best_idx], "*")
+      jin_rows_to_gray <- c(jin_rows_to_gray, non_best_idx)
+    }
+  }
+
+  # Gray out non-best duplicate rows for best_match_jin and cosine_v_jin
+  if (length(jin_rows_to_gray) > 0) {
+    df$best_match_jin[jin_rows_to_gray] <- paste0(
+      '<span style="color: #B0B0B0;">', df$best_match_jin[jin_rows_to_gray], '</span>'
+    )
+    df$cosine_v_jin[jin_rows_to_gray] <- paste0(
+      '<span style="color: #B0B0B0;">', df$cosine_v_jin[jin_rows_to_gray], '</span>'
     )
   }
 
