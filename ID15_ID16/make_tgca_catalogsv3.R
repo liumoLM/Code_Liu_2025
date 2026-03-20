@@ -23,11 +23,19 @@ getannotvcf = function(tcgaid) {
   return(b2)
 }
 
-vvv = getannotvcf("TCGA-13-0889-01A-01W-0420-08")
+tcgaid <- "TCGA-13-0889-01A-01W-0420-08"
+vvv = getannotvcf(tcgaid)
 vv = vvv$annotated.vcf
 
 vv |>
   count(ins_or_del, short_visual) |>
   arrange(desc(n))
 
-ICAMS::annot_vcf_to_83_catalog(vv)
+t83 <- ICAMS::annot_vcf_to_83_catalog(vv, sample_id = tcgaid)
+t89 <- ICAMS::annot_vcf_to_89_catalog(vv, sample_id = tcgaid)
+t476 <- ICAMS::annot_vcf_to_476_catalog(vv, sample_id = tcgaid)
+
+mydir <- here::here("ID15_ID16/correct_id16_spectra")
+write.table(t83, file.path(mydir, glue::glue("{tcgaid}_83.tsv")), sep = '\t')
+write.table(t89, file.path(mydir, glue::glue("{tcgaid}_89.tsv")), sep = '\t')
+write.table(t476, file.path(mydir, glue::glue("{tcgaid}_476.tsv")), sep = '\t')
