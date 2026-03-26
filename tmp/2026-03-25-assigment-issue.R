@@ -133,3 +133,55 @@ spec_plot <- mSigPlot::plot_89(
   )
 )
 gridExtra::grid.arrange(sig_plot, spec_plot, ncol = 1)
+
+# ============================================================
+# Problem 4: InsDel_B — exemplar CPCT02020413T
+# ============================================================
+
+cat("\n\n=== InsDel_B: exemplar CPCT02020413T ===\n")
+
+exemplar_B <- "CPCT02020413T"
+tsig = "InsDel_B"
+
+# Cosine similarity
+cos_B <- cosine(
+  as.numeric(sigs_89[, tsig]),
+  as.numeric(spectra_89[, exemplar_B])
+)
+cat(
+  "Cosine similarity (InsDel_B sig vs",
+  exemplar_B,
+  "spectrum):",
+  cos_B,
+  "\n\n"
+)
+
+# Assignment for this exemplar
+cat("Assignments for", exemplar_B, ":\n")
+a_b <- assign_89[, exemplar_2a]
+names(a_b) <- rownames(assign_89)
+print(a_b[a_b > 0])
+cat("Total assigned:", sum(a_b), "\n")
+cat("Spectra total:", sum(spectra_89[, exemplar_B]), "\n")
+cat(
+  "InsDel_B assigned:",
+  a_b[tsig],
+  sprintf("(%.1f%%)\n", 100 * a_b[tsig] / sum(a_b))
+)
+
+# Plot signature and exemplar spectrum
+
+sig_plot <- mSigPlot::plot_89(
+  sigs_89[, tsig, drop = FALSE],
+  plot_title = paste(tsig, "signature")
+)
+spec_plot <- mSigPlot::plot_89(
+  spectra_89[, exemplar_B, drop = FALSE],
+  plot_title = paste0(
+    exemplar_B,
+    " spectrum (cosine = ",
+    format(cos_B, digits = 4),
+    ")"
+  )
+)
+gridExtra::grid.arrange(sig_plot, spec_plot, ncol = 1)

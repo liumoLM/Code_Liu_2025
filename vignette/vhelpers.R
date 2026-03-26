@@ -212,6 +212,17 @@ compute_sig_data <- function(
       # Get assignment for this catalog, filtered to common signatures
       assignment <- assignment_matrix[common_sigs, exemplar_89, drop = FALSE]
 
+      # Workaround for assignments in which the number of mutations is doubled:
+      # check if assignment total is approx 2x the spectrum total; if so, halve it
+      spectrum_total <- sum(ID89_catalogs[, exemplar_89])
+      assignment_total <- sum(assignment)
+      if (spectrum_total > 0) {
+        ratio <- assignment_total / spectrum_total
+        if (ratio > 1.8 && ratio < 2.2) {
+          assignment <- assignment / 2
+        }
+      }
+
       # Check if this signature (or its alias) is in common_sigs
       sigid <- type89_sig_id
       if (!(sigid %in% common_sigs)) {
