@@ -28,7 +28,6 @@ source("vhelpers.R")
 
 # Data directory
 data_dir <- "../Manuscript_data/"
-finalized_dir <- file.path(data_dir, "Mo_CAP9_analysis", "finalized_cap9")
 ```
 
 ```{r}
