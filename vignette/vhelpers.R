@@ -1,10 +1,35 @@
 # Helper functions for vignette.Rmd
 # These functions separate computation from plotting for easier debugging
 
-source("plot_83_w_wout_t.R")
+source(here::here("vignette", "plot_83_w_wout_t.R"))
 
 # Source collapse functions for Sankey plot generation
 source(here::here("code", "collapse_476_to_83.R"))
+
+# Global path to finalized data directory
+finalized_dir <- here::here("Manuscript_data", "Mo_CAP9_analysis", "finalized_cap9")
+
+# Named paths to finalized data files
+finalized_files <- c(
+  "89_assignment"    = file.path(finalized_dir, "liu_et_al_89_assignment.tsv"),
+  "89_signatures"    = file.path(finalized_dir, "liu_et_al_89_signatures.tsv"),
+  "89_spectra"       = file.path(finalized_dir, "liu_et_al_89_spectra.tsv"),
+  "83_signatures"    = file.path(finalized_dir, "liu_et_al_83_signatures.tsv"),
+  "83_spectra"       = file.path(finalized_dir, "liu_et_al_83_spectra.tsv"),
+  "476_signatures"   = file.path(finalized_dir, "liu_et_al_476_signatures.tsv"),
+  "476_spectra"      = file.path(finalized_dir, "liu_et_al_476_spectra.tsv"),
+  "connection_table" = file.path(finalized_dir, "connection_table.tsv")
+)
+
+#' Read a finalized data file
+#'
+#' @param name Short name from `finalized_files` (e.g. "83_spectra").
+#' @return Data frame with row names from first column.
+read_finalized <- function(name, row.names = 1) {
+  path <- finalized_files[[name]]
+  if (is.null(path)) stop("Unknown finalized file: ", name)
+  read.delim(path, sep = "\t", row.names = row.names, check.names = FALSE)
+}
 
 #' Format signature name with Greek letters
 #'
@@ -1001,7 +1026,6 @@ generate_all_plots_parallel <- function(
 #' @return Logical: TRUE if cache is valid, FALSE if regeneration needed
 check_plot_cache <- function(
   data_dir,
-  finalized_dir,
   plot_dir,
   cache_file = "plot_cache_hash.rds"
 ) {
@@ -1009,22 +1033,12 @@ check_plot_cache <- function(
 
   # Source files in data_dir that plots depend on
   data_files <- file.path(data_dir, c(
-    "Liu_et_al_89_type_signature_assignments.tsv",
     "COSMIC_v3.5_ID_GRCh37_signatures.tsv",
     "jin_2024_sup_tab_1_signatures.tsv",
     "Koh_signatures.tsv"
   ))
 
-  # Source files in finalized_dir
-  finalized_files <- file.path(finalized_dir, c(
-    "liu_et_al_89_signatures.tsv",
-    "liu_et_al_89_spectra.tsv",
-    "liu_et_al_83_signatures.tsv",
-    "liu_et_al_83_spectra.tsv",
-    "liu_et_al_476_signatures.tsv",
-    "liu_et_al_476_spectra.tsv",
-    "connection_table.tsv"
-  ))
+  # finalized_files is a global named vector defined at top of file
 
   # Files in vignette directory that affect plotting
   vignette_files <- c(
@@ -1071,28 +1085,17 @@ check_plot_cache <- function(
 #' @param cache_file Name of the cache hash file
 save_plot_cache <- function(
   data_dir,
-  finalized_dir,
   plot_dir,
   cache_file = "plot_cache_hash.rds"
 ) {
   # Source files in data_dir
   data_files <- file.path(data_dir, c(
-    "Liu_et_al_89_type_signature_assignments.tsv",
     "COSMIC_v3.5_ID_GRCh37_signatures.tsv",
     "jin_2024_sup_tab_1_signatures.tsv",
     "Koh_signatures.tsv"
   ))
 
-  # Source files in finalized_dir
-  finalized_files <- file.path(finalized_dir, c(
-    "liu_et_al_89_signatures.tsv",
-    "liu_et_al_89_spectra.tsv",
-    "liu_et_al_83_signatures.tsv",
-    "liu_et_al_83_spectra.tsv",
-    "liu_et_al_476_signatures.tsv",
-    "liu_et_al_476_spectra.tsv",
-    "connection_table.tsv"
-  ))
+  # finalized_files is a global named vector defined at top of file
 
   # Files in vignette directory that affect plotting
   vignette_files <- c(

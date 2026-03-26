@@ -44,6 +44,8 @@ execute:
   message: false
 ---
 
+Source file:  `r knitr::current_input(dir = TRUE)`
+
 ```{r}
 #| label: key-params
 #| include: false
@@ -60,7 +62,6 @@ execute:
 # ======================================================
 REGENERATE_PLOTS <- FALSE
 data_dir <- here::here("Manuscript_data")
-finalized_dir <- file.path(data_dir, "Mo_CAP9_analysis", "finalized_cap9")
 
 # Minimum cosine similarity to show matching COSMIC signatures
 COSMIC_min_cosine <- 0.9
@@ -102,29 +103,23 @@ source("ppar.R")
 
 # Scale factor for 476-type plots (1.0 = default, 1.4 = 40% bigger)
 plot476_scale <- 1.2
+
+# Load helper functions for modular processing
+source(here::here("vignette", "vhelpers.R"))
 ```
 
 ```{r}
 #| label: get-data-1
 #| include: false
 
-connect_89_to_83 <- read.delim(
-  file.path(finalized_dir, "connection_table.tsv"),
-  sep = "\t",
-  check.names = FALSE
-)
+connect_89_to_83 <- read_finalized("connection_table", row.names = NULL)
 ```
 
 ```{r}
 #| label: get-data-2-a
 #| include: false
 
-type83_spectra <- read.delim(
-  file.path(finalized_dir, "liu_et_al_83_spectra.tsv"),
-  sep = "\t",
-  row.names = 1,
-  check.names = FALSE
-)
+type83_spectra <- read_finalized("83_spectra")
 ```
 
 ```{r}
@@ -139,12 +134,7 @@ type83_spectra.no.polyT[c("DEL:T:1:5+", "INS:T:1:5+"), ] <- 0
 #| label: get-data-3
 #| include: false
 
-type83_sigs <- read.delim(
-  file.path(finalized_dir, "liu_et_al_83_signatures.tsv"),
-  sep = "\t",
-  row.names = 1,
-  check.names = FALSE
-)
+type83_sigs <- read_finalized("83_signatures")
 
 ```
 
@@ -246,19 +236,9 @@ names(jin_matches) <- rownames(jin_cosine_matrix)
 #| label: setup3
 #| include: false
 
-type89_sigs <- read.delim(
-  file.path(finalized_dir, "liu_et_al_89_signatures.tsv"),
-  sep = "\t",
-  row.names = 1,
-  check.names = FALSE
-)
+type89_sigs <- read_finalized("89_signatures")
 
-type89_spectra <- read.delim(
-  file.path(finalized_dir, "liu_et_al_89_spectra.tsv"),
-  sep = "\t",
-  row.names = 1,
-  check.names = FALSE
-)
+type89_spectra <- read_finalized("89_spectra")
 ```
 
 
@@ -312,36 +292,16 @@ names(koh_matches) <- rownames(koh_cosine_matrix)
 #| label: setup4
 #| include: false
 
-ID89.mSigAct.assignment <- read.delim(
-  file.path(data_dir, "Liu_et_al_89_type_signature_assignments.tsv"),
-  row.names = 1,
-  check.names = FALSE
-)
-# Strip cancer-type prefix (e.g., "Breast::SP12345" -> "SP12345")
-colnames(ID89.mSigAct.assignment) <- sub(
-  "^.*::",
-  "",
-  colnames(ID89.mSigAct.assignment)
-)
+ID89.mSigAct.assignment <- read_finalized("89_assignment")
 ```
 
 ```{r}
 #| label: setup5
 #| include: false
 
-type476_sigs <- read.delim(
-  file.path(finalized_dir, "liu_et_al_476_signatures.tsv"),
-  sep = "\t",
-  row.names = 1,
-  check.names = FALSE
-)
+type476_sigs <- read_finalized("476_signatures")
 
-to.plot.all.ID476.catalogs <- read.delim(
-  file.path(finalized_dir, "liu_et_al_476_spectra.tsv"),
-  sep = "\t",
-  row.names = 1,
-  check.names = FALSE
-)
+to.plot.all.ID476.catalogs <- read_finalized("476_spectra")
 ```
 
 ```{r}
@@ -367,8 +327,6 @@ ID89_mapped_from_476 <- t476_to_89(type476_sigs)
 # This uses optimal redistribution to minimize squared error vs target 83-type sig
 ID83_mapped_from_476 <- collapse_all_476_to_83_matrix(
   type476_sigs,
-  data_dir = data_dir,
-  sig_dir = finalized_dir,
   store_flows = TRUE
 )
 
@@ -379,14 +337,6 @@ collapse_cosine_sims <- attr(ID83_mapped_from_476, "cosine_similarities")
 
 # Extract flows for Sankey plot generation
 collapse_flows <- attr(ID83_mapped_from_476, "flows")
-```
-
-```{r}
-#| label: load-helpers
-#| include: false
-
-# Load helper functions for modular processing
-source(here::here("vignette", "vhelpers.R"))
 ```
 
 ```{r}
@@ -558,7 +508,7 @@ create_overview_table(sig_table2)
 # To force regeneration: delete figure/parallel_plots/ or set REGENERATE_PLOTS <- TRtUE
 plot_dir <- "figure/parallel_plots"
 
-cache_valid <- check_plot_cache(data_dir, finalized_dir, plot_dir) &&
+cache_valid <- check_plot_cache(data_dir, plot_dir) &&
   !REGENERATE_PLOTS
 
 if (cache_valid) {
@@ -588,7 +538,7 @@ if (cache_valid) {
     collapse_flows = collapse_flows,
     n_workers = 10
   )
-  save_plot_cache(data_dir, finalized_dir, plot_dir)
+  save_plot_cache(data_dir, plot_dir)
   message("Plots generated and cache saved in: ", plot_dir)
 }
 ```

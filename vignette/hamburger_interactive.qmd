@@ -43,7 +43,10 @@ assignments_648 <- read.delim(
   check.names = FALSE
 )
 
-# Load additional assignment files for decomposition view
+# WARNING: This assignment file is out of date.
+# The current 89-type assignments are in
+# Manuscript_data/Mo_CAP9_analysis/finalized_cap9/liu_et_al_89_assignment.tsv
+# and can be read via read_89_type_assignments() from vhelpers.R.
 assignments_89 <- read.delim(
   file.path(
     data_dir,

@@ -2,29 +2,17 @@ library(here)
 library(lsa)
 
 source(here::here("code", "find_best_match_spectra.R"))
-
-finalized_dir <- here::here(
-  "Manuscript_data", "Mo_CAP9_analysis", "finalized_cap9"
-)
+source(here::here("vignette", "vhelpers.R"))
 
 # Read signature files (mutation types as rows, signatures as columns)
-sigs_83 <- as.matrix(read.table(
-  file.path(finalized_dir, "liu_et_al_83_signatures.tsv"),
-  header = TRUE, sep = "\t", row.names = 1, check.names = FALSE
-))
-sigs_89 <- as.matrix(read.table(
-  file.path(finalized_dir, "liu_et_al_89_signatures.tsv"),
-  header = TRUE, sep = "\t", row.names = 1, check.names = FALSE
-))
-sigs_476 <- as.matrix(read.table(
-  file.path(finalized_dir, "liu_et_al_476_signatures.tsv"),
-  header = TRUE, sep = "\t", row.names = 1, check.names = FALSE
-))
+sigs_83  <- as.matrix(read_finalized("83_signatures"))
+sigs_89  <- as.matrix(read_finalized("89_signatures"))
+sigs_476 <- as.matrix(read_finalized("476_signatures"))
 
 # Spectra file paths
-spectra_83_path  <- file.path(finalized_dir, "liu_et_al_83_spectra.tsv")
-spectra_89_path  <- file.path(finalized_dir, "liu_et_al_89_spectra.tsv")
-spectra_476_path <- file.path(finalized_dir, "liu_et_al_476_spectra.tsv")
+spectra_83_path  <- finalized_files[["83_spectra"]]
+spectra_89_path  <- finalized_files[["89_spectra"]]
+spectra_476_path <- finalized_files[["476_spectra"]]
 
 # Map an 89/476-type signature name to the corresponding 83-type name.
 # Numeric series: InsDel{N}[a-z]? -> C_ID{N}  (e.g. InsDel1a, InsDel4 -> C_ID1, C_ID4)
@@ -110,7 +98,7 @@ build_row <- function(idx) {
 
 connection <- do.call(rbind, lapply(seq_along(sig89_names), build_row))
 
-out_path <- file.path(finalized_dir, "connection_table.tsv")
+out_path <- finalized_files[["connection_table"]]
 write.table(
   connection,
   out_path,
