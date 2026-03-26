@@ -5,10 +5,13 @@
 
 library(openxlsx)
 
-source("table_1_col_name_mapping.R")
+source(here::here("vignette/table_1_col_name_mapping.R"))
 
 # Read CSV
-df <- read.csv("prot_table_1.csv", stringsAsFactors = FALSE)
+df <- read.csv(
+  here::here("vignette/prot_table_1.csv"),
+  stringsAsFactors = FALSE
+)
 
 # Replace underscores with spaces in column names
 # names(df) <- gsub("_", " ", names(df))
@@ -44,6 +47,27 @@ for (koh_val in unique_koh) {
     df$`best_match_koh`[best_idx] <- paste0(df$`best_match_koh`[best_idx], "*")
     # Track non-best rows for graying
     rows_to_gray <- c(rows_to_gray, non_best_idx)
+  }
+}
+
+# Handle best_match_jin duplicates: add asterisk to best match, track non-best for graying
+best_jin_col <- which(names(df) == "best_match_jin")
+cos_jin_col <- which(names(df) == "cosine_v_jin")
+
+jin_values <- df$`best_match_jin`
+jin_non_na_idx <- which(!is.na(jin_values))
+
+jin_rows_to_gray <- c()
+
+unique_jin <- unique(jin_values[jin_non_na_idx])
+for (jin_val in unique_jin) {
+  matching_rows <- which(jin_values == jin_val)
+  if (length(matching_rows) > 1) {
+    cos_vals <- df$`cosine_v_jin`[matching_rows]
+    best_idx <- matching_rows[which.max(cos_vals)]
+    non_best_idx <- setdiff(matching_rows, best_idx)
+    df$`best_match_jin`[best_idx] <- paste0(df$`best_match_jin`[best_idx], "*")
+    jin_rows_to_gray <- c(jin_rows_to_gray, non_best_idx)
   }
 }
 
@@ -128,6 +152,37 @@ if (length(rows_to_gray) > 0) {
   }
 }
 
+# Apply gray style to non-best duplicate rows for best_match_jin and cosine_v_jin columns
+if (length(jin_rows_to_gray) > 0) {
+  grayStyle <- createStyle(fontColour = "#B0B0B0", halign = "center")
+  grayNumericStyle <- createStyle(
+    fontColour = "#B0B0B0",
+    numFmt = "0.0000",
+    halign = "center"
+  )
+  for (row_idx in jin_rows_to_gray) {
+    excel_row <- row_idx + 1 # Add 1 for header row
+    # Gray out best_match_jin (text column)
+    addStyle(
+      wb,
+      1,
+      grayStyle,
+      rows = excel_row,
+      cols = best_jin_col,
+      stack = TRUE
+    )
+    # Gray out cosine_v_jin (numeric column)
+    addStyle(
+      wb,
+      1,
+      grayNumericStyle,
+      rows = excel_row,
+      cols = cos_jin_col,
+      stack = TRUE
+    )
+  }
+}
+
 # Calculate column widths based on data only (rows 2-48), not headers
 col_widths <- sapply(1:ncol(df), function(col) {
   if (col %in% numeric_cols) {
@@ -207,6 +262,6 @@ footnote <- "** indicates that in the linking tumor's spectrum, insertions of si
 writeData(wb, 1, footnote, startRow = 51, startCol = 1)
 
 # Save workbook
-saveWorkbook(wb, "prot_table_1.xlsx", overwrite = TRUE)
+saveWorkbook(wb, here::here("vignette/prot_table_1.xlsx"), overwrite = TRUE)
 
-message("Saved prot_table_1.xlsx")
+message("Saved ", here::here("vignette/prot_table_1.xlsx"))

@@ -6,6 +6,7 @@ library(lsa)
 library(plotly)
 
 source(here::here("code", "collapse_476_to_89.R"))
+source(here::here("code", "find_best_match_spectra.R"))
 
 # Colors for source groups
 dendro2_colors <- c(
@@ -62,30 +63,6 @@ rename_sigs2 <- function(file_path) {
   source_group <- paste0(cap, ".", dataset)
   attr(sigs, "source_group") <- source_group
   sigs
-}
-
-#' Find the best-matching spectrum for each signature from a catalog
-#'
-#' @param signatures Matrix with 89 rows (mutation types) x N signature columns
-#' @param catalog_path Path to a TSV catalog file (mutation types as rows, samples as columns)
-#' @return Subset of the catalog containing only the unique best-match columns (raw counts)
-find_best_match_spectra <- function(signatures, catalog_path) {
-  catalog <- read.table(
-    catalog_path,
-    header = TRUE,
-    sep = "\t",
-    row.names = 1,
-    check.names = FALSE
-  )
-  cat_mat <- as.matrix(catalog)
-  best_samples <- character(0)
-  for (i in seq_len(ncol(signatures))) {
-    sig_vec <- signatures[, i]
-    cos_sims <- apply(cat_mat, 2, function(x) lsa::cosine(sig_vec, x))
-    best_samples <- c(best_samples, names(which.max(cos_sims)))
-  }
-  unique_samples <- unique(best_samples)
-  catalog[, unique_samples, drop = FALSE]
 }
 
 #' Strip CancerType:: prefix from sample names

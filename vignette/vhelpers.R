@@ -1,10 +1,35 @@
 # Helper functions for vignette.Rmd
 # These functions separate computation from plotting for easier debugging
 
-source("plot_83_w_wout_t.R")
+source(here::here("vignette", "plot_83_w_wout_t.R"))
 
 # Source collapse functions for Sankey plot generation
 source(here::here("code", "collapse_476_to_83.R"))
+
+# Global path to finalized data directory
+finalized_dir <- here::here("Manuscript_data", "Mo_CAP9_analysis", "finalized_cap9")
+
+# Named paths to finalized data files
+finalized_files <- c(
+  "89_assignment"    = file.path(finalized_dir, "liu_et_al_89_assignment.tsv"),
+  "89_signatures"    = file.path(finalized_dir, "liu_et_al_89_signatures.tsv"),
+  "89_spectra"       = file.path(finalized_dir, "liu_et_al_89_spectra.tsv"),
+  "83_signatures"    = file.path(finalized_dir, "liu_et_al_83_signatures.tsv"),
+  "83_spectra"       = file.path(finalized_dir, "liu_et_al_83_spectra.tsv"),
+  "476_signatures"   = file.path(finalized_dir, "liu_et_al_476_signatures.tsv"),
+  "476_spectra"      = file.path(finalized_dir, "liu_et_al_476_spectra.tsv"),
+  "connection_table" = file.path(finalized_dir, "connection_table.tsv")
+)
+
+#' Read a finalized data file
+#'
+#' @param name Short name from `finalized_files` (e.g. "83_spectra").
+#' @return Data frame with row names from first column.
+read_finalized <- function(name, row.names = 1) {
+  path <- finalized_files[[name]]
+  if (is.null(path)) stop("Unknown finalized file: ", name)
+  read.delim(path, sep = "\t", row.names = row.names, check.names = FALSE)
+}
 
 #' Format signature name with Greek letters
 #'
@@ -70,7 +95,10 @@ find_sig_txt <- function(sig_id) {
 #' Compute cosine similarities for a signature-catalog pair
 #'
 #' @param type89_sig_id Character: the ID89 signature name
-#' @param exemplar_id Character: the identifier of the linking tumor
+#' @param exemplar_89 Character: the BestMatch89_1 linking tumor ID
+#' @param exemplar_83 Character: the BestMatch83_1 linking tumor ID
+#' @param exemplar_476 Character: the BestMatch476_1 linking tumor ID
+#' @param ID83signature Character: the corresponding ID83 signature name
 #' @param ID89_signatures Data frame of ID89 signatures
 #' @param ID89_catalogs Data frame of ID89 catalogs
 #' @param ID83_signatures ICAMS catalog of ID83 signatures
@@ -78,7 +106,6 @@ find_sig_txt <- function(sig_id) {
 #' @param ID83_catalogs_no_polyT ICAMS catalog with polyT removed
 #' @param ID476_signatures Data frame of ID476 signatures
 #' @param ID476_catalogs Data frame of ID476 catalogs
-#' @param ID83signature Character: the corresponding ID83 signature name
 #' @param assignment_matrix Data frame of signature assignments
 #' @param cosmic_matches Named list of data frames with COSMIC signature matches
 #' @param jin_matches Named list of data frames with Jin signature matches
@@ -86,7 +113,9 @@ find_sig_txt <- function(sig_id) {
 #' @return List with cosine similarities and intermediate data
 compute_sig_data <- function(
   type89_sig_id,
-  exemplar_id,
+  exemplar_89,
+  exemplar_83,
+  exemplar_476,
   ID83signature,
   ID89_signatures,
   ID89_catalogs,
@@ -137,11 +166,13 @@ compute_sig_data <- function(
 
   result <- list(
     type89_sig_id = type89_sig_id,
-    exemplar_id = exemplar_id,
+    exemplar_89 = exemplar_89,
+    exemplar_83 = exemplar_83,
+    exemplar_476 = exemplar_476,
     ID83signature = ID83signature,
     is_insdel15_16 = type89_sig_id %in% c("InsDel15", "InsDel16"),
     is_polyT_removed = ID83signature %in%
-      c("C_ID7", "ID_J", "C_ID10", "ID_N", "ID_O"),
+      c("C_ID7", "ID_J", "C_ID10", "ID_N"),
     has_476_signature = has_476_sig,
     has_83_signature = ID83signature %in% colnames(ID83_signatures),
     has_mapped_476_sig = has_mapped_476_sig,
@@ -151,11 +182,11 @@ compute_sig_data <- function(
     koh_matches = koh_match_data
   )
 
-  # Compute cosine89 (raw catalog vs signature)
+  # Compute cosine89: sig89 vs exemplar_89's 89-type spectrum
   result$cosine89 <-
     lsa::cosine(
       as.numeric(ID89_signatures[, type89_sig_id]),
-      as.numeric(ID89_catalogs[, exemplar_id])
+      as.numeric(ID89_catalogs[, exemplar_89])
     )
   # Compute cosine similarity between main signature and mapped signature
   if (has_mapped_476_sig) {
@@ -168,21 +199,7 @@ compute_sig_data <- function(
     result$cosine89_mapped <- NA
   }
 
-  # Assert that all signatures in assignment matrix exist in signature matrix
-  missing_sigs <- setdiff(
-    row.names(assignment_matrix),
-    colnames(ID89_signatures)
-  )
-  if (length(missing_sigs) > 0) {
-    stop(
-      "dim assignment matrix ",
-      dim(assignment_matrix),
-      "Assignment matrix has signatures not in signature matrix: ",
-      paste(missing_sigs, collapse = ", ")
-    )
-  }
-
-  # For non-InsDel15/16, compute the decomposition
+  # For non-InsDel15/16, compute the decomposition using exemplar_89
   if (!result$is_insdel15_16) {
     # Find signatures present in both the signature matrix and assignment matrix
     common_sigs <- intersect(
@@ -190,78 +207,131 @@ compute_sig_data <- function(
       row.names(assignment_matrix)
     )
 
-    # Get assignment for this catalog, filtered to common signatures
-    assignment <- assignment_matrix[common_sigs, exemplar_id, drop = FALSE]
+    # Check if exemplar_89 exists in assignment matrix columns
+    if (exemplar_89 %in% colnames(assignment_matrix)) {
+      # Get assignment for this catalog, filtered to common signatures
+      assignment <- assignment_matrix[common_sigs, exemplar_89, drop = FALSE]
 
-    # There is no assignment for InsDel_N because it is identical to
-    # InsDel_J
-    sigid = type89_sig_id
-    if (sigid == "InsDel_N") {
-      sigid <- "InsDel_J"
-    }
-    # Zero out the current signature to get contribution by other signatures
-    assignment_others <- assignment
-    stopifnot(sigid %in% common_sigs)
-    assignment_others[sigid, ] <- 0
-    rm(sigid)
+      # Check if this signature (or its alias) is in common_sigs
+      sigid <- type89_sig_id
+      if (!(sigid %in% common_sigs)) {
+        # Try known aliases
+        if (sigid %in% c("InsDel_N_alpha", "InsDel_N_beta") &&
+            "InsDel_J" %in% common_sigs) {
+          sigid <- "InsDel_J"
+        }
+      }
 
-    # Reconstruct catalog without this signature
-    # Use common signature names to ensure alignment
-    result$residual_spectrum <- as.matrix(
-      ID89_signatures[, common_sigs]
-    ) %*%
-      as.matrix(assignment_others)
+      if (sigid %in% common_sigs) {
+        # Zero out the current signature to get contribution by other signatures
+        assignment_others <- assignment
+        assignment_others[sigid, ] <- 0
 
-    # Difference = mutations attributed to this signature
-    result$target_sig_partial_spectrum <- ID89_catalogs[,
-      exemplar_id,
-      drop = FALSE
-    ] -
-      result$residual_spectrum
-    result$target_sig_partial_spectrum[
-      result$target_sig_partial_spectrum < 0
-    ] <- 0
+        # Reconstruct catalog without this signature
+        result$residual_spectrum <- as.matrix(
+          ID89_signatures[, common_sigs]
+        ) %*%
+          as.matrix(assignment_others)
 
-    # Cosine of diff vs signature
-    result$cosine_sig_89_v_partial_spec <-
-      lsa::cosine(
-        as.numeric(ID89_signatures[, type89_sig_id]),
-        as.numeric(as.matrix(result$target_sig_partial_spectrum))
+        # Difference = mutations attributed to this signature
+        result$target_sig_partial_spectrum <- ID89_catalogs[,
+          exemplar_89,
+          drop = FALSE
+        ] -
+          result$residual_spectrum
+        result$target_sig_partial_spectrum[
+          result$target_sig_partial_spectrum < 0
+        ] <- 0
+
+        # Cosine of diff vs signature
+        result$cosine_sig_89_v_partial_spec <-
+          lsa::cosine(
+            as.numeric(ID89_signatures[, type89_sig_id]),
+            as.numeric(as.matrix(result$target_sig_partial_spectrum))
+          )
+      } else {
+        message(
+          "Skipping decomposition for ", type89_sig_id,
+          ": signature not found in assignment matrix"
+        )
+        result$cosine_sig_89_v_partial_spec <- NA
+        result$residual_spectrum <- NULL
+        result$target_sig_partial_spectrum <- NULL
+      }
+    } else {
+      message(
+        "Skipping decomposition for ", type89_sig_id,
+        ": exemplar ", exemplar_89, " not found in assignment matrix"
       )
+      result$cosine_sig_89_v_partial_spec <- NA
+      result$residual_spectrum <- NULL
+      result$target_sig_partial_spectrum <- NULL
+    }
   } else {
     result$cosine_sig_89_v_partial_spec <- NA
     result$residual_spectrum <- NULL
     result$target_sig_partial_spectrum <- NULL
   }
 
-  # Compute cosine476
+  # Compute cosine476: sig476 vs exemplar_476's 476-type spectrum
   if (result$has_476_signature) {
     result$cosine476 <-
       lsa::cosine(
         as.numeric(ID476_signatures[, type89_sig_id]),
-        as.numeric(ID476_catalogs[, exemplar_id])
+        as.numeric(ID476_catalogs[, exemplar_476])
       )
   } else {
     result$cosine476 <- NA
   }
 
-  # Compute cosine83
+  # Also compute cosine476_linking: sig476 vs exemplar_89's 476-type spectrum
+  if (result$has_476_signature && exemplar_89 %in% colnames(ID476_catalogs)) {
+    result$cosine476_linking <-
+      lsa::cosine(
+        as.numeric(ID476_signatures[, type89_sig_id]),
+        as.numeric(ID476_catalogs[, exemplar_89])
+      )
+  } else {
+    result$cosine476_linking <- NA
+  }
+
+  # Compute cosine83: sig83 vs exemplar_83's 83-type spectrum
   if (result$is_polyT_removed) {
     result$cosine83 <-
       lsa::cosine(
         as.numeric(ID83_signatures[, ID83signature]),
-        as.numeric(ID83_catalogs_no_polyT[, exemplar_id])
+        as.numeric(ID83_catalogs_no_polyT[, exemplar_83])
       )
   } else {
     if (ID83signature %in% colnames(ID83_signatures)) {
       result$cosine83 <-
         lsa::cosine(
           as.numeric(ID83_signatures[, ID83signature]),
-          as.numeric(ID83_catalogs[, exemplar_id])
+          as.numeric(ID83_catalogs[, exemplar_83])
         )
     } else {
       result$cosine83 <- 0
     }
+  }
+
+  # Also compute cosine83_linking: sig83 vs exemplar_89's 83-type spectrum
+  if (ID83signature %in% colnames(ID83_signatures) &&
+      exemplar_89 %in% colnames(ID83_catalogs)) {
+    if (result$is_polyT_removed) {
+      result$cosine83_linking <-
+        lsa::cosine(
+          as.numeric(ID83_signatures[, ID83signature]),
+          as.numeric(ID83_catalogs_no_polyT[, exemplar_89])
+        )
+    } else {
+      result$cosine83_linking <-
+        lsa::cosine(
+          as.numeric(ID83_signatures[, ID83signature]),
+          as.numeric(ID83_catalogs[, exemplar_89])
+        )
+    }
+  } else {
+    result$cosine83_linking <- NA
   }
 
   # Compute cosine similarity between native 83-type and mapped 83-type signature
@@ -377,7 +447,20 @@ generate_plots_to_files <- function(
     ),
     id83_sig_ablated_catalog = NULL,
     id83_mapped_ablated_catalog = NULL,
-    id83_catalog_ablated_catalog = NULL
+    id83_catalog_ablated_catalog = NULL,
+    id476_catalog_476match = file.path(
+      plot_dir,
+      paste0(safe_name, "_id476_catalog_476match.png")
+    ),
+    id83_catalog_83match = file.path(
+      plot_dir,
+      paste0(safe_name, "_id83_catalog_83match.png")
+    ),
+    id83_catalog_83match_ablated = file.path(
+      plot_dir,
+      paste0(safe_name, "_id83_catalog_83match_ablated.png")
+    ),
+    id83_catalog_83match_ablated_catalog = NULL
   )
 
   # Helper to save ggplot
@@ -433,14 +516,14 @@ generate_plots_to_files <- function(
     paths$id89_mapped <- NULL
   }
 
-  # ID89 Plot 2: Catalog
-  catalogtoplot = ID89_catalogs[, sig_data$exemplar_id, drop = FALSE]
+  # ID89 Plot 2: Catalog (using exemplar_89)
+  catalogtoplot = ID89_catalogs[, sig_data$exemplar_89, drop = FALSE]
   ymax = max(catalogtoplot)
   p2 <- p89(
     catalogtoplot,
     plot_title = paste0(
       "Spectrum of linking-tumor ",
-      sig_data$exemplar_id,
+      sig_data$exemplar_89,
       " | cosine similarity to ",
       sig_data$type89_sig_id,
       " = ",
@@ -454,14 +537,14 @@ generate_plots_to_files <- function(
   if (!sig_data$is_insdel15_16 && !is.null(sig_data$residual_spectrum)) {
     target_sig_title <- paste0(
       "Partial mutational spectrum of linking-tumor ",
-      sig_data$exemplar_id,
+      sig_data$exemplar_89,
       " due to ",
       sig_data$type89_sig_id
     )
 
     residual_title <- paste0(
       "Remaining mutations in ",
-      sig_data$exemplar_id,
+      sig_data$exemplar_89,
       " not due to ",
       sig_data$type89_sig_id
       # " (A minus B) " #| Cosine similarity to ",
@@ -515,21 +598,35 @@ generate_plots_to_files <- function(
     )
     save476(p5, paths$id476_sig)
 
+    # 476-type spectrum of BestMatch89_1 (linking tumor)
     p6 <- p476(
-      ID476_catalogs[, sig_data$exemplar_id],
+      ID476_catalogs[, sig_data$exemplar_89],
       plot_title = ""
     )
     save476(p6, paths$id476_catalog)
+
+    # 476-type spectrum of BestMatch476_1 (type-specific best match)
+    if (sig_data$exemplar_476 != sig_data$exemplar_89 &&
+        sig_data$exemplar_476 %in% colnames(ID476_catalogs)) {
+      p6b <- p476(
+        ID476_catalogs[, sig_data$exemplar_476],
+        plot_title = ""
+      )
+      save476(p6b, paths$id476_catalog_476match)
+    } else {
+      paths$id476_catalog_476match <- NULL
+    }
   } else {
     p5 <- p476(
-      ID476_catalogs[, sig_data$exemplar_id],
+      ID476_catalogs[, sig_data$exemplar_89],
       plot_title = paste0(
         "476-type spectrum of the linking-tumor ",
-        sig_data$exemplar_id
+        sig_data$exemplar_89
       )
     )
     save476(p5, paths$id476_sig)
     paths$id476_catalog <- NULL
+    paths$id476_catalog_476match <- NULL
   }
 
   # ID83 signature (only if exists)
@@ -607,13 +704,13 @@ generate_plots_to_files <- function(
     paths$id83_mapped_ablated_catalog <- NULL
   }
 
-  # ID83 spectrum catalog, always shown
+  # ID83 spectrum catalog: exemplar_89 (linking tumor)
   if (sig_data$is_polyT_removed) {
     cat83touse = ID83_catalogs_no_polyT
   } else {
     cat83touse = ID83_catalogs
   }
-  result <- p83(cat83touse[, sig_data$exemplar_id, drop = FALSE])
+  result <- p83(cat83touse[, sig_data$exemplar_89, drop = FALSE])
   save_result <- save83_result(
     result,
     paths$id83_catalog,
@@ -623,6 +720,25 @@ generate_plots_to_files <- function(
     paths$id83_catalog_ablated <- NULL
   }
   paths$id83_catalog_ablated_catalog <- save_result$ablated_catalog
+
+  # ID83 spectrum catalog: exemplar_83 (type-specific best match)
+  if (sig_data$exemplar_83 != sig_data$exemplar_89 &&
+      sig_data$exemplar_83 %in% colnames(cat83touse)) {
+    result <- p83(cat83touse[, sig_data$exemplar_83, drop = FALSE])
+    save_result <- save83_result(
+      result,
+      paths$id83_catalog_83match,
+      paths$id83_catalog_83match_ablated
+    )
+    if (!save_result$ablated) {
+      paths$id83_catalog_83match_ablated <- NULL
+    }
+    paths$id83_catalog_83match_ablated_catalog <- save_result$ablated_catalog
+  } else {
+    paths$id83_catalog_83match <- NULL
+    paths$id83_catalog_83match_ablated <- NULL
+    paths$id83_catalog_83match_ablated_catalog <- NULL
+  }
 
   # COSMIC matching signatures
   paths$cosmic_plots <- NULL
@@ -828,48 +944,71 @@ generate_all_plots_parallel <- function(
   # Create plot directory
   dir.create(plot_dir, showWarnings = FALSE, recursive = TRUE)
 
-  # Set up parallel backend
-  future::plan(future::multisession, workers = n_workers)
+  # Try parallel, fall back to sequential if it fails
+  # (e.g., R/Rscript version mismatch with parallelly)
+  use_parallel <- TRUE
+  if (n_workers > 1) {
+    tryCatch(
+      {
+        future::plan(future::multisession, workers = n_workers)
+      },
+      error = function(e) {
+        warning(
+          "Parallel setup failed, falling back to sequential: ",
+          conditionMessage(e)
+        )
+        use_parallel <<- FALSE
+      }
+    )
+  } else {
+    use_parallel <- FALSE
+  }
 
-  # Generate plots in parallel
-  all_paths <- furrr::future_map(
-    all_sig_data,
-    function(sig_data) {
-      generate_plots_to_files(
-        sig_data = sig_data,
-        ID89_signatures = ID89_signatures,
-        ID89_catalogs = ID89_catalogs,
-        ID83_signatures = ID83_signatures,
-        ID83_catalogs = ID83_catalogs,
-        ID83_catalogs_no_polyT = ID83_catalogs_no_polyT,
-        ID476_signatures = ID476_signatures,
-        ID476_catalogs = ID476_catalogs,
-        plot_dir = plot_dir,
-        ID89_mapped_signatures = ID89_mapped_signatures,
-        ID83_mapped_signatures = ID83_mapped_signatures,
-        cosmic_signatures = cosmic_signatures,
-        jin_signatures = jin_signatures,
-        koh_signatures = koh_signatures,
-        min_ts_to_trigger = min_ts_to_trigger,
-        collapse_flows = collapse_flows
-      )
-    },
-    .options = furrr::furrr_options(
-      seed = TRUE,
-      packages = c(
-        "ggplot2",
-        "ICAMS",
-        "mSigPlot",
-        "indelsig.tools.lib",
-        "scales",
-        "ggalluvial"
-      )
-    ),
-    .progress = TRUE
-  )
+  map_fn <- if (use_parallel) furrr::future_map else lapply
+  map_args <- list()
 
-  # Reset to sequential
-  future::plan(future::sequential)
+  plot_one <- function(sig_data) {
+    generate_plots_to_files(
+      sig_data = sig_data,
+      ID89_signatures = ID89_signatures,
+      ID89_catalogs = ID89_catalogs,
+      ID83_signatures = ID83_signatures,
+      ID83_catalogs = ID83_catalogs,
+      ID83_catalogs_no_polyT = ID83_catalogs_no_polyT,
+      ID476_signatures = ID476_signatures,
+      ID476_catalogs = ID476_catalogs,
+      plot_dir = plot_dir,
+      ID89_mapped_signatures = ID89_mapped_signatures,
+      ID83_mapped_signatures = ID83_mapped_signatures,
+      cosmic_signatures = cosmic_signatures,
+      jin_signatures = jin_signatures,
+      koh_signatures = koh_signatures,
+      min_ts_to_trigger = min_ts_to_trigger,
+      collapse_flows = collapse_flows
+    )
+  }
+
+  if (use_parallel) {
+    all_paths <- furrr::future_map(
+      all_sig_data,
+      plot_one,
+      .options = furrr::furrr_options(
+        seed = TRUE,
+        packages = c(
+          "ggplot2",
+          "ICAMS",
+          "mSigPlot",
+          "indelsig.tools.lib",
+          "scales",
+          "ggalluvial"
+        )
+      ),
+      .progress = TRUE
+    )
+    future::plan(future::sequential)
+  } else {
+    all_paths <- lapply(all_sig_data, plot_one)
+  }
 
   names(all_paths) <- names(all_sig_data)
   return(all_paths)
@@ -893,19 +1032,13 @@ check_plot_cache <- function(
   cache_path <- file.path(plot_dir, cache_file)
 
   # Source files in data_dir that plots depend on
-  data_files <- c(
-    "Liu_et_al_final_89_type_signatures.tsv",
-    "Liu_et_al_89_type_spectra.tsv",
-    "Liu_et_al_final_83_type_signatures.tsv",
-    "Liu_et_al_83_type_spectra.tsv",
-    "Liu_et_al_final_476_type_signatures.tsv",
-    "Liu_et_al_476_type_spectra.tsv",
-    "Liu_et_al_89_type_signature_assignments.tsv",
-    "89type_to_83type_connection.tsv",
+  data_files <- file.path(data_dir, c(
     "COSMIC_v3.5_ID_GRCh37_signatures.tsv",
     "jin_2024_sup_tab_1_signatures.tsv",
     "Koh_signatures.tsv"
-  )
+  ))
+
+  # finalized_files is a global named vector defined at top of file
 
   # Files in vignette directory that affect plotting
   vignette_files <- c(
@@ -920,15 +1053,15 @@ check_plot_cache <- function(
   }
 
   # Compute current hash from file modification times
-  data_paths <- file.path(data_dir, data_files)
-  if (!all(file.exists(data_paths))) {
+  all_data_paths <- c(data_files, finalized_files)
+  if (!all(file.exists(all_data_paths))) {
     return(FALSE)
   }
 
   # Check vignette files (optional - skip missing files)
   vignette_paths <- vignette_files[file.exists(vignette_files)]
 
-  all_paths <- c(data_paths, vignette_paths)
+  all_paths <- c(all_data_paths, vignette_paths)
   current_hash <- digest::digest(
     sapply(all_paths, file.mtime)
   )
@@ -956,19 +1089,13 @@ save_plot_cache <- function(
   cache_file = "plot_cache_hash.rds"
 ) {
   # Source files in data_dir
-  data_files <- c(
-    "Liu_et_al_final_89_type_signatures.tsv",
-    "Liu_et_al_89_type_spectra.tsv",
-    "Liu_et_al_final_83_type_signatures.tsv",
-    "Liu_et_al_83_type_spectra.tsv",
-    "Liu_et_al_final_476_type_signatures.tsv",
-    "Liu_et_al_476_type_spectra.tsv",
-    "Liu_et_al_89_type_signature_assignments.tsv",
-    "89type_to_83type_connection.tsv",
+  data_files <- file.path(data_dir, c(
     "COSMIC_v3.5_ID_GRCh37_signatures.tsv",
     "jin_2024_sup_tab_1_signatures.tsv",
     "Koh_signatures.tsv"
-  )
+  ))
+
+  # finalized_files is a global named vector defined at top of file
 
   # Files in vignette directory that affect plotting
   vignette_files <- c(
@@ -977,10 +1104,10 @@ save_plot_cache <- function(
     "83_mapped_from_476.tsv"
   )
 
-  data_paths <- file.path(data_dir, data_files)
+  all_data_paths <- c(data_files, finalized_files)
   vignette_paths <- vignette_files[file.exists(vignette_files)]
 
-  all_paths <- c(data_paths, vignette_paths)
+  all_paths <- c(all_data_paths, vignette_paths)
   current_hash <- digest::digest(
     sapply(all_paths, file.mtime)
   )
@@ -1020,6 +1147,10 @@ reconstruct_plot_paths <- function(signature_names, plot_dir) {
         plot_dir,
         paste0(safe_name, "_id476_catalog.png")
       ),
+      id476_catalog_476match = file.path(
+        plot_dir,
+        paste0(safe_name, "_id476_catalog_476match.png")
+      ),
       id83_sig = file.path(plot_dir, paste0(safe_name, "_id83_sig.png")),
       id83_mapped = file.path(plot_dir, paste0(safe_name, "_id83_mapped.png")),
       id83_catalog = file.path(
@@ -1038,13 +1169,23 @@ reconstruct_plot_paths <- function(signature_names, plot_dir) {
         plot_dir,
         paste0(safe_name, "_id83_catalog_ablated.png")
       ),
+      id83_catalog_83match = file.path(
+        plot_dir,
+        paste0(safe_name, "_id83_catalog_83match.png")
+      ),
+      id83_catalog_83match_ablated = file.path(
+        plot_dir,
+        paste0(safe_name, "_id83_catalog_83match_ablated.png")
+      ),
       id83_sig_ablated_catalog = NULL,
       id83_mapped_ablated_catalog = NULL,
-      id83_catalog_ablated_catalog = NULL
+      id83_catalog_ablated_catalog = NULL,
+      id83_catalog_83match_ablated_catalog = NULL
     )
 
     # Set to NULL if file doesn't exist (skip non-path entries)
-    paths <- lapply(names(paths), function(nm) {
+    path_names <- names(paths)
+    paths <- lapply(path_names, function(nm) {
       p <- paths[[nm]]
       # Skip entries that are data frames, not file paths
       if (grepl("_ablated_catalog$", nm)) {
@@ -1052,24 +1193,7 @@ reconstruct_plot_paths <- function(signature_names, plot_dir) {
       }
       if (is.null(p) || !file.exists(p)) NULL else p
     })
-    names(paths) <- c(
-      "id89_sig",
-      "id89_mapped",
-      "id89_catalog",
-      "id89_residual",
-      "id89_target_sig_partial_spectrum",
-      "id476_sig",
-      "id476_catalog",
-      "id83_sig",
-      "id83_mapped",
-      "id83_catalog",
-      "id83_sig_ablated",
-      "id83_mapped_ablated",
-      "id83_catalog_ablated",
-      "id83_sig_ablated_catalog",
-      "id83_mapped_ablated_catalog",
-      "id83_catalog_ablated_catalog"
-    )
+    names(paths) <- path_names
 
     # Find any COSMIC plots for this signature
     cosmic_pattern <- paste0(safe_name, "_cosmic_*.png")
