@@ -1,7 +1,0 @@
-
-************** Reported Current Memory Use: 0.6 GB *****************
-
-Extracting signature 20 for mutation type INDEL
-The matrix normalizing cutoff is 8300
-
-
