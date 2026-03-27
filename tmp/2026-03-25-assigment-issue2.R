@@ -10,9 +10,9 @@ source(here::here("vignette", "vhelpers.R"))
 spectra_89 <- read_finalized("89_spectra")
 assign_89 <- read_finalized("89_assignment")
 sigs_89 <- read_finalized("89_signatures")
-sig <- "InsDel1b"
+sig <- "InsDel2c"
 
-exemplar <- "SP21400"
+exemplar <- "DRUP01330020T"
 
 # Cosine similarity
 cos_1c <- cosine(
