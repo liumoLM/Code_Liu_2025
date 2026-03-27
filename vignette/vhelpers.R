@@ -231,7 +231,7 @@ compute_sig_data <- function(
 
       # Check if this signature (or its alias) is in common_sigs
       sigid <- type89_sig_id
-      if (!(sigid %in% common_sigs)) {
+      if (FALSE && !(sigid %in% common_sigs)) {
         # Try known aliases
         if (
           sigid %in%
@@ -243,25 +243,35 @@ compute_sig_data <- function(
       }
 
       if (sigid %in% common_sigs) {
-        # Zero out the current signature to get contribution by other signatures
-        assignment_others <- assignment
-        assignment_others[sigid, ] <- 0
+        result$target_sig_partial_spectrum <-
+          assignment[sigid, ] * ID89_signatures[, sigid]
 
-        # Reconstruct catalog without this signature
-        result$residual_spectrum <- as.matrix(
-          ID89_signatures[, common_sigs]
-        ) %*%
-          as.matrix(assignment_others)
+        result$residual_spectrum <- ID89_catalogs[, exemplar_89] -
+          result$target_sig_partial_spectrum
 
-        # Difference = mutations attributed to this signature
-        result$target_sig_partial_spectrum <- ID89_catalogs[,
-          exemplar_89,
-          drop = FALSE
-        ] -
-          result$residual_spectrum
-        result$target_sig_partial_spectrum[
-          result$target_sig_partial_spectrum < 0
-        ] <- 0
+        result$residual_spectrum[result$residual_spectrum < 0] <- 0
+
+        if (FALSE) {
+          # Zero out the current signature to get contribution by other signatures
+          assignment_others <- assignment
+          assignment_others[sigid, ] <- 0
+
+          # Reconstruct catalog without this signature
+          result$residual_spectrum <- as.matrix(
+            ID89_signatures[, common_sigs]
+          ) %*%
+            as.matrix(assignment_others)
+
+          # Difference = mutations attributed to this signature
+          result$target_sig_partial_spectrum <- ID89_catalogs[,
+            exemplar_89,
+            drop = FALSE
+          ] -
+            result$residual_spectrum
+          result$target_sig_partial_spectrum[
+            result$target_sig_partial_spectrum < 0
+          ] <- 0
+        }
 
         # Cosine of diff vs signature
         result$cosine_sig_89_v_partial_spec <-
