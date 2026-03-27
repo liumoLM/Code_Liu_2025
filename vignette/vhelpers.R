@@ -178,7 +178,7 @@ compute_sig_data <- function(
     ID83signature = ID83signature,
     is_insdel15_16 = type89_sig_id %in% c("InsDel15", "InsDel16"),
     is_polyT_removed = ID83signature %in%
-      c("C_ID7", "ID_J", "C_ID10", "ID_N"),
+      c("C_ID7", "ID_J", "C_ID10"),  ## remove ID_N
     has_476_signature = has_476_sig,
     has_83_signature = ID83signature %in% colnames(ID83_signatures),
     has_mapped_476_sig = has_mapped_476_sig,
@@ -243,6 +243,7 @@ compute_sig_data <- function(
       }
 
       if (sigid %in% common_sigs) {
+
         result$target_sig_partial_spectrum <-
           assignment[sigid, ] * ID89_signatures[, sigid]
 
@@ -555,7 +556,9 @@ generate_plots_to_files <- function(
 
   # ID89 Plot 2: Catalog (using exemplar_89)
   catalogtoplot = ID89_catalogs[, sig_data$exemplar_89, drop = FALSE]
-  ymax = max(catalogtoplot)
+  #ymax = max(c(catalogtoplot,max(sig_data$target_sig_partial_spectrum)))  ## Mo comment: some peaks exceed the ymax in partial credit
+  print(max(catalogtoplot))
+  ymax = max(catalogtoplot)*1.1
   p2 <- p89(
     catalogtoplot,
     plot_title = paste0(
