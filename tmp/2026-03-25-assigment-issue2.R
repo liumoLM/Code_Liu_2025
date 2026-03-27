@@ -10,9 +10,9 @@ source(here::here("vignette", "vhelpers.R"))
 spectra_89 <- read_finalized("89_spectra")
 assign_89 <- read_finalized("89_assignment")
 sigs_89 <- read_finalized("89_signatures")
-sig <- "InsDel1a"
+sig <- "InsDel1b"
 
-exemplar <- "SP107784"
+exemplar <- "SP21400"
 
 # Cosine similarity
 cos_1c <- cosine(
@@ -34,14 +34,15 @@ names(a_1c) <- rownames(assign_89)
 print(a_1c[a_1c > 0])
 cat("Total assigned:", sum(a_1c), "\n")
 cat(
-  "InsDel1c assigned:",
-  a_1c["InsDel1c"],
-  sprintf("(%.1f%%)\n", 100 * a_1c["InsDel1c"] / sum(a_1c))
+  sig,
+  "assigned:",
+  a_1c[sig],
+  sprintf("(%.1f%%)\n", 100 * a_1c[sig] / sum(a_1c))
 )
 
 # Plot signature and exemplar spectrum
 sig_plot <- mSigPlot::plot_89(
-  sigs_89[, exemplar, drop = FALSE],
+  sigs_89[, sig, drop = FALSE],
   plot_title = sig
 )
 spec_plot <- mSigPlot::plot_89(

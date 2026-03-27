@@ -7,17 +7,21 @@ source(here::here("vignette", "plot_83_w_wout_t.R"))
 source(here::here("code", "collapse_476_to_83.R"))
 
 # Global path to finalized data directory
-finalized_dir <- here::here("Manuscript_data", "Mo_CAP9_analysis", "finalized_cap9")
+finalized_dir <- here::here(
+  "Manuscript_data",
+  "Mo_CAP9_analysis",
+  "finalized_cap9"
+)
 
 # Named paths to finalized data files
 finalized_files <- c(
-  "89_assignment"    = file.path(finalized_dir, "liu_et_al_89_assignment.tsv"),
-  "89_signatures"    = file.path(finalized_dir, "liu_et_al_89_signatures.tsv"),
-  "89_spectra"       = file.path(finalized_dir, "liu_et_al_89_spectra.tsv"),
-  "83_signatures"    = file.path(finalized_dir, "liu_et_al_83_signatures.tsv"),
-  "83_spectra"       = file.path(finalized_dir, "liu_et_al_83_spectra.tsv"),
-  "476_signatures"   = file.path(finalized_dir, "liu_et_al_476_signatures.tsv"),
-  "476_spectra"      = file.path(finalized_dir, "liu_et_al_476_spectra.tsv"),
+  "89_assignment" = file.path(finalized_dir, "liu_et_al_89_assignment.tsv"),
+  "89_signatures" = file.path(finalized_dir, "liu_et_al_89_signatures.tsv"),
+  "89_spectra" = file.path(finalized_dir, "liu_et_al_89_spectra.tsv"),
+  "83_signatures" = file.path(finalized_dir, "liu_et_al_83_signatures.tsv"),
+  "83_spectra" = file.path(finalized_dir, "liu_et_al_83_spectra.tsv"),
+  "476_signatures" = file.path(finalized_dir, "liu_et_al_476_signatures.tsv"),
+  "476_spectra" = file.path(finalized_dir, "liu_et_al_476_spectra.tsv"),
   "connection_table" = file.path(finalized_dir, "connection_table.tsv")
 )
 
@@ -27,7 +31,9 @@ finalized_files <- c(
 #' @return Data frame with row names from first column.
 read_finalized <- function(name, row.names = 1) {
   path <- finalized_files[[name]]
-  if (is.null(path)) stop("Unknown finalized file: ", name)
+  if (is.null(path)) {
+    stop("Unknown finalized file: ", name)
+  }
   read.delim(path, sep = "\t", row.names = row.names, check.names = FALSE)
 }
 
@@ -227,8 +233,11 @@ compute_sig_data <- function(
       sigid <- type89_sig_id
       if (!(sigid %in% common_sigs)) {
         # Try known aliases
-        if (sigid %in% c("InsDel_N_alpha", "InsDel_N_beta") &&
-            "InsDel_J" %in% common_sigs) {
+        if (
+          sigid %in%
+            c("InsDel_N_alpha", "InsDel_N_beta") &&
+            "InsDel_J" %in% common_sigs
+        ) {
           sigid <- "InsDel_J"
         }
       }
@@ -262,7 +271,8 @@ compute_sig_data <- function(
           )
       } else {
         message(
-          "Skipping decomposition for ", type89_sig_id,
+          "Skipping decomposition for ",
+          type89_sig_id,
           ": signature not found in assignment matrix"
         )
         result$cosine_sig_89_v_partial_spec <- NA
@@ -271,8 +281,11 @@ compute_sig_data <- function(
       }
     } else {
       message(
-        "Skipping decomposition for ", type89_sig_id,
-        ": exemplar ", exemplar_89, " not found in assignment matrix"
+        "Skipping decomposition for ",
+        type89_sig_id,
+        ": exemplar ",
+        exemplar_89,
+        " not found in assignment matrix"
       )
       result$cosine_sig_89_v_partial_spec <- NA
       result$residual_spectrum <- NULL
@@ -326,8 +339,11 @@ compute_sig_data <- function(
   }
 
   # Also compute cosine83_linking: sig83 vs exemplar_89's 83-type spectrum
-  if (ID83signature %in% colnames(ID83_signatures) &&
-      exemplar_89 %in% colnames(ID83_catalogs)) {
+  if (
+    ID83signature %in%
+      colnames(ID83_signatures) &&
+      exemplar_89 %in% colnames(ID83_catalogs)
+  ) {
     if (result$is_polyT_removed) {
       result$cosine83_linking <-
         lsa::cosine(
@@ -617,8 +633,10 @@ generate_plots_to_files <- function(
     save476(p6, paths$id476_catalog)
 
     # 476-type spectrum of BestMatch476_1 (type-specific best match)
-    if (sig_data$exemplar_476 != sig_data$exemplar_89 &&
-        sig_data$exemplar_476 %in% colnames(ID476_catalogs)) {
+    if (
+      sig_data$exemplar_476 != sig_data$exemplar_89 &&
+        sig_data$exemplar_476 %in% colnames(ID476_catalogs)
+    ) {
       p6b <- p476(
         ID476_catalogs[, sig_data$exemplar_476],
         plot_title = ""
@@ -733,8 +751,10 @@ generate_plots_to_files <- function(
   paths$id83_catalog_ablated_catalog <- save_result$ablated_catalog
 
   # ID83 spectrum catalog: exemplar_83 (type-specific best match)
-  if (sig_data$exemplar_83 != sig_data$exemplar_89 &&
-      sig_data$exemplar_83 %in% colnames(cat83touse)) {
+  if (
+    sig_data$exemplar_83 != sig_data$exemplar_89 &&
+      sig_data$exemplar_83 %in% colnames(cat83touse)
+  ) {
     result <- p83(cat83touse[, sig_data$exemplar_83, drop = FALSE])
     save_result <- save83_result(
       result,
@@ -1043,11 +1063,14 @@ check_plot_cache <- function(
   cache_path <- file.path(plot_dir, cache_file)
 
   # Source files in data_dir that plots depend on
-  data_files <- file.path(data_dir, c(
-    "COSMIC_v3.5_ID_GRCh37_signatures.tsv",
-    "jin_2024_sup_tab_1_signatures.tsv",
-    "Koh_signatures.tsv"
-  ))
+  data_files <- file.path(
+    data_dir,
+    c(
+      "COSMIC_v3.5_ID_GRCh37_signatures.tsv",
+      "jin_2024_sup_tab_1_signatures.tsv",
+      "Koh_signatures.tsv"
+    )
+  )
 
   # finalized_files is a global named vector defined at top of file
 
@@ -1100,11 +1123,14 @@ save_plot_cache <- function(
   cache_file = "plot_cache_hash.rds"
 ) {
   # Source files in data_dir
-  data_files <- file.path(data_dir, c(
-    "COSMIC_v3.5_ID_GRCh37_signatures.tsv",
-    "jin_2024_sup_tab_1_signatures.tsv",
-    "Koh_signatures.tsv"
-  ))
+  data_files <- file.path(
+    data_dir,
+    c(
+      "COSMIC_v3.5_ID_GRCh37_signatures.tsv",
+      "jin_2024_sup_tab_1_signatures.tsv",
+      "Koh_signatures.tsv"
+    )
+  )
 
   # finalized_files is a global named vector defined at top of file
 
