@@ -115,6 +115,7 @@ build_row <- function(idx) {
 connection <- do.call(rbind, lapply(seq_along(sig89_names), build_row))
 
 out_path <- finalized_files[["connection_table"]]
+old <- options(digits = 12)
 write.table(
   connection,
   out_path,
@@ -122,4 +123,5 @@ write.table(
   quote = FALSE,
   row.names = FALSE
 )
+options(old)
 message("Wrote connection table to ", out_path)
