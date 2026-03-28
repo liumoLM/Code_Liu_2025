@@ -178,7 +178,7 @@ compute_sig_data <- function(
     ID83signature = ID83signature,
     is_insdel15_16 = type89_sig_id %in% c("InsDel15", "InsDel16"),
     is_polyT_removed = ID83signature %in%
-      c("C_ID7", "ID_J", "C_ID10"),  ## remove ID_N
+      c("C_ID7", "ID_J", "C_ID10"), ## remove ID_N
     has_476_signature = has_476_sig,
     has_83_signature = ID83signature %in% colnames(ID83_signatures),
     has_mapped_476_sig = has_mapped_476_sig,
@@ -243,7 +243,6 @@ compute_sig_data <- function(
       }
 
       if (sigid %in% common_sigs) {
-
         result$target_sig_partial_spectrum <-
           assignment[sigid, ] * ID89_signatures[, sigid]
 
@@ -251,6 +250,30 @@ compute_sig_data <- function(
           result$target_sig_partial_spectrum
 
         result$residual_spectrum[result$residual_spectrum < 0] <- 0
+
+        # Log assignment and sigid for debugging
+        log_con <- file(
+          here::here("vignette", "assign_for_residual.log"),
+          open = "a"
+        )
+        writeLines(paste0("=== sigid: ", sigid, " ==="), log_con)
+        writeLines("assignment (with row names):", log_con)
+        capture.output(print(assignment), file = log_con, append = TRUE)
+        sigid_pct <- 100 * sum(assignment[sigid, ]) / sum(assignment)
+        if (sigid_pct < 80) {
+          writeLines(
+            paste(
+              "WARNING:",
+              sigid,
+              "has only",
+              round(sigid_pct, 1),
+              "% of mutations"
+            ),
+            log_con
+          )
+        }
+        writeLines("", log_con)
+        close(log_con)
 
         if (FALSE) {
           # Zero out the current signature to get contribution by other signatures
@@ -558,7 +581,7 @@ generate_plots_to_files <- function(
   catalogtoplot = ID89_catalogs[, sig_data$exemplar_89, drop = FALSE]
   #ymax = max(c(catalogtoplot,max(sig_data$target_sig_partial_spectrum)))  ## Mo comment: some peaks exceed the ymax in partial credit
   print(max(catalogtoplot))
-  ymax = max(catalogtoplot)*1.1
+  ymax = max(catalogtoplot) * 1.1
   p2 <- p89(
     catalogtoplot,
     plot_title = paste0(
