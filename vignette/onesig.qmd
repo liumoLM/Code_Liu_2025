@@ -62,8 +62,70 @@ if (!is.null(plot_paths$id89_mapped)) {
 #| echo: false
 #| output: asis
 
+displayplot(plot_paths$id89_catalog, getp("hw89"))
+
+```
+
+
+```{r}
+#| echo: false
+#| output: asis
+
+# Decomposition plots (only for non-InsDel15/16)
+if (
+  !is.null(plot_paths$id89_residual) &&
+    !is.null(plot_paths$id89_target_sig_partial_spectrum)
+) {
+  cat('\n\n<details>\n<summary>Click to view decomposition of the linking tumor spectrum</summary>\n\n')
+  displayplot(plot_paths$id89_target_sig_partial_spectrum, getp("hw89"))
+  displayplot(plot_paths$id89_residual, getp("hw89"))
+  cat(sprintf(
+    paste0(
+      "\nN subtract: %.1f | ",
+      "N residual: %.1f | ",
+      "Total negative: %.1f | ",
+      "N negative channels: %d | ",
+      "P(\u2265 total negative): %.3f\n\n"
+    ),
+    sig_data$n_subtract,
+    sig_data$n_residual,
+    sig_data$total_negative,
+    sig_data$n_negative_channels,
+    sig_data$prob_ge_total_negative
+  ))
+
+  # Nested fold with per-channel table
+  if (!is.null(sig_data$residual_table)) {
+    cat('\n\n<details>\n<summary>Per-channel residual breakdown</summary>\n\n')
+    df <- sig_data$residual_table
+    # Color negative residuals red
+    df$Residual <- ifelse(
+      df$Residual < 0,
+      paste0('<span style="color:red;">', df$Residual, '</span>'),
+      as.character(df$Residual)
+    )
+    tbl <- knitr::kable(df, format = "html", escape = FALSE,
+                         row.names = FALSE, align = "lrrr") |>
+      kableExtra::kable_styling(
+        bootstrap_options = c("striped", "hover", "condensed"),
+        full_width = FALSE,
+        font_size = 12
+      )
+    cat(as.character(tbl))
+    cat('\n\n</details>\n\n')
+  }
+
+  cat('\n\n</details>\n\n')
+}
+```
+
+```{r}
+#| echo: false
+#| output: asis
+
 # Koh matching signatures section (89-type)
 if (!is.null(plot_paths$koh_plots) && length(plot_paths$koh_plots) > 0) {
+  cat('\n\n<details>\n<summary>Click to view similar signatures from Koh et al.</summary>\n\n')
   for (koh_name in names(plot_paths$koh_plots)) {
     koh_info <- plot_paths$koh_plots[[koh_name]]
 
@@ -82,30 +144,7 @@ if (!is.null(plot_paths$koh_plots) && length(plot_paths$koh_plots) > 0) {
     # Display the plot (89-type width)
     displayplot(koh_info$path, getp("hw89"))
   }
-}
-```
-
-
-```{r}
-#| echo: false
-#| output: asis
-
-displayplot(plot_paths$id89_catalog, getp("hw89"))
-
-```
-
-
-```{r}
-#| echo: false
-#| output: asis
-
-# Decomposition plots (only for non-InsDel15/16)
-if (
-  !is.null(plot_paths$id89_residual) &&
-    !is.null(plot_paths$id89_target_sig_partial_spectrum)
-) {
-  displayplot(plot_paths$id89_target_sig_partial_spectrum, getp("hw89"))
-  displayplot(plot_paths$id89_residual, getp("hw89"))
+  cat('\n\n</details>\n\n')
 }
 ```
 

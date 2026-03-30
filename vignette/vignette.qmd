@@ -14,6 +14,7 @@ date-format: "YYYY-MM-DD HH:mm"
 format:
   html:
     output-file: "repertoire_of_indel_mutational_signatures.html"
+    format-links: false
     toc: true
     toc-location: left
     toc-depth: 2
@@ -128,6 +129,11 @@ source(here::here(
 #| include: true
 
 connect_89_to_83 <- read_finalized("connection_table", row.names = NULL)
+
+# Override exemplar_89 and exemplar_476 for InsDel_J
+j_row <- which(connect_89_to_83$InDel89 == "InsDel_J")
+connect_89_to_83$BestMatch89_1[j_row] <- "DRUP01010037T"
+connect_89_to_83$BestMatch476_1[j_row] <- "DRUP01010037T"
 ```
 
 ```{r}
@@ -304,13 +310,6 @@ names(koh_matches) <- rownames(koh_cosine_matrix)
 ```
 
 ```{r}
-#| label: setup4
-#| include: false
-
-ID89.mSigAct.assignment <- read_finalized("89_assignment")
-```
-
-```{r}
 #| label: setup5
 #| include: false
 
@@ -377,7 +376,6 @@ all_sig_data <- lapply(
       ID83_catalogs_no_polyT = type83_spectra.no.polyT,
       ID476_signatures = type476_sigs,
       ID476_catalogs = to.plot.all.ID476.catalogs,
-      assignment_matrix = ID89.mSigAct.assignment,
       ID89_mapped_signatures = ID89_mapped_from_476,
       ID83_mapped_signatures = ID83_mapped_from_476,
       cosmic_matches = cosmic_matches,
@@ -495,6 +493,14 @@ sig_table2 <- sig_table %>%
     sig83_from_476_v_83_cos = cosine83_mapped,
 
     is_polyT_removed
+  ) %>%
+  dplyr::select(
+    -n_subtract,
+    -n_residual,
+    -total_negative,
+    -n_negative_channels,
+    -prob_ge_total_negative,
+    -residual_table
   )
 
 write.csv(sig_table2, "prot_table_1.csv", row.names = FALSE)
