@@ -5,11 +5,7 @@
 # signature to match the corresponding 83-type signature as closely as possible.
 
 # Use here::here() for robust path resolution when sourced from different directories
-if (requireNamespace("here", quietly = TRUE)) {
-  source(here::here("code", "solve_bipartite_match.R"))
-} else {
-  source("code/solve_bipartite_match.R")
-}
+source(here::here("code", "solve_bipartite_match.R"))
 
 
 #' Generate missing edges for R(9,) types
@@ -93,7 +89,9 @@ collapse_476_to_83 <- function(
   sig_dir = NULL
 ) {
   # sig_dir: directory containing signature files; defaults to data_dir
-  if (is.null(sig_dir)) sig_dir <- data_dir
+  if (is.null(sig_dir)) {
+    sig_dir <- data_dir
+  }
 
   # Load edges from unique_pairs.tsv
   # Column 1 (COSMIC_83) becomes b (target)
@@ -834,7 +832,8 @@ collapse_all_476_to_83_matrix <- function(
       tryCatch(
         {
           collapse_result <- collapse_476_to_83(
-            sig_476, sig_83,
+            sig_476,
+            sig_83,
             data_dir = here::here("Manuscript_data"),
             sig_dir = finalized_dir
           )

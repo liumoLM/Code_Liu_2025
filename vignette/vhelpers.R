@@ -1,6 +1,12 @@
 # Helper functions for vignette.Rmd
 # These functions separate computation from plotting for easier debugging
 
+assign_log_file <- here::here("vignette", "assign_for_residual.log")
+if (file.exists(assign_log_file)) {
+  file.remove(assign_log_file)
+  message("removed ", assign_log_file)
+}
+
 source(here::here("vignette", "plot_83_w_wout_t.R"))
 
 # Source collapse functions for Sankey plot generation
@@ -252,15 +258,11 @@ compute_sig_data <- function(
         result$residual_spectrum[result$residual_spectrum < 0] <- 0
 
         # Log assignment and sigid for debugging
-        log_con <- file(
-          here::here("vignette", "assign_for_residual.log"),
-          open = "a"
-        )
+        log_con <- file(assign_log_file, open = "a")
         writeLines(paste0("=== sigid: ", sigid, " ==="), log_con)
-        writeLines("assignment (with row names):", log_con)
-        capture.output(print(assignment), file = log_con, append = TRUE)
         sigid_pct <- 100 * sum(assignment[sigid, ]) / sum(assignment)
-        if (sigid_pct < 80) {
+        writeLines(paste("sigid_pct = ", sigid_pct), log_con)
+        if (sigid_pct < 50) {
           writeLines(
             paste(
               "WARNING:",
@@ -272,8 +274,11 @@ compute_sig_data <- function(
             log_con
           )
         }
+        writeLines("assignment (with row names):", log_con)
+        capture.output(print(assignment), file = log_con, append = TRUE)
         writeLines("", log_con)
         close(log_con)
+        message("closed ", assign_log_file)
 
         if (FALSE) {
           # Zero out the current signature to get contribution by other signatures
@@ -1377,4 +1382,122 @@ reconstruct_plot_paths <- function(signature_names, plot_dir) {
 
   names(all_paths) <- signature_names
   return(all_paths)
+}
+
+#' Create overview kable table with hyperlinks to signature sections
+#'
+#' Generates a kable table for the Overview section with:
+#' - Signature IDs hyperlinked to their corresponding sections
+#' - User-friendly column names
+#' - Centered text, smaller font
+#' - Scrollable with fixed header
+#'
+#' @param sig_table Data frame: the signature summary table (sig_table2)
+#' @return kableExtra styled table
+create_overview_table <- function(sig_table) {
+  source("table_1_col_name_mapping.R")
+
+  df <- sig_table
+
+  # Remove is_polyT_removed column (not needed in display)
+  df$is_polyT_removed <- NULL
+
+  # Remove the last column
+  df <- df[, -ncol(df)]
+
+  # exemplar columns already have plain sample IDs (no prefix to strip)
+
+  # Clean up best_match_jin: remove 'jin' prefix
+  df$best_match_jin <- sub("^jin", "", df$best_match_jin)
+
+  # Round cos_v_koh and cosine_v_jin first (before any HTML wrapping)
+  df$cos_v_koh <- round(df$cos_v_koh, 4)
+  df$cosine_v_jin <- round(df$cosine_v_jin, 4)
+
+  # Handle best_match_koh duplicates: mark best match with asterisk, gray out non-best
+  koh_values <- df$best_match_koh
+  non_na_idx <- which(!is.na(koh_values))
+  rows_to_gray <- c()
+
+  unique_koh <- unique(koh_values[non_na_idx])
+  for (koh_val in unique_koh) {
+    matching_rows <- which(koh_values == koh_val)
+    if (length(matching_rows) > 1) {
+      # Duplicate: find row with highest cos_v_koh
+      cos_vals <- df$cos_v_koh[matching_rows]
+      best_idx <- matching_rows[which.max(cos_vals)]
+      non_best_idx <- setdiff(matching_rows, best_idx)
+      # Add asterisk to best match
+      df$best_match_koh[best_idx] <- paste0(df$best_match_koh[best_idx], "*")
+      # Track non-best rows for graying
+      rows_to_gray <- c(rows_to_gray, non_best_idx)
+    }
+  }
+
+  # Gray out non-best duplicate rows for best_match_koh and cos_v_koh
+  if (length(rows_to_gray) > 0) {
+    df$best_match_koh[rows_to_gray] <- paste0(
+      '<span style="color: #B0B0B0;">',
+      df$best_match_koh[rows_to_gray],
+      '</span>'
+    )
+    df$cos_v_koh[rows_to_gray] <- paste0(
+      '<span style="color: #B0B0B0;">',
+      df$cos_v_koh[rows_to_gray],
+      '</span>'
+    )
+  }
+
+  # Handle best_match_jin duplicates: mark best match with asterisk, gray out non-best
+  jin_values <- df$best_match_jin
+  jin_non_na_idx <- which(!is.na(jin_values))
+  jin_rows_to_gray <- c()
+
+  unique_jin <- unique(jin_values[jin_non_na_idx])
+  for (jin_val in unique_jin) {
+    matching_rows <- which(jin_values == jin_val)
+    if (length(matching_rows) > 1) {
+      cos_vals <- df$cosine_v_jin[matching_rows]
+      best_idx <- matching_rows[which.max(cos_vals)]
+      non_best_idx <- setdiff(matching_rows, best_idx)
+      df$best_match_jin[best_idx] <- paste0(df$best_match_jin[best_idx], "*")
+      jin_rows_to_gray <- c(jin_rows_to_gray, non_best_idx)
+    }
+  }
+
+  # Gray out non-best duplicate rows for best_match_jin and cosine_v_jin
+  if (length(jin_rows_to_gray) > 0) {
+    df$best_match_jin[jin_rows_to_gray] <- paste0(
+      '<span style="color: #B0B0B0;">',
+      df$best_match_jin[jin_rows_to_gray],
+      '</span>'
+    )
+    df$cosine_v_jin[jin_rows_to_gray] <- paste0(
+      '<span style="color: #B0B0B0;">',
+      df$cosine_v_jin[jin_rows_to_gray],
+      '</span>'
+    )
+  }
+
+  # Add hyperlinks to signature IDs
+  df$signature_id <- sapply(df$signature_id, make_sig_hyperlink)
+
+  # Rename columns using the mapping
+  names(df) <- table_1_col_name_mapping(names(df))
+
+  # Round numeric columns to 4 decimal places
+  numeric_cols <- sapply(df, is.numeric)
+  df[numeric_cols] <- lapply(df[numeric_cols], function(x) round(x, 4))
+
+  # Create kable with HTML formatting
+  tbl <- knitr::kable(df, format = "html", escape = FALSE, align = 'c') |>
+    kableExtra::kable_styling(
+      bootstrap_options = c("striped", "hover", "condensed"),
+      full_width = TRUE,
+      fixed_thead = TRUE
+    ) |>
+    kableExtra::scroll_box(width = "100%", height = "600px")
+
+  # Wrap in div with smaller font size
+  htmltools::div(style = "font-size: 70%;", htmltools::HTML(tbl))
 }

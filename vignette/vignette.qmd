@@ -48,7 +48,7 @@ Source file:  `r knitr::current_input(dir = TRUE)`
 
 ```{r}
 #| label: key-params
-#| include: false
+#| include: true
 
 # Set to TRUE to force regeneration, otherwise the code
 # will use check_plot_cache to see if the cache is still
@@ -60,13 +60,16 @@ Source file:  `r knitr::current_input(dir = TRUE)`
 # general the detection of changes is not perfect.
 # When in doubt regenerate the plots.
 # ======================================================
-REGENERATE_PLOTS <- T # FALSE
+REGENERATE_PLOTS <- T # FALSE 
+
+REGENERATE_CONNECTION_TABLE <- F # TRUE
+
 data_dir <- here::here("Manuscript_data")
 
 # Minimum cosine similarity to show matching COSMIC signatures
 COSMIC_min_cosine <- 0.9
 
-# Minimum cosine similarity to show matching Jin signatures
+# Minimum cosine similarity to show matching Jin signature
 Jin_min_cosine <- 0.9
 
 # Minimum cosine similarity to show matching Koh signatures
@@ -78,7 +81,7 @@ min_ts_to_trigger <- 0.15
 
 ```{r}
 #| label: libraries
-#| include: false
+#| include: true
 
 library(magrittr)
 library(gridExtra)
@@ -96,10 +99,10 @@ library(DT)
 
 ```{r}
 #| label: other-globals
-#| include: false
+#| include: true
 
 # Load plotting parameters from separate file (changes trigger plot regeneration)
-source("ppar.R")
+source(here::here("vignette", "ppar.R"))
 
 # Scale factor for 476-type plots (1.0 = default, 1.4 = 40% bigger)
 plot476_scale <- 1.2
@@ -109,8 +112,20 @@ source(here::here("vignette", "vhelpers.R"))
 ```
 
 ```{r}
+#| label: regenerate-connection-table
+#| include: true
+
+if (REGENERATE_CONNECTION_TABLE) {
+source(here::here(
+    "Manuscript_data/Mo_CAP9_analysis",
+    "make_connection_table.R"))
+}
+
+```
+
+```{r}
 #| label: get-data-1
-#| include: false
+#| include: true
 
 connect_89_to_83 <- read_finalized("connection_table", row.names = NULL)
 ```
@@ -124,7 +139,7 @@ type83_spectra <- read_finalized("83_spectra")
 
 ```{r}
 #| label: get-data-2-b
-#| include: false
+#| include: true
 type83_spectra.no.polyT <-
   type83_spectra
 type83_spectra.no.polyT[c("DEL:T:1:5+", "INS:T:1:5+"), ] <- 0
@@ -132,7 +147,7 @@ type83_spectra.no.polyT[c("DEL:T:1:5+", "INS:T:1:5+"), ] <- 0
 
 ```{r}
 #| label: get-data-3
-#| include: false
+#| include: true
 
 type83_sigs <- read_finalized("83_signatures")
 
@@ -140,7 +155,7 @@ type83_sigs <- read_finalized("83_signatures")
 
 ```{r}
 #| label: get-data-cosmic
-#| include: false
+#| include: true
 
 # Read COSMIC ID signatures
 cosmic_sigs <- read.delim(
@@ -494,7 +509,6 @@ write.csv(sig_table2, "prot_table_1.csv", row.names = FALSE)
 #| label: overview-table
 #| echo: false
 
-source("table_1_as_dt.R")
 create_overview_table(sig_table2)
 ```
 

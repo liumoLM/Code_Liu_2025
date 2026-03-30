@@ -1,4 +1,5 @@
 === sigid: InsDel1a ===
+sigid_pct =  81.6930137684855
 assignment (with row names):
                CPCT02050439T
 InsDel1a                3204
@@ -45,6 +46,7 @@ InsDel_N_alpha             0
 InsDel_N_beta            566
 
 === sigid: InsDel1b ===
+sigid_pct =  85.6506492275614
 assignment (with row names):
                SP21400
 InsDel1a             0
@@ -91,6 +93,7 @@ InsDel_N_alpha       0
 InsDel_N_beta        0
 
 === sigid: InsDel1c ===
+sigid_pct =  84.6634281748786
 assignment (with row names):
                SP112907
 InsDel1a              0
@@ -137,6 +140,7 @@ InsDel_N_alpha        0
 InsDel_N_beta         0
 
 === sigid: InsDel2a ===
+sigid_pct =  54.3316366189414
 assignment (with row names):
                SP17172
 InsDel1a             0
@@ -183,6 +187,7 @@ InsDel_N_alpha       0
 InsDel_N_beta        0
 
 === sigid: InsDel2b ===
+sigid_pct =  79.5985208663497
 assignment (with row names):
                SP96118
 InsDel1a             0
@@ -229,6 +234,7 @@ InsDel_N_alpha       0
 InsDel_N_beta        0
 
 === sigid: InsDel2c ===
+sigid_pct =  82.473389612773
 assignment (with row names):
                DRUP01330020T
 InsDel1a                   0
@@ -275,6 +281,7 @@ InsDel_N_alpha             0
 InsDel_N_beta              0
 
 === sigid: InsDel3a ===
+sigid_pct =  82.0374574347333
 assignment (with row names):
                CPCT02050436T
 InsDel1a                 0.0
@@ -321,6 +328,7 @@ InsDel_N_alpha           0.0
 InsDel_N_beta          316.5
 
 === sigid: InsDel3b ===
+sigid_pct =  100
 assignment (with row names):
                CPCT02080086T
 InsDel1a                   0
@@ -367,6 +375,7 @@ InsDel_N_alpha             0
 InsDel_N_beta              0
 
 === sigid: InsDel4 ===
+sigid_pct =  100
 assignment (with row names):
                SP48008
 InsDel1a             0
@@ -413,6 +422,7 @@ InsDel_N_alpha       0
 InsDel_N_beta        0
 
 === sigid: InsDel5a ===
+sigid_pct =  100
 assignment (with row names):
                SP97194
 InsDel1a             0
@@ -459,1992 +469,56 @@ InsDel_N_alpha       0
 InsDel_N_beta        0
 
 === sigid: InsDel5b ===
-assignment (with row names):
-               SP112290
-InsDel1a          221.0
-InsDel1b            0.0
-InsDel1c            0.0
-InsDel2a            0.0
-InsDel2b            0.0
-InsDel2c            0.0
-InsDel3a            0.0
-InsDel3b          353.5
-InsDel4             0.0
-InsDel5a            0.0
-InsDel5b          316.0
-InsDel5c            0.0
-InsDel6             0.0
-InsDel7             0.0
-InsDel8           145.5
-InsDel9             0.0
-InsDel10            0.0
-InsDel11            0.0
-InsDel12            0.0
-InsDel13            0.0
-InsDel14            0.0
-InsDel17            0.0
-InsDel18            0.0
-InsDel19a           0.0
-InsDel19b           0.0
-InsDel23            0.0
-InsDel_A_alpha      0.0
-InsDel_A_beta       0.0
-InsDel_B            0.0
-InsDel_C            0.0
-InsDel_D            0.0
-InsDel_E            0.0
-InsDel_F            0.0
-InsDel_G            0.0
-InsDel_H            0.0
-InsDel_I            0.0
-InsDel_J            0.0
-InsDel_K            0.0
-InsDel_L            0.0
-InsDel_M            0.0
-InsDel_N_alpha      0.0
-InsDel_N_beta       0.0
-
-=== sigid: InsDel5c ===
-assignment (with row names):
-               SP8564
-InsDel1a        124.0
-InsDel1b          0.0
-InsDel1c          0.0
-InsDel2a          0.0
-InsDel2b          0.0
-InsDel2c          0.0
-InsDel3a          0.0
-InsDel3b          0.0
-InsDel4         173.5
-InsDel5a          0.0
-InsDel5b          0.0
-InsDel5c          0.0
-InsDel6           0.0
-InsDel7           0.0
-InsDel8           0.0
-InsDel9           0.0
-InsDel10          0.0
-InsDel11          0.0
-InsDel12          0.0
-InsDel13          0.0
-InsDel14          0.0
-InsDel17          0.0
-InsDel18          0.0
-InsDel19a         0.0
-InsDel19b         0.0
-InsDel23          0.0
-InsDel_A_alpha    0.0
-InsDel_A_beta     0.0
-InsDel_B        138.5
-InsDel_C          0.0
-InsDel_D          0.0
-InsDel_E          0.0
-InsDel_F          0.0
-InsDel_G          0.0
-InsDel_H          0.0
-InsDel_I          0.0
-InsDel_J          0.0
-InsDel_K          0.0
-InsDel_L          0.0
-InsDel_M          0.0
-InsDel_N_alpha    0.0
-InsDel_N_beta     0.0
-
-=== sigid: InsDel6 ===
-assignment (with row names):
-               SP102035
-InsDel1a              0
-InsDel1b              0
-InsDel1c              0
-InsDel2a              0
-InsDel2b              0
-InsDel2c              0
-InsDel3a              0
-InsDel3b              0
-InsDel4               0
-InsDel5a              0
-InsDel5b              0
-InsDel5c              0
-InsDel6             996
-InsDel7               0
-InsDel8               0
-InsDel9               0
-InsDel10              0
-InsDel11              0
-InsDel12              0
-InsDel13              0
-InsDel14              0
-InsDel17              0
-InsDel18              0
-InsDel19a             0
-InsDel19b             0
-InsDel23              0
-InsDel_A_alpha        0
-InsDel_A_beta         0
-InsDel_B              0
-InsDel_C              0
-InsDel_D              0
-InsDel_E              0
-InsDel_F              0
-InsDel_G              0
-InsDel_H              0
-InsDel_I              0
-InsDel_J              0
-InsDel_K              0
-InsDel_L              0
-InsDel_M              0
-InsDel_N_alpha        0
-InsDel_N_beta         0
-
-=== sigid: InsDel7 ===
-assignment (with row names):
-               WIDE01010075T
-InsDel1a                   0
-InsDel1b                   0
-InsDel1c                   0
-InsDel2a                   0
-InsDel2b                2442
-InsDel2c                   0
-InsDel3a                   0
-InsDel3b                   0
-InsDel4                    0
-InsDel5a                   0
-InsDel5b                   0
-InsDel5c                   0
-InsDel6                    0
-InsDel7                19835
-InsDel8                    0
-InsDel9                    0
-InsDel10                   0
-InsDel11                   0
-InsDel12                   0
-InsDel13                   0
-InsDel14                   0
-InsDel17                   0
-InsDel18                   0
-InsDel19a                  0
-InsDel19b                274
-InsDel23                   0
-InsDel_A_alpha             0
-InsDel_A_beta              0
-InsDel_B                   0
-InsDel_C                   0
-InsDel_D                   0
-InsDel_E                   0
-InsDel_F                   0
-InsDel_G                   0
-InsDel_H                   0
-InsDel_I                   0
-InsDel_J                   0
-InsDel_K                 404
-InsDel_L                   0
-InsDel_M                   0
-InsDel_N_alpha             0
-InsDel_N_beta              0
-
-=== sigid: InsDel8 ===
-assignment (with row names):
-               CPCT02070336T
-InsDel1a                 0.0
-InsDel1b                 0.0
-InsDel1c                 0.0
-InsDel2a                 0.0
-InsDel2b                 0.0
-InsDel2c                 0.0
-InsDel3a                 0.0
-InsDel3b                 0.0
-InsDel4                  0.0
-InsDel5a                 0.0
-InsDel5b                 0.0
-InsDel5c                 0.0
-InsDel6                  0.0
-InsDel7                  0.0
-InsDel8               2144.5
-InsDel9                  0.0
-InsDel10                 0.0
-InsDel11                 0.0
-InsDel12                 0.0
-InsDel13                 0.0
-InsDel14                 0.0
-InsDel17                 0.0
-InsDel18                 0.0
-InsDel19a                0.0
-InsDel19b                0.0
-InsDel23                 0.0
-InsDel_A_alpha           0.0
-InsDel_A_beta            0.0
-InsDel_B              2350.5
-InsDel_C                 0.0
-InsDel_D                 0.0
-InsDel_E                 0.0
-InsDel_F                 0.0
-InsDel_G                 0.0
-InsDel_H                 0.0
-InsDel_I                 0.0
-InsDel_J                 0.0
-InsDel_K                 0.0
-InsDel_L                 0.0
-InsDel_M                 0.0
-InsDel_N_alpha           0.0
-InsDel_N_beta            0.0
-
-=== sigid: InsDel9 ===
-assignment (with row names):
-               SP102617
-InsDel1a              0
-InsDel1b              0
-InsDel1c              0
-InsDel2a              0
-InsDel2b              0
-InsDel2c              0
-InsDel3a              0
-InsDel3b              0
-InsDel4               0
-InsDel5a              0
-InsDel5b              0
-InsDel5c              0
-InsDel6               0
-InsDel7               0
-InsDel8               0
-InsDel9             166
-InsDel10              0
-InsDel11              0
-InsDel12              0
-InsDel13              0
-InsDel14              0
-InsDel17              0
-InsDel18              0
-InsDel19a             0
-InsDel19b             0
-InsDel23              0
-InsDel_A_alpha        0
-InsDel_A_beta         0
-InsDel_B              0
-InsDel_C              0
-InsDel_D              0
-InsDel_E              0
-InsDel_F              0
-InsDel_G              0
-InsDel_H              0
-InsDel_I              0
-InsDel_J              0
-InsDel_K              0
-InsDel_L              0
-InsDel_M              0
-InsDel_N_alpha        0
-InsDel_N_beta         0
-
-=== sigid: InsDel10 ===
-assignment (with row names):
-               SP109957
-InsDel1a          187.5
-InsDel1b            0.0
-InsDel1c            0.0
-InsDel2a            0.0
-InsDel2b            0.0
-InsDel2c            0.0
-InsDel3a            0.0
-InsDel3b            0.0
-InsDel4             0.0
-InsDel5a            0.0
-InsDel5b            0.0
-InsDel5c            0.0
-InsDel6             0.0
-InsDel7             0.0
-InsDel8             0.0
-InsDel9             0.0
-InsDel10          249.0
-InsDel11            0.0
-InsDel12            0.0
-InsDel13            0.0
-InsDel14            0.0
-InsDel17            0.0
-InsDel18            0.0
-InsDel19a           0.0
-InsDel19b           0.0
-InsDel23            0.0
-InsDel_A_alpha    109.5
-InsDel_A_beta       0.0
-InsDel_B            0.0
-InsDel_C            0.0
-InsDel_D            0.0
-InsDel_E            0.0
-InsDel_F            0.0
-InsDel_G            0.0
-InsDel_H            0.0
-InsDel_I            0.0
-InsDel_J            0.0
-InsDel_K            0.0
-InsDel_L            0.0
-InsDel_M            0.0
-InsDel_N_alpha      0.0
-InsDel_N_beta       0.0
-
-=== sigid: InsDel11 ===
-assignment (with row names):
-               SP77956
-InsDel1a             0
-InsDel1b             0
-InsDel1c             0
-InsDel2a             0
-InsDel2b             0
-InsDel2c             0
-InsDel3a             0
-InsDel3b             0
-InsDel4              0
-InsDel5a             0
-InsDel5b             0
-InsDel5c             0
-InsDel6              0
-InsDel7              0
-InsDel8              0
-InsDel9              0
-InsDel10             0
-InsDel11          5473
-InsDel12             0
-InsDel13             0
-InsDel14             0
-InsDel17             0
-InsDel18             0
-InsDel19a            0
-InsDel19b            0
-InsDel23             0
-InsDel_A_alpha       0
-InsDel_A_beta        0
-InsDel_B             0
-InsDel_C             0
-InsDel_D             0
-InsDel_E             0
-InsDel_F             0
-InsDel_G             0
-InsDel_H             0
-InsDel_I             0
-InsDel_J             0
-InsDel_K             0
-InsDel_L             0
-InsDel_M             0
-InsDel_N_alpha       0
-InsDel_N_beta        0
-
-=== sigid: InsDel12 ===
-assignment (with row names):
-               SP112947
-InsDel1a            0.0
-InsDel1b            0.0
-InsDel1c           81.5
-InsDel2a            0.0
-InsDel2b            0.0
-InsDel2c            0.0
-InsDel3a            0.0
-InsDel3b            0.0
-InsDel4             0.0
-InsDel5a            0.0
-InsDel5b            0.0
-InsDel5c            0.0
-InsDel6             0.0
-InsDel7             0.0
-InsDel8             0.0
-InsDel9             0.0
-InsDel10            0.0
-InsDel11            0.0
-InsDel12          243.5
-InsDel13            0.0
-InsDel14            0.0
-InsDel17            0.0
-InsDel18            0.0
-InsDel19a           0.0
-InsDel19b           0.0
-InsDel23            0.0
-InsDel_A_alpha      0.0
-InsDel_A_beta       0.0
-InsDel_B            0.0
-InsDel_C            0.0
-InsDel_D            0.0
-InsDel_E            0.0
-InsDel_F            0.0
-InsDel_G            0.0
-InsDel_H            0.0
-InsDel_I            0.0
-InsDel_J            0.0
-InsDel_K            0.0
-InsDel_L            0.0
-InsDel_M            0.0
-InsDel_N_alpha      0.0
-InsDel_N_beta       0.0
-
-=== sigid: InsDel13 ===
-assignment (with row names):
-               CPCT02060291T
-InsDel1a                   0
-InsDel1b                   0
-InsDel1c                   0
-InsDel2a                   0
-InsDel2b                   0
-InsDel2c                   0
-InsDel3a                   0
-InsDel3b                   0
-InsDel4                    0
-InsDel5a                   0
-InsDel5b                   0
-InsDel5c                   0
-InsDel6                    0
-InsDel7                    0
-InsDel8                    0
-InsDel9                    0
-InsDel10                   0
-InsDel11                   0
-InsDel12                   0
-InsDel13                1260
-InsDel14                   0
-InsDel17                   0
-InsDel18                   0
-InsDel19a                  0
-InsDel19b                  0
-InsDel23                   0
-InsDel_A_alpha             0
-InsDel_A_beta              0
-InsDel_B                   0
-InsDel_C                   0
-InsDel_D                   0
-InsDel_E                   0
-InsDel_F                   0
-InsDel_G                   0
-InsDel_H                   0
-InsDel_I                   0
-InsDel_J                   0
-InsDel_K                   0
-InsDel_L                   0
-InsDel_M                   0
-InsDel_N_alpha             0
-InsDel_N_beta              0
-
-=== sigid: InsDel14 ===
-assignment (with row names):
-               CPCT02340014T
-InsDel1a                   0
-InsDel1b                   0
-InsDel1c                   0
-InsDel2a                   0
-InsDel2b                   0
-InsDel2c                   0
-InsDel3a                   0
-InsDel3b                   0
-InsDel4                    0
-InsDel5a                   0
-InsDel5b                   0
-InsDel5c                   0
-InsDel6                    0
-InsDel7                    0
-InsDel8                    0
-InsDel9                    0
-InsDel10                   0
-InsDel11                   0
-InsDel12                   0
-InsDel13                   0
-InsDel14                3260
-InsDel17                   0
-InsDel18                   0
-InsDel19a                  0
-InsDel19b                  0
-InsDel23                   0
-InsDel_A_alpha             0
-InsDel_A_beta              0
-InsDel_B                   0
-InsDel_C                   0
-InsDel_D                   0
-InsDel_E                   0
-InsDel_F                   0
-InsDel_G                   0
-InsDel_H                   0
-InsDel_I                   0
-InsDel_J                   0
-InsDel_K                   0
-InsDel_L                   0
-InsDel_M                   0
-InsDel_N_alpha             0
-InsDel_N_beta              0
-
-=== sigid: InsDel17 ===
-assignment (with row names):
-               CPCT02250003T
-InsDel1a                   0
-InsDel1b                   0
-InsDel1c                   0
-InsDel2a                   0
-InsDel2b                   0
-InsDel2c                   0
-InsDel3a                   0
-InsDel3b                   0
-InsDel4                    0
-InsDel5a                   0
-InsDel5b                   0
-InsDel5c                   0
-InsDel6                    0
-InsDel7                    0
-InsDel8                    0
-InsDel9                    0
-InsDel10                   0
-InsDel11                   0
-InsDel12                   0
-InsDel13                   0
-InsDel14                   0
-InsDel17                4427
-InsDel18                   0
-InsDel19a                  0
-InsDel19b                  0
-InsDel23                   0
-InsDel_A_alpha             0
-InsDel_A_beta              0
-InsDel_B                   0
-InsDel_C                   0
-InsDel_D                   0
-InsDel_E                   0
-InsDel_F                   0
-InsDel_G                   0
-InsDel_H                   0
-InsDel_I                   0
-InsDel_J                   0
-InsDel_K                   0
-InsDel_L                   0
-InsDel_M                   0
-InsDel_N_alpha             0
-InsDel_N_beta              0
-
-=== sigid: InsDel18 ===
-assignment (with row names):
-               CPCT02070053T
-InsDel1a                   0
-InsDel1b                   0
-InsDel1c                   0
-InsDel2a                   0
-InsDel2b                   0
-InsDel2c                   0
-InsDel3a                   0
-InsDel3b                   0
-InsDel4                    0
-InsDel5a                   0
-InsDel5b                   0
-InsDel5c                   0
-InsDel6                    0
-InsDel7                    0
-InsDel8                    0
-InsDel9                    0
-InsDel10                   0
-InsDel11                   0
-InsDel12                   0
-InsDel13                   0
-InsDel14                   0
-InsDel17                   0
-InsDel18                1510
-InsDel19a                  0
-InsDel19b                  0
-InsDel23                   0
-InsDel_A_alpha             0
-InsDel_A_beta              0
-InsDel_B                   0
-InsDel_C                   0
-InsDel_D                   0
-InsDel_E                   0
-InsDel_F                   0
-InsDel_G                   0
-InsDel_H                   0
-InsDel_I                   0
-InsDel_J                   0
-InsDel_K                   0
-InsDel_L                   0
-InsDel_M                   0
-InsDel_N_alpha             0
-InsDel_N_beta              0
-
-=== sigid: InsDel19a ===
-assignment (with row names):
-               CPCT02010408TII
-InsDel1a                  82.0
-InsDel1b                   0.0
-InsDel1c                   0.0
-InsDel2a                   0.0
-InsDel2b                   0.0
-InsDel2c                   0.0
-InsDel3a                  81.0
-InsDel3b                   0.0
-InsDel4                   68.5
-InsDel5a                   0.0
-InsDel5b                   0.0
-InsDel5c                   0.0
-InsDel6                   51.5
-InsDel7                    0.0
-InsDel8                    0.0
-InsDel9                    0.0
-InsDel10                   0.0
-InsDel11                   0.0
-InsDel12                   0.0
-InsDel13                   0.0
-InsDel14                   0.0
-InsDel17                   0.0
-InsDel18                   0.0
-InsDel19a                  0.0
-InsDel19b                 85.0
-InsDel23                   0.0
-InsDel_A_alpha             0.0
-InsDel_A_beta              0.0
-InsDel_B                   0.0
-InsDel_C                   0.0
-InsDel_D                   0.0
-InsDel_E                   0.0
-InsDel_F                   0.0
-InsDel_G                   0.0
-InsDel_H                   0.0
-InsDel_I                   0.0
-InsDel_J                   0.0
-InsDel_K                   0.0
-InsDel_L                   0.0
-InsDel_M                   0.0
-InsDel_N_alpha             0.0
-InsDel_N_beta              0.0
-
-=== sigid: InsDel19b ===
-assignment (with row names):
-               CPCT02050192T
-InsDel1a                   0
-InsDel1b                   0
-InsDel1c                   0
-InsDel2a                   0
-InsDel2b                   0
-InsDel2c                   0
-InsDel3a                   0
-InsDel3b                   0
-InsDel4                    0
-InsDel5a                   0
-InsDel5b                   0
-InsDel5c                   0
-InsDel6                    0
-InsDel7                    0
-InsDel8                    0
-InsDel9                    0
-InsDel10                   0
-InsDel11                   0
-InsDel12                   0
-InsDel13                   0
-InsDel14                   0
-InsDel17                   0
-InsDel18                   0
-InsDel19a                  0
-InsDel19b                331
-InsDel23                   0
-InsDel_A_alpha             0
-InsDel_A_beta              0
-InsDel_B                   0
-InsDel_C                   0
-InsDel_D                   0
-InsDel_E                   0
-InsDel_F                   0
-InsDel_G                   0
-InsDel_H                   0
-InsDel_I                   0
-InsDel_J                   0
-InsDel_K                   0
-InsDel_L                   0
-InsDel_M                   0
-InsDel_N_alpha             0
-InsDel_N_beta              0
-
-=== sigid: InsDel23 ===
-assignment (with row names):
-               SP102957
-InsDel1a            0.0
-InsDel1b            0.0
-InsDel1c            0.0
-InsDel2a            0.0
-InsDel2b            0.0
-InsDel2c            0.0
-InsDel3a            0.0
-InsDel3b            0.0
-InsDel4             0.0
-InsDel5a          560.5
-InsDel5b            0.0
-InsDel5c            0.0
-InsDel6             0.0
-InsDel7             0.0
-InsDel8             0.0
-InsDel9             0.0
-InsDel10            0.0
-InsDel11            0.0
-InsDel12            0.0
-InsDel13            0.0
-InsDel14            0.0
-InsDel17            0.0
-InsDel18            0.0
-InsDel19a           0.0
-InsDel19b           0.0
-InsDel23          734.5
-InsDel_A_alpha      0.0
-InsDel_A_beta       0.0
-InsDel_B            0.0
-InsDel_C            0.0
-InsDel_D            0.0
-InsDel_E            0.0
-InsDel_F            0.0
-InsDel_G            0.0
-InsDel_H            0.0
-InsDel_I            0.0
-InsDel_J            0.0
-InsDel_K            0.0
-InsDel_L            0.0
-InsDel_M            0.0
-InsDel_N_alpha      0.0
-InsDel_N_beta       0.0
-
-=== sigid: InsDel_A_alpha ===
-assignment (with row names):
-               CPCT02120078T
-InsDel1a              1017.5
-InsDel1b                 0.0
-InsDel1c                 0.0
-InsDel2a                 0.0
-InsDel2b                 0.0
-InsDel2c                 0.0
-InsDel3a                 0.0
-InsDel3b                 0.0
-InsDel4                  0.0
-InsDel5a                 0.0
-InsDel5b                 0.0
-InsDel5c                 0.0
-InsDel6                  0.0
-InsDel7                  0.0
-InsDel8                  0.0
-InsDel9                  0.0
-InsDel10                 0.0
-InsDel11                 0.0
-InsDel12                 0.0
-InsDel13                 0.0
-InsDel14                 0.0
-InsDel17                 0.0
-InsDel18                 0.0
-InsDel19a                0.0
-InsDel19b                0.0
-InsDel23                 0.0
-InsDel_A_alpha         767.5
-InsDel_A_beta            0.0
-InsDel_B                 0.0
-InsDel_C                 0.0
-InsDel_D                 0.0
-InsDel_E                 0.0
-InsDel_F                 0.0
-InsDel_G                 0.0
-InsDel_H                 0.0
-InsDel_I                 0.0
-InsDel_J                 0.0
-InsDel_K                 0.0
-InsDel_L                 0.0
-InsDel_M                 0.0
-InsDel_N_alpha           0.0
-InsDel_N_beta            0.0
-
-=== sigid: InsDel_A_beta ===
-assignment (with row names):
-               SP2293
-InsDel1a           83
-InsDel1b            0
-InsDel1c            0
-InsDel2a            0
-InsDel2b            0
-InsDel2c            0
-InsDel3a            0
-InsDel3b            0
-InsDel4             0
-InsDel5a            0
-InsDel5b            0
-InsDel5c            0
-InsDel6             0
-InsDel7             0
-InsDel8             0
-InsDel9             0
-InsDel10            0
-InsDel11            0
-InsDel12            0
-InsDel13            0
-InsDel14            0
-InsDel17            0
-InsDel18            0
-InsDel19a           0
-InsDel19b           0
-InsDel23            0
-InsDel_A_alpha      0
-InsDel_A_beta     250
-InsDel_B            0
-InsDel_C            0
-InsDel_D            0
-InsDel_E            0
-InsDel_F            0
-InsDel_G            0
-InsDel_H            0
-InsDel_I            0
-InsDel_J            0
-InsDel_K            0
-InsDel_L            0
-InsDel_M            0
-InsDel_N_alpha      0
-InsDel_N_beta       0
-
-=== sigid: InsDel_B ===
-assignment (with row names):
-               CPCT02020413T
-InsDel1a                 0.0
-InsDel1b                 0.0
-InsDel1c                 0.0
-InsDel2a                 0.0
-InsDel2b                 0.0
-InsDel2c                 0.0
-InsDel3a                 0.0
-InsDel3b                 0.0
-InsDel4                  0.0
-InsDel5a               549.5
-InsDel5b                 0.0
-InsDel5c                 0.0
-InsDel6                  0.0
-InsDel7                  0.0
-InsDel8                  0.0
-InsDel9                  0.0
-InsDel10                 0.0
-InsDel11                 0.0
-InsDel12                 0.0
-InsDel13                 0.0
-InsDel14                 0.0
-InsDel17                 0.0
-InsDel18                 0.0
-InsDel19a                0.0
-InsDel19b                0.0
-InsDel23                 0.0
-InsDel_A_alpha           0.0
-InsDel_A_beta            0.0
-InsDel_B              1392.5
-InsDel_C                 0.0
-InsDel_D                 0.0
-InsDel_E                 0.0
-InsDel_F                 0.0
-InsDel_G                 0.0
-InsDel_H                 0.0
-InsDel_I                 0.0
-InsDel_J                 0.0
-InsDel_K                 0.0
-InsDel_L                 0.0
-InsDel_M                 0.0
-InsDel_N_alpha           0.0
-InsDel_N_beta            0.0
-
-=== sigid: InsDel_C ===
-assignment (with row names):
-               CPCT02010772T
-InsDel1a                 0.0
-InsDel1b                 0.0
-InsDel1c                 0.0
-InsDel2a                 0.0
-InsDel2b                 0.0
-InsDel2c                 0.0
-InsDel3a                 0.0
-InsDel3b                 0.0
-InsDel4                  0.0
-InsDel5a                 0.0
-InsDel5b                 0.0
-InsDel5c                 0.0
-InsDel6                  0.0
-InsDel7                  0.0
-InsDel8                  0.0
-InsDel9                  0.0
-InsDel10                 0.0
-InsDel11                 0.0
-InsDel12                 0.0
-InsDel13               184.5
-InsDel14                 0.0
-InsDel17                 0.0
-InsDel18                 0.0
-InsDel19a                0.0
-InsDel19b               86.0
-InsDel23                 0.0
-InsDel_A_alpha           0.0
-InsDel_A_beta            0.0
-InsDel_B                 0.0
-InsDel_C               299.0
-InsDel_D                 0.0
-InsDel_E                 0.0
-InsDel_F                 0.0
-InsDel_G                 0.0
-InsDel_H                 0.0
-InsDel_I                 0.0
-InsDel_J                 0.0
-InsDel_K                 0.0
-InsDel_L                 0.0
-InsDel_M                 0.0
-InsDel_N_alpha           0.0
-InsDel_N_beta           92.5
-
-=== sigid: InsDel_D ===
-assignment (with row names):
-               CPCT02100101T
-InsDel1a                   0
-InsDel1b                   0
-InsDel1c                   0
-InsDel2a                1303
-InsDel2b                   0
-InsDel2c                   0
-InsDel3a                   0
-InsDel3b                   0
-InsDel4                    0
-InsDel5a                   0
-InsDel5b                   0
-InsDel5c                   0
-InsDel6                    0
-InsDel7                    0
-InsDel8                    0
-InsDel9                    0
-InsDel10                   0
-InsDel11                   0
-InsDel12                   0
-InsDel13                   0
-InsDel14                   0
-InsDel17                   0
-InsDel18                   0
-InsDel19a                  0
-InsDel19b                322
-InsDel23                   0
-InsDel_A_alpha             0
-InsDel_A_beta              0
-InsDel_B                   0
-InsDel_C                   0
-InsDel_D               12957
-InsDel_E                   0
-InsDel_F                   0
-InsDel_G                   0
-InsDel_H                   0
-InsDel_I                   0
-InsDel_J                 548
-InsDel_K                   0
-InsDel_L                   0
-InsDel_M                   0
-InsDel_N_alpha             0
-InsDel_N_beta              0
-
-=== sigid: InsDel_E ===
-assignment (with row names):
-               DRUP01340014T
-InsDel1a                95.5
-InsDel1b                 0.0
-InsDel1c                 0.0
-InsDel2a                 0.0
-InsDel2b                 0.0
-InsDel2c                 0.0
-InsDel3a                 0.0
-InsDel3b                 0.0
-InsDel4                  0.0
-InsDel5a                 0.0
-InsDel5b                 0.0
-InsDel5c                 0.0
-InsDel6                  0.0
-InsDel7                  0.0
-InsDel8                  0.0
-InsDel9                  0.0
-InsDel10                 0.0
-InsDel11                 0.0
-InsDel12                 0.0
-InsDel13                 0.0
-InsDel14                 0.0
-InsDel17                 0.0
-InsDel18                 0.0
-InsDel19a                0.0
-InsDel19b                0.0
-InsDel23                 0.0
-InsDel_A_alpha           0.0
-InsDel_A_beta            0.0
-InsDel_B                 0.0
-InsDel_C                 0.0
-InsDel_D                 0.0
-InsDel_E               345.5
-InsDel_F                 0.0
-InsDel_G                 0.0
-InsDel_H                 0.0
-InsDel_I                 0.0
-InsDel_J                 0.0
-InsDel_K                 0.0
-InsDel_L                 0.0
-InsDel_M                 0.0
-InsDel_N_alpha           0.0
-InsDel_N_beta            0.0
-
-=== sigid: InsDel_F ===
-assignment (with row names):
-               DRUP01030028T
-InsDel1a                 230
-InsDel1b                   0
-InsDel1c                   0
-InsDel2a                   0
-InsDel2b                   0
-InsDel2c                   0
-InsDel3a                   0
-InsDel3b                   0
-InsDel4                    0
-InsDel5a                   0
-InsDel5b                   0
-InsDel5c                   0
-InsDel6                    0
-InsDel7                    0
-InsDel8                    0
-InsDel9                    0
-InsDel10                   0
-InsDel11                   0
-InsDel12                   0
-InsDel13                   0
-InsDel14                   0
-InsDel17                   0
-InsDel18                   0
-InsDel19a                  0
-InsDel19b                  0
-InsDel23                   0
-InsDel_A_alpha             0
-InsDel_A_beta              0
-InsDel_B                   0
-InsDel_C                   0
-InsDel_D                   0
-InsDel_E                   0
-InsDel_F                1445
-InsDel_G                   0
-InsDel_H                   0
-InsDel_I                   0
-InsDel_J                   0
-InsDel_K                   0
-InsDel_L                   0
-InsDel_M                   0
-InsDel_N_alpha             0
-InsDel_N_beta              0
-
-=== sigid: InsDel_G ===
-assignment (with row names):
-               DRUP01030015T
-InsDel1a               389.5
-InsDel1b                 0.0
-InsDel1c                 0.0
-InsDel2a                 0.0
-InsDel2b                 0.0
-InsDel2c                 0.0
-InsDel3a                 0.0
-InsDel3b                 0.0
-InsDel4                  0.0
-InsDel5a                 0.0
-InsDel5b                 0.0
-InsDel5c                 0.0
-InsDel6                  0.0
-InsDel7                  0.0
-InsDel8                  0.0
-InsDel9                  0.0
-InsDel10                 0.0
-InsDel11                 0.0
-InsDel12                 0.0
-InsDel13                 0.0
-InsDel14                 0.0
-InsDel17                 0.0
-InsDel18                 0.0
-InsDel19a                0.0
-InsDel19b                0.0
-InsDel23                 0.0
-InsDel_A_alpha           0.0
-InsDel_A_beta            0.0
-InsDel_B                 0.0
-InsDel_C                 0.0
-InsDel_D                 0.0
-InsDel_E                 0.0
-InsDel_F                 0.0
-InsDel_G               643.5
-InsDel_H                 0.0
-InsDel_I                 0.0
-InsDel_J                 0.0
-InsDel_K                 0.0
-InsDel_L                 0.0
-InsDel_M                 0.0
-InsDel_N_alpha           0.0
-InsDel_N_beta            0.0
-
-=== sigid: InsDel_H ===
-assignment (with row names):
-               CPCT02010648T
-InsDel1a                 0.0
-InsDel1b                 0.0
-InsDel1c                 0.0
-InsDel2a                 0.0
-InsDel2b                 0.0
-InsDel2c                 0.0
-InsDel3a                 0.0
-InsDel3b                 0.0
-InsDel4                  0.0
-InsDel5a                 0.0
-InsDel5b                 0.0
-InsDel5c                 0.0
-InsDel6                  0.0
-InsDel7                  0.0
-InsDel8                  0.0
-InsDel9                167.5
-InsDel10                 0.0
-InsDel11                 0.0
-InsDel12                 0.0
-InsDel13                 0.0
-InsDel14                 0.0
-InsDel17                 0.0
-InsDel18                 0.0
-InsDel19a                0.0
-InsDel19b              101.5
-InsDel23                 0.0
-InsDel_A_alpha           0.0
-InsDel_A_beta            0.0
-InsDel_B                 0.0
-InsDel_C                 0.0
-InsDel_D                 0.0
-InsDel_E                 0.0
-InsDel_F                 0.0
-InsDel_G                 0.0
-InsDel_H               212.0
-InsDel_I                 0.0
-InsDel_J                 0.0
-InsDel_K                 0.0
-InsDel_L                 0.0
-InsDel_M                 0.0
-InsDel_N_alpha           0.0
-InsDel_N_beta            0.0
-
-=== sigid: InsDel_I ===
-assignment (with row names):
-               SP107439
-InsDel1a             36
-InsDel1b              0
-InsDel1c              0
-InsDel2a              0
-InsDel2b              0
-InsDel2c              0
-InsDel3a              0
-InsDel3b              0
-InsDel4               0
-InsDel5a              0
-InsDel5b              0
-InsDel5c              0
-InsDel6               0
-InsDel7               0
-InsDel8               0
-InsDel9               0
-InsDel10              0
-InsDel11              0
-InsDel12              0
-InsDel13              0
-InsDel14              0
-InsDel17              0
-InsDel18              0
-InsDel19a             0
-InsDel19b             0
-InsDel23              0
-InsDel_A_alpha        0
-InsDel_A_beta         0
-InsDel_B              0
-InsDel_C              0
-InsDel_D              0
-InsDel_E              0
-InsDel_F              0
-InsDel_G              0
-InsDel_H              0
-InsDel_I            251
-InsDel_J              0
-InsDel_K              0
-InsDel_L              0
-InsDel_M              0
-InsDel_N_alpha        0
-InsDel_N_beta         0
-
-=== sigid: InsDel_J ===
-assignment (with row names):
-               DRUP01010037T
-InsDel1a                   0
-InsDel1b                   0
-InsDel1c                   0
-InsDel2a                   0
-InsDel2b                   0
-InsDel2c                   0
-InsDel3a                   0
-InsDel3b                   0
-InsDel4                    0
-InsDel5a                   0
-InsDel5b                   0
-InsDel5c                   0
-InsDel6                    0
-InsDel7                26324
-InsDel8                    0
-InsDel9                    0
-InsDel10                   0
-InsDel11                   0
-InsDel12                   0
-InsDel13                   0
-InsDel14                   0
-InsDel17                   0
-InsDel18                   0
-InsDel19a                  0
-InsDel19b                682
-InsDel23                   0
-InsDel_A_alpha             0
-InsDel_A_beta              0
-InsDel_B                   0
-InsDel_C                   0
-InsDel_D                2203
-InsDel_E                   0
-InsDel_F                   0
-InsDel_G                   0
-InsDel_H                   0
-InsDel_I                   0
-InsDel_J                9689
-InsDel_K                   0
-InsDel_L                   0
-InsDel_M                   0
-InsDel_N_alpha             0
-InsDel_N_beta              0
-
-=== sigid: InsDel_K ===
-assignment (with row names):
-               SP17905
-InsDel1a             0
-InsDel1b         11910
-InsDel1c             0
-InsDel2a             0
-InsDel2b             0
-InsDel2c             0
-InsDel3a             0
-InsDel3b             0
-InsDel4              0
-InsDel5a             0
-InsDel5b             0
-InsDel5c             0
-InsDel6              0
-InsDel7              0
-InsDel8              0
-InsDel9              0
-InsDel10             0
-InsDel11             0
-InsDel12             0
-InsDel13             0
-InsDel14             0
-InsDel17             0
-InsDel18             0
-InsDel19a            0
-InsDel19b            0
-InsDel23             0
-InsDel_A_alpha       0
-InsDel_A_beta        0
-InsDel_B             0
-InsDel_C             0
-InsDel_D             0
-InsDel_E             0
-InsDel_F             0
-InsDel_G             0
-InsDel_H             0
-InsDel_I             0
-InsDel_J             0
-InsDel_K         13756
-InsDel_L             0
-InsDel_M             0
-InsDel_N_alpha       0
-InsDel_N_beta        0
-
-=== sigid: InsDel_L ===
-assignment (with row names):
-               CPCT02450014T
-InsDel1a                   0
-InsDel1b                   0
-InsDel1c                   0
-InsDel2a                   0
-InsDel2b                   0
-InsDel2c                   0
-InsDel3a                   0
-InsDel3b                   0
-InsDel4                    0
-InsDel5a                   0
-InsDel5b                   0
-InsDel5c                   0
-InsDel6                    0
-InsDel7                20067
-InsDel8                    0
-InsDel9                    0
-InsDel10                   0
-InsDel11                   0
-InsDel12                   0
-InsDel13                   0
-InsDel14                   0
-InsDel17                   0
-InsDel18                   0
-InsDel19a                  0
-InsDel19b                  0
-InsDel23                   0
-InsDel_A_alpha             0
-InsDel_A_beta              0
-InsDel_B                   0
-InsDel_C                   0
-InsDel_D               63411
-InsDel_E                   0
-InsDel_F                   0
-InsDel_G                   0
-InsDel_H                   0
-InsDel_I                   0
-InsDel_J                   0
-InsDel_K                   0
-InsDel_L              184009
-InsDel_M                   0
-InsDel_N_alpha             0
-InsDel_N_beta              0
-
-=== sigid: InsDel_M ===
-assignment (with row names):
-               SP112777
-InsDel1a            0.0
-InsDel1b            0.0
-InsDel1c            0.0
-InsDel2a          244.5
-InsDel2b            0.0
-InsDel2c            0.0
-InsDel3a            0.0
-InsDel3b            0.0
-InsDel4             0.0
-InsDel5a            0.0
-InsDel5b            0.0
-InsDel5c            0.0
-InsDel6             0.0
-InsDel7             0.0
-InsDel8             0.0
-InsDel9             0.0
-InsDel10            0.0
-InsDel11            0.0
-InsDel12            0.0
-InsDel13            0.0
-InsDel14            0.0
-InsDel17            0.0
-InsDel18            0.0
-InsDel19a           0.0
-InsDel19b           0.0
-InsDel23            0.0
-InsDel_A_alpha      0.0
-InsDel_A_beta       0.0
-InsDel_B            0.0
-InsDel_C            0.0
-InsDel_D            0.0
-InsDel_E            0.0
-InsDel_F            0.0
-InsDel_G            0.0
-InsDel_H            0.0
-InsDel_I            0.0
-InsDel_J            0.0
-InsDel_K            0.0
-InsDel_L            0.0
-InsDel_M          357.5
-InsDel_N_alpha      0.0
-InsDel_N_beta       0.0
-
-=== sigid: InsDel_N_alpha ===
-assignment (with row names):
-               SP93227
-InsDel1a             0
-InsDel1b             0
-InsDel1c             0
-InsDel2a             0
-InsDel2b             0
-InsDel2c             0
-InsDel3a             0
-InsDel3b             0
-InsDel4              0
-InsDel5a             0
-InsDel5b             0
-InsDel5c             0
-InsDel6              0
-InsDel7          14708
-InsDel8              0
-InsDel9              0
-InsDel10             0
-InsDel11             0
-InsDel12             0
-InsDel13             0
-InsDel14             0
-InsDel17             0
-InsDel18             0
-InsDel19a            0
-InsDel19b            0
-InsDel23             0
-InsDel_A_alpha       0
-InsDel_A_beta        0
-InsDel_B             0
-InsDel_C             0
-InsDel_D             0
-InsDel_E             0
-InsDel_F             0
-InsDel_G             0
-InsDel_H             0
-InsDel_I             0
-InsDel_J             0
-InsDel_K          7604
-InsDel_L             0
-InsDel_M             0
-InsDel_N_alpha  107027
-InsDel_N_beta        0
-
-=== sigid: InsDel_N_beta ===
-assignment (with row names):
-               SP111038
-InsDel1a              0
-InsDel1b              0
-InsDel1c              0
-InsDel2a              0
-InsDel2b              0
-InsDel2c              0
-InsDel3a              0
-InsDel3b              0
-InsDel4               0
-InsDel5a              0
-InsDel5b              0
-InsDel5c              0
-InsDel6               0
-InsDel7               0
-InsDel8               0
-InsDel9               0
-InsDel10              0
-InsDel11              0
-InsDel12              0
-InsDel13              0
-InsDel14              0
-InsDel17              0
-InsDel18              0
-InsDel19a             0
-InsDel19b             0
-InsDel23              0
-InsDel_A_alpha        0
-InsDel_A_beta         0
-InsDel_B              0
-InsDel_C              0
-InsDel_D              0
-InsDel_E              0
-InsDel_F              0
-InsDel_G              0
-InsDel_H              0
-InsDel_I              0
-InsDel_J              0
-InsDel_K              0
-InsDel_L              0
-InsDel_M              0
-InsDel_N_alpha        0
-InsDel_N_beta      3419
-
-=== sigid: InsDel1a ===
-assignment (with row names):
-               CPCT02050439T
-InsDel1a                3204
-InsDel1b                   0
-InsDel1c                   0
-InsDel2a                   0
-InsDel2b                   0
-InsDel2c                   0
-InsDel3a                   0
-InsDel3b                   0
-InsDel4                    0
-InsDel5a                   0
-InsDel5b                   0
-InsDel5c                   0
-InsDel6                    0
-InsDel7                    0
-InsDel8                    0
-InsDel9                    0
-InsDel10                   0
-InsDel11                   0
-InsDel12                   0
-InsDel13                   0
-InsDel14                   0
-InsDel17                   0
-InsDel18                   0
-InsDel19a                  0
-InsDel19b                  0
-InsDel23                   0
-InsDel_A_alpha             0
-InsDel_A_beta              0
-InsDel_B                 152
-InsDel_C                   0
-InsDel_D                   0
-InsDel_E                   0
-InsDel_F                   0
-InsDel_G                   0
-InsDel_H                   0
-InsDel_I                   0
-InsDel_J                   0
-InsDel_K                   0
-InsDel_L                   0
-InsDel_M                   0
-InsDel_N_alpha             0
-InsDel_N_beta            566
-WARNING: InsDel1a has only 81.7 % of mutations
-
-=== sigid: InsDel1b ===
-assignment (with row names):
-               SP21400
-InsDel1a             0
-InsDel1b          9037
-InsDel1c             0
-InsDel2a           851
-InsDel2b           663
-InsDel2c             0
-InsDel3a             0
-InsDel3b             0
-InsDel4              0
-InsDel5a             0
-InsDel5b             0
-InsDel5c             0
-InsDel6              0
-InsDel7              0
-InsDel8              0
-InsDel9              0
-InsDel10             0
-InsDel11             0
-InsDel12             0
-InsDel13             0
-InsDel14             0
-InsDel17             0
-InsDel18             0
-InsDel19a            0
-InsDel19b            0
-InsDel23             0
-InsDel_A_alpha       0
-InsDel_A_beta        0
-InsDel_B             0
-InsDel_C             0
-InsDel_D             0
-InsDel_E             0
-InsDel_F             0
-InsDel_G             0
-InsDel_H             0
-InsDel_I             0
-InsDel_J             0
-InsDel_K             0
-InsDel_L             0
-InsDel_M             0
-InsDel_N_alpha       0
-InsDel_N_beta        0
-WARNING: InsDel1b has only 85.7 % of mutations
-
-=== sigid: InsDel1c ===
-assignment (with row names):
-               SP112907
-InsDel1a              0
-InsDel1b              0
-InsDel1c           1220
-InsDel2a              0
-InsDel2b              0
-InsDel2c              0
-InsDel3a              0
-InsDel3b              0
-InsDel4               0
-InsDel5a              0
-InsDel5b              0
-InsDel5c              0
-InsDel6               0
-InsDel7               0
-InsDel8               0
-InsDel9               0
-InsDel10              0
-InsDel11              0
-InsDel12             71
-InsDel13              0
-InsDel14              0
-InsDel17              0
-InsDel18              0
-InsDel19a             0
-InsDel19b             0
-InsDel23              0
-InsDel_A_alpha        0
-InsDel_A_beta         0
-InsDel_B            150
-InsDel_C              0
-InsDel_D              0
-InsDel_E              0
-InsDel_F              0
-InsDel_G              0
-InsDel_H              0
-InsDel_I              0
-InsDel_J              0
-InsDel_K              0
-InsDel_L              0
-InsDel_M              0
-InsDel_N_alpha        0
-InsDel_N_beta         0
-WARNING: InsDel1c has only 84.7 % of mutations
-
-=== sigid: InsDel2a ===
-assignment (with row names):
-               SP17172
-InsDel1a             0
-InsDel1b             0
-InsDel1c             0
-InsDel2a         21668
-InsDel2b          3539
-InsDel2c             0
-InsDel3a             0
-InsDel3b             0
-InsDel4              0
-InsDel5a             0
-InsDel5b             0
-InsDel5c             0
-InsDel6              0
-InsDel7          14674
-InsDel8              0
-InsDel9              0
-InsDel10             0
-InsDel11             0
-InsDel12             0
-InsDel13             0
-InsDel14             0
-InsDel17             0
-InsDel18             0
-InsDel19a            0
-InsDel19b            0
-InsDel23             0
-InsDel_A_alpha       0
-InsDel_A_beta        0
-InsDel_B             0
-InsDel_C             0
-InsDel_D             0
-InsDel_E             0
-InsDel_F             0
-InsDel_G             0
-InsDel_H             0
-InsDel_I             0
-InsDel_J             0
-InsDel_K             0
-InsDel_L             0
-InsDel_M             0
-InsDel_N_alpha       0
-InsDel_N_beta        0
-WARNING: InsDel2a has only 54.3 % of mutations
-
-=== sigid: InsDel2b ===
-assignment (with row names):
-               SP96118
-InsDel1a             0
-InsDel1b             0
-InsDel1c             0
-InsDel2a             0
-InsDel2b          7534
-InsDel2c             0
-InsDel3a             0
-InsDel3b             0
-InsDel4              0
-InsDel5a             0
-InsDel5b             0
-InsDel5c             0
-InsDel6              0
-InsDel7           1542
-InsDel8              0
-InsDel9              0
-InsDel10             0
-InsDel11             0
-InsDel12             0
-InsDel13             0
-InsDel14             0
-InsDel17             0
-InsDel18             0
-InsDel19a            0
-InsDel19b            0
-InsDel23             0
-InsDel_A_alpha       0
-InsDel_A_beta        0
-InsDel_B             0
-InsDel_C             0
-InsDel_D             0
-InsDel_E             0
-InsDel_F             0
-InsDel_G             0
-InsDel_H             0
-InsDel_I             0
-InsDel_J           389
-InsDel_K             0
-InsDel_L             0
-InsDel_M             0
-InsDel_N_alpha       0
-InsDel_N_beta        0
-WARNING: InsDel2b has only 79.6 % of mutations
-
-=== sigid: InsDel2c ===
-assignment (with row names):
-               DRUP01330020T
-InsDel1a                   0
-InsDel1b                   0
-InsDel1c                   0
-InsDel2a                   0
-InsDel2b                   0
-InsDel2c              179759
-InsDel3a                   0
-InsDel3b                   0
-InsDel4                    0
-InsDel5a                   0
-InsDel5b                   0
-InsDel5c                   0
-InsDel6                    0
-InsDel7                25781
-InsDel8                    0
-InsDel9                    0
-InsDel10                   0
-InsDel11                   0
-InsDel12                   0
-InsDel13                   0
-InsDel14                   0
-InsDel17                   0
-InsDel18                   0
-InsDel19a                  0
-InsDel19b                  0
-InsDel23                   0
-InsDel_A_alpha             0
-InsDel_A_beta              0
-InsDel_B                   0
-InsDel_C                   0
-InsDel_D                   0
-InsDel_E                   0
-InsDel_F                   0
-InsDel_G                   0
-InsDel_H                   0
-InsDel_I                   0
-InsDel_J               12420
-InsDel_K                   0
-InsDel_L                   0
-InsDel_M                   0
-InsDel_N_alpha             0
-InsDel_N_beta              0
-WARNING: InsDel2c has only 82.5 % of mutations
-
-=== sigid: InsDel3a ===
-assignment (with row names):
-               CPCT02050436T
-InsDel1a                 0.0
-InsDel1b                 0.0
-InsDel1c                 0.0
-InsDel2a                 0.0
-InsDel2b                 0.0
-InsDel2c                 0.0
-InsDel3a              1445.5
-InsDel3b                 0.0
-InsDel4                  0.0
-InsDel5a                 0.0
-InsDel5b                 0.0
-InsDel5c                 0.0
-InsDel6                  0.0
-InsDel7                  0.0
-InsDel8                  0.0
-InsDel9                  0.0
-InsDel10                 0.0
-InsDel11                 0.0
-InsDel12                 0.0
-InsDel13                 0.0
-InsDel14                 0.0
-InsDel17                 0.0
-InsDel18                 0.0
-InsDel19a                0.0
-InsDel19b                0.0
-InsDel23                 0.0
-InsDel_A_alpha           0.0
-InsDel_A_beta            0.0
-InsDel_B                 0.0
-InsDel_C                 0.0
-InsDel_D                 0.0
-InsDel_E                 0.0
-InsDel_F                 0.0
-InsDel_G                 0.0
-InsDel_H                 0.0
-InsDel_I                 0.0
-InsDel_J                 0.0
-InsDel_K                 0.0
-InsDel_L                 0.0
-InsDel_M                 0.0
-InsDel_N_alpha           0.0
-InsDel_N_beta          316.5
-WARNING: InsDel3a has only 82 % of mutations
-
-=== sigid: InsDel3b ===
-assignment (with row names):
-               CPCT02080086T
-InsDel1a                   0
-InsDel1b                   0
-InsDel1c                   0
-InsDel2a                   0
-InsDel2b                   0
-InsDel2c                   0
-InsDel3a                   0
-InsDel3b                3772
-InsDel4                    0
-InsDel5a                   0
-InsDel5b                   0
-InsDel5c                   0
-InsDel6                    0
-InsDel7                    0
-InsDel8                    0
-InsDel9                    0
-InsDel10                   0
-InsDel11                   0
-InsDel12                   0
-InsDel13                   0
-InsDel14                   0
-InsDel17                   0
-InsDel18                   0
-InsDel19a                  0
-InsDel19b                  0
-InsDel23                   0
-InsDel_A_alpha             0
-InsDel_A_beta              0
-InsDel_B                   0
-InsDel_C                   0
-InsDel_D                   0
-InsDel_E                   0
-InsDel_F                   0
-InsDel_G                   0
-InsDel_H                   0
-InsDel_I                   0
-InsDel_J                   0
-InsDel_K                   0
-InsDel_L                   0
-InsDel_M                   0
-InsDel_N_alpha             0
-InsDel_N_beta              0
-
-=== sigid: InsDel4 ===
-assignment (with row names):
-               SP48008
-InsDel1a             0
-InsDel1b             0
-InsDel1c             0
-InsDel2a             0
-InsDel2b             0
-InsDel2c             0
-InsDel3a             0
-InsDel3b             0
-InsDel4            586
-InsDel5a             0
-InsDel5b             0
-InsDel5c             0
-InsDel6              0
-InsDel7              0
-InsDel8              0
-InsDel9              0
-InsDel10             0
-InsDel11             0
-InsDel12             0
-InsDel13             0
-InsDel14             0
-InsDel17             0
-InsDel18             0
-InsDel19a            0
-InsDel19b            0
-InsDel23             0
-InsDel_A_alpha       0
-InsDel_A_beta        0
-InsDel_B             0
-InsDel_C             0
-InsDel_D             0
-InsDel_E             0
-InsDel_F             0
-InsDel_G             0
-InsDel_H             0
-InsDel_I             0
-InsDel_J             0
-InsDel_K             0
-InsDel_L             0
-InsDel_M             0
-InsDel_N_alpha       0
-InsDel_N_beta        0
-
-=== sigid: InsDel5a ===
-assignment (with row names):
-               SP97194
-InsDel1a             0
-InsDel1b             0
-InsDel1c             0
-InsDel2a             0
-InsDel2b             0
-InsDel2c             0
-InsDel3a             0
-InsDel3b             0
-InsDel4              0
-InsDel5a          2176
-InsDel5b             0
-InsDel5c             0
-InsDel6              0
-InsDel7              0
-InsDel8              0
-InsDel9              0
-InsDel10             0
-InsDel11             0
-InsDel12             0
-InsDel13             0
-InsDel14             0
-InsDel17             0
-InsDel18             0
-InsDel19a            0
-InsDel19b            0
-InsDel23             0
-InsDel_A_alpha       0
-InsDel_A_beta        0
-InsDel_B             0
-InsDel_C             0
-InsDel_D             0
-InsDel_E             0
-InsDel_F             0
-InsDel_G             0
-InsDel_H             0
-InsDel_I             0
-InsDel_J             0
-InsDel_K             0
-InsDel_L             0
-InsDel_M             0
-InsDel_N_alpha       0
-InsDel_N_beta        0
-
-=== sigid: InsDel5b ===
-assignment (with row names):
-               SP112290
-InsDel1a          221.0
-InsDel1b            0.0
-InsDel1c            0.0
-InsDel2a            0.0
-InsDel2b            0.0
-InsDel2c            0.0
-InsDel3a            0.0
-InsDel3b          353.5
-InsDel4             0.0
-InsDel5a            0.0
-InsDel5b          316.0
-InsDel5c            0.0
-InsDel6             0.0
-InsDel7             0.0
-InsDel8           145.5
-InsDel9             0.0
-InsDel10            0.0
-InsDel11            0.0
-InsDel12            0.0
-InsDel13            0.0
-InsDel14            0.0
-InsDel17            0.0
-InsDel18            0.0
-InsDel19a           0.0
-InsDel19b           0.0
-InsDel23            0.0
-InsDel_A_alpha      0.0
-InsDel_A_beta       0.0
-InsDel_B            0.0
-InsDel_C            0.0
-InsDel_D            0.0
-InsDel_E            0.0
-InsDel_F            0.0
-InsDel_G            0.0
-InsDel_H            0.0
-InsDel_I            0.0
-InsDel_J            0.0
-InsDel_K            0.0
-InsDel_L            0.0
-InsDel_M            0.0
-InsDel_N_alpha      0.0
-InsDel_N_beta       0.0
+sigid_pct =  30.5019305019305
 WARNING: InsDel5b has only 30.5 % of mutations
+assignment (with row names):
+               SP112290
+InsDel1a          221.0
+InsDel1b            0.0
+InsDel1c            0.0
+InsDel2a            0.0
+InsDel2b            0.0
+InsDel2c            0.0
+InsDel3a            0.0
+InsDel3b          353.5
+InsDel4             0.0
+InsDel5a            0.0
+InsDel5b          316.0
+InsDel5c            0.0
+InsDel6             0.0
+InsDel7             0.0
+InsDel8           145.5
+InsDel9             0.0
+InsDel10            0.0
+InsDel11            0.0
+InsDel12            0.0
+InsDel13            0.0
+InsDel14            0.0
+InsDel17            0.0
+InsDel18            0.0
+InsDel19a           0.0
+InsDel19b           0.0
+InsDel23            0.0
+InsDel_A_alpha      0.0
+InsDel_A_beta       0.0
+InsDel_B            0.0
+InsDel_C            0.0
+InsDel_D            0.0
+InsDel_E            0.0
+InsDel_F            0.0
+InsDel_G            0.0
+InsDel_H            0.0
+InsDel_I            0.0
+InsDel_J            0.0
+InsDel_K            0.0
+InsDel_L            0.0
+InsDel_M            0.0
+InsDel_N_alpha      0.0
+InsDel_N_beta       0.0
 
 === sigid: InsDel5c ===
+sigid_pct =  0
+WARNING: InsDel5c has only 0 % of mutations
 assignment (with row names):
                SP8564
 InsDel1a        124.0
@@ -2489,9 +563,9 @@ InsDel_L          0.0
 InsDel_M          0.0
 InsDel_N_alpha    0.0
 InsDel_N_beta     0.0
-WARNING: InsDel5c has only 0 % of mutations
 
 === sigid: InsDel6 ===
+sigid_pct =  100
 assignment (with row names):
                SP102035
 InsDel1a              0
@@ -2538,6 +612,7 @@ InsDel_N_alpha        0
 InsDel_N_beta         0
 
 === sigid: InsDel7 ===
+sigid_pct =  86.4081899368329
 assignment (with row names):
                WIDE01010075T
 InsDel1a                   0
@@ -2582,9 +657,10 @@ InsDel_L                   0
 InsDel_M                   0
 InsDel_N_alpha             0
 InsDel_N_beta              0
-WARNING: InsDel7 has only 86.4 % of mutations
 
 === sigid: InsDel8 ===
+sigid_pct =  47.7085650723026
+WARNING: InsDel8 has only 47.7 % of mutations
 assignment (with row names):
                CPCT02070336T
 InsDel1a                 0.0
@@ -2629,9 +705,9 @@ InsDel_L                 0.0
 InsDel_M                 0.0
 InsDel_N_alpha           0.0
 InsDel_N_beta            0.0
-WARNING: InsDel8 has only 47.7 % of mutations
 
 === sigid: InsDel9 ===
+sigid_pct =  100
 assignment (with row names):
                SP102617
 InsDel1a              0
@@ -2678,6 +754,8 @@ InsDel_N_alpha        0
 InsDel_N_beta         0
 
 === sigid: InsDel10 ===
+sigid_pct =  45.6043956043956
+WARNING: InsDel10 has only 45.6 % of mutations
 assignment (with row names):
                SP109957
 InsDel1a          187.5
@@ -2722,9 +800,9 @@ InsDel_L            0.0
 InsDel_M            0.0
 InsDel_N_alpha      0.0
 InsDel_N_beta       0.0
-WARNING: InsDel10 has only 45.6 % of mutations
 
 === sigid: InsDel11 ===
+sigid_pct =  100
 assignment (with row names):
                SP77956
 InsDel1a             0
@@ -2771,6 +849,7 @@ InsDel_N_alpha       0
 InsDel_N_beta        0
 
 === sigid: InsDel12 ===
+sigid_pct =  74.9230769230769
 assignment (with row names):
                SP112947
 InsDel1a            0.0
@@ -2815,9 +894,9 @@ InsDel_L            0.0
 InsDel_M            0.0
 InsDel_N_alpha      0.0
 InsDel_N_beta       0.0
-WARNING: InsDel12 has only 74.9 % of mutations
 
 === sigid: InsDel13 ===
+sigid_pct =  100
 assignment (with row names):
                CPCT02060291T
 InsDel1a                   0
@@ -2864,6 +943,7 @@ InsDel_N_alpha             0
 InsDel_N_beta              0
 
 === sigid: InsDel14 ===
+sigid_pct =  100
 assignment (with row names):
                CPCT02340014T
 InsDel1a                   0
@@ -2910,6 +990,7 @@ InsDel_N_alpha             0
 InsDel_N_beta              0
 
 === sigid: InsDel17 ===
+sigid_pct =  100
 assignment (with row names):
                CPCT02250003T
 InsDel1a                   0
@@ -2956,6 +1037,7 @@ InsDel_N_alpha             0
 InsDel_N_beta              0
 
 === sigid: InsDel18 ===
+sigid_pct =  100
 assignment (with row names):
                CPCT02070053T
 InsDel1a                   0
@@ -3002,6 +1084,8 @@ InsDel_N_alpha             0
 InsDel_N_beta              0
 
 === sigid: InsDel19a ===
+sigid_pct =  0
+WARNING: InsDel19a has only 0 % of mutations
 assignment (with row names):
                CPCT02010408TII
 InsDel1a                  82.0
@@ -3046,9 +1130,9 @@ InsDel_L                   0.0
 InsDel_M                   0.0
 InsDel_N_alpha             0.0
 InsDel_N_beta              0.0
-WARNING: InsDel19a has only 0 % of mutations
 
 === sigid: InsDel19b ===
+sigid_pct =  100
 assignment (with row names):
                CPCT02050192T
 InsDel1a                   0
@@ -3095,6 +1179,7 @@ InsDel_N_alpha             0
 InsDel_N_beta              0
 
 === sigid: InsDel23 ===
+sigid_pct =  56.7181467181467
 assignment (with row names):
                SP102957
 InsDel1a            0.0
@@ -3139,9 +1224,10 @@ InsDel_L            0.0
 InsDel_M            0.0
 InsDel_N_alpha      0.0
 InsDel_N_beta       0.0
-WARNING: InsDel23 has only 56.7 % of mutations
 
 === sigid: InsDel_A_alpha ===
+sigid_pct =  42.9971988795518
+WARNING: InsDel_A_alpha has only 43 % of mutations
 assignment (with row names):
                CPCT02120078T
 InsDel1a              1017.5
@@ -3186,9 +1272,9 @@ InsDel_L                 0.0
 InsDel_M                 0.0
 InsDel_N_alpha           0.0
 InsDel_N_beta            0.0
-WARNING: InsDel_A_alpha has only 43 % of mutations
 
 === sigid: InsDel_A_beta ===
+sigid_pct =  75.0750750750751
 assignment (with row names):
                SP2293
 InsDel1a           83
@@ -3233,9 +1319,9 @@ InsDel_L            0
 InsDel_M            0
 InsDel_N_alpha      0
 InsDel_N_beta       0
-WARNING: InsDel_A_beta has only 75.1 % of mutations
 
 === sigid: InsDel_B ===
+sigid_pct =  71.7044284243048
 assignment (with row names):
                CPCT02020413T
 InsDel1a                 0.0
@@ -3280,9 +1366,10 @@ InsDel_L                 0.0
 InsDel_M                 0.0
 InsDel_N_alpha           0.0
 InsDel_N_beta            0.0
-WARNING: InsDel_B has only 71.7 % of mutations
 
 === sigid: InsDel_C ===
+sigid_pct =  45.166163141994
+WARNING: InsDel_C has only 45.2 % of mutations
 assignment (with row names):
                CPCT02010772T
 InsDel1a                 0.0
@@ -3327,9 +1414,9 @@ InsDel_L                 0.0
 InsDel_M                 0.0
 InsDel_N_alpha           0.0
 InsDel_N_beta           92.5
-WARNING: InsDel_C has only 45.2 % of mutations
 
 === sigid: InsDel_D ===
+sigid_pct =  85.6378056840714
 assignment (with row names):
                CPCT02100101T
 InsDel1a                   0
@@ -3374,9 +1461,9 @@ InsDel_L                   0
 InsDel_M                   0
 InsDel_N_alpha             0
 InsDel_N_beta              0
-WARNING: InsDel_D has only 85.6 % of mutations
 
 === sigid: InsDel_E ===
+sigid_pct =  78.3446712018141
 assignment (with row names):
                DRUP01340014T
 InsDel1a                95.5
@@ -3421,9 +1508,9 @@ InsDel_L                 0.0
 InsDel_M                 0.0
 InsDel_N_alpha           0.0
 InsDel_N_beta            0.0
-WARNING: InsDel_E has only 78.3 % of mutations
 
 === sigid: InsDel_F ===
+sigid_pct =  86.2686567164179
 assignment (with row names):
                DRUP01030028T
 InsDel1a                 230
@@ -3468,9 +1555,9 @@ InsDel_L                   0
 InsDel_M                   0
 InsDel_N_alpha             0
 InsDel_N_beta              0
-WARNING: InsDel_F has only 86.3 % of mutations
 
 === sigid: InsDel_G ===
+sigid_pct =  62.2942884801549
 assignment (with row names):
                DRUP01030015T
 InsDel1a               389.5
@@ -3515,9 +1602,10 @@ InsDel_L                 0.0
 InsDel_M                 0.0
 InsDel_N_alpha           0.0
 InsDel_N_beta            0.0
-WARNING: InsDel_G has only 62.3 % of mutations
 
 === sigid: InsDel_H ===
+sigid_pct =  44.0748440748441
+WARNING: InsDel_H has only 44.1 % of mutations
 assignment (with row names):
                CPCT02010648T
 InsDel1a                 0.0
@@ -3562,9 +1650,9 @@ InsDel_L                 0.0
 InsDel_M                 0.0
 InsDel_N_alpha           0.0
 InsDel_N_beta            0.0
-WARNING: InsDel_H has only 44.1 % of mutations
 
 === sigid: InsDel_I ===
+sigid_pct =  87.4564459930314
 assignment (with row names):
                SP107439
 InsDel1a             36
@@ -3609,56 +1697,57 @@ InsDel_L              0
 InsDel_M              0
 InsDel_N_alpha        0
 InsDel_N_beta         0
-WARNING: InsDel_I has only 87.5 % of mutations
 
 === sigid: InsDel_J ===
+sigid_pct =  0
+WARNING: InsDel_J has only 0 % of mutations
 assignment (with row names):
-               DRUP01010037T
-InsDel1a                   0
-InsDel1b                   0
-InsDel1c                   0
-InsDel2a                   0
-InsDel2b                   0
-InsDel2c                   0
-InsDel3a                   0
-InsDel3b                   0
-InsDel4                    0
-InsDel5a                   0
-InsDel5b                   0
-InsDel5c                   0
-InsDel6                    0
-InsDel7                26324
-InsDel8                    0
-InsDel9                    0
-InsDel10                   0
-InsDel11                   0
-InsDel12                   0
-InsDel13                   0
-InsDel14                   0
-InsDel17                   0
-InsDel18                   0
-InsDel19a                  0
-InsDel19b                682
-InsDel23                   0
-InsDel_A_alpha             0
-InsDel_A_beta              0
-InsDel_B                   0
-InsDel_C                   0
-InsDel_D                2203
-InsDel_E                   0
-InsDel_F                   0
-InsDel_G                   0
-InsDel_H                   0
-InsDel_I                   0
-InsDel_J                9689
-InsDel_K                   0
-InsDel_L                   0
-InsDel_M                   0
-InsDel_N_alpha             0
-InsDel_N_beta              0
-WARNING: InsDel_J has only 24.9 % of mutations
+               SP112959
+InsDel1a              0
+InsDel1b              0
+InsDel1c              0
+InsDel2a              0
+InsDel2b              0
+InsDel2c              0
+InsDel3a              0
+InsDel3b              0
+InsDel4               0
+InsDel5a              0
+InsDel5b              0
+InsDel5c              0
+InsDel6               0
+InsDel7               0
+InsDel8               0
+InsDel9               0
+InsDel10              0
+InsDel11              0
+InsDel12             48
+InsDel13              0
+InsDel14              0
+InsDel17              0
+InsDel18              0
+InsDel19a             0
+InsDel19b             0
+InsDel23              0
+InsDel_A_alpha        0
+InsDel_A_beta         0
+InsDel_B              0
+InsDel_C              0
+InsDel_D              0
+InsDel_E              0
+InsDel_F              0
+InsDel_G              0
+InsDel_H              0
+InsDel_I              0
+InsDel_J              0
+InsDel_K              0
+InsDel_L              0
+InsDel_M              0
+InsDel_N_alpha        0
+InsDel_N_beta         0
 
 === sigid: InsDel_K ===
+sigid_pct =  53.5961973038261
 assignment (with row names):
                SP17905
 InsDel1a             0
@@ -3703,9 +1792,9 @@ InsDel_L             0
 InsDel_M             0
 InsDel_N_alpha       0
 InsDel_N_beta        0
-WARNING: InsDel_K has only 53.6 % of mutations
 
 === sigid: InsDel_L ===
+sigid_pct =  68.7917543656327
 assignment (with row names):
                CPCT02450014T
 InsDel1a                   0
@@ -3750,9 +1839,9 @@ InsDel_L              184009
 InsDel_M                   0
 InsDel_N_alpha             0
 InsDel_N_beta              0
-WARNING: InsDel_L has only 68.8 % of mutations
 
 === sigid: InsDel_M ===
+sigid_pct =  59.3853820598007
 assignment (with row names):
                SP112777
 InsDel1a            0.0
@@ -3797,9 +1886,9 @@ InsDel_L            0.0
 InsDel_M          357.5
 InsDel_N_alpha      0.0
 InsDel_N_beta       0.0
-WARNING: InsDel_M has only 59.4 % of mutations
 
 === sigid: InsDel_N_alpha ===
+sigid_pct =  82.7492094418543
 assignment (with row names):
                SP93227
 InsDel1a             0
@@ -3844,9 +1933,9 @@ InsDel_L             0
 InsDel_M             0
 InsDel_N_alpha  107027
 InsDel_N_beta        0
-WARNING: InsDel_N_alpha has only 82.7 % of mutations
 
 === sigid: InsDel_N_beta ===
+sigid_pct =  100
 assignment (with row names):
                SP111038
 InsDel1a              0
