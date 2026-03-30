@@ -1,7 +1,7 @@
 # Helper functions for vignette.Rmd
 # These functions separate computation from plotting for easier debugging
 
-assign_log_file <- here::here("vignette", "assign_for_residual.log")
+assign_log_file <- here::here("vignette", "assign_for_residual.md")
 if (file.exists(assign_log_file)) {
   file.remove(assign_log_file)
   message("removed ", assign_log_file)
@@ -118,7 +118,6 @@ find_sig_txt <- function(sig_id) {
 #' @param ID83_catalogs_no_polyT ICAMS catalog with polyT removed
 #' @param ID476_signatures Data frame of ID476 signatures
 #' @param ID476_catalogs Data frame of ID476 catalogs
-#' @param assignment_matrix Data frame of signature assignments
 #' @param cosmic_matches Named list of data frames with COSMIC signature matches
 #' @param jin_matches Named list of data frames with Jin signature matches
 #' @param koh_matches Named list of data frames with Koh signature matches
@@ -136,7 +135,6 @@ compute_sig_data <- function(
   ID83_catalogs_no_polyT,
   ID476_signatures,
   ID476_catalogs,
-  assignment_matrix,
   ID89_mapped_signatures = NULL,
   ID83_mapped_signatures = NULL,
   cosmic_matches = NULL,
@@ -211,129 +209,104 @@ compute_sig_data <- function(
     result$cosine89_mapped <- NA
   }
 
-  # For non-InsDel15/16, compute the decomposition using exemplar_89
+  # For non-InsDel15/16, compute the decomposition using max_subtract_signature
   if (!result$is_insdel15_16) {
-    # Find signatures present in both the signature matrix and assignment matrix
-    common_sigs <- intersect(
-      colnames(ID89_signatures),
-      row.names(assignment_matrix)
+    spectrum <- ID89_catalogs[, exemplar_89]
+    sig_to_subtract <- ID89_signatures[, type89_sig_id]
+
+    mss_result <- mSigBG::max_subtract_signature(
+      spectrum         = spectrum,
+      sig_to_subtract  = sig_to_subtract,
+      max_neg_fraction = 0.02
     )
 
-    # Check if exemplar_89 exists in assignment matrix columns
-    if (exemplar_89 %in% colnames(assignment_matrix)) {
-      # Get assignment for this catalog, filtered to common signatures
-      assignment <- assignment_matrix[common_sigs, exemplar_89, drop = FALSE]
+    # Partial spectrum due to type89_sig_id
+    result$target_sig_partial_spectrum <-
+      mss_result$n_subtract * sig_to_subtract
 
-      # Workaround for assignments in which the number of mutations is doubled:
-      # check if assignment total is approx 2x the spectrum total; if so, halve it
-      spectrum_total <- sum(ID89_catalogs[, exemplar_89])
-      assignment_total <- sum(assignment)
-      if (spectrum_total > 0) {
-        ratio <- assignment_total / spectrum_total
-        if (ratio > 1.8 && ratio < 2.2) {
-          assignment <- assignment / 2
-        }
-      }
+    # Residual spectrum (unnormalized counts, negative values preserved)
+    result$residual_spectrum <-
+      spectrum - result$target_sig_partial_spectrum
 
-      # Check if this signature (or its alias) is in common_sigs
-      sigid <- type89_sig_id
-      if (FALSE && !(sigid %in% common_sigs)) {
-        # Try known aliases
-        if (
-          sigid %in%
-            c("InsDel_N_alpha", "InsDel_N_beta") &&
-            "InsDel_J" %in% common_sigs
-        ) {
-          sigid <- "InsDel_J"
-        }
-      }
-
-      if (sigid %in% common_sigs) {
-        result$target_sig_partial_spectrum <-
-          assignment[sigid, ] * ID89_signatures[, sigid]
-
-        result$residual_spectrum <- ID89_catalogs[, exemplar_89] -
-          result$target_sig_partial_spectrum
-
-        result$residual_spectrum[result$residual_spectrum < 0] <- 0
-
-        # Log assignment and sigid for debugging
-        log_con <- file(assign_log_file, open = "a")
-        writeLines(paste0("=== sigid: ", sigid, " ==="), log_con)
-        sigid_pct <- 100 * sum(assignment[sigid, ]) / sum(assignment)
-        writeLines(paste("sigid_pct = ", sigid_pct), log_con)
-        if (sigid_pct < 50) {
-          writeLines(
-            paste(
-              "WARNING:",
-              sigid,
-              "has only",
-              round(sigid_pct, 1),
-              "% of mutations"
-            ),
-            log_con
-          )
-        }
-        writeLines("assignment (with row names):", log_con)
-        capture.output(print(assignment), file = log_con, append = TRUE)
-        writeLines("", log_con)
-        close(log_con)
-        message("closed ", assign_log_file)
-
-        if (FALSE) {
-          # Zero out the current signature to get contribution by other signatures
-          assignment_others <- assignment
-          assignment_others[sigid, ] <- 0
-
-          # Reconstruct catalog without this signature
-          result$residual_spectrum <- as.matrix(
-            ID89_signatures[, common_sigs]
-          ) %*%
-            as.matrix(assignment_others)
-
-          # Difference = mutations attributed to this signature
-          result$target_sig_partial_spectrum <- ID89_catalogs[,
-            exemplar_89,
-            drop = FALSE
-          ] -
-            result$residual_spectrum
-          result$target_sig_partial_spectrum[
-            result$target_sig_partial_spectrum < 0
-          ] <- 0
-        }
-
-        # Cosine of diff vs signature
-        result$cosine_sig_89_v_partial_spec <-
-          lsa::cosine(
-            as.numeric(ID89_signatures[, type89_sig_id]),
-            as.numeric(as.matrix(result$target_sig_partial_spectrum))
-          )
-      } else {
-        message(
-          "Skipping decomposition for ",
-          type89_sig_id,
-          ": signature not found in assignment matrix"
-        )
-        result$cosine_sig_89_v_partial_spec <- NA
-        result$residual_spectrum <- NULL
-        result$target_sig_partial_spectrum <- NULL
-      }
-    } else {
-      message(
-        "Skipping decomposition for ",
-        type89_sig_id,
-        ": exemplar ",
-        exemplar_89,
-        " not found in assignment matrix"
+    # Cosine of signature vs partial spectrum
+    result$cosine_sig_89_v_partial_spec <-
+      lsa::cosine(
+        as.numeric(sig_to_subtract),
+        as.numeric(result$target_sig_partial_spectrum)
       )
-      result$cosine_sig_89_v_partial_spec <- NA
-      result$residual_spectrum <- NULL
-      result$target_sig_partial_spectrum <- NULL
+
+    # Store max_subtract_signature summary fields
+    result$n_subtract            <- mss_result$n_subtract
+    result$n_residual            <- mss_result$n_residual
+    result$total_negative        <- mss_result$total_negative
+    result$n_negative_channels   <- mss_result$n_negative_channels
+    result$prob_ge_total_negative <- mss_result$prob_ge_total_negative
+
+    # Build a data.frame for DT display in the vignette
+    ch_names <- rownames(ID89_catalogs)
+    residual_vec <- as.numeric(result$residual_spectrum)
+    result$residual_table <- data.frame(
+      Channel  = ch_names,
+      Residual = round(residual_vec, 1),
+      Spectrum = as.numeric(spectrum),
+      Sig_Prop = round(as.numeric(sig_to_subtract), 5),
+      stringsAsFactors = FALSE
+    )
+
+    # Format a markdown table of residual, spectrum, and signature columns
+    # Negative residual rows marked with <<< at end
+    format_residual_table <- function(residual, spectrum_vec, sig_vec,
+                                      ch_names) {
+      resid_str <- sprintf("%8.1f", residual)
+      spec_str <- sprintf("%7.0f", spectrum_vec)
+      sig_str  <- sprintf("%8.5f", sig_vec)
+      ch_pad   <- sprintf("%-25s", ch_names)
+      flag <- ifelse(residual < 0, " <<<", "    ")
+      header <- sprintf("| %-25s | %9s | %7s | %8s |     |",
+                         "Channel", "Residual", "Spectrum", "Sig Prop")
+      sep <- paste0("|", strrep("-", 27), "|", strrep("-", 11), "|",
+                    strrep("-", 9), "|", strrep("-", 10), "|", strrep("-", 5), "|")
+      rows <- paste0("| ", ch_pad, " | ", resid_str, " | ", spec_str,
+                     " | ", sig_str, " |", flag, "|")
+      c(header, sep, rows)
     }
+
+    # Log result as markdown
+    log_con <- file(assign_log_file, open = "a")
+    writeLines(paste0("## ", type89_sig_id), log_con)
+    writeLines("", log_con)
+    writeLines(sprintf("- N subtract: %.1f", mss_result$n_subtract), log_con)
+    writeLines(sprintf("- N residual: %.1f", mss_result$n_residual), log_con)
+    writeLines(sprintf("- Total negative: %.1f", mss_result$total_negative),
+               log_con)
+    writeLines(sprintf("- N negative channels: %d",
+                       mss_result$n_negative_channels), log_con)
+    prob_line <- sprintf("- P(\u2265 total negative): %.3f",
+                         mss_result$prob_ge_total_negative)
+    if (mss_result$prob_ge_total_negative < 0.1) {
+      prob_line <- sprintf("- P(\u2265 total negative): %.3f  <<<",
+                           mss_result$prob_ge_total_negative)
+    }
+    writeLines(prob_line, log_con)
+    writeLines("", log_con)
+    writeLines(format_residual_table(
+      as.numeric(result$residual_spectrum),
+      as.numeric(spectrum),
+      as.numeric(sig_to_subtract),
+      ch_names
+    ), log_con)
+    writeLines("", log_con)
+    close(log_con)
   } else {
     result$cosine_sig_89_v_partial_spec <- NA
     result$residual_spectrum <- NULL
     result$target_sig_partial_spectrum <- NULL
+    result$n_subtract <- NA
+    result$n_residual <- NA
+    result$total_negative <- NA
+    result$n_negative_channels <- NA
+    result$prob_ge_total_negative <- NA
+    result$residual_table <- NULL
   }
 
   # Compute cosine476: sig476 vs exemplar_476's 476-type spectrum
