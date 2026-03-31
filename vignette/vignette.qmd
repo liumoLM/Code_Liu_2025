@@ -9,7 +9,7 @@ author:
   - Ying Yang
   - Runxi Shen
   - Steven G. Rozen
-date: last-modified
+date: now
 date-format: "YYYY-MM-DD HH:mm"
 format:
   html:
@@ -500,6 +500,7 @@ sig_table2 <- sig_table %>%
     -total_negative,
     -n_negative_channels,
     -prob_ge_total_negative,
+    -max_neg_fraction,
     -residual_table
   )
 

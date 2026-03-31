@@ -214,11 +214,20 @@ compute_sig_data <- function(
     spectrum <- ID89_catalogs[, exemplar_89]
     sig_to_subtract <- ID89_signatures[, type89_sig_id]
 
+    max_neg_fraction <- 0.02
     mss_result <- mSigBG::max_subtract_signature(
-      spectrum         = spectrum,
-      sig_to_subtract  = sig_to_subtract,
-      max_neg_fraction = 0.02
+      spectrum = spectrum,
+      sig_to_subtract = sig_to_subtract,
+      max_neg_fraction = max_neg_fraction
     )
+    if (mss_result$prob_ge_total_negative > 0.9) {
+      max_neg_fraction <- 0.1
+      mss_result <- mSigBG::max_subtract_signature(
+        spectrum = spectrum,
+        sig_to_subtract = sig_to_subtract,
+        max_neg_fraction = max_neg_fraction
+      )
+    }
 
     # Partial spectrum due to type89_sig_id
     result$target_sig_partial_spectrum <-
@@ -236,17 +245,18 @@ compute_sig_data <- function(
       )
 
     # Store max_subtract_signature summary fields
-    result$n_subtract            <- mss_result$n_subtract
-    result$n_residual            <- mss_result$n_residual
-    result$total_negative        <- mss_result$total_negative
-    result$n_negative_channels   <- mss_result$n_negative_channels
+    result$n_subtract <- mss_result$n_subtract
+    result$n_residual <- mss_result$n_residual
+    result$total_negative <- mss_result$total_negative
+    result$n_negative_channels <- mss_result$n_negative_channels
     result$prob_ge_total_negative <- mss_result$prob_ge_total_negative
+    result$max_neg_fraction <- max_neg_fraction
 
     # Build a data.frame for DT display in the vignette
     ch_names <- rownames(ID89_catalogs)
     residual_vec <- as.numeric(result$residual_spectrum)
     result$residual_table <- data.frame(
-      Channel  = ch_names,
+      Channel = ch_names,
       Residual = round(residual_vec, 1),
       Spectrum = as.numeric(spectrum),
       Sig_Prop = round(as.numeric(sig_to_subtract), 5),
@@ -255,19 +265,50 @@ compute_sig_data <- function(
 
     # Format a markdown table of residual, spectrum, and signature columns
     # Negative residual rows marked with <<< at end
-    format_residual_table <- function(residual, spectrum_vec, sig_vec,
-                                      ch_names) {
+    format_residual_table <- function(
+      residual,
+      spectrum_vec,
+      sig_vec,
+      ch_names
+    ) {
       resid_str <- sprintf("%8.1f", residual)
       spec_str <- sprintf("%7.0f", spectrum_vec)
-      sig_str  <- sprintf("%8.5f", sig_vec)
-      ch_pad   <- sprintf("%-25s", ch_names)
+      sig_str <- sprintf("%8.5f", sig_vec)
+      ch_pad <- sprintf("%-25s", ch_names)
       flag <- ifelse(residual < 0, " <<<", "    ")
-      header <- sprintf("| %-25s | %9s | %7s | %8s |     |",
-                         "Channel", "Residual", "Spectrum", "Sig Prop")
-      sep <- paste0("|", strrep("-", 27), "|", strrep("-", 11), "|",
-                    strrep("-", 9), "|", strrep("-", 10), "|", strrep("-", 5), "|")
-      rows <- paste0("| ", ch_pad, " | ", resid_str, " | ", spec_str,
-                     " | ", sig_str, " |", flag, "|")
+      header <- sprintf(
+        "| %-25s | %9s | %7s | %8s |     |",
+        "Channel",
+        "Residual",
+        "Spectrum",
+        "Sig Prop"
+      )
+      sep <- paste0(
+        "|",
+        strrep("-", 27),
+        "|",
+        strrep("-", 11),
+        "|",
+        strrep("-", 9),
+        "|",
+        strrep("-", 10),
+        "|",
+        strrep("-", 5),
+        "|"
+      )
+      rows <- paste0(
+        "| ",
+        ch_pad,
+        " | ",
+        resid_str,
+        " | ",
+        spec_str,
+        " | ",
+        sig_str,
+        " |",
+        flag,
+        "|"
+      )
       c(header, sep, rows)
     }
 
@@ -275,26 +316,38 @@ compute_sig_data <- function(
     log_con <- file(assign_log_file, open = "a")
     writeLines(paste0("## ", type89_sig_id), log_con)
     writeLines("", log_con)
+    writeLines(sprintf("- Max neg fraction: %.2f", max_neg_fraction), log_con)
     writeLines(sprintf("- N subtract: %.1f", mss_result$n_subtract), log_con)
     writeLines(sprintf("- N residual: %.1f", mss_result$n_residual), log_con)
-    writeLines(sprintf("- Total negative: %.1f", mss_result$total_negative),
-               log_con)
-    writeLines(sprintf("- N negative channels: %d",
-                       mss_result$n_negative_channels), log_con)
-    prob_line <- sprintf("- P(\u2265 total negative): %.3f",
-                         mss_result$prob_ge_total_negative)
+    writeLines(
+      sprintf("- Total negative: %.1f", mss_result$total_negative),
+      log_con
+    )
+    writeLines(
+      sprintf("- N negative channels: %d", mss_result$n_negative_channels),
+      log_con
+    )
+    prob_line <- sprintf(
+      "- P(\u2265 total negative): %.3f",
+      mss_result$prob_ge_total_negative
+    )
     if (mss_result$prob_ge_total_negative < 0.1) {
-      prob_line <- sprintf("- P(\u2265 total negative): %.3f  <<<",
-                           mss_result$prob_ge_total_negative)
+      prob_line <- sprintf(
+        "- P(\u2265 total negative): %.3f  <<<",
+        mss_result$prob_ge_total_negative
+      )
     }
     writeLines(prob_line, log_con)
     writeLines("", log_con)
-    writeLines(format_residual_table(
-      as.numeric(result$residual_spectrum),
-      as.numeric(spectrum),
-      as.numeric(sig_to_subtract),
-      ch_names
-    ), log_con)
+    writeLines(
+      format_residual_table(
+        as.numeric(result$residual_spectrum),
+        as.numeric(spectrum),
+        as.numeric(sig_to_subtract),
+        ch_names
+      ),
+      log_con
+    )
     writeLines("", log_con)
     close(log_con)
   } else {
@@ -306,6 +359,7 @@ compute_sig_data <- function(
     result$total_negative <- NA
     result$n_negative_channels <- NA
     result$prob_ge_total_negative <- NA
+    result$max_neg_fraction <- NA
     result$residual_table <- NULL
   }
 
