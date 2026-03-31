@@ -81,12 +81,17 @@ if (
   displayplot(plot_paths$id89_residual, getp("hw89"))
   cat(sprintf(
     paste0(
-      "\nN subtract: %.1f | ",
-      "N residual: %.1f | ",
-      "Total negative: %.1f | ",
-      "N negative channels: %d | ",
-      "P(\u2265 total negative): %.3f\n\n"
+      "\nMax neg fraction (maximum allowed negative residual count as fraction of total): %.2f<br>",
+      "N subtract (mutation count assigned to signature): %.1f<br>",
+      "N residual (mutation count in residual \"partial spectrum\"): %.1f<br>",
+      "Total negative (sum of negative residual mutation counts): %.1f<br>",
+      "N negative channels (number of channels with negative residual): %d<br>",
+      "P(\u2265 total negative) (Monte Carlo estimated probability
+       that negative-binomial-sampled spectra from the signature contributing 
+       N subtract mutations would produce a total negative count >= the observed
+       Total negative; higher number means not surprising): %.3f\n\n"
     ),
+    sig_data$max_neg_fraction,
     sig_data$n_subtract,
     sig_data$n_residual,
     sig_data$total_negative,
