@@ -214,19 +214,33 @@ compute_sig_data <- function(
     spectrum <- ID89_catalogs[, exemplar_89]
     sig_to_subtract <- ID89_signatures[, type89_sig_id]
 
-    max_neg_fraction <- 0.02
-    mss_result <- mSigBG::max_subtract_signature(
-      spectrum = spectrum,
-      sig_to_subtract = sig_to_subtract,
-      max_neg_fraction = max_neg_fraction
-    )
-    if (mss_result$prob_ge_total_negative > 0.9) {
-      max_neg_fraction <- 0.1
+    # Search for the highest max_neg_fraction that keeps
+    # prob_ge_total_negative >= min_prob_ge_total_negative
+    min_prob_ge_total_negative <- 0.5
+    best_max_neg_fraction <- NULL
+    best_mss_result <- NULL
+    for (max_neg_fraction in seq(0.005, 0.15, by = 0.005)) {
       mss_result <- mSigBG::max_subtract_signature(
         spectrum = spectrum,
         sig_to_subtract = sig_to_subtract,
         max_neg_fraction = max_neg_fraction
       )
+      if (mss_result$prob_ge_total_negative >= min_prob_ge_total_negative) {
+        best_max_neg_fraction <- max_neg_fraction
+        best_mss_result <- mss_result
+      }
+    }
+    # Use the best result found, or fall back to the smallest step
+    if (is.null(best_mss_result)) {
+      max_neg_fraction <- 0.005
+      mss_result <- mSigBG::max_subtract_signature(
+        spectrum = spectrum,
+        sig_to_subtract = sig_to_subtract,
+        max_neg_fraction = max_neg_fraction
+      )
+    } else {
+      max_neg_fraction <- best_max_neg_fraction
+      mss_result <- best_mss_result
     }
 
     # Partial spectrum due to type89_sig_id
@@ -257,8 +271,9 @@ compute_sig_data <- function(
     residual_vec <- as.numeric(result$residual_spectrum)
     result$residual_table <- data.frame(
       Channel = ch_names,
-      Residual = round(residual_vec, 1),
       Spectrum = as.numeric(spectrum),
+      Sig_Count = round(as.numeric(result$target_sig_partial_spectrum), 1),
+      Residual = round(residual_vec, 1),
       Sig_Prop = round(as.numeric(sig_to_subtract), 5),
       stringsAsFactors = FALSE
     )
@@ -613,7 +628,7 @@ generate_plots_to_files <- function(
   catalogtoplot = ID89_catalogs[, sig_data$exemplar_89, drop = FALSE]
   #ymax = max(c(catalogtoplot,max(sig_data$target_sig_partial_spectrum)))  ## Mo comment: some peaks exceed the ymax in partial credit
   print(max(catalogtoplot))
-  ymax = max(catalogtoplot) * 1.1
+  ymax = max(catalogtoplot) * 1.2
   p2 <- p89(
     catalogtoplot,
     plot_title = paste0(
