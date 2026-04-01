@@ -217,6 +217,7 @@ compute_sig_data <- function(
     # Search for the highest max_neg_fraction that keeps
     # prob_ge_total_negative >= min_prob_ge_total_negative
     min_prob_ge_total_negative <- 0.5
+    max_negative_channel <- 0.1
     best_max_neg_fraction <- NULL
     best_mss_result <- NULL
     for (max_neg_fraction in seq(0.005, 0.15, by = 0.005)) {
@@ -225,6 +226,14 @@ compute_sig_data <- function(
         sig_to_subtract = sig_to_subtract,
         max_neg_fraction = max_neg_fraction
       )
+      # Stop if most negative residual channel exceeds 5% of spectrum peak
+      residual <- as.numeric(spectrum) -
+        mss_result$n_subtract * as.numeric(sig_to_subtract)
+      if (
+        abs(min(residual)) > max_negative_channel * max(as.numeric(spectrum))
+      ) {
+        break
+      }
       if (mss_result$prob_ge_total_negative >= min_prob_ge_total_negative) {
         best_max_neg_fraction <- max_neg_fraction
         best_mss_result <- mss_result
