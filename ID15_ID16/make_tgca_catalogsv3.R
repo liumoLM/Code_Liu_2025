@@ -36,6 +36,24 @@ t89 <- ICAMS::annot_vcf_to_89_catalog(vv, sample_id = tcgaid)
 t476 <- ICAMS::annot_vcf_to_476_catalog(vv, sample_id = tcgaid)
 
 mydir <- here::here("ID15_ID16/correct_id16_spectra")
+
 write.table(t83, file.path(mydir, glue::glue("{tcgaid}_83.tsv")), sep = '\t')
 write.table(t89, file.path(mydir, glue::glue("{tcgaid}_89.tsv")), sep = '\t')
 write.table(t476, file.path(mydir, glue::glue("{tcgaid}_476.tsv")), sep = '\t')
+
+options(digits = 15)
+write.table(
+  t83 / sum(t83),
+  file.path(mydir, "sig_ID16_83.tsv"),
+  sep = '\t'
+)
+write.table(
+  t89 / sum(t89),
+  file.path(mydir, "sig_ID16_89.tsv"),
+  sep = '\t'
+)
+write.table(
+  t476 / sum(t476),
+  file.path(mydir, "sig_ID476.tsv"),
+  sep = '\t'
+)
