@@ -107,6 +107,11 @@ if (need_rds) {
   # Load connection file
   connect_89_to_83 <- read_finalized("connection_table", row.names = NULL)
 
+  # Override exemplar_89 and exemplar_476 for InsDel_J
+  j_row <- which(connect_89_to_83$InDel89 == "InsDel_J")
+  connect_89_to_83$BestMatch89_1[j_row] <- "DRUP01010037T"
+  connect_89_to_83$BestMatch476_1[j_row] <- "DRUP01010037T"
+
   # Load all data files
   message("Loading data files...")
 
