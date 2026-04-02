@@ -3,3 +3,4 @@
 .RData
 .Ruserdata
 vignette/figure/cache/
+vignette/figure/parallel_plots/

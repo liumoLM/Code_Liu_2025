@@ -15,7 +15,6 @@ source(here::here("code", "collapse_476_to_83.R"))
 # Global path to finalized data directory
 finalized_dir <- here::here(
   "Manuscript_data",
-  "Mo_CAP9_analysis",
   "finalized_cap9"
 )
 

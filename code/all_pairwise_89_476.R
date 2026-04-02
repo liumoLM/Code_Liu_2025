@@ -158,6 +158,8 @@ plot_dendrogram <- function(sigs, title, cosine_cutoff = 0.9) {
   invisible(list(hclust = hc, cos_mat = cos_mat_full))
 }
 
+data_path <- here::here("Manuscript_data/finalized_cap9")
+
 #' Compare 89-type and 476-type signatures with combined visualization
 #'
 #' Creates a multi-page PDF with:
@@ -173,26 +175,48 @@ plot_dendrogram <- function(sigs, title, cosine_cutoff = 0.9) {
 #' @return Invisibly returns list with cosine matrices for both types
 #' @export
 all_pairwise_89_476 <- function(
-    out_pdf = file.path(plot_output, "pairwise_89_476_signatures.pdf"),
-    cosine_cutoff = 0.9) {
+  out_pdf = file.path(plot_output, "pairwise_89_476_signatures.pdf"),
+  cosine_cutoff = 0.9
+) {
   # Hard-coded paths to signature files
-  sig_path_89 <- "Manuscript_data/Liu_et_al_final_89_type_signatures.tsv"
-  sig_path_476 <- "Manuscript_data/Liu_et_al_final_476_type_signatures.tsv"
+  sig_path_89 <- file.path(data_path, "liu_et_al_89_signatures.tsv")
+  sig_path_476 <- file.path(data_path, "liu_et_al_476_signatures.tsv")
 
   # Read signatures
-  sigs_89 <- read.delim(sig_path_89, sep = "\t", row.names = 1, check.names = FALSE)
-  sigs_476 <- read.delim(sig_path_476, sep = "\t", row.names = 1, check.names = FALSE)
+  sigs_89 <- read.delim(
+    sig_path_89,
+    sep = "\t",
+    row.names = 1,
+    check.names = FALSE
+  )
+  pre_sigs_476 <- read.delim(
+    sig_path_476,
+    sep = "\t",
+    row.names = 1,
+    check.names = FALSE
+  )
+  pre_sigs_476 |> dplyr::select(-InsDel_N, -InsDel_O, -InsDel_P) -> sigs_476
 
   # Verify signature names match
-  if (!identical(colnames(sigs_89), colnames(sigs_476))) {
+  if (!identical(sort(colnames(sigs_89)), sort(colnames(sigs_476)))) {
     in_89_not_476 <- setdiff(colnames(sigs_89), colnames(sigs_476))
     in_476_not_89 <- setdiff(colnames(sigs_476), colnames(sigs_89))
     msg <- "Signature names do not match between 89-type and 476-type files."
     if (length(in_89_not_476) > 0) {
-      msg <- paste0(msg, " In 89-type only: ", paste(in_89_not_476, collapse = ", "), ".")
+      msg <- paste0(
+        msg,
+        " In 89-type only: ",
+        paste(in_89_not_476, collapse = ", "),
+        "."
+      )
     }
     if (length(in_476_not_89) > 0) {
-      msg <- paste0(msg, " In 476-type only: ", paste(in_476_not_89, collapse = ", "), ".")
+      msg <- paste0(
+        msg,
+        " In 476-type only: ",
+        paste(in_476_not_89, collapse = ", "),
+        "."
+      )
     }
     warning(msg)
   }

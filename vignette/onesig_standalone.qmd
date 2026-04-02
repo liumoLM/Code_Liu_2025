@@ -28,6 +28,9 @@ source("vhelpers.R")
 
 # Data directory
 data_dir <- "../Manuscript_data/"
+
+# Threshold used by onesig.qmd
+Jin_min_cosine <- 0.9
 ```
 
 ```{r}

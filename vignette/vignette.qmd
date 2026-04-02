@@ -118,7 +118,7 @@ source(here::here("vignette", "vhelpers.R"))
 
 if (REGENERATE_CONNECTION_TABLE) {
 source(here::here(
-    "Manuscript_data/Mo_CAP9_analysis",
+    "Manuscript_data/finalized_cap9",
     "make_connection_table.R"))
 }
 
