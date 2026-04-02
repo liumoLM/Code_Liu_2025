@@ -19,108 +19,85 @@ library(mSigPlot)
 library(gridExtra)
 library(ggplot2)
 library(ggrepel)
+library(here)
 
 # Load helper functions
 source("hamburger_helpers.R")
 
 # Data directory
-data_dir <- "../Manuscript_data"
+data_dir <- here::here("Manuscript_data/finalized_cap9/")
 
 # Load assignment matrices
-assignments_83_89 <- read.delim(
-  file.path(
-    data_dir,
-    "assignment_from_172_type",
-    "Liu_et_al_83_plus_89_as_83_type_signature_assignments.tsv"
-  ),
+assignments_83 <- read.delim(
+  file.path(data_dir, "liu_et_al_83_assignment.tsv"),
   row.names = 1,
   check.names = FALSE
 )
 
-assignments_648 <- read.delim(
-  file.path(data_dir, "Liu_et_al_648_type_signature_assignments.tsv"),
-  row.names = 1,
-  check.names = FALSE
-)
-
-# WARNING: This assignment file is out of date.
-# The current 89-type assignments are in
-# Manuscript_data/Mo_CAP9_analysis/finalized_cap9/liu_et_al_89_assignment.tsv
-# and can be read via read_89_type_assignments() from vhelpers.R.
 assignments_89 <- read.delim(
-  file.path(
-    data_dir,
-    "assignment_from_172_type",
-    "Liu_et_al_83_plus_89_as_89_type_signature_assignments.tsv"
-  ),
-  row.names = 1,
-  check.names = FALSE
-)
-
-assignments_476 <- read.delim(
-  file.path(data_dir, "Liu_et_al_476_type_signature_assignments.tsv"),
+  file.path(data_dir, "liu_et_al_89_assignment.tsv"),
   row.names = 1,
   check.names = FALSE
 )
 
 # Load spectra files
 spectra_83 <- read.delim(
-  file.path(data_dir, "Liu_et_al_83_type_spectra.tsv"),
+  file.path(data_dir, "liu_et_al_83_spectra.tsv"),
   row.names = 1,
   check.names = FALSE
 )
 
 spectra_89 <- read.delim(
-  file.path(data_dir, "Liu_et_al_89_type_spectra.tsv"),
-  row.names = 1,
-  check.names = FALSE
-)
-
-spectra_476 <- read.delim(
-  file.path(data_dir, "Liu_et_al_476_type_spectra.tsv"),
+  file.path(data_dir, "liu_et_al_89_spectra.tsv"),
   row.names = 1,
   check.names = FALSE
 )
 
 # Load signature files
 sigs_83 <- read.delim(
-  file.path(data_dir, "Liu_et_al_final_83_type_signatures.tsv"),
+  file.path(data_dir, "liu_et_al_83_signatures.tsv"),
   row.names = 1,
   check.names = FALSE
 )
 
 sigs_89 <- read.delim(
-  file.path(data_dir, "Liu_et_al_final_89_type_signatures.tsv"),
-  row.names = 1,
-  check.names = FALSE
-)
-
-sigs_476 <- read.delim(
-  file.path(data_dir, "Liu_et_al_final_476_type_signatures.tsv"),
+  file.path(data_dir, "liu_et_al_89_signatures.tsv"),
   row.names = 1,
   check.names = FALSE
 )
 
 # Load signature mapping (89-type to 83-type correspondence)
 sig_mapping <- read.delim(
-  file.path(data_dir, "89type_to_83type_connection.tsv"),
+  file.path(data_dir, "connection_table.tsv"),
   check.names = FALSE
 )
 
 # Load sample info for MSI status coloring
 sample_info <- read.delim(
-  file.path(data_dir, "sample_info.tsv"),
+  here::here("Manuscript_data", "sample_info.tsv"),
   check.names = FALSE
 )
 
+# Prefix column names with "CancerType::" using sample_info lookup.
+# get_hamburger_data() extracts cancer type from this prefix.
+prefix_cancer_type <- function(df, info) {
+  ctype <- info$Cancer_Type[match(colnames(df), info$Patient)]
+  ctype[is.na(ctype)] <- "Unknown"
+  colnames(df) <- paste0(ctype, "::", colnames(df))
+  df
+}
+
+assignments_83 <- prefix_cancer_type(assignments_83, sample_info)
+assignments_89 <- prefix_cancer_type(assignments_89, sample_info)
+spectra_83 <- prefix_cancer_type(spectra_83, sample_info)
+spectra_89 <- prefix_cancer_type(spectra_89, sample_info)
+
 # Get signature lists
-signatures_83_89 <- rownames(assignments_83_89)
+signatures_83 <- rownames(assignments_83)
 signatures_89 <- rownames(assignments_89)
-signatures_476 <- rownames(assignments_476)
-signatures_648 <- rownames(assignments_648)
 ```
 
-This interactive visualization shows the distribution of signature mutations across cancer types ("hamburger plots"). Click on any point to view that tumor's mutational spectrum in ID83, ID89, and ID476 classifications using mSigPlot.
+This interactive visualization shows the distribution of signature mutations across cancer types ("hamburger plots"). Click on any point to view that tumor's mutational spectrum in ID83 and ID89 classifications using mSigPlot.
 
 ## Select Assignment Type and Signature
 
@@ -132,12 +109,10 @@ selectInput(
   "assignment_type",
   "Assignment Type:",
   choices = c(
-    "83+89 as 83-type (33 signatures)" = "83_89",
-    "83+89 as 89-type (48 signatures)" = "89",
-    "476-type (44 signatures)" = "476",
-    "648-type (44 signatures)" = "648"
+    "83-type" = "83",
+    "89-type" = "89"
   ),
-  selected = "83_89"
+  selected = "83"
 )
 
 uiOutput("signature_selector")
@@ -150,11 +125,9 @@ uiOutput("signature_selector")
 output$signature_selector <- renderUI({
   sigs <- switch(
     input$assignment_type,
-    "83_89" = signatures_83_89,
+    "83" = signatures_83,
     "89" = signatures_89,
-    "476" = signatures_476,
-    "648" = signatures_648,
-    signatures_83_89  # default
+    signatures_83  # default
   )
   selectInput("signature", "Signature:", choices = sigs)
 })
@@ -175,22 +148,20 @@ plotlyOutput("hamburger_plot", height = "500px")
 #| context: server
 
 # Helper function to map signature names between assignment types
-# 83_89 uses C_ID* names, while 89/476/648 use InsDel* names
+# 83-type uses C_ID* names, while 89-type uses InsDel* names
 map_signature_name <- function(sig_name, from_type, to_type, mapping) {
 
   if (from_type == to_type) {
     return(sig_name)
   }
 
-  # Determine if we need to convert between naming conventions
-  from_is_83 <- from_type == "83_89"
-  to_is_83 <- to_type == "83_89"
+  from_is_83 <- from_type == "83"
+  to_is_83 <- to_type == "83"
 
   if (from_is_83 && !to_is_83) {
     # Map from 83-type (C_ID*) to 89-type (InsDel*)
     matches <- mapping$InDel89[mapping$InDel83 == sig_name]
     if (length(matches) > 0) {
-      # Return the one with lowest lexicographic order
       return(sort(matches)[1])
     }
   } else if (!from_is_83 && to_is_83) {
@@ -200,9 +171,7 @@ map_signature_name <- function(sig_name, from_type, to_type, mapping) {
       return(matches[1])
     }
   }
-  # If both use same naming convention (89/476/648), return as-is
 
-  # Return original if no mapping found
   return(sig_name)
 }
 
@@ -213,14 +182,10 @@ mapped_signature <- reactive({
   sig_name <- input$signature
 
   # Determine the source type based on whether the signature exists in each matrix
-  if (sig_name %in% rownames(assignments_83_89)) {
-    source_type <- "83_89"
+  if (sig_name %in% rownames(assignments_83)) {
+    source_type <- "83"
   } else if (sig_name %in% rownames(assignments_89)) {
     source_type <- "89"
-  } else if (sig_name %in% rownames(assignments_476)) {
-    source_type <- "476"
-  } else if (sig_name %in% rownames(assignments_648)) {
-    source_type <- "648"
   } else {
     return(sig_name)
   }
@@ -235,11 +200,9 @@ hamburger_data <- reactive({
 
   assignment_matrix <- switch(
     input$assignment_type,
-    "83_89" = assignments_83_89,
+    "83" = assignments_83,
     "89" = assignments_89,
-    "476" = assignments_476,
-    "648" = assignments_648,
-    assignments_83_89  # default
+    assignments_83
   )
 
   # Check if signature exists in the matrix
@@ -464,8 +427,8 @@ output$spectrum_83_ui <- renderUI({
   }
 
   # Calculate height based on number of non-zero signatures in decomposition mode
-  if (show_decomposition() && sample_id %in% colnames(assignments_83_89)) {
-    sample_assignments <- assignments_83_89[, sample_id]
+  if (show_decomposition() && sample_id %in% colnames(assignments_83)) {
+    sample_assignments <- assignments_83[, sample_id]
     n_sigs <- sum(sample_assignments > 0)
     # 400px donut + 300px spectrum + 300px reconstructed + 300px per signature
     height <- paste0(400 + 300 + 300 + n_sigs * 300, "px")
@@ -492,7 +455,7 @@ output$spectrum_83 <- renderPlot(
     if (show_decomposition()) {
       plot_decomposition(
         sample_id = sample_id,
-        assignments = assignments_83_89,
+        assignments = assignments_83,
         signatures = sigs_83,
         spectra = spectra_83,
         plot_fn = mSigPlot::plot_83,
@@ -503,7 +466,7 @@ output$spectrum_83 <- renderPlot(
 
     # Normal spectrum view
     # Get the 83-type signature name
-    if (input$assignment_type == "83_89") {
+    if (input$assignment_type == "83") {
       sig_83_name <- sig_name # Already 83-type
     } else {
       # Map from 89-type to 83-type
@@ -591,7 +554,7 @@ output$spectrum_89 <- renderPlot(
 
     # Normal spectrum view
     # Get the 89-type signature name
-    if (input$assignment_type == "648") {
+    if (input$assignment_type == "89") {
       sig_89_name <- sig_name # Already 89-type
     } else {
       # Map from 83-type to 89-type (find first matching 89-type)
@@ -620,222 +583,6 @@ output$spectrum_89 <- renderPlot(
 )
 ```
 
-### 476-type
-
-```{r}
-#| label: spectrum-476
-
-uiOutput("spectrum_476_ui")
-```
-
-```{r}
-#| label: spectrum-476-server
-#| context: server
-
-# Dynamic UI for 476-type plot with adjustable height
-output$spectrum_476_ui <- renderUI({
-  sample_id <- selected_sample()
-  if (is.null(sample_id)) {
-    return(tags$p("Select a sample to view spectrum."))
-  }
-
-  # Calculate height based on number of non-zero signatures in decomposition mode
-  if (show_decomposition() && sample_id %in% colnames(assignments_476)) {
-    sample_assignments <- assignments_476[, sample_id]
-    n_sigs <- sum(sample_assignments > 0)
-    # 500px donut + 400px spectrum + 400px reconstructed + 400px per signature (476-type plots need more height)
-    height <- paste0(500 + 400 + 400 + n_sigs * 400, "px")
-  } else {
-    height <- "600px"
-  }
-
-  plotOutput("spectrum_476", height = height, width = "100%")
-})
-
-# Reactive to calculate 476 plot height for renderPlot
-spectrum_476_height <- reactive({
-  sample_id <- selected_sample()
-  if (is.null(sample_id)) {
-    return(600)
-  }
-
-  if (show_decomposition() && sample_id %in% colnames(assignments_476)) {
-    sample_assignments <- assignments_476[, sample_id]
-    n_sigs <- sum(sample_assignments > 0)
-    # 500px donut + 400px spectrum + 400px reconstructed + 400px per signature
-    return(500 + 400 + 400 + n_sigs * 400)
-  }
-  600
-})
-
-output$spectrum_476 <- renderPlot(
-  {
-    sample_id <- selected_sample()
-    sig_name <- input$signature
-    req(sample_id, sig_name)
-
-    if (!sample_id %in% colnames(spectra_476)) {
-      plot.new()
-      text(0.5, 0.5, paste("No ID476 data for", sample_id))
-      return()
-    }
-
-    # Check if we should show decomposition view
-    if (show_decomposition()) {
-      plot_decomposition(
-        sample_id = sample_id,
-        assignments = assignments_476,
-        signatures = sigs_476,
-        spectra = spectra_476,
-        plot_fn = mSigPlot::plot_476,
-        title_prefix = "ID476"
-      )
-      return()
-    }
-
-    # Normal spectrum view
-    # Get the 476-type signature name (uses same names as 89-type)
-    if (input$assignment_type == "648") {
-      # Already 89-type name, use directly
-      sig_476_name <- sig_name
-    } else {
-      # Map from 83-type to 89-type (find first matching)
-      idx <- which(sig_mapping$InDel83 == sig_name)
-      sig_476_name <- if (length(idx) > 0) sig_mapping$InDel89[idx[1]] else NULL
-    }
-
-    spectrum <- spectra_476[, sample_id, drop = FALSE]
-    p1 <- mSigPlot::plot_476(
-      spectrum,
-      plot_title = paste("Spectrum:", sample_id)
-    )
-
-    if (!is.null(sig_476_name) && sig_476_name %in% colnames(sigs_476)) {
-      sig_data <- sigs_476[, sig_476_name, drop = FALSE]
-      p2 <- mSigPlot::plot_476(
-        sig_data,
-        plot_title = paste("Signature:", sig_476_name)
-      )
-      gridExtra::grid.arrange(p1, p2, ncol = 1)
-    } else {
-      p1
-    }
-  },
-  res = 100,
-  width = 1400,
-  height = function() {
-    spectrum_476_height()
-  }
-)
-```
-
-### 648 assignments / 476 plots
-
-```{r}
-#| label: spectrum-648-as-476
-
-uiOutput("spectrum_648_476_ui")
-```
-
-```{r}
-#| label: spectrum-648-as-476-server
-#| context: server
-
-# Dynamic UI for 648-assignments with 476-type plots
-output$spectrum_648_476_ui <- renderUI({
-  sample_id <- selected_sample()
-  if (is.null(sample_id)) {
-    return(tags$p("Select a sample to view spectrum."))
-  }
-
-  # Calculate height based on number of non-zero signatures in decomposition mode
-  if (show_decomposition() && sample_id %in% colnames(assignments_648)) {
-    sample_assignments <- assignments_648[, sample_id]
-    n_sigs <- sum(sample_assignments > 0)
-    # 500px donut + 400px spectrum + 400px reconstructed + 400px per signature
-    height <- paste0(500 + 400 + 400 + n_sigs * 400, "px")
-  } else {
-    height <- "600px"
-  }
-
-  plotOutput("spectrum_648_476", height = height, width = "100%")
-})
-
-# Reactive to calculate plot height for renderPlot
-spectrum_648_476_height <- reactive({
-  sample_id <- selected_sample()
-  if (is.null(sample_id)) {
-    return(600)
-  }
-
-  if (show_decomposition() && sample_id %in% colnames(assignments_648)) {
-    sample_assignments <- assignments_648[, sample_id]
-    n_sigs <- sum(sample_assignments > 0)
-    return(500 + 400 + 400 + n_sigs * 400)
-  }
-  600
-})
-
-output$spectrum_648_476 <- renderPlot(
-  {
-    sample_id <- selected_sample()
-    sig_name <- input$signature
-    req(sample_id, sig_name)
-
-    if (!sample_id %in% colnames(spectra_476)) {
-      plot.new()
-      text(0.5, 0.5, paste("No ID476 data for", sample_id))
-      return()
-    }
-
-    # Check if we should show decomposition view
-    if (show_decomposition()) {
-      plot_decomposition(
-        sample_id = sample_id,
-        assignments = assignments_648,
-        signatures = sigs_476,
-        spectra = spectra_476,
-        plot_fn = mSigPlot::plot_476,
-        title_prefix = "648 as 476"
-      )
-      return()
-    }
-
-    # Normal spectrum view
-    # Get the signature name (648-type uses same names as 476-type)
-    if (input$assignment_type == "648") {
-      sig_476_name <- sig_name
-    } else {
-      # Map from 83-type to 89-type (find first matching)
-      idx <- which(sig_mapping$InDel83 == sig_name)
-      sig_476_name <- if (length(idx) > 0) sig_mapping$InDel89[idx[1]] else NULL
-    }
-
-    spectrum <- spectra_476[, sample_id, drop = FALSE]
-    p1 <- mSigPlot::plot_476(
-      spectrum,
-      plot_title = paste("Spectrum:", sample_id)
-    )
-
-    if (!is.null(sig_476_name) && sig_476_name %in% colnames(sigs_476)) {
-      sig_data <- sigs_476[, sig_476_name, drop = FALSE]
-      p2 <- mSigPlot::plot_476(
-        sig_data,
-        plot_title = paste("Signature:", sig_476_name)
-      )
-      gridExtra::grid.arrange(p1, p2, ncol = 1)
-    } else {
-      p1
-    }
-  },
-  res = 100,
-  width = 1400,
-  height = function() {
-    spectrum_648_476_height()
-  }
-)
-```
-
 :::
 
 ## About This Visualization
@@ -844,11 +591,11 @@ This page displays **hamburger plots** (also known as snake plots) showing how m
 
 ### How to Use
 
-1. **Select an assignment type**: Choose between the 83+89 as 83-type assignments (33 signatures) or the 648-type assignments (44 signatures).
+1. **Select an assignment type**: Choose between 83-type or 89-type assignments.
 
 2. **Select a signature**: Pick a signature from the dropdown to view its hamburger plot.
 
-3. **Click on a point**: Each point represents one tumor. Click on a point to view that tumor's full mutational spectrum rendered with mSigPlot in ID83, ID89, and ID476 classifications.
+3. **Click on a point**: Each point represents one tumor. Click on a point to view that tumor's full mutational spectrum rendered with mSigPlot in ID83 and ID89 classifications.
 
 4. **View signature decomposition**: Click on the sample ID (shown in blue) to see how that tumor's spectrum is decomposed into constituent signatures. This shows a bar plot of mutation counts assigned to each signature, followed by plots of the individual signatures.
 
