@@ -1,5 +1,1 @@
-InsDel14 and InsDel_D are similar but differ in TODO.
-
-WARNING: We do not think we extracted InsDel14 from the 476-type classification, but we think we did extract InsDel_D from the 476-type
-classification
-
+InsDel_D and InsDel_1a as extracted in the 89-type classification have cosine similarity of 0.91 and as extracted in the 476-type classification have cosine similarity of 0.95. On balance we think they are different because InsDel_D is enriched in MSIs and with obviously higher >=2bp insertions.  
