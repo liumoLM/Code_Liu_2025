@@ -1,25 +1,28 @@
 # To Do Mo
 
-* ID_B is wrong in the paper figure 2 / thumbnail
-* Indel signature file as InsDel N, O, P
-* Check sigs classified as pol e or pol d / are the 'linking tumors" / tumors highly similar to the
+- Check sigs classified as pol e or pol d / are the 'linking tumors" / tumors highly similar to the
   sig mutated for pol e / pol d?
-  re-do sex association
-* Check if methods are up to date  
+
+- re-do sex association
+
+- Check if methods are up to date  
 
 # To do steve
 
-Look at fig 5 (? indel vs SBS associations) and write up
+- Look at fig 5 (? indel vs SBS associations) and write up
+
+- Look at Fig 6 and corresponding section of the MS.
+
+- Consider ID14 trans. strand. bias and interaction w/ SBS93 --> potential etiology of id14
+
+- consider info on assignments below and review that section of the ms
 
 # Decisions
 
 # Status: 
 
-- Topography due over the weekend, after which steve needs to write
 
-- Correlation analysis - see figure 5
-
-# Assignments / \
+# Assignments
 
 - 1a everywhere
 - 1b a bit enriched in breast

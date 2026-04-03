@@ -1,1 +1,1 @@
-ID_N can be decomposed into C_ID1 and C_ID2. We think it is a novel signature rather than a combination of two signatures because (1) it was found in both SigProfiler and mSigHdp and (2) we found the corresponding 89-type/476-type signatures
+ID_N can be decomposed into C_ID1 and C_ID2. Nevertheless, We think it is a novel signature rather than a combination of two signatures because (1) it was found in both SigProfiler and mSigHdp and (2) we found the corresponding 89-type/476-type signatures (InsDel_N_alpha and InsDel_N_beta).
