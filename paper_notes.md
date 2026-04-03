@@ -5,10 +5,7 @@
 * Check sigs classified as pol e or pol d / are the 'linking tumors" / tumors highly similar to the
   sig mutated for pol e / pol d?
   re-do sex association
-  
-# To Do Mo time permitting
-
-* Cell resource paper requirements - what are they?
+* Check if methods are up to date  
 
 # To do steve
 
