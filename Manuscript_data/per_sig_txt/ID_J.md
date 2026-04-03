@@ -1,0 +1,1 @@
+ID_J usually co-occur with C_ID7 in MSI tumors
