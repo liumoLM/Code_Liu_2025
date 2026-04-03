@@ -1,9 +1,9 @@
 #!/usr/bin/env Rscript
 # Plot all finalized signatures of a given ID type to a multi-page PDF.
 #
-# Layout (8.5 x 11 inch pages, landscape):
-#   83-type and 89-type:  2 columns x 3 rows per page
-#   476-type:             1 column  x 3 rows per page
+# Layout (8.5 x 11 inch pages, portrait):
+#   83-type and 89-type:  2 columns x 4 rows per page
+#   476-type:             1 column  x 4 rows per page
 #
 # Arguments:
 #   --type  Signature type to plot: "83", "89", or "476" (required)
@@ -47,11 +47,11 @@ if (args$type == "476") {
 } else {
   ncols <- 2
 }
-nrows <- 3
+nrows <- 4
 per_page <- ncols * nrows
 
 out_path <- paste0("/tmp/all_", args$type, "_signatures.pdf")
-pdf(out_path, width = 11, height = 8.5)
+pdf(out_path, width = 8.5, height = 11)
 
 for (start in seq(1, n_sigs, by = per_page)) {
   end <- min(start + per_page - 1, n_sigs)
