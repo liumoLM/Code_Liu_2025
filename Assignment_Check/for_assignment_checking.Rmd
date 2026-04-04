@@ -1,0 +1,238 @@
+---
+title: "Assignment Plot"
+author: "Mo Liu"
+date: "2026-04-04"
+output: html_document
+---
+
+## The code is working but may have some unnecessary lines, because of the long working process on the assignment data. I kept those to avoid crashing the code. However, I highlighted the key lines which are important for generating the plots.
+
+## Can directly go to Line 36,142,144 for changing filters
+## cancer.type exposure
+
+
+```{r}
+rm(list=ls())
+gc()
+load("for_assignment_checking.RData")
+```
+
+
+```{r}
+library(dplyr)
+library(reshape2)
+
+# --- Utility function: normalize signature assignment, convert to long format, merge patient info ---
+process_signature_assignment <- function(assignment, meta, catalog, cohort_name_pattern = "SP", cohort1 = "PCAWG", cohort2 = "HMF") {
+  # Normalize
+  assignment_prop <- apply(assignment, 2, function(x) x / sum(x))
+  assignment_prop[is.na(assignment_prop)] <- 0
+  
+  # Filter low exposures
+  ##########################################
+  ##To Steve: This is the first filter
+  ##########################################
+  assignment_filtered <- assignment
+  assignment_filtered[assignment_prop <= 0.05] <- 0
+  
+  # Convert to long format
+  assignment_long <- assignment_filtered %>%
+    as.data.frame() %>%
+    tibble::rownames_to_column("Signature") %>%
+    reshape2::melt(id.vars = "Signature", variable.name = "SampleID", value.name = "Exposure")
+  
+  # Fill zeros
+  assignment_long$Exposure[is.na(assignment_long$Exposure)] <- 0
+  
+  # Extract patient ID
+  assignment_long$PatientID <- assignment_long$SampleID
+  meta$PatientID <- sub(".*::", "", meta$new_sample_ID)
+  
+  # Merge clinical information
+  assignment_long <- assignment_long %>%
+    left_join(meta %>% dplyr::select(PatientID, cancertype, Age, Gender, MSI_status), by = "PatientID")
+  
+  # Mutation burden
+  meta$mutation_burden <- colSums(catalog)[match(meta$final_ID, colnames(catalog))]
+  assignment_long$mutation_burden <- meta$mutation_burden[match(assignment_long$PatientID, meta$PatientID)]
+  
+  # Assign cohort
+  assignment_long$Cohort <- cohort2
+  assignment_long$Cohort[grepl(cohort_name_pattern, assignment_long$SampleID)] <- cohort1
+  
+  return(assignment_long)
+}
+
+# --- Calculate summary ---
+calc_signature_summary <- function(assignment_long) {
+  assignment_long %>%
+    group_by(Signature, cancertype) %>%
+    summarise(
+      active_proportion = mean(Exposure > 0, na.rm = TRUE),   ## here can change to median or mean
+      mean_exposure = mean(Exposure[Exposure > 0], na.rm = TRUE)  ## here can change to median or mean
+    ) %>%
+    ungroup()
+}
+
+```
+
+
+```{r}
+# --- Main workflow ---
+
+## Select samples with either >0.9 reconstruction similarity in ID83 reconstruction or ID89 reconstruction)
+select.samples <- unique(c(colnames(ID83.SPA.assignment.high.quality), colnames(ID89.SPA.assignment.high.quality)))
+
+long_id83 <- process_signature_assignment(
+  assignment = ID83.SPA.assignment[,select.samples],
+  meta = all.meta,
+  catalog = justified.ICAMS83.catalog.cap9
+)
+summary_id83 <- calc_signature_summary(long_id83)
+
+# Process ID89
+long_id89 <- process_signature_assignment(
+  assignment = ID89.SPA.assignment[,select.samples],
+  meta = all.meta,
+  catalog = justified.Koh89.catalog.cap9
+)
+summary_id89 <- calc_signature_summary(long_id89)
+
+# Combine summaries
+summary_all <- bind_rows(summary_id83, summary_id89)
+
+# log2(mean exposure)
+summary_all <- summary_all %>%
+  mutate(
+    mean_exposure_raw = mean_exposure/2,  ## divide the exposure by 2
+    mean_exposure = mean_exposure_raw/2800, ## get Mut/Mb
+    active_proportion = ifelse(active_proportion == 0, NA, active_proportion),
+    mean_exposure = ifelse(is.infinite(mean_exposure), NA, mean_exposure)
+  )
+
+# Define signature order
+signature.orders <- c("InsDel_N_beta","InsDel_N_alpha","ID_N","ID_M","ID_L",
+                      "ID_K","ID_J","ID_I",
+                      "ID_H","ID_G","ID_F","ID_E","ID_D",
+                      "ID_C","ID_B","InsDel_A_beta","InsDel_A_alpha","ID_A",
+                      "C_ID23","InsDel19b","InsDel19a","C_ID19","C_ID18","C_ID17","C_ID14",
+                      "C_ID13","C_ID12","C_ID11","C_ID10","C_ID9",
+                      "C_ID8","C_ID7","C_ID6","InsDel5c","InsDel5b",
+                      "InsDel5a","C_ID5",
+                      "C_ID4","InsDel3b","InsDel3a","C_ID3","InsDel2c","InsDel2b","InsDel2a",
+                      "C_ID2","InsDel1c","InsDel1b","InsDel1a","C_ID1")
+
+# Apply signature order to all summaries
+summary_all <- summary_all[summary_all$Signature %in% signature.orders,]
+summary_all$Signature <- factor(summary_all$Signature, levels=signature.orders)
+
+```
+
+
+
+```{r,fig.height=15,fig.width=8}
+library(ggplot2)
+
+pdf("signature.assignment.all.signatures.test.all.SPA.pdf",height=16,width=8)
+
+summary_all_original <- summary_all[!is.na(summary_all$cancertype),]
+
+##################################################################################################
+####To Steve: Here are the two filters: (1) removed the cases with extremely low mean exposures
+summary_all_original$active_proportion[summary_all_original$mean_exposure<=0.01] <-NA   # here is mut/Mb
+####To Steve: Here are the two filters: (2) removed the cases with <1% active proportion and mean 0.03 mut/Mb 0.03mut/Mb ~ 100 Mutations
+summary_all_original$active_proportion[summary_all_original$active_proportion<=0.01&summary_all_original$mean_exposure<0.0357] <-NA   
+##################################################################################################
+
+
+signature_palette <- c(
+   "#F6D746", # 0–0.001
+  "#F4B343",  # 0.001–0.05
+  "#F28E42",  # 0.05–0.075
+  "#F06A4A",  # 0.075–0.1
+  "#E64B6A",  # 0.1–0.12
+  "#9C5FE8",  # 0.15–0.2
+  "#5B6EE1",  # 0.2–0.25
+  "#2C5AA0",  # 0.25–0.5
+  "#08306B"
+)
+exposure_breaks <- c(0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.25, 0.5, 1, 20)
+exposure_labels <- c(
+  "0.05–0.075",
+  "0.075–0.1",
+  "0.1–0.12",
+  "0.12–0.15",
+  "0.15–0.2",
+  "0.2–0.25",
+  "0.25–0.5",
+  "0.5–1",
+  "≥1"
+)
+
+ggplot(summary_all_original, 
+       aes(cancertype, Signature, fill = mean_exposure, size = active_proportion)) +
+  geom_point(shape = 21, stroke = 0.25) +
+  geom_hline(yintercept = seq(0.5, 52.5, 1), linewidth = 0.2, colour = "grey90") +
+  scale_x_discrete(position = "top") +
+  scale_radius(range = c(1.5, 9)) +
+  
+  # Stepped color scale with explicit breaks in original (non-log) space
+  scale_fill_stepsn(
+    colours = signature_palette,
+    breaks = exposure_breaks,
+    limits = c(0.01, 20),
+    trans = "log10",
+    name = "Median mutations per Mb\ndue to signature\n(among tumours with signature)",
+    guide = guide_coloursteps(
+      direction = 1,          # vertical legend
+      show.limits = TRUE,     # show min/max values
+      barheight = unit(1.2, "cm"),  # taller keys for better color visibility
+      barwidth = unit(1.5, "cm"),
+      raster = FALSE          # crisp color boundaries (no anti-aliasing)
+    )
+  ) +
+  
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    legend.box = "vertical",
+    legend.margin = margin(5, 0, 10, 0),
+    legend.key.height = unit(0.6, "cm"),
+    legend.key.width = unit(1.5, "cm"),
+    legend.text = element_text(size = 9, face = "plain"),
+    legend.title = element_text(size = 10, face = "bold", margin = margin(b = 5)),
+    legend.spacing.x = unit(3, "pt"),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.text.x = element_text(angle = 45, vjust = 0.5, hjust =0.5, size = 9),
+    axis.text.y = element_text(size = 9),
+    plot.margin = margin(10, 10, 10, 10)
+  ) +
+  
+  guides(
+    size = guide_legend(
+      override.aes = list(fill = "white", colour = "black", stroke = 0.3),
+      title.position = "top",
+      label.position = "bottom",
+      order = 1,
+      keywidth = unit(1, "cm"),
+      keyheight = unit(0.6, "cm"),
+      
+    ),
+    fill = guide_coloursteps(
+      title.position = "top",
+      label.position = "bottom",  # labels below color steps
+      order = 2,
+      nbin = 10,                  # match number of color bins
+      raster = FALSE,label.theme = element_text(angle = 90, hjust = 0.5, vjust = 0.5)
+    )
+  ) +
+  labs(
+    size = "Active proportion",
+    fill = "Signature exposure",
+    x = NULL,
+    y = NULL
+  )
+
+dev.off()
+```
