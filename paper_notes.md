@@ -55,6 +55,9 @@
 - N alph, somwhat rare, slightly more in stomach?
 - N beta, everywhere except thymus kindey liver *** look for complimentary signature 
 
+# Under consideration / nice to have
+
+Electronically (via link) Examples of mutations in the different (somewhat obscure) classification
 
 
 

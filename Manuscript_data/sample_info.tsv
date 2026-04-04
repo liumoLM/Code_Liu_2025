@@ -1,4 +1,4 @@
-Patient	Age	Sex	Cancer_Type	Data_Set	MSI_status	MSIseq_MSI-H	Original_Cancer_Type
+Patient	Age	Sex	Cancer_Type	Data_Set	MSI_status	MSIseq_MSI.H	Original_Cancer_Type
 SP117655	76	Female	Biliary	PCAWG	MSS	FALSE	Biliary
 SP117556	49	Female	Biliary	PCAWG	MSS	FALSE	Biliary
 SP117627	53	Female	Biliary	PCAWG	MSS	FALSE	Biliary
@@ -7012,3 +7012,6 @@ WIDE01010725T	NA	NA	Esophagus	HMF	MSS	FALSE	Esophagus
 WIDE01010663T	NA	NA	Other	HMF	MSS	FALSE	Unknown
 WIDE01010707T	NA	NA	Lung	HMF	MSS	FALSE	Lung
 WIDE01010708T	NA	NA	Lung	HMF	MSS	FALSE	Lung
+TCGA.EW.A2FV.01A.11D.A17D.09	NA	Female	Breast	TCGA: brca_tcga_gdc	NA	NA	Invasive Breast Carcinoma
+TCGA.D8.A27V.01A.12D.A17D.09	NA	Female	Breast	TCGA: brca_tcga_gdc	NA	NA	Invasive Breast Carcinoma
+TCGA.13.0889.01A.01W.0420.08	NA	Female	Ovary	TCGA: ov_tcga	NA	NA	Serous Cystadenocarcinoma

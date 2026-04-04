@@ -296,6 +296,22 @@ output$hamburger_plot <- renderPlotly({
     plot_title <- paste0(sig_display, " mutations")
   }
 
+  # Build sample count annotations below each cancer type
+  # Get one row per cancer type for counts
+  count_df <- unique(df[, c("cancer_type", "x_pos", "nonzero_samples", "total_samples")])
+  count_annotations <- lapply(seq_len(nrow(count_df)), function(i) {
+    list(
+      x = count_df$x_pos[i],
+      y = -0.07,
+      xref = "x",
+      yref = "paper",
+      text = paste0(count_df$nonzero_samples[i], "<br>", count_df$total_samples[i]),
+      showarrow = FALSE,
+      font = list(size = 11),
+      align = "center"
+    )
+  })
+
   plot_ly(
     data = df,
     x = ~x_plot,
@@ -325,8 +341,9 @@ output$hamburger_plot <- renderPlotly({
         showgrid = TRUE
       ),
       shapes = all_shapes,
+      annotations = count_annotations,
       hovermode = "closest",
-      margin = list(t = 120, b = 50, l = 60, r = 20)
+      margin = list(t = 120, b = 70, l = 60, r = 20)
     ) |>
     config(displayModeBar = TRUE, displaylogo = FALSE) |>
     event_register("plotly_click")

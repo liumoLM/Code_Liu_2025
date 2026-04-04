@@ -96,7 +96,7 @@ collapse_476_to_83 <- function(
   # Load edges from unique_pairs.tsv
   # Column 1 (COSMIC_83) becomes b (target)
   # Column 2 (Koh_476) becomes a (source)
-  edges_file <- file.path(data_dir, "unique_pairs.tsv")
+  edges_file <- here::here("code", "unique_pairs.tsv")
   edges_raw <- read.delim(edges_file, stringsAsFactors = FALSE)
   edges <- data.frame(
     a = edges_raw$Koh_476, # 476-type (source)
