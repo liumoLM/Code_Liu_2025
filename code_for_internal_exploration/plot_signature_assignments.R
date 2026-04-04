@@ -308,7 +308,8 @@ plot_signature_by_cancer_type <- function(
       ggplot2::aes(
         x = x_pos,
         y = y_label_pos,
-        label = paste0(nonzero_samples, "\n", total_samples)
+        label = paste0(nonzero_samples, "\n", total_samples, "\n",
+                       round(nonzero_samples / total_samples, 2))
       ),
       vjust = 2.0,
       size = 3.5,
@@ -337,7 +338,7 @@ plot_signature_by_cancer_type <- function(
       panel.grid.major.x = ggplot2::element_blank(),
       panel.grid.minor.x = ggplot2::element_blank(),
       legend.position = "none",
-      plot.margin = ggplot2::margin(t = 5, r = 5, b = 80, l = 5, unit = "pt")
+      plot.margin = ggplot2::margin(t = 5, r = 5, b = 100, l = 5, unit = "pt")
     )
 
   # Apply log scale if requested
