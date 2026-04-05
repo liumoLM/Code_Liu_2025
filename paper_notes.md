@@ -17,6 +17,10 @@
 
 - consider info on assignments below and review that section of the ms
 
+- add additional catalog row orders to mSigPlot
+
+- Time permitting, close the open intervals eg L(2,) -> L(2,9)
+
 # Decisions
 
 # Status: 
@@ -27,16 +31,24 @@
 - 1a everywhere
 - 1b a bit enriched in breast
 - 1c everywhere 
+- ID* much rarer than in COSMIC -- to partial credit in 476 for the Del T 6+ peak
 - 2a some enrichment in breask lunk eso, colon
-- 2b MSI, high in uterus, breast,colon
-- 2c MIS high prosate, colon, and no msi lymphoid
+- 2b MSI per Mo, high in uterus, breast,colon
+- 2c MSI per Mo,  high prosate, colon, and no msi lymphoid
 - 3a prevalent in bladder
 - 3b liver and lung
+- 4
+- 5
+- 6
+- 7 MSI per Mo
+- 8
+- 9
+- 10
 - 11 super rare
 - 12 prostate
 - 13 skin (expected)
 - 14 colon and esophagus (and stomach)
-- 17 breast, low counts but top2A **** see our paper / stomach
+- 17 ** breast, low counts but top2A **** worth revisting in light of our paper / stomach
 - 18 colon (colibactin)
 - 19a rare -- assoc w MSI in colon and esophagus
 - 19b everywhere
@@ -45,13 +57,13 @@
 - A beta strong breast
 - B everywhere except stomach
 - C super rare -- some very high in Colon, Breast
-- D msi assoc, esp prostate and colon
+- D MSI per Mo, esp prostate and colon
 - E generally rare..
 - F rare; we think we have an explanation
 - G rare
-- H skin only (any similarity to 13?)
+- H ** skin only, consists of basically of Del(6,9):U(4,):R(2,9) and Del(7,9):M(6,)
 - I super rare - 10 tumors
-- J MSI in prostate, breask, colon
+- J MSI per Mo in prostate, breask, colon
 - K super rare; 9 tumors nly pancrease, prostate, colon
 - L super rare; about 20 tumors only CNS, SKin, pancrease
 - M super rare, high MIS assoc, only lung breast colon protate

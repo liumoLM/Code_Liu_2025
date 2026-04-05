@@ -269,7 +269,7 @@ output$hamburger_plot <- renderPlotly({
   df$patient_id <- sub("^.*::", "", df$sample_id)
 
   # Look up MSI status from sample_info
-  df$msi_status <- sample_info$`MSIseq_MSI-H`[match(df$patient_id, sample_info$Patient)]
+  df$msi_status <- sample_info$MSIseq_MSI.H[match(df$patient_id, sample_info$Patient)]
 
   # Set dot color: red for MSI-H (TRUE), black for others
  df$dot_color <- ifelse(!is.na(df$msi_status) & df$msi_status == TRUE, "red", "black")

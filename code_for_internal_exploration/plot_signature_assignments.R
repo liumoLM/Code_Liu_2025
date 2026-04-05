@@ -13,8 +13,8 @@
 #                   fraction of the sample's total mutations (default: 0.0)
 #
 # Output:
-#   /tmp/83_assignments.pdf
-#   /tmp/89_assignments.pdf
+#   plot_output/83_assignments.pdf
+#   plot_output/89_assignments.pdf
 #
 # Usage:
 #   Rscript plot_signature_assignments.R
@@ -25,13 +25,18 @@ library(scales)
 library(argparser)
 
 p <- arg_parser("Generate per-signature assignment hamburger plots to PDF")
-p <- add_argument(p, "--min-fraction", type = "double", default = 0.0,
-  help = "Only plot a sample's point for a signature if that signature accounts for >= this fraction of the sample's total mutations")
+p <- add_argument(
+  p,
+  "--min-fraction",
+  type = "double",
+  default = 0.0,
+  help = "Only plot a sample's point for a signature if that signature accounts for >= this fraction of the sample's total mutations"
+)
 args <- parse_args(p)
 
 # Configuration
 data_dir <- here::here("Manuscript_data/finalized_cap9/")
-plot_dir <- "/tmp"
+plot_dir <- here::here("plot_output")
 
 # Load sample info for MSI status coloring
 sample_info <- read.delim(
@@ -128,7 +133,7 @@ plot_signature_by_cancer_type <- function(
     # Extract patient ID by removing "CancerType::" prefix
     df_all$patient_id <- sub("^.*::", "", df_all$sample)
     # Look up MSI status
-    df_all$msi_status <- sample_info$`MSIseq_MSI-H`[
+    df_all$msi_status <- sample_info$MSIseq_MSI.H[
       match(df_all$patient_id, sample_info$Patient)
     ]
     # Set color: red for MSI-H (TRUE), default point_color for others
@@ -140,12 +145,12 @@ plot_signature_by_cancer_type <- function(
     # Set shape: solid triangle (17) for MSI-H, circle (16) for others
     df_all$dot_shape <- ifelse(
       !is.na(df_all$msi_status) & df_all$msi_status == TRUE,
-      17,  # solid triangle
-      16   # solid circle
+      17, # solid triangle
+      16 # solid circle
     )
   } else {
     df_all$dot_color <- point_color
-    df_all$dot_shape <- 16  # solid circle
+    df_all$dot_shape <- 16 # solid circle
   }
 
   # Calculate sample counts per cancer type (before any filtering)
@@ -308,8 +313,13 @@ plot_signature_by_cancer_type <- function(
       ggplot2::aes(
         x = x_pos,
         y = y_label_pos,
-        label = paste0(nonzero_samples, "\n", total_samples, "\n",
-                       round(nonzero_samples / total_samples, 2))
+        label = paste0(
+          nonzero_samples,
+          "\n",
+          total_samples,
+          "\n",
+          round(nonzero_samples / total_samples, 2)
+        )
       ),
       vjust = 2.0,
       size = 3.5,
@@ -442,7 +452,11 @@ read_assignment_and_plot_hamburger <- function(
       match(colnames(assignment_matrix), sample_info$Patient)
     ]
     ctype[is.na(ctype)] <- "Unknown"
-    colnames(assignment_matrix) <- paste0(ctype, "::", colnames(assignment_matrix))
+    colnames(assignment_matrix) <- paste0(
+      ctype,
+      "::",
+      colnames(assignment_matrix)
+    )
   }
 
   signature_names <- rownames(assignment_matrix)
@@ -494,7 +508,11 @@ read_assignment_and_plot_hamburger <- function(
 for (pair in in_out_pairs) {
   read_assignment_and_plot_hamburger(
     input_file = pair$input_file,
-    output_file = sub("\\.pdf$", paste0("_mf", args$min_fraction, ".pdf"), pair$output_file),
+    output_file = sub(
+      "\\.pdf$",
+      paste0("_mf", args$min_fraction, ".pdf"),
+      pair$output_file
+    ),
     data_dir = data_dir,
     plot_dir = plot_dir,
     params = params,
