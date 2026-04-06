@@ -50,7 +50,7 @@ result <- indel_deep_dive(
 
 csv_path <- here::here(
   "code_for_internal_exploration/indel_deep_dive",
-  paste0("deep_dive_H_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".csv")
+  paste0("deep_dive_H.csv")
 )
 write.csv(result, csv_path, row.names = FALSE)
 cat("Saved visual table to", csv_path, "\n")

@@ -13,8 +13,8 @@
 #                   fraction of the sample's total mutations (default: 0.0)
 #
 # Output:
-#   plot_output/83_assignments.pdf
-#   plot_output/89_assignments.pdf
+#   code_for_internal_exploration/hamburger_plots/83_assignments.pdf
+#   code_for_internal_exploration/hamburger_plots/89_assignments.pdf
 #
 # Usage:
 #   Rscript plot_signature_assignments.R
@@ -36,7 +36,7 @@ args <- parse_args(p)
 
 # Configuration
 data_dir <- here::here("Manuscript_data/finalized_cap9/")
-plot_dir <- here::here("plot_output")
+plot_dir <- here::here("code_for_internal_exploration/hamburger_plots")
 
 # Load sample info for MSI status coloring
 sample_info <- read.delim(

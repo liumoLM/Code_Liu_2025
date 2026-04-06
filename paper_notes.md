@@ -19,6 +19,8 @@
 
 - add additional catalog row orders to mSigPlot
 
+- H -- how common are the 2 deletions that make up H across all tumors? how constant is the ratio in skin tumors? Scatter plot?
+
 - Time permitting, close the open intervals eg L(2,) -> L(2,9)
 
 # Decisions
