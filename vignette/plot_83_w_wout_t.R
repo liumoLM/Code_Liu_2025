@@ -1,12 +1,11 @@
 #' Plot ID83 catalog with optional suppression of high polyT rows
 #'
-#' Wraps mSigPlot::: to optionally generate a second plot with polyT 5+
+#' Wraps mSigPlot::plot_ID83 to optionally generate a second plot with polyT 5+
 #' rows set to -3 when mutation counts exceed a threshold.
 #'
 #' @param catalog An ID83 catalog (matrix or data frame with row names).
 #' @param plot_title Title for the plot(s).
-#' @param text_cex Text size passed to plot_83.
-#' @param base_size Base size passed to plot_83.
+#' @param base_size Base size passed to plot_ID83.
 #' @param min_ts_to_trigger If >= 1.1, treated as an absolute count threshold.
 #'   If < 1.1, treated as a proportion of total mutations.
 #' @param ablate_both If TRUE, the if either the intertion or
@@ -25,7 +24,6 @@
 plot_83_w_wout_t <- function(
   catalog,
   plot_title = NULL,
-  text_cex = NULL,
   base_size = NULL,
   min_ts_to_trigger = .1,
   ablate_both = TRUE,
@@ -60,20 +58,17 @@ plot_83_w_wout_t <- function(
     ins_t_offending <- del_t_offending || ins_t_offending
   }
 
-  # Build argument list for plot_83, excluding NULL values
+  # Build argument list for plot_ID83, excluding NULL values
   plot_args <- list(catalog = catalog)
   if (!is.null(plot_title)) {
     plot_args$plot_title <- plot_title
-  }
-  if (!is.null(text_cex)) {
-    plot_args$text_cex <- text_cex
   }
   if (!is.null(base_size)) {
     plot_args$base_size <- base_size
   }
 
   # Create the original plot
-  p_with_ts <- do.call(mSigPlot::plot_83, plot_args)
+  p_with_ts <- do.call(mSigPlot::plot_ID83, plot_args)
 
   # If no offending rows, return single plot
   if (!del_t_offending && !ins_t_offending) {
@@ -124,15 +119,12 @@ plot_83_w_wout_t <- function(
     catalog = catalog_modified2,
     plot_title = modified_title
   )
-  if (!is.null(text_cex)) {
-    plot_args_modified$text_cex <- text_cex
-  }
   if (!is.null(base_size)) {
     plot_args_modified$base_size <- base_size
   }
 
   # Create the modified plot
-  p_wout_ts <- do.call(mSigPlot::plot_83, plot_args_modified)
+  p_wout_ts <- do.call(mSigPlot::plot_ID83, plot_args_modified)
 
   # Return both plots and the catalog with
   # the offendening peaks 0

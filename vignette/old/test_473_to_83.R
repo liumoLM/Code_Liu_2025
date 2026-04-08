@@ -41,7 +41,7 @@ testit = function() {
       title = paste(title, sim)
     }
 
-    plots[[length(plots) + 1]] <- plot_83(
+    plots[[length(plots) + 1]] <- plot_ID83(
       xx[, i, drop = FALSE],
       plot_title = title
     )

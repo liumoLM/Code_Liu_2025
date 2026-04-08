@@ -58,6 +58,13 @@ Key data in `Manuscript_data/`:
 - `89type_to_83type_connection.tsv` - Mapping between 89-type and 83-type signatures
 - `correspondence_476_to_89_and_note.xlsx` - 476 to 89 type correspondence
 
+Sample metadata:
+- `sample_info.tsv` - Maps sample/tumor IDs to cancer type (and age, sex, data set, MSI status). The `Patient` column contains sample IDs that match column names in the assignment files below.
+
+Signature assignments in `finalized_cap9/`:
+- `liu_et_al_83_assignment.tsv` - ID83 signature assignments (rows = signatures with signature identifiers as row names, columns = sample/tumor IDs)
+- `liu_et_al_89_assignment.tsv` - ID89 signature assignments (same layout)
+
 Reference signatures:
 - `COSMIC_v3.5_ID_GRCh37_signatures.tsv` - COSMIC indel signatures
 - `Koh_signatures.tsv` - Koh et al. signatures

@@ -9,6 +9,8 @@
 
 # To do steve
 
+- which "splits" of 83-type are interesting.  
+
 - Look at fig 5 (? indel vs SBS associations) and write up
 
 - Look at Fig 6 and corresponding section of the MS.

@@ -592,14 +592,14 @@ generate_plots_to_files <- function(
   }
 
   p89 <- function(catalog, plot_title, setyaxis = NULL) {
-    mSigPlot::plot_89(
+    mSigPlot::plot_ID89(
       catalog,
       plot_title = plot_title,
       # text_size = getp('textsize89'),
       # top_bar_text_size = getp('topbartextsize89'),
       base_size = getp('basesize89'),
-      setyaxis = setyaxis,
-      count_label_size = 0.9
+      ylim = setyaxis,
+      count_label_cex = 0.9
     )
   }
 
@@ -691,12 +691,12 @@ generate_plots_to_files <- function(
 
   # ID476 plots
   p476 <- function(catalog, plot_title) {
-    mSigPlot::plot_476(
+    mSigPlot::plot_ID476(
       catalog,
       plot_title = plot_title,
       # text_size = 5,
       # label_size = plot476_label_size,
-      num_labels = 5,
+      num_peak_labels = 5,
       base_size = ppar[["plot476_base_size"]] # ,
       #simplify_labels = plot476_simplify_labels
     )
