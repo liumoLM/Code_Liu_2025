@@ -78,5 +78,11 @@
 
 Electronically (via link) Examples of mutations in the different (somewhat obscure) classification
 
+Review SBS / indel associations
 
+# Data sources for Degaspari SBS data
+  https://zenodo.org/records/5571551/files/SBS_v2.03.zip?download=1                                                                                                                        
+                                                                                                                                                                                            
+  (From Zenodo record https://zenodo.org/records/5571551)
+  https://doi.org/10.5281/zenodo.5571551 
 
