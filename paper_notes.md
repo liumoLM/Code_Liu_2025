@@ -78,6 +78,8 @@
 
 Electronically (via link) Examples of mutations in the different (somewhat obscure) classification
 
+The Sig F / Reijn annotated VCFs need to be redone with "cap 9"
+
 Review SBS / indel associations
 
 # Data sources for Degaspari SBS data

@@ -24,39 +24,22 @@ wt_cell_path = "../Manuscript_data/Reijn_wt_cell_annot.vcf"
 mut_cell_path = "../Manuscript_data/Reijn_mut_cell_annot.vcf"
 ```
 
-## Annotate InsDelF linking tumor VCF
+## Read annotated InsDelF and InsDel4 linking tumor VCFs
 
 ```{r}
-file1 = dir(indir1, pattern = sigFfile, full.names = TRUE) # This is the InsdelF linking Tumor
+#| label: read-tumor-vcfs
+# The .annotated.indel.vcf.gz files are pre-annotated TSVs
+sf_gz <- file.path(indir1, paste0(sigFfile, ".annotated.indel.vcf.gz"))
+s4_gz <- file.path(indir1, paste0(sig4file, ".annotated.indel.vcf.gz"))
 
 if (!file.exists(sfpath)) {
-  vcf <- ICAMS::ReadVCFs(file1, filter.status = "PASS")
-  F <-
-    AnnotateIDVCF(
-      vcf[[1]],
-      ref.genome = "hg19",
-      explain_indels = 1
-    )
-  file_w_F_vcf = F[[1]]
-  file_w_F_vcf %>% fwrite(sfpath)
+  file_w_F_vcf <- fread(sf_gz)
+  fwrite(file_w_F_vcf, sfpath)
 }
-```
 
-## Annotate InsDel4 linking tumor VCF
-
-```{r}
 if (!file.exists(s4path)) {
-  file2 = dir(indir1, pattern = sig4file, full.names = TRUE) # This is the Insdel4 linking tumor
-  vcf <- ICAMS::ReadVCFs(file2, filter.status = "PASS")
-  library(ICAMS)
-  F <-
-    AnnotateIDVCF(
-      vcf[[1]],
-      ref.genome = "hg19",
-      explain_indels = 1
-    )
-  file_w_4_vcf = F[[1]]
-  file_w_4_vcf %>% fwrite(s4path)
+  file_w_4_vcf <- fread(s4_gz)
+  fwrite(file_w_4_vcf, s4path)
 }
 ```
 
@@ -73,14 +56,15 @@ fread(mut_cell_path) -> mut_cellvcf
 ## Helper functions
 
 ```{r}
-del2_counts = function(annotvcf) {
+del_counts = function(annotvcf) {
   annotvcf %>%
     dplyr::filter(nchar(ins_or_del_seq) >= 2) %>%
     dplyr::filter(ins_or_del == "d") %>%
+    dplyr::filter(R <= 9) %>%
     dplyr::count(short_visual, Koh_476) %>%
     dplyr::arrange(desc(n)) %>%
     dplyr::mutate(vis2 = gsub("\\}", "", gsub("\\{", "", short_visual))) %>%
-    dplyr::mutate(dinuc = str_extract(vis2, "(?<=<).{2}(?=>)")) %>%
+    dplyr::mutate(del_seq = str_extract(vis2, "(?<=<)[^>]+(?=>)")) %>%
     dplyr::mutate(hasmh = grepl("\\{", short_visual)) -> foo
   return(foo)
 }
@@ -103,23 +87,23 @@ normit = function(xx) {
 ## Summarize and normalize deletion types
 
 ```{r}
-file_w_F_vcfsummary = del2_counts(file_w_F_vcf)
+file_w_F_vcfsummary = del_counts(file_w_F_vcf)
 
 normit(file_w_F_vcfsummary) -> normF
 
-file_w_4_vcfsummary = del2_counts(file_w_4_vcf)
+file_w_4_vcfsummary = del_counts(file_w_4_vcf)
 
 normit(file_w_4_vcfsummary) -> norm4
 
-del2_counts(mousevcf) -> mouse_summary
+del_counts(mousevcf) -> mouse_summary
 
 normit(mouse_summary) -> norm_mouse
 
-del2_counts(wt_cellvcf) -> wt_cell_summary
+del_counts(wt_cellvcf) -> wt_cell_summary
 
 normit(wt_cell_summary) -> wt_cell_norm
 
-del2_counts(mut_cellvcf) -> mut_cell_summary
+del_counts(mut_cellvcf) -> mut_cell_summary
 
 normit(mut_cell_summary) -> mut_cell_norm
 
@@ -140,7 +124,12 @@ all_norm <- bind_rows(
 
 for (deltype in c(
   "Del2:M1",
-  "Del2:U2:R2"
+  "Del2:U2:R2",
+  "Del3:U3:R2",
+  "Del4:U4:R2",
+  "Del3:M2",
+  "Del4:M3",
+  "Del4:M2"
 )) {
   cat("###", deltype, "\n\n")
   all_norm %>%
