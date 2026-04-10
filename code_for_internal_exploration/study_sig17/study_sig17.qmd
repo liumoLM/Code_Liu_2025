@@ -1,0 +1,241 @@
+---
+title: "Study InsDel17 and InsDel8 linking tumors"
+format: html
+---
+
+## Setup
+
+```{r}
+#| label: setup
+library(stringr)
+library(ICAMS)
+library(glue)
+library(dplyr)
+library(data.table)
+
+indir1 <- "~/MEGA/important_mut_sig_data/fmh-unfiltered_vcfs"
+
+sig17file <- "CPCT02250003T"
+sig8file <- "CPCT02070336T"
+
+s17path <- glue("{sig17file}_annotvcf.csv")
+s8path <- glue("{sig8file}_annotvcf.csv")
+```
+
+## Read annotated InsDel17 and InsDel8 linking tumor VCFs
+
+```{r}
+#| label: read-tumor-vcfs
+s17_gz <- file.path(indir1, paste0(sig17file, ".annotated.indel.vcf.gz"))
+s8_gz <- file.path(indir1, paste0(sig8file, ".annotated.indel.vcf.gz"))
+
+if (!file.exists(s17path)) {
+  file_w_17_vcf <- fread(s17_gz)
+  fwrite(file_w_17_vcf, s17path)
+}
+
+if (!file.exists(s8path)) {
+  file_w_8_vcf <- fread(s8_gz)
+  fwrite(file_w_8_vcf, s8path)
+}
+```
+
+## Read annotated VCFs
+
+```{r}
+#| label: read-vcfs
+file_w_17_vcf <- fread(s17path)
+file_w_8_vcf <- fread(s8path)
+```
+
+## ID476 catalog plots
+
+```{r}
+#| label: build-catalogs
+#| warning: false
+build_ID476_catalog <- function(annotvcf, sample_id) {
+  tmp476 <- annotvcf %>%
+    dplyr::group_by(CHROM, POS) %>%
+    dplyr::summarise(
+      Koh_476 = Koh_476[1],
+      R = R[1],
+      .groups = "drop"
+    ) %>%
+    dplyr::mutate(
+      Koh_476 = dplyr::if_else(
+        R >= 9 &
+          stringr::str_detect(
+            Koh_476,
+            "Del\\(T\\)|Del\\(C\\)|Ins\\(C\\)|Ins\\(T\\)"
+          ),
+        stringr::str_replace(Koh_476, "R\\d+", "R(9,)"),
+        Koh_476
+      )
+    )
+  tab <- table(tmp476$Koh_476)
+  row_order <- ICAMS::catalog.row.order$ID476
+  catalog <- setNames(rep(0L, length(row_order)), row_order)
+  shared <- intersect(names(tab), row_order)
+  catalog[shared] <- as.integer(tab[shared])
+  catalog
+}
+
+cat17 <- build_ID476_catalog(file_w_17_vcf, sig17file)
+cat8 <- build_ID476_catalog(file_w_8_vcf, sig8file)
+```
+
+```{r}
+#| label: plot-sig17-476
+#| fig-width: 18
+#| fig-height: 5
+mSigPlot::plot_ID476(
+  cat17,
+  plot_title = glue("{sig17file} (sig17 tumor) - ID476 spectrum"),
+  num_peak_labels = 10
+)
+```
+
+```{r}
+#| label: plot-sig8-476
+#| fig-width: 18
+#| fig-height: 5
+mSigPlot::plot_ID476(
+  cat8,
+  plot_title = glue("{sig8file} (sig8 tumor) - ID476 spectrum"),
+  num_peak_labels = 10
+)
+```
+
+## Helper functions
+
+```{r}
+#| label: helper-del-counts
+del_counts <- function(annotvcf) {
+  annotvcf %>%
+    dplyr::filter(nchar(ins_or_del_seq) >= 2) %>%
+    dplyr::filter(ins_or_del == "d") %>%
+    dplyr::filter(R <= 9) %>%
+    dplyr::count(short_visual, Koh_476) %>%
+    dplyr::arrange(desc(n)) %>%
+    dplyr::mutate(vis2 = gsub("\\}", "", gsub("\\{", "", short_visual))) %>%
+    dplyr::mutate(del_seq = str_extract(vis2, "(?<=<)[^>]+(?=>)")) %>%
+    dplyr::mutate(hasmh = grepl("\\{", short_visual))
+}
+```
+
+```{r}
+#| label: helper-normit
+normit <- function(xx) {
+  xx %>%
+    mutate(post = gsub(".*>", "", vis2)) %>%
+    mutate(post = gsub("\\[", "", post)) %>%
+    mutate(clean = gsub("]", "", gsub("[><\\[]", "", vis2))) %>%
+    mutate(
+      norm = ifelse(substr(clean, 1, 1) %in% c("A", "G"), revc(clean), clean)
+    ) %>%
+    mutate(prop_n = n / sum(xx$n)) %>%
+    select(Koh_476, norm, n, prop_n, short_visual)
+}
+```
+
+## Summarize and normalize deletion types
+
+```{r}
+#| label: summarize
+file_w_17_summary <- del_counts(file_w_17_vcf)
+norm17 <- normit(file_w_17_summary)
+
+file_w_8_summary <- del_counts(file_w_8_vcf)
+norm8 <- normit(file_w_8_summary)
+```
+
+## Print catalogs
+
+```{r}
+#| label: print-catalogs
+cat("=== sig17 tumor catalog (non-zero entries) ===\n")
+cat17_nz <- cat17[cat17 > 0]
+print(data.frame(category = names(cat17_nz), count = unname(cat17_nz)))
+
+cat("\n=== sig8 tumor catalog (non-zero entries) ===\n")
+cat8_nz <- cat8[cat8 > 0]
+print(data.frame(category = names(cat8_nz), count = unname(cat8_nz)))
+```
+
+## Counts and relative counts of different deletion types
+
+```{r}
+#| label: display-tables
+#| results: asis
+
+all_norm <- bind_rows(
+  norm17 %>% mutate(source = "sig17 tumor"),
+  norm8 %>% mutate(source = "sig8 tumor")
+)
+
+# Match Koh_476 strings directly (they already use aggregated forms
+# like "Del2:U(2,):R1" and "Del(7,):M1")
+indel_types <- c(
+  "Del2:U(2,):R1",
+  "Del2:U2:R(5,9)",
+  "Del(10,):U1:R1",
+  "Del(10,):U(2,):R1",
+  "Del4:M1",
+  "Del(7,):M1",
+  "Del(7,):M2",
+  "Del(7,):M3"
+)
+
+for (deltype in indel_types) {
+  cat("###", deltype, "\n\n")
+  filtered <- all_norm %>%
+    dplyr::filter(Koh_476 == deltype)
+  if (nrow(filtered) == 0) {
+    cat("No matching deletions found.\n\n")
+    next
+  }
+  wide <- filtered %>%
+    mutate(short_visual = gsub("<", "&lt;", gsub(">", "&gt;", short_visual))) %>%
+    mutate(prop_n = sprintf("%.4f", prop_n), n = as.character(n)) %>%
+    tidyr::pivot_wider(
+      id_cols = c(norm, short_visual),
+      names_from = source,
+      values_from = c(n, prop_n),
+      names_glue = "{source} {.value}",
+      names_vary = "slowest",
+      values_fill = ""
+    )
+
+  # Compute totals
+  prop_cols <- grep("prop_n", names(wide), value = TRUE)
+  n_cols <- grep(" n$", names(wide), value = TRUE)
+  totals <- list()
+  for (nc in n_cols) {
+    vals <- as.numeric(wide[[nc]][wide[[nc]] != ""])
+    totals[[nc]] <- sum(vals, na.rm = TRUE)
+  }
+  for (pc in prop_cols) {
+    vals <- as.numeric(wide[[pc]][wide[[pc]] != ""])
+    totals[[pc]] <- sprintf("%.4f", sum(vals, na.rm = TRUE))
+  }
+
+  # Print totals outside the fold
+  total_parts <- paste(
+    sapply(n_cols, function(nc) paste0(nc, " = ", totals[[nc]])),
+    sapply(prop_cols, function(pc) paste0(pc, " = ", totals[[pc]])),
+    sep = ", "
+  )
+  cat(paste(total_parts, collapse = "; "), "\n\n")
+
+  # Print full table inside a fold
+  cat("<details><summary>Details</summary>\n\n")
+  total_row <- setNames(as.list(rep("", ncol(wide))), names(wide))
+  total_row[["norm"]] <- "**Total**"
+  for (nc in n_cols) total_row[[nc]] <- as.character(totals[[nc]])
+  for (pc in prop_cols) total_row[[pc]] <- totals[[pc]]
+  bind_rows(wide, tibble(!!!total_row)) %>%
+    knitr::kable() %>%
+    print()
+  cat("\n</details>\n\n")
+}
+```
