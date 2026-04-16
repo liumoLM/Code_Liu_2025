@@ -147,9 +147,15 @@ load_cross_type_spectra <- function(
 load_all_signatures <- function(
   dataset_type,
   find_similar = FALSE,
-  sig_dir = here::here("Manuscript_data", "Mo_CAP9_analysis", "Signatures"),
-  catalog_dir = here::here("Manuscript_data", "Mo_CAP9_analysis", "Catalogs"),
-  data_dir = here::here("Manuscript_data")
+  sig_dir = here::here("prev_Manuscript_data", "steve-clipped-signartures"),
+  catalog_dir = here::here("prev_Manuscript_data", "steve_clipped_catalogs"),
+  data_dir = here::here("Manuscript_data"),
+  liu_dir = here::here("prev_Manuscript_data"),
+  spectra_dir = here::here(
+    "Manuscript_data",
+    "Mo_CAP9_analysis_remove_for_release",
+    "selected_spectra"
+  )
 ) {
   sig_files <- Sys.glob(file.path(sig_dir, dataset_type, "*.txt"))
 
@@ -218,7 +224,7 @@ load_all_signatures <- function(
   # Read Liu reference
   liu_suffix <- if (dataset_type == "Koh89") "89" else if (dataset_type == "Koh476") "476" else "83"
   liu_file <- file.path(
-    data_dir,
+    liu_dir,
     paste0("Liu_et_al_final_", liu_suffix, "_type_signatures.tsv")
   )
   liu_sigs <- read.table(
@@ -302,7 +308,7 @@ load_all_signatures <- function(
 
     # Load Liu 476-type signatures
     liu_file_476 <- file.path(
-      data_dir,
+      liu_dir,
       "Liu_et_al_final_476_type_signatures.tsv"
     )
     liu_476 <- read.table(
@@ -341,7 +347,6 @@ load_all_signatures <- function(
 
   # Find best-matching spectra for each signature and write to disk
   if (find_similar) {
-    spectra_dir <- file.path(data_dir, "Mo_CAP9_analysis", "selected_spectra")
     dir.create(spectra_dir, showWarnings = FALSE, recursive = TRUE)
 
     # CAP9-searchable: all groups except N.H (and its mapped variant N.H.m)
@@ -409,8 +414,6 @@ load_all_signatures <- function(
 
   # Load previously-saved selected spectra if they exist
   {
-    spectra_dir <- file.path(data_dir, "Mo_CAP9_analysis", "selected_spectra")
-
     cap9_sp_file <- file.path(
       spectra_dir,
       paste0("CAP9.selected_spectra.", dataset_type, ".tsv")
