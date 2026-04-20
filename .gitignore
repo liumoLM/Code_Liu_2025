@@ -2,5 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
+Rplots.pdf
 vignette/figure/cache/
 vignette/figure/parallel_plots/

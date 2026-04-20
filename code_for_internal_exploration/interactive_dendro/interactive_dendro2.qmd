@@ -394,11 +394,11 @@ output$sig_plots <- renderPlot(
     sigs <- sigs[order(match(sigs, leaf_order))]
     combined <- res$combined
     plot_fn <- if (input$dataset == "Koh89") {
-      mSigPlot::plot_89
+      mSigPlot::plot_ID89
     } else if (input$dataset == "COSMIC83") {
       mSigPlot::plot_83
     } else {
-      mSigPlot::plot_476
+      mSigPlot::plot_ID476
     }
 
     plots <- lapply(sigs, function(s) {
@@ -501,5 +501,5 @@ output$cosine_table <- renderUI({
 - **Workflow**: Select a dataset, pick a seed source and signature, set cosine similarity threshold, click "Update Dendrogram"
 - **Click** a leaf marker to select/deselect it (shown in badges above)
 - **Zoom** into crowded regions using plotly's built-in zoom
-- Signature profiles are rendered with mSigPlot (`plot_89` or `plot_476`)
+- Signature profiles are rendered with mSigPlot (`plot_ID89` or `plot_ID476`)
 - No limit on the number of signatures that can be selected
