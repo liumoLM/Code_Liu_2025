@@ -49,11 +49,11 @@ find_many_similar <- function(
   # Select plotting function based on number of rows
   nrows <- nrow(sigs)
   if (nrows == 83) {
-    plotit <- function(vec, title) plot_83(vec, plot_title = title)
+    plotit <- function(vec, title) plot_ID83(vec, plot_title = title)
   } else if (nrows == 89) {
-    plotit <- function(vec, title) plot_89(vec, plot_title = title)
+    plotit <- function(vec, title) plot_ID89(vec, plot_title = title)
   } else if (nrows == 476) {
-    plotit <- function(vec, title) plot_476(vec, plot_title = title)
+    plotit <- function(vec, title) plot_ID476(vec, plot_title = title)
   } else {
     stop(paste(
       "Unsupported number of rows:",

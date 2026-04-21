@@ -19,8 +19,17 @@ source(here::here("code_for_internal_exploration/read_annotated_vcf.R"))
 #' @param cap9 Logical: if TRUE, filter to R <= 9 before counting.
 #' @param pdf_path Output PDF path. Defaults to a timestamped file in
 #'   code_for_internal_exploration/indel_deep_dive/.
-#' @return A tibble with columns: tumor_id, cancer_type, pattern,
-#'   short_visual, R, L, count.
+#' @return A tibble with columns: tumor_id, rc_visual, visual, count,
+#'   cancer_type, pattern, short_visual, ins_or_del_seq, R, R_intuitive, L,
+#'   mh_length, prefix, suffix. `visual` is `paste0(prefix, short_visual,
+#'   suffix)`. `rc_visual` equals `visual` except on rows whose ref-strand
+#'   indel sequence (content between `<` and `>` in `short_visual`) starts
+#'   with a purine (A or G) *and* whose reverse complement starts with a
+#'   pyrimidine (T or C); on those rows it is the bracket-preserving
+#'   reverse complement of `visual` (A<->T, C<->G on bases, bracket
+#'   characters pinned in place, remaining bases reversed). `ins_or_del_seq`
+#'   is the VCF column of the same name (already pyrimidine-canonical
+#'   upstream). Rows are sorted by descending count.
 indel_deep_dive <- function(
   samples_to_fetch,
   patterns_to_match,
@@ -78,12 +87,20 @@ indel_deep_dive <- function(
         counts_list[[pat]] <- bind_rows(counts_list[[pat]], counts)
       }
 
-      # Collect short_visual, R, L, and prefix counts for this pattern
+      # Collect short_visual, R, L, prefix (flank base to the left of the
+      # indel block) and suffix (flank base to the right of the indel block)
+      # counts for this pattern. `long_visual` looks like
+      #   "...GCGGGTG <{CT}GGTCA>{CT} CTGCGAG..."
+      # so prefix = "G" (the letter just before ` <`), suffix = "C" (the
+      # first letter after `>` plus any `{...}` microhomology and a space).
       vis_counts <- vcf |>
         as_tibble() |>
         dplyr::filter(grepl(pat, Koh_476)) |>
-        dplyr::mutate(prefix = sub(".*([A-Z]) <.*", "\\1", long_visual)) |>
-        dplyr::count(short_visual, R, L, prefix)
+        dplyr::mutate(
+          prefix = sub(".*([A-Z]) <.*", "\\1", long_visual),
+          suffix = sub(".*>[^ ]* ([A-Z]).*", "\\1", long_visual)
+        ) |>
+        dplyr::count(short_visual, ins_or_del_seq, R, L, prefix, suffix)
       if (nrow(vis_counts) > 0) {
         vis_counts$pattern <- patterns_to_match[i]
         vis_counts$tumor_id <- sample_id
@@ -158,7 +175,8 @@ indel_deep_dive <- function(
   # Aggregate short_visual counts per tumor
   if (length(visual_list) > 0) {
     visual_table <- bind_rows(visual_list) |>
-      group_by(tumor_id, pattern, short_visual, R, L, prefix) |>
+      group_by(tumor_id, pattern, short_visual, ins_or_del_seq,
+               R, L, prefix, suffix) |>
       summarise(count = sum(n), .groups = "drop")
 
     # Add cancer_type from sample_info
@@ -191,23 +209,72 @@ indel_deep_dive <- function(
     )
 
     visual_table <- visual_table |>
+      dplyr::mutate(visual = paste0(prefix, short_visual, suffix))
+
+    # Build `rc_visual`: equals `visual` by default, but on rows whose
+    # ref-strand indel sequence (content between `<` and `>` in
+    # `short_visual`, with cosmetic microhomology braces `{` `}` stripped
+    # but their letters kept) starts with a purine (A or G) *and* whose
+    # reverse complement starts with a pyrimidine (T or C), it is the
+    # bracket-preserving reverse complement of `visual`. `ins_or_del_seq`
+    # is already pyrimidine-canonical upstream, so short_visual is the
+    # ref-strand truth we test against.
+    ref_seq <- sub(".*<([^>]+)>.*", "\\1", visual_table$short_visual)
+    ref_seq <- gsub("[{}]", "", ref_seq)
+    starts_AG <- grepl("^[AG]", ref_seq)
+    flip <- logical(nrow(visual_table))
+    if (any(starts_AG)) {
+      rc_seq <- fastrc::fast_rc(ref_seq[starts_AG])
+      flip[starts_AG] <- grepl("^[TC]", rc_seq)
+    }
+    # For flipped rows: complement A<->T and C<->G on the base letters,
+    # reverse the order of those bases only, and leave bracket characters
+    # (< > { } [ ]) pinned to their original positions so opener/closer
+    # roles are preserved.
+    #
+    # TODO (correctness): this bracket-pinning behavior is not the literal
+    # "complement bases then reverse the whole string" that was originally
+    # requested — the brackets here do *not* get reversed along with the
+    # bases. It produces sensible results on the InsDel23 examples we've
+    # checked (e.g. "T<{G}A>{G}G" -> "C<{C}T>{C}A"), but the semantics of
+    # bracket-pinned RC for microhomology / repeat contexts has not been
+    # formally validated. Revisit when time permits.
+    visual_table$rc_visual <- visual_table$visual
+    if (any(flip)) {
+      flip_visual <- function(s) {
+        vapply(s, function(x) {
+          ch <- strsplit(x, "", fixed = TRUE)[[1]]
+          is_base <- ch %in% c("A", "C", "G", "T")
+          ch[is_base] <- rev(chartr("ACGT", "TGCA", ch[is_base]))
+          paste(ch, collapse = "")
+        }, character(1), USE.NAMES = FALSE)
+      }
+      visual_table$rc_visual[flip] <- flip_visual(visual_table$visual[flip])
+    }
+
+    visual_table <- visual_table |>
       dplyr::select(
-        tumor_id, cancer_type, pattern, short_visual,
-        R, R_intuitive, L, mh_length, prefix, count
+        tumor_id, rc_visual, visual, count, cancer_type, pattern,
+        short_visual, ins_or_del_seq, R, R_intuitive, L, mh_length,
+        prefix, suffix
       ) |>
-      arrange(tumor_id, pattern, desc(count))
+      arrange(desc(count))
   } else {
     visual_table <- tibble(
       tumor_id = character(),
+      rc_visual = character(),
+      visual = character(),
+      count = integer(),
       cancer_type = character(),
       pattern = character(),
       short_visual = character(),
+      ins_or_del_seq = character(),
       R = integer(),
       R_intuitive = integer(),
       L = integer(),
       mh_length = integer(),
       prefix = character(),
-      count = integer()
+      suffix = character()
     )
   }
 

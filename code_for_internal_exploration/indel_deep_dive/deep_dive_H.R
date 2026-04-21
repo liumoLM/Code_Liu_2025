@@ -8,9 +8,7 @@
 
 library(here)
 
-source(here::here(
-  "code_for_internal_exploration/indel_deep_dive/indel_deep_dive.R"
-))
+source(here::here("code_for_internal_exploration/indel_deep_dive.R"))
 
 # Load assignment matrix and sample info
 assignments <- read.delim(
