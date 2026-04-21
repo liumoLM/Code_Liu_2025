@@ -7,7 +7,11 @@ library(ggplot2)
 
 # ---- Params (edit these to tune the figure) -------------------------------
 
-num_peaks <- 4
+# When TRUE, draw peak-label arrows and write fig1_with_arrows.pdf.
+# When FALSE, suppress all peak labels and write fig1.pdf.
+plot_arrows <- TRUE
+
+num_peaks <- if (plot_arrows) 4 else 0
 
 base_size <- 9.5
 base_size_83 <- base_size
@@ -52,7 +56,10 @@ script_dir <- if (!is.null(this_script) && nzchar(this_script)) {
   getwd()
 }
 data_file <- file.path(script_dir, "fig1_data.rds")
-out_file <- file.path(script_dir, "fig1.pdf")
+out_file <- file.path(
+  script_dir,
+  if (plot_arrows) "fig1_with_arrows.pdf" else "fig1.pdf"
+)
 
 # ---- Read signatures ------------------------------------------------------
 
