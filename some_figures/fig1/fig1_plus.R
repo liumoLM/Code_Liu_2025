@@ -55,7 +55,7 @@ script_dir <- if (!is.null(this_script) && nzchar(this_script)) {
 data_file <- file.path(script_dir, "fig1_data.rds")
 out_file <- file.path(
   script_dir,
-  if (plot_arrows) "fig1_with_arrows.pdf" else "fig1.pdf"
+  "fig1_plus.pdf"
 )
 
 # ---- Read signatures ------------------------------------------------------
@@ -65,6 +65,15 @@ dat <- readRDS(data_file)
 # ---- Write PDF with plot block positioned in top printable area -----------
 
 source(file.path(script_dir, "one_page_83_89_476.R"))
+
+mytxt <- function(label, x, y) {
+  grid::grid.text(
+    label = label,
+    x = unit(x, "pt"),
+    y = unit(y, "pt"),
+    gp = gpar(fontsize = base_size)
+  )
+}
 
 cairo_pdf(out_file, width = page_w, height = page_h)
 one_page_83_89_476(
@@ -79,6 +88,20 @@ one_page_83_89_476(
   margin_left = margin_left,
   margin_top = margin_top
 )
+mytxt("VTV\u2192VV", 131.9, 681)
+mytxt("VTTV\u2192VTV", 177, 645)
+mytxt("e.g. CACA\u2192CA", 233.6, 633)
+mytxt("2 base deletion\nwith microhomology\ne.g. TAT\u2192T", 484, 638)
+
+mytxt(
+  "AT{1,4}A\u2192AT{0,3}A, i.e. ATA\u2192AA, ATTA\u2192ATA, ATTTA\u2192ATTA, or ATTTTA\u2192ATTTA",
+  345,
+  550
+)
+mytxt("CT{1,4}A\u2192CT{0,3}A", 225, 535)
+mytxt("GT{1,4}A\u2192GT{0,3}A", 234, 520)
+mytxt("Many possibilities", 410, 526)
+mytxt("Many\npossibilities", 507, 530)
 dev.off()
 
 message("Wrote: ", out_file)
