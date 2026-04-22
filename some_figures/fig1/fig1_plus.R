@@ -66,12 +66,12 @@ dat <- readRDS(data_file)
 
 source(file.path(script_dir, "one_page_83_89_476.R"))
 
-mytxt <- function(label, x, y) {
+mytxt <- function(label, x, y, fontsize = base_size) {
   grid::grid.text(
     label = label,
     x = unit(x, "pt"),
     y = unit(y, "pt"),
-    gp = gpar(fontsize = base_size, lineheight = 1)
+    gp = grid::gpar(fontsize = fontsize, lineheight = 1)
   )
 }
 
@@ -101,11 +101,20 @@ one_page_83_89_476(
   margin_top = margin_top
 )
 
+
 # ID 83 =============
 
-mytxt("VTV\u2192VV", 131, 681)
-mytxt("VTTV\u2192VTV", 170, 665)
+mytxt("A", 120, 678, fontsize = 1.6 * base_size)
+mytxt("B", 233, 662, fontsize = 1.6 * base_size)
+mytxt("C", 481, 669, fontsize = 1.6 * base_size)
+
+
+myseg(136, 666, 143, 675)
+mytxt("VTV\u2192VV", 150, 681)
+
 myseg(141, 635, 162, 659)
+mytxt("VTTV\u2192VTV", 170, 665)
+
 mytxt("e.g. TATA\u2192TA\ne.g. TGTG\u2192TG", 240, 640)
 mytxt("2 base deletion\nwith microhomology\ne.g. GAG\u2192G", 484, 642)
 
@@ -129,7 +138,7 @@ mytxt("GT{1,4}A\u2192GT{0,3}A", 240, yGT)
 yM <- 526
 myseg(443.3, yM, 453, yM)
 mytxt("Many possibilities", 405, yM)
-mytxt("Many\npossibilities", 507, 530)
+mytxt("Many Mh\npossibilities", 507, 530)
 
 # ID 476 =============
 
