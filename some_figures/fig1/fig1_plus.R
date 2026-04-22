@@ -55,7 +55,7 @@ script_dir <- if (!is.null(this_script) && nzchar(this_script)) {
 data_file <- file.path(script_dir, "fig1_data.rds")
 out_file <- file.path(
   script_dir,
-  "fig1_plus.pdf"
+  "fig1.pdf"
 )
 
 # ---- Read signatures ------------------------------------------------------
@@ -71,12 +71,24 @@ mytxt <- function(label, x, y) {
     label = label,
     x = unit(x, "pt"),
     y = unit(y, "pt"),
-    gp = gpar(fontsize = base_size)
+    gp = gpar(fontsize = base_size, lineheight = 1)
+  )
+}
+
+myseg <- function(x0, y0, x1, y1) {
+  grid::grid.segments(
+    x0 = unit(x0, "pt"),
+    y0 = unit(y0, "pt"),
+    x1 = unit(x1, "pt"),
+    y1 = unit(y1, "pt")
   )
 }
 
 cairo_pdf(out_file, width = page_w, height = page_h)
 one_page_83_89_476(
+  title_83 = "83-Type Classification",
+  title_89 = "89-Type Classification",
+  title_476 = "476-Type Classification",
   sig_83 = dat$sig_83,
   sig_89 = dat$sig_89,
   sig_476 = dat$sig_476,
@@ -88,20 +100,46 @@ one_page_83_89_476(
   margin_left = margin_left,
   margin_top = margin_top
 )
-mytxt("VTV\u2192VV", 131.9, 681)
-mytxt("VTTV\u2192VTV", 177, 645)
-mytxt("e.g. CACA\u2192CA", 233.6, 633)
-mytxt("2 base deletion\nwith microhomology\ne.g. TAT\u2192T", 484, 638)
 
+# ID 83 =============
+
+mytxt("VTV\u2192VV", 131, 681)
+mytxt("VTTV\u2192VTV", 170, 665)
+myseg(141, 635, 162, 659)
+mytxt("e.g. TATA\u2192TA\ne.g. TGTG\u2192TG", 240, 640)
+mytxt("2 base deletion\nwith microhomology\ne.g. GAG\u2192G", 484, 642)
+
+# ID 89 =============
+
+yA <- 550
+myseg(158, yA, 168, yA)
 mytxt(
   "AT{1,4}A\u2192AT{0,3}A, i.e. ATA\u2192AA, ATTA\u2192ATA, ATTTA\u2192ATTA, or ATTTTA\u2192ATTTA",
   345,
-  550
+  yA
 )
+
+myseg(169.4, 529.5, 178.5, 535)
 mytxt("CT{1,4}A\u2192CT{0,3}A", 225, 535)
-mytxt("GT{1,4}A\u2192GT{0,3}A", 234, 520)
-mytxt("Many possibilities", 410, 526)
+
+yGT <- 520
+myseg(189, yGT, 194, yGT)
+mytxt("GT{1,4}A\u2192GT{0,3}A", 240, yGT)
+
+yM <- 526
+myseg(443.3, yM, 453, yM)
+mytxt("Many possibilities", 405, yM)
 mytxt("Many\npossibilities", 507, 530)
+
+# ID 476 =============
+
+mytxt("ATA\u2192AA", 186, 404)
+mytxt("CTA\u2192CA", 218, 385)
+mytxt("GTA\u2192GA", 260, 359)
+mytxt("e.g. TATA\u2192TA\ne.g. TGTG\u2192TG", 416, 398)
+# mytxt("e.g. TATATA\n\u2192TATA", 460, 345)
+mytxt("2 base deletion\nwith microhomology\ne.g. GAG\u2192G", 503, 381)
+
 dev.off()
 
 message("Wrote: ", out_file)

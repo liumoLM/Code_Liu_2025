@@ -55,7 +55,7 @@ script_dir <- if (!is.null(this_script) && nzchar(this_script)) {
 data_file <- file.path(script_dir, "fig1_data.rds")
 out_file <- file.path(
   script_dir,
-  if (plot_arrows) "fig1_with_arrows.pdf" else "fig1.pdf"
+  if (plot_arrows) "fig1_with_arrows.pdf" else "fig1_no_arrows.pdf"
 )
 
 # ---- Read signatures ------------------------------------------------------
