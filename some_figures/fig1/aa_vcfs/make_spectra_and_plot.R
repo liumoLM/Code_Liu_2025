@@ -128,7 +128,7 @@ base_size <- 9.5
 page_w <- 8.5 # letter portrait width  (in)
 page_h <- 11 # letter portrait height (in)
 
-out_pdf <- file.path(script_dir, "aa_vcfs_spectra2.pdf")
+out_pdf <- file.path(script_dir, "aa_vcfs_spectra.pdf")
 
 cairo_pdf(out_pdf, width = page_w, height = page_h, onefile = TRUE)
 on.exit(grDevices::dev.off(), add = TRUE)
