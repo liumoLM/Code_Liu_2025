@@ -94,19 +94,29 @@ for (i in seq_along(vcf_files)) {
     }
   }
 
-  ann <- suppressWarnings(mSigSpectra::annotate_vcf(
-    id_vcf, ref_genome = bsg, variant_type = "ID", name_of_vcf = s
-  ))
+  ann <- mSigSpectra::annotate_id_vcf(
+    id_vcf,
+    ref_genome = bsg,
+    name_of_vcf = s
+  )
 
   for (t in id_types) {
-    per_sample_cats[[t]][[i]] <- suppressWarnings(mSigSpectra::vcf_to_catalog(
-      ann, type = t, ref_genome = bsg, region = "genome", sample_name = s
+    per_sample_cats[[t]][[
+      i
+    ]] <- suppressWarnings(mSigSpectra::vcf_to_id_catalog(
+      ann,
+      type = t,
+      ref_genome = bsg,
+      region = "genome",
+      clip_le_9 = TRUE,
+      FILTER_PASS = TRUE,
+      sample_name = s
     ))
   }
 }
 
-id83  <- mSigSpectra::cbind_catalogs(per_sample_cats$ID83)
-id89  <- mSigSpectra::cbind_catalogs(per_sample_cats$ID89)
+id83 <- mSigSpectra::cbind_catalogs(per_sample_cats$ID83)
+id89 <- mSigSpectra::cbind_catalogs(per_sample_cats$ID89)
 id476 <- mSigSpectra::cbind_catalogs(per_sample_cats$ID476)
 
 # ---- Plot (fig1.R layout: one letter-portrait page per sample) ------------
@@ -121,7 +131,6 @@ page_h <- 11 # letter portrait height (in)
 out_pdf <- file.path(script_dir, "aa_vcfs_spectra2.pdf")
 
 cairo_pdf(out_pdf, width = page_w, height = page_h, onefile = TRUE)
-on.exit(grDevices::dev.off(), add = TRUE)
 
 first_page <- TRUE
 for (s in sample_names) {
@@ -143,6 +152,5 @@ for (s in sample_names) {
 }
 
 grDevices::dev.off()
-on.exit()
 
 message("Wrote: ", out_pdf)
