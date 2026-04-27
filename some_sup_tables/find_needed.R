@@ -13,7 +13,7 @@ mapping <- read.delim(
 )
 
 rosetta <- read.csv(
-  here::here("some_sup_tables", "rosetta_stone_476_89.csv"),
+  here::here("some_sup_tables", "rosetta_stone_476_89_cap9.csv"),
   stringsAsFactors = FALSE,
   check.names = FALSE
 )

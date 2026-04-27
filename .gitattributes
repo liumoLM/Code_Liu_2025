@@ -6,3 +6,4 @@ vignette/repertoire_of_indel_mutational_signatures.html filter=lfs diff=lfs merg
 *.vcf.gz filter=lfs diff=lfs merge=lfs -text
 *.jsonl filter=lfs diff=lfs merge=lfs -text
 some_sup_tables/rosetta_stone_full.csv filter=lfs diff=lfs merge=lfs -text
+some_sup_tables/rosetta_stone_full_cap9.csv filter=lfs diff=lfs merge=lfs -text
