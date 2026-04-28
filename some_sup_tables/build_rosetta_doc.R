@@ -20,12 +20,27 @@ message("Loaded ", nrow(pairs), " (Koh_476, Koh_89) pairs")
 message("Reading ", basename(full_path), " ...")
 full <- fread(full_path)
 
-message("Selecting up to ", n_examples, " distinct long_visual per pair ...")
+is_single_tc_class <- function(x) {
+  grepl("^[ACGT]\\[(Del|Ins)\\([CT]\\):R[^]]+\\][ACGT]$", x)
+}
+
+# For single-base T/C indels, restrict examples to ones where the indel base
+# on the reported strand is itself C or T (long_visual middle token like
+# "<C>" or "<T>"), and keep only one such example per Koh_476 class.
+single_tc <- is_single_tc_class(full$Koh_476)
+drop <- single_tc & !grepl(" <[CT]>", full$long_visual)
+message("Dropping ", sum(drop),
+        " rows whose strand-flipped base hides the canonical C/T")
+full <- full[!drop]
+
+message("Selecting distinct long_visual per pair ...")
 full_unique <- unique(full, by = c("Koh_476", "Koh_89", "long_visual"))
 setorder(full_unique, Koh_476, Koh_89)
-examples <- full_unique[, head(.SD, n_examples),
-                        by = .(Koh_476, Koh_89),
-                        .SDcols = c("COSMIC_83", "long_visual")]
+examples <- full_unique[, {
+  n <- if (is_single_tc_class(.BY$Koh_476)) 1L else n_examples
+  head(.SD, n)
+}, by = .(Koh_476, Koh_89),
+   .SDcols = c("COSMIC_83", "long_visual")]
 
 cosmic_per_pair <- full_unique[, .(COSMIC_83 = paste(sort(unique(COSMIC_83)),
                                                     collapse = "; ")),
@@ -48,6 +63,24 @@ setorder(doc, .row_ord, Koh_89, example_n, na.last = TRUE)
 doc[, .row_ord := NULL]
 
 doc <- doc[, .(Koh_476, Koh_89, COSMIC_83, example_n, long_visual)]
+
+# For single-base T/C indels, the flanking sequence is uninformative — keep
+# only the immediate neighbouring base on each side. Then collapse the
+# remaining spaces in every long_visual value.
+is_single_tc <- grepl("^[ACGT]\\[(Del|Ins)\\([CT]\\):R[^]]+\\][ACGT]$",
+                      doc$Koh_476)
+shrink_single_tc <- function(x) {
+  # x looks like "<pre> <token> <post>"; keep last char of pre, token,
+  # first char of post.
+  m <- regmatches(x, regexec("^(.*) (\\S+) (.*)$", x))
+  vapply(m, function(p) {
+    if (length(p) != 4L) return(NA_character_)
+    pre <- p[2]; tok <- p[3]; post <- p[4]
+    paste(substr(pre, nchar(pre), nchar(pre)), tok, substr(post, 1, 1))
+  }, character(1))
+}
+doc$long_visual[is_single_tc] <- shrink_single_tc(doc$long_visual[is_single_tc])
+doc$long_visual <- gsub(" ", "", doc$long_visual, fixed = TRUE)
 
 n_pairs <- uniqueN(doc, by = c("Koh_476", "Koh_89"))
 counts <- doc[, .N, by = .(Koh_476, Koh_89)]
