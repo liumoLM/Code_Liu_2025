@@ -1,15 +1,26 @@
 #!/usr/bin/env Rscript
 
-n_per_dir <- 300
-
 # Build a "Rosetta stone" mapping table linking the indel classification
 # columns Koh_476, Koh_89, COSMIC_83, and long_visual across the n_per_dir largest
 # annotated indel VCFs from the FMH and PCAWG cohorts.
 
 suppressPackageStartupMessages({
+  library(argparser)
   library(dplyr)
   library(readr)
 })
+
+p <- arg_parser("Build rosetta stone mapping table from annotated indel VCFs")
+p <- add_argument(p, "--n-per-dir", type = "integer", default = 300,
+                  help = "Number of largest VCFs to use from each directory")
+p <- add_argument(p, "--flank-5", type = "integer", default = 5,
+                  help = "Number of characters to keep from the 5' flank in long_visual")
+p <- add_argument(p, "--flank-3", type = "integer", default = 20,
+                  help = "Number of characters to keep from the 3' flank in long_visual")
+args <- parse_args(p)
+n_per_dir  <- args$n_per_dir
+flank_5    <- args$flank_5
+flank_3    <- args$flank_3
 
 out_dir <- here::here("some_sup_tables")
 
@@ -61,13 +72,14 @@ read_one <- function(path) {
       df[[m]] <- NA_character_
     }
   }
-  df$long_visual <- shorten_long_visual(df$long_visual)
+  df$long_visual <- shorten_long_visual(df$long_visual, flank_5, flank_3)
   df[, keep_cols, drop = FALSE]
 }
 
-# long_visual is "<5'-flank> <indel-token> <3'-flank>". Keep the last 5 chars
-# of the 5' flank, the indel token, and the first 5 chars of the 3' flank.
-shorten_long_visual <- function(x) {
+# long_visual is "<5'-flank> <indel-token> <3'-flank>". Keep the last flank_5
+# chars of the 5' flank, the indel token, and the first flank_3 chars of the
+# 3' flank.
+shorten_long_visual <- function(x, flank_5 = 5, flank_3 = 20) {
   out <- x
   ok <- !is.na(x)
   parts <- strsplit(x[ok], " ", fixed = TRUE)
@@ -78,9 +90,9 @@ shorten_long_visual <- function(x) {
   mid <- vapply(good, `[`, character(1), 2)
   post <- vapply(good, `[`, character(1), 3)
   out[idx] <- paste(
-    substr(pre, pmax(1, nchar(pre) - 4), nchar(pre)),
+    substr(pre, pmax(1, nchar(pre) - flank_5 + 1), nchar(pre)),
     mid,
-    substr(post, 1, 5)
+    substr(post, 1, flank_3)
   )
   out
 }

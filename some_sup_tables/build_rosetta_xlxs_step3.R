@@ -260,7 +260,7 @@ for (i in seq_along(runs$lengths)) {
 # Column widths.
 wb$set_col_widths(
   cols = seq_along(doc),
-  widths = c(18, 20, 17, 3, 90, 12, 8, 8, 12, 10)
+  widths = c(17, 18, 13, 3, 70, 12, 8, 8, 12, 10)
 )
 
 wb_save(wb, out_path, overwrite = TRUE)
