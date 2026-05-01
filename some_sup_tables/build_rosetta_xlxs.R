@@ -40,6 +40,7 @@ full <- full[!drop]
 message("Selecting distinct long_visual per pair ...")
 full_unique <- unique(full, by = c("Koh_476", "Koh_89", "long_visual"))
 setorder(full_unique, Koh_476, Koh_89)
+extra_cols <- c("U_seq", "R", "mh", "unit", "spacer")
 examples <- full_unique[,
   {
     n <- if (is_single_tc_class(.BY$Koh_476)) {
@@ -50,7 +51,7 @@ examples <- full_unique[,
     head(.SD, n)
   },
   by = .(Koh_476, Koh_89),
-  .SDcols = c("COSMIC_83", "long_visual")
+  .SDcols = c("COSMIC_83", "long_visual", extra_cols)
 ]
 
 cosmic_per_pair <- full_unique[,
@@ -60,7 +61,7 @@ cosmic_per_pair <- full_unique[,
 
 doc <- merge(
   pairs,
-  examples[, .(Koh_476, Koh_89, long_visual)],
+  examples[, c("Koh_476", "Koh_89", "long_visual", extra_cols), with = FALSE],
   by = c("Koh_476", "Koh_89"),
   all.x = TRUE,
   sort = FALSE
@@ -121,7 +122,10 @@ if (length(multi_koh476) > 0) {
   doc[Koh_476 %in% multi_koh476, Koh_476 := paste0(Koh_476, "*")]
 }
 
-doc <- doc[, .(Koh_476, Koh_89, COSMIC_83, example_n, long_visual)]
+doc <- doc[,
+  c("Koh_476", "Koh_89", "COSMIC_83", "example_n", "long_visual", extra_cols),
+  with = FALSE
+]
 
 n_pairs <- uniqueN(doc, by = c("Koh_476", "Koh_89"))
 counts <- doc[, .N, by = .(Koh_476, Koh_89)]
@@ -254,7 +258,10 @@ for (i in seq_along(runs$lengths)) {
 }
 
 # Column widths.
-wb$set_col_widths(cols = seq_along(doc), widths = c(22, 28, 18, 8, 90))
+wb$set_col_widths(
+  cols = seq_along(doc),
+  widths = c(18, 20, 17, 3, 90, 12, 8, 8, 12, 10)
+)
 
 wb_save(wb, out_path, overwrite = TRUE)
 message("Wrote ", out_path)

@@ -21,7 +21,7 @@ files <- c(
 )
 
 for (f in files) {
-  in_path  <- file.path(in_dir, f)
+  in_path <- file.path(in_dir, f)
   out_path <- file.path(in_dir, sub("\\.csv$", "_cap9.csv", f))
   message("Reading ", f)
   dt <- fread(in_path, showProgress = FALSE)
@@ -31,9 +31,14 @@ for (f in files) {
   # Rewrite "(Ins|Del)(C|T):R9]" as "(Ins|Del)(C|T):R(9,)]" so the Koh_476
   # values match the ID476_ID89 mapping convention for the open-ended bin.
   dt$Koh_476 <- sub(
-    "((?:Ins|Del)\\([CT]\\)):R9\\]", "\\1:R(9,)]", dt$Koh_476, perl = TRUE
+    "((?:Ins|Del)\\([CT]\\)):R9\\]",
+    "\\1:R(9,)]",
+    dt$Koh_476,
+    perl = TRUE
   )
-  if (f != "rosetta_stone_full.csv") dt <- unique(dt)
+  if (f != "rosetta_stone_full.csv") {
+    dt <- unique(dt)
+  }
   fwrite(dt, out_path)
   message("  wrote ", out_path, " (", nrow(dt), " rows)")
 }
