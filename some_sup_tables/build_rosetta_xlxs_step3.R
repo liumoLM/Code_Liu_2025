@@ -164,25 +164,22 @@ setnames(doc,
 
 h_align <- if (suppress_details) "left" else "center"
 
-if (suppress_details) {
-  doc[[long_col]] <- gsub("[<>{}\\[\\]]", "", doc[[long_col]])
-}
-
-# Write the non-rich columns first.
+# Write the non-rich columns first (long_col filled in by rich-text pass below).
 plain <- copy(doc)
 plain[[long_col]] <- NA_character_
 wb$add_data(x = plain, na.strings = "")
 
 # Write long_visual as rich text per cell.
+# When brackets=FALSE, bracket characters (<>{}[]) are omitted from the output
+# but their contents retain full styling (color, bold, underline).
 cyan <- wb_color(hex = "FFFF1493") # bright pink (DeepPink)
 mono_font <- "Liberation Mono"
 
-# Recursively style: top level recognises <...>, [...], {...}; inside <...>
-# any nested {...} is additionally underlined.
-rich_long_visual <- function(s) {
+rich_long_visual <- function(s, brackets = TRUE) {
   if (is.na(s) || !nzchar(s)) {
     return(fmt_txt(""))
   }
+  br  <- function(x) if (brackets) list(txt(x)) else list()
   txt <- function(x, ...) fmt_txt(x, font = mono_font, ...)
   pieces <- regmatches(
     s,
@@ -192,7 +189,7 @@ rich_long_visual <- function(s) {
   for (p in pieces) {
     if (startsWith(p, "<")) {
       inner <- substr(p, 2L, nchar(p) - 1L)
-      parts <- c(parts, list(txt("<")))
+      parts <- c(parts, br("<"))
       subs <- regmatches(
         inner,
         gregexpr("\\{[^}]*\\}|[^{]+", inner, perl = TRUE)
@@ -201,33 +198,33 @@ rich_long_visual <- function(s) {
         if (startsWith(sp, "{")) {
           parts <- c(
             parts,
-            list(txt("{")),
+            br("{"),
             list(txt(
               substr(sp, 2L, nchar(sp) - 1L),
               bold = TRUE,
               color = cyan,
               underline = TRUE
             )),
-            list(txt("}"))
+            br("}")
           )
         } else {
           parts <- c(parts, list(txt(sp, bold = TRUE, color = cyan)))
         }
       }
-      parts <- c(parts, list(txt(">")))
+      parts <- c(parts, br(">"))
     } else if (startsWith(p, "[")) {
       parts <- c(
         parts,
-        list(txt("[")),
+        br("["),
         list(txt(substr(p, 2L, nchar(p) - 1L), color = cyan)),
-        list(txt("]"))
+        br("]")
       )
     } else if (startsWith(p, "{")) {
       parts <- c(
         parts,
-        list(txt("{")),
+        br("{"),
         list(txt(substr(p, 2L, nchar(p) - 1L), underline = TRUE)),
-        list(txt("}"))
+        br("}")
       )
     } else {
       parts <- c(parts, list(txt(p)))
@@ -238,7 +235,7 @@ rich_long_visual <- function(s) {
 
 for (i in seq_len(nrow(doc))) {
   wb$add_data(
-    x = rich_long_visual(doc[[long_col]][i]),
+    x = rich_long_visual(doc[[long_col]][i], brackets = !suppress_details),
     dims = wb_dims(rows = i + 1L, cols = long_col)
   )
 }
