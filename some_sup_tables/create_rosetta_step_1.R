@@ -11,16 +11,31 @@ suppressPackageStartupMessages({
 })
 
 p <- arg_parser("Build rosetta stone mapping table from annotated indel VCFs")
-p <- add_argument(p, "--n-per-dir", type = "integer", default = 300,
-                  help = "Number of largest VCFs to use from each directory")
-p <- add_argument(p, "--flank-5", type = "integer", default = 5,
-                  help = "Number of characters to keep from the 5' flank in long_visual")
-p <- add_argument(p, "--flank-3", type = "integer", default = 20,
-                  help = "Number of characters to keep from the 3' flank in long_visual")
+p <- add_argument(
+  p,
+  "--n-per-dir",
+  type = "integer",
+  default = 300,
+  help = "Number of largest VCFs to use from each directory"
+)
+p <- add_argument(
+  p,
+  "--flank-5",
+  type = "integer",
+  default = 5,
+  help = "Number of characters to keep from the 5' flank in long_visual"
+)
+p <- add_argument(
+  p,
+  "--flank-3",
+  type = "integer",
+  default = 20,
+  help = "Number of characters to keep from the 3' flank in long_visual"
+)
 args <- parse_args(p)
-n_per_dir  <- args$n_per_dir
-flank_5    <- args$flank_5
-flank_3    <- args$flank_3
+n_per_dir <- args$n_per_dir
+flank_5 <- args$flank_5
+flank_3 <- args$flank_3
 
 out_dir <- here::here("some_sup_tables")
 
@@ -39,7 +54,14 @@ keep_cols <- c(
   "R",
   "mh",
   "unit",
-  "spacer"
+  "unit_length",
+  "internal_rep",
+  "internal_reps",
+  "spacer",
+  "spacer_length",
+  "prime3_rep",
+  "prime3_reps",
+  "original_reps"
 )
 
 pick_largest <- function(dir, n) {
