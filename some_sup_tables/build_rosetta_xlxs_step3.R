@@ -6,11 +6,18 @@ suppressPackageStartupMessages({
   library(data.table)
   library(openxlsx2)
   library(ICAMS)
+  library(argparser)
 })
+
+p <- arg_parser("Build rosetta-stone Excel table")
+p <- add_argument(p, "--show-details",
+  help = "Include detail columns after 'Indel in context'",
+  flag = TRUE)
+args <- parse_args(p)
+suppress_details <- !args$show_details
 
 n_examples <- 20 # for non single-base T/C indels
 n_examples_singletc <- 1
-suppress_details <- TRUE
 in_dir <- here::here("some_sup_tables")
 pairs_path <- file.path(in_dir, "rosetta_stone_476_89_cap9.csv")
 full_path <- file.path(in_dir, "rosetta_stone_full_cap9.csv")
@@ -127,14 +134,8 @@ if (length(multi_koh476) > 0) {
   doc[Koh_476 %in% multi_koh476, Koh_476 := paste0(Koh_476, "*")]
 }
 
-doc[, issue := (U_seq != unit) | (R != original_reps)]
-n_issues <- sum(doc$issue, na.rm = TRUE)
-if (n_issues > 0) {
-  message("Rows flagged (U_seq != unit or R != original_reps): ", n_issues)
-}
-
 doc <- doc[,
-  c("Koh_476", "Koh_89", "COSMIC_83", "example_n", "long_visual", extra_cols, "issue"),
+  c("Koh_476", "Koh_89", "COSMIC_83", "example_n", "long_visual", extra_cols),
   with = FALSE
 ]
 if (suppress_details) {
@@ -162,7 +163,6 @@ setnames(doc,
   new = c("476-type", "89-type", "83-type", "Example n", "Indel in context")
 )
 
-h_align <- if (suppress_details) "left" else "center"
 
 # Write the non-rich columns first (long_col filled in by rich-text pass below).
 plain <- copy(doc)
@@ -185,11 +185,23 @@ rich_long_visual <- function(s, brackets = TRUE) {
     s,
     gregexpr("<[^>]*>|\\[[^]]*\\]|\\{[^}]*\\}|[^<\\[\\{]+", s, perl = TRUE)
   )[[1]]
+
+  # Pre-pass: derive the repeat unit length from the <...> content by stripping
+  # {} delimiters to get the raw sequence length.
+  unit_len <- NA_integer_
+  for (piece in pieces) {
+    if (startsWith(piece, "<")) {
+      inner <- substr(piece, 2L, nchar(piece) - 1L)
+      unit_len <- nchar(gsub("[{}]", "", inner))
+      break
+    }
+  }
+
   parts <- list()
   for (p in pieces) {
     if (startsWith(p, "<")) {
       inner <- substr(p, 2L, nchar(p) - 1L)
-      parts <- c(parts, br("<"))
+      parts <- c(parts, list(txt("<")))
       subs <- regmatches(
         inner,
         gregexpr("\\{[^}]*\\}|[^{]+", inner, perl = TRUE)
@@ -203,7 +215,7 @@ rich_long_visual <- function(s, brackets = TRUE) {
               substr(sp, 2L, nchar(sp) - 1L),
               bold = TRUE,
               color = cyan,
-              underline = TRUE
+              underline = "double"
             )),
             br("}")
           )
@@ -211,19 +223,38 @@ rich_long_visual <- function(s, brackets = TRUE) {
           parts <- c(parts, list(txt(sp, bold = TRUE, color = cyan)))
         }
       }
-      parts <- c(parts, br(">"))
+      parts <- c(parts, list(txt(">")))
     } else if (startsWith(p, "[")) {
-      parts <- c(
-        parts,
-        br("["),
-        list(txt(substr(p, 2L, nchar(p) - 1L), color = cyan)),
-        br("]")
-      )
+      content <- substr(p, 2L, nchar(p) - 1L)
+      parts <- c(parts, br("["))
+      if (!is.na(unit_len) && unit_len > 0L && nchar(content) >= 2L * unit_len) {
+        # Split into per-copy chunks; underline even-numbered copies (2, 4, 6…).
+        n_copies <- floor(nchar(content) / unit_len)
+        for (copy_i in seq_len(n_copies)) {
+          copy_seq <- substr(
+            content,
+            (copy_i - 1L) * unit_len + 1L,
+            copy_i * unit_len
+          )
+          if (copy_i %% 2L == 0L) {
+            parts <- c(parts, list(txt(copy_seq, color = cyan, underline = TRUE)))
+          } else {
+            parts <- c(parts, list(txt(copy_seq, color = cyan)))
+          }
+        }
+        remainder <- substr(content, n_copies * unit_len + 1L, nchar(content))
+        if (nzchar(remainder)) {
+          parts <- c(parts, list(txt(remainder, color = cyan)))
+        }
+      } else {
+        parts <- c(parts, list(txt(content, color = cyan)))
+      }
+      parts <- c(parts, br("]"))
     } else if (startsWith(p, "{")) {
       parts <- c(
         parts,
         br("{"),
-        list(txt(substr(p, 2L, nchar(p) - 1L), underline = TRUE)),
+        list(txt(substr(p, 2L, nchar(p) - 1L), underline = "double")),
         br("}")
       )
     } else {
@@ -235,15 +266,14 @@ rich_long_visual <- function(s, brackets = TRUE) {
 
 for (i in seq_len(nrow(doc))) {
   wb$add_data(
-    x = rich_long_visual(doc[[long_col]][i], brackets = !suppress_details),
+    x = rich_long_visual(doc[[long_col]][i], brackets = FALSE),
     dims = wb_dims(rows = i + 1L, cols = long_col)
   )
 }
 
-# Header style: centered; numeric column headers rotated vertical.
+# Header style: bold, vertically centered; numeric headers rotated vertical.
 wb$add_cell_style(
   dims = wb_dims(rows = 1, cols = seq_along(doc)),
-  horizontal = h_align,
   vertical = "center"
 )
 wb$add_font(dims = wb_dims(rows = 1, cols = seq_along(doc)), bold = "1")
@@ -251,42 +281,35 @@ if (length(numeric_cols) > 0) {
   wb$add_cell_style(
     dims = wb_dims(rows = 1, cols = numeric_cols),
     text_rotation = 90,
-    horizontal = h_align,
+    horizontal = "center",
     vertical = "bottom"
   )
 }
 
-# All body cells: centered.
+# All body cells: vertically centered; numeric columns horizontally centered.
 body_rows <- seq_len(nrow(doc)) + 1L
 wb$add_cell_style(
   dims = wb_dims(rows = body_rows, cols = seq_along(doc)),
-  vertical = "center",
-  horizontal = h_align
+  vertical = "center"
 )
+if (length(numeric_cols) > 0) {
+  wb$add_cell_style(
+    dims = wb_dims(rows = body_rows, cols = numeric_cols),
+    vertical = "center",
+    horizontal = "center"
+  )
+}
 
 # Wrap text in 83-type column.
 wb$add_cell_style(
   dims = wb_dims(rows = body_rows, cols = cosmic_col),
   wrap_text = "1",
-  vertical = "center",
-  horizontal = h_align
+  vertical = "center"
 )
 
 # Monospace "Indel in context" cells (font also set per rich-text run, but set
 # the whole-cell font too so plain segments stay aligned).
 wb$add_font(dims = wb_dims(rows = body_rows, cols = long_col), name = mono_font)
-
-# Light-pink highlight for flagged rows.
-if ("issue" %in% names(doc)) {
-  light_pink <- wb_color(hex = "FFFFB6C1")
-  issue_rows <- which(doc$issue) + 1L  # +1 for header row
-  for (r in issue_rows) {
-    wb$add_fill(
-      dims = wb_dims(rows = r, cols = seq_along(doc)),
-      color = light_pink
-    )
-  }
-}
 
 wb$freeze_pane(first_row = TRUE)
 

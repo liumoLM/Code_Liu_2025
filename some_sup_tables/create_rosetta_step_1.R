@@ -49,6 +49,7 @@ keep_cols <- c(
   "Koh_89",
   "COSMIC_83",
   "long_visual",
+  "ins_or_del_seq",
   "U_seq",
   "U_seq_count_in_indel_seq",
   "R",
