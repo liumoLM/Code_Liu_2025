@@ -16,11 +16,17 @@ p <- add_argument(
   help = "Include detail columns after 'Indel in context'",
   flag = TRUE
 )
+p <- add_argument(
+  p,
+  "--more-singletc",
+  help = "Show 5 examples per single-base T/C class (default: 1)",
+  flag = TRUE
+)
 args <- parse_args(p)
 suppress_details <- !args$show_details
 
 n_examples <- 20 # for non single-base T/C indels
-n_examples_singletc <- 1
+n_examples_singletc <- if (args$more_singletc) 5L else 1L
 in_dir <- here::here("some_sup_tables")
 pairs_path <- file.path(in_dir, "rosetta_stone_476_89_cap9.csv")
 full_path <- file.path(in_dir, "rosetta_stone_full_cap9.csv")
@@ -73,8 +79,20 @@ examples <- full_unique[,
       head(.SD, n_examples_singletc)
     } else {
       seqs <- unique(ins_or_del_seq)
-      if (length(seqs) > n_examples) seqs <- seqs[seq_len(n_examples)]
-      .SD[match(seqs, ins_or_del_seq)]
+      if (length(seqs) >= n_examples) {
+        # More (or equal) seqs than budget: one row per seq, capped.
+        .SD[match(seqs[seq_len(n_examples)], ins_or_del_seq)]
+      } else {
+        # Fewer seqs than budget: round-robin to fill up to n_examples.
+        # seq_rank    = which seq each row belongs to (position in seqs).
+        # within_rank = ordinal of the row within its seq group (1st, 2nd, …).
+        # Sorting by (within_rank, seq_rank) interleaves seqs: all 1st
+        # occurrences first, then all 2nd occurrences, etc., guaranteeing at
+        # least one example per seq before any seq gets a second.
+        seq_rank <- match(ins_or_del_seq, seqs)
+        within_rank <- ave(seq_rank, seq_rank, FUN = seq_along)
+        head(.SD[order(within_rank, seq_rank)], n_examples)
+      }
     }
   },
   by = .(Koh_476, Koh_89),
@@ -134,9 +152,7 @@ shrink_single_tc <- function(x) {
     character(1)
   )
 }
-doc$long_visual[is_single_tc_doc] <- shrink_single_tc(doc$long_visual[
-  is_single_tc_doc
-])
+# Longer flanking context is always shown for single-base T/C indels.
 doc$long_visual <- gsub(" ", "", doc$long_visual, fixed = TRUE)
 
 # Asterisk Koh_476 values that map to more than one Koh_89.
@@ -350,7 +366,27 @@ for (i in seq_along(runs$lengths)) {
 }
 
 # Column widths: numeric columns 4 wide, others by content.
-col_widths <- c(17, 18, 13, 3, 70, 12, 12, 10, 8, 8, 12, 8, 8, 8, 10, 8, 8, 8, 8)
+col_widths <- c(
+  17,
+  18,
+  16,
+  3,
+  70,
+  12,
+  12,
+  10,
+  8,
+  8,
+  12,
+  8,
+  8,
+  8,
+  10,
+  8,
+  8,
+  8,
+  8
+)
 col_widths[numeric_cols] <- 4
 wb$set_col_widths(cols = seq_along(doc), widths = col_widths[seq_along(doc)])
 
