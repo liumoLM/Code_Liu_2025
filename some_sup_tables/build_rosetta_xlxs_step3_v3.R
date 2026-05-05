@@ -6,6 +6,7 @@ suppressPackageStartupMessages({
   library(data.table)
   library(openxlsx2)
   library(ICAMS)
+  library(mSigSpectra)
   library(argparser)
 })
 
@@ -132,6 +133,9 @@ if (length(not_in_order) > 0) {
 }
 setorder(doc, .row_ord, Koh_89, example_n, na.last = TRUE)
 doc[, .row_ord := NULL]
+
+doc[, Koh_476 := mSigSpectra::change_476_type_ids_to_open_intervals(Koh_476)]
+doc[, Koh_89  := mSigSpectra::change_89_type_ids_to_open_intervals(Koh_89)]
 
 # For single-base T/C indels, shrink long_visual flanks to the immediate
 # neighbours; then collapse spaces in every long_visual.
