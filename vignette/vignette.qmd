@@ -61,7 +61,7 @@ Source file:  `r xfun::with_ext(knitr::current_input(), "qmd")`
 # general the detection of changes is not perfect.
 # When in doubt regenerate the plots.
 # ======================================================
-REGENERATE_PLOTS <- FALSE
+REGENERATE_PLOTS <- T # FALSE
 
 REGENERATE_CONNECTION_TABLE <- FALSE
 

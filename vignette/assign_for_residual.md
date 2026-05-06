@@ -5,7 +5,7 @@
 - N residual: 387.3
 - Total negative: 313.6
 - N negative channels: 22
-- P(≥ total negative): 0.709
+- P(≥ total negative): 0.707
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -106,7 +106,7 @@
 - N residual: 1665.7
 - Total negative: 211.0
 - N negative channels: 14
-- P(≥ total negative): 0.994
+- P(≥ total negative): 0.993
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -207,7 +207,7 @@
 - N residual: 444.7
 - Total negative: 36.0
 - N negative channels: 14
-- P(≥ total negative): 0.944
+- P(≥ total negative): 0.940
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -308,7 +308,7 @@
 - N residual: 6747.0
 - Total negative: 1794.5
 - N negative channels: 37
-- P(≥ total negative): 0.789
+- P(≥ total negative): 0.762
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -409,7 +409,7 @@
 - N residual: 963.6
 - Total negative: 804.3
 - N negative channels: 31
-- P(≥ total negative): 0.586
+- P(≥ total negative): 0.644
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -510,7 +510,7 @@
 - N residual: 55407.8
 - Total negative: 2179.5
 - N negative channels: 4
-- P(≥ total negative): 0.908
+- P(≥ total negative): 0.928
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -611,7 +611,7 @@
 - N residual: 207.8
 - Total negative: 96.8
 - N negative channels: 26
-- P(≥ total negative): 0.977
+- P(≥ total negative): 0.988
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -712,7 +712,7 @@
 - N residual: 3.7
 - Total negative: 263.9
 - N negative channels: 39
-- P(≥ total negative): 0.987
+- P(≥ total negative): 0.984
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -813,7 +813,7 @@
 - N residual: 12.6
 - Total negative: 87.8
 - N negative channels: 51
-- P(≥ total negative): 0.582
+- P(≥ total negative): 0.601
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -1015,7 +1015,7 @@
 - N residual: 260.3
 - Total negative: 31.1
 - N negative channels: 24
-- P(≥ total negative): 0.992
+- P(≥ total negative): 0.993
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -1116,7 +1116,7 @@
 - N residual: 63.9
 - Total negative: 45.7
 - N negative channels: 39
-- P(≥ total negative): 0.944
+- P(≥ total negative): 0.939
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -1217,7 +1217,7 @@
 - N residual: 0.0
 - Total negative: 93.2
 - N negative channels: 42
-- P(≥ total negative): 0.900
+- P(≥ total negative): 0.909
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -1318,7 +1318,7 @@
 - N residual: 0.0
 - Total negative: 1277.3
 - N negative channels: 25
-- P(≥ total negative): 0.993
+- P(≥ total negative): 0.994
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -1419,7 +1419,7 @@
 - N residual: 647.5
 - Total negative: 179.8
 - N negative channels: 26
-- P(≥ total negative): 0.794
+- P(≥ total negative): 0.774
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -1520,7 +1520,7 @@
 - N residual: 53.5
 - Total negative: 19.1
 - N negative channels: 42
-- P(≥ total negative): 0.885
+- P(≥ total negative): 0.876
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -1621,7 +1621,7 @@
 - N residual: 253.0
 - Total negative: 27.3
 - N negative channels: 20
-- P(≥ total negative): 0.763
+- P(≥ total negative): 0.757
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -1823,7 +1823,7 @@
 - N residual: 38.7
 - Total negative: 43.9
 - N negative channels: 46
-- P(≥ total negative): 0.745
+- P(≥ total negative): 0.722
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -1924,7 +1924,7 @@
 - N residual: 0.0
 - Total negative: 145.0
 - N negative channels: 45
-- P(≥ total negative): 0.842
+- P(≥ total negative): 0.808
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -2025,7 +2025,7 @@
 - N residual: 60.5
 - Total negative: 293.2
 - N negative channels: 42
-- P(≥ total negative): 0.697
+- P(≥ total negative): 0.703
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -2227,7 +2227,7 @@
 - N residual: 0.0
 - Total negative: 155.6
 - N negative channels: 37
-- P(≥ total negative): 0.725
+- P(≥ total negative): 0.750
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -2328,7 +2328,7 @@
 - N residual: 79.8
 - Total negative: 29.4
 - N negative channels: 32
-- P(≥ total negative): 0.978
+- P(≥ total negative): 0.969
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -2429,7 +2429,7 @@
 - N residual: 0.0
 - Total negative: 49.4
 - N negative channels: 46
-- P(≥ total negative): 0.888
+- P(≥ total negative): 0.915
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -2530,7 +2530,7 @@
 - N residual: 303.5
 - Total negative: 64.6
 - N negative channels: 37
-- P(≥ total negative): 0.805
+- P(≥ total negative): 0.800
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -2631,7 +2631,7 @@
 - N residual: 1073.8
 - Total negative: 17.8
 - N negative channels: 6
-- P(≥ total negative): 0.903
+- P(≥ total negative): 0.901
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -2732,7 +2732,7 @@
 - N residual: 97.9
 - Total negative: 24.8
 - N negative channels: 34
-- P(≥ total negative): 0.914
+- P(≥ total negative): 0.916
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -3035,7 +3035,7 @@
 - N residual: 1048.1
 - Total negative: 756.4
 - N negative channels: 19
-- P(≥ total negative): 0.985
+- P(≥ total negative): 0.970
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -3136,7 +3136,7 @@
 - N residual: 78.8
 - Total negative: 43.9
 - N negative channels: 28
-- P(≥ total negative): 0.695
+- P(≥ total negative): 0.698
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -3237,7 +3237,7 @@
 - N residual: 233.1
 - Total negative: 142.3
 - N negative channels: 16
-- P(≥ total negative): 0.528
+- P(≥ total negative): 0.560
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -3338,7 +3338,7 @@
 - N residual: 333.4
 - Total negative: 31.0
 - N negative channels: 16
-- P(≥ total negative): 0.961
+- P(≥ total negative): 0.965
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -3439,7 +3439,7 @@
 - N residual: 389.4
 - Total negative: 7.2
 - N negative channels: 16
-- P(≥ total negative): 0.608
+- P(≥ total negative): 0.615
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -3641,7 +3641,7 @@
 - N residual: 30637.2
 - Total negative: 194.5
 - N negative channels: 3
-- P(≥ total negative): 0.407
+- P(≥ total negative): 0.439
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -3742,7 +3742,7 @@
 - N residual: 8181.6
 - Total negative: 1026.4
 - N negative channels: 26
-- P(≥ total negative): 0.845
+- P(≥ total negative): 0.855
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -3843,7 +3843,7 @@
 - N residual: 82691.4
 - Total negative: 5349.6
 - N negative channels: 9
-- P(≥ total negative): 0.754
+- P(≥ total negative): 0.756
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -4045,7 +4045,7 @@
 - N residual: 17128.0
 - Total negative: 5173.4
 - N negative channels: 16
-- P(≥ total negative): 0.947
+- P(≥ total negative): 0.939
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -4146,7 +4146,7 @@
 - N residual: 450.3
 - Total negative: 102.4
 - N negative channels: 18
-- P(≥ total negative): 0.999
+- P(≥ total negative): 0.998
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|

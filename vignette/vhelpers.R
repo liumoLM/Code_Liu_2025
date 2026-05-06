@@ -112,9 +112,9 @@ find_sig_txt <- function(sig_id) {
 #' @param ID83signature Character: the corresponding ID83 signature name
 #' @param ID89_signatures Data frame of ID89 signatures
 #' @param ID89_catalogs Data frame of ID89 catalogs
-#' @param ID83_signatures ICAMS catalog of ID83 signatures
-#' @param ID83_catalogs ICAMS catalog of ID83 catalogs
-#' @param ID83_catalogs_no_polyT ICAMS catalog with polyT removed
+#' @param ID83_signatures Catalog of ID83 signatures
+#' @param ID83_catalogs Catalog of ID83 catalogs
+#' @param ID83_catalogs_no_polyT Catalog with polyT removed
 #' @param ID476_signatures Data frame of ID476 signatures
 #' @param ID476_catalogs Data frame of ID476 catalogs
 #' @param cosmic_matches Named list of data frames with COSMIC signature matches
@@ -496,9 +496,9 @@ generate_section_footer <- function(sig_data) {
 #' @param sig_data List returned from compute_sig_data
 #' @param ID89_signatures Data frame of ID89 signatures
 #' @param ID89_catalogs Data frame of ID89 catalogs
-#' @param ID83_signatures ICAMS catalog of ID83 signatures
-#' @param ID83_catalogs ICAMS catalog of ID83 catalogs
-#' @param ID83_catalogs_no_polyT ICAMS catalog with polyT removed
+#' @param ID83_signatures Catalog of ID83 signatures
+#' @param ID83_catalogs Catalog of ID83 catalogs
+#' @param ID83_catalogs_no_polyT Catalog with polyT removed
 #' @param ID476_signatures Data frame of ID476 signatures
 #' @param ID476_catalogs Data frame of ID476 catalogs
 #' @param plot_dir Directory to save plots
@@ -1118,7 +1118,6 @@ generate_all_plots_parallel <- function(
         seed = TRUE,
         packages = c(
           "ggplot2",
-          "ICAMS",
           "mSigPlot",
           "indelsig.tools.lib",
           "scales",
