@@ -122,7 +122,7 @@ solve_bipartite_match <- function(edges, cA, tB, lambda = 0) {
     u = u,
     pars = list(verbose = FALSE, eps_abs = 1e-8, eps_rel = 1e-8)
   )
-  res <- model$Solve()
+  res <- model@Solve()
 
   if (res$info$status_val %in% c(1L, 2L)) {
     x <- res$x
