@@ -27,7 +27,11 @@ ppar <- list(
 
   hw83 = "80%",
 
-  cosine_digits = 4
+  cosine_digits = 4,
+
+  # Set to TRUE to force generate_all_plots_parallel() to run with a single
+  # worker (sequential lapply), so browser()/debug()/traceback() work.
+  force_single_worker = FALSE
 )
 
 getp <- function(parname) {

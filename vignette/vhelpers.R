@@ -592,11 +592,11 @@ generate_plots_to_files <- function(
   }
 
   p89 <- function(catalog, plot_title, setyaxis = NULL) {
+    stopifnot(!is.null(plot_title))
+    message("p89 plot_title = ", plot_title)
     mSigPlot::plot_ID89(
       catalog,
       plot_title = plot_title,
-      # text_size = getp('textsize89'),
-      # top_bar_text_size = getp('topbartextsize89'),
       base_size = getp('basesize89'),
       ylim = setyaxis,
       count_label_cex = 0.9
@@ -639,14 +639,15 @@ generate_plots_to_files <- function(
   ymax = max(catalogtoplot) * 1.2
   p2 <- p89(
     catalogtoplot,
-    plot_title = paste0(
-      "Spectrum of linking-tumor ",
-      sig_data$exemplar_89,
-      " | cosine similarity to ",
-      sig_data$type89_sig_id,
-      " = ",
-      format(sig_data$cosine89, digits = getp("cosine_digits"))
-    ),
+    plot_title = paste0("Linking tumor", sig_data$exemplar_89),
+    #paste0(
+    #  "Spectrum of linking-tumor ",
+    #  sig_data$exemplar_89,
+    #  " | cosine similarity to ",
+    #  sig_data$type89_sig_id,
+    #  " = ",
+    #  format(sig_data$cosine89, digits = getp("cosine_digits"))
+    # ),
     setyaxis = ymax
   )
   save89(p2, paths$id89_catalog)

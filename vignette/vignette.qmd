@@ -561,7 +561,7 @@ if (cache_valid) {
     koh_signatures = koh_sigs,
     min_ts_to_trigger = min_ts_to_trigger,
     collapse_flows = collapse_flows,
-    n_workers = 10
+    n_workers = if (isTRUE(getp("force_single_worker"))) 1 else 10
   )
   save_plot_cache(data_dir, plot_dir)
   message("Plots generated and cache saved in: ", plot_dir)

@@ -62,6 +62,16 @@ if (!is.null(plot_paths$id89_mapped)) {
 #| echo: false
 #| output: asis
 
+cat(paste0(
+  '\n\n89-type spectrum of the linking tumor ',
+  sig_data$exemplar_89,
+  " | cosine similarity to ",
+  sig_data$type89_sig_id,
+  ": ",
+  format(sig_data$cosine89, digits = getp("cosine_digits")),
+  '\n\n'
+))
+
 displayplot(plot_paths$id89_catalog, getp("hw89"))
 
 ```
