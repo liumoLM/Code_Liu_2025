@@ -592,8 +592,8 @@ generate_plots_to_files <- function(
   }
 
   p89 <- function(catalog, plot_title, setyaxis = NULL) {
-    stopifnot(!is.null(plot_title))
-    message("p89 plot_title = ", plot_title)
+    # stopifnot(!is.null(plot_title))
+    # message("p89 plot_title = ", plot_title)
     mSigPlot::plot_ID89(
       catalog,
       plot_title = plot_title,
@@ -710,10 +710,11 @@ generate_plots_to_files <- function(
   if (sig_data$has_476_signature) {
     p5 <- p476(
       ID476_signatures[, sig_data$type89_sig_id],
-      plot_title = paste0(
-        "Extracted 476-type signature corresponding to ",
-        sig_data$type89_sig_id
-      )
+      plot_title = ''
+      # plot_title = paste0(
+      #  "Extracted 476-type signature corresponding to ",
+      #  sig_data$type89_sig_id
+      #)
     )
     save476(p5, paths$id476_sig)
 

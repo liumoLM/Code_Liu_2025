@@ -197,6 +197,8 @@ if (sig_data$has_476_signature) {
 
 # ID476 signature plot
 if (!is.null(plot_paths$id476_sig)) {
+  cat('\n\nExtracted 476-type signature corresponding to ',
+  sig_data$type89_sig_id, '\n\n')
   displayplot(plot_paths$id476_sig)
 }
 ```
