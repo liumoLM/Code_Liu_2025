@@ -8,6 +8,7 @@ format: html
 ```{r}
 library(magrittr)
 library(ICAMS)
+library(mSigSpectra)
 library(mSigPlot)
 library(ggplot2)
 library(cowplot)
@@ -19,7 +20,7 @@ library(data.table)
 sigFfile = "DRUP01030028T"
 sig4file = "CPCT02100089T"
 
-source("../code/Generate_Koh89_Koh476_catalog_0121.R")
+# source("../code/Generate_Koh89_Koh476_catalog_0121.R")
 ```
 
 ## Helper functions
@@ -34,39 +35,30 @@ stdwrite = function(obj, ff) {
 
 
 myplot83 = function(xx, plot_title) {
-  plot_83(
+  plot_ID83(
     xx,
     plot_title = plot_title,
-    base_size = 11,
-    count_label_cex = 0.9
   )
 }
 
 myplot89 = function(xx, plot_title) {
-  plot_89(
+  plot_ID89(
     xx,
-    plot_title = plot_title,
-    base_size = 11,
-    # x_axis_tick_label_size = 0.5,
-    # y_axis_tick_label_size = 0.6,
-    y_title_size = 1,
-    title_text_size = 1.2
+    plot_title = plot_title
   )
 }
 
 myplot476 = function(xx, plot_title) {
-  plot_476(
+  plot_ID476(
     xx,
     plot_title = plot_title,
     base_size = 10,
-    # label_size = 3,
-    # text_size = 2.5,
     label_threshold_denominator = 4
   )
 }
 
 myplot476right = function(xx, plot_title) {
-  plot_476_right(
+  plot_ID476_right(
     xx,
     plot_title = plot_title,
     base_size = 10,
@@ -104,8 +96,7 @@ fwrite(cell_wt, "../Manuscript_data/Reijn_wt_cell_annot.vcf")
 ## Get  Reijns summary spectra catalogs
 
 ```{r}
-GenerateKoh476CatalogfromAnnotateVcf(mvcf, "Sample") %>%
-  rowSums() %>%
+mSigSpectra::annot_vcf_to_476_catalog(mvcf) %>%
   as.data.frame() -> mouse476
 
 colnames(mouse476) <- "all_mouse_mutations_summed"
@@ -117,13 +108,14 @@ stdwrite(mouse476, "mutated_mice.tsv")
 ## Plot mice (476, 89, and 83 types)
 
 ```{r}
+#| label = plotmice
+
 plot_mice = function() {
   title = "RNase H2 deficient mouse tumor"
   p4_1 = myplot476(mouse476, plot_title = title)
   mouse476_right = myplot476right(mouse476, plot_title = title)
 
-  xm4 = GenerateKoh89CatalogfromAnnotateVcf(mvcf, "Sample")
-  xm_all = as.data.frame(rowSums(xm4))
+  xm_all = mSigSpectra::vcf_to_id_catalog(mvcf, type="ID89")
   p8_1 = myplot89(xm_all, plot_title = title)
 
   colnames(mvcf)[1:2] <- c("CHROM", "POS")
