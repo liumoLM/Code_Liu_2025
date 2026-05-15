@@ -5,7 +5,7 @@
 - N residual: 387.3
 - Total negative: 313.6
 - N negative channels: 22
-- P(≥ total negative): 0.722
+- P(≥ total negative): 0.712
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -106,7 +106,7 @@
 - N residual: 1665.7
 - Total negative: 211.0
 - N negative channels: 14
-- P(≥ total negative): 0.996
+- P(≥ total negative): 0.994
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -207,7 +207,7 @@
 - N residual: 444.7
 - Total negative: 36.0
 - N negative channels: 14
-- P(≥ total negative): 0.938
+- P(≥ total negative): 0.917
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -308,7 +308,7 @@
 - N residual: 6747.0
 - Total negative: 1794.5
 - N negative channels: 37
-- P(≥ total negative): 0.774
+- P(≥ total negative): 0.760
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -409,7 +409,7 @@
 - N residual: 963.6
 - Total negative: 804.3
 - N negative channels: 31
-- P(≥ total negative): 0.600
+- P(≥ total negative): 0.622
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -510,7 +510,7 @@
 - N residual: 55407.8
 - Total negative: 2179.5
 - N negative channels: 4
-- P(≥ total negative): 0.913
+- P(≥ total negative): 0.914
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -712,7 +712,7 @@
 - N residual: 3.7
 - Total negative: 263.9
 - N negative channels: 39
-- P(≥ total negative): 0.981
+- P(≥ total negative): 0.980
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -813,7 +813,7 @@
 - N residual: 12.6
 - Total negative: 87.8
 - N negative channels: 51
-- P(≥ total negative): 0.588
+- P(≥ total negative): 0.579
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -1015,7 +1015,7 @@
 - N residual: 260.3
 - Total negative: 31.1
 - N negative channels: 24
-- P(≥ total negative): 0.995
+- P(≥ total negative): 0.993
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -1116,7 +1116,7 @@
 - N residual: 63.9
 - Total negative: 45.7
 - N negative channels: 39
-- P(≥ total negative): 0.934
+- P(≥ total negative): 0.952
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -1217,7 +1217,7 @@
 - N residual: 0.0
 - Total negative: 93.2
 - N negative channels: 42
-- P(≥ total negative): 0.902
+- P(≥ total negative): 0.897
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -1318,7 +1318,7 @@
 - N residual: 0.0
 - Total negative: 1277.3
 - N negative channels: 25
-- P(≥ total negative): 0.999
+- P(≥ total negative): 0.995
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -1419,7 +1419,7 @@
 - N residual: 647.5
 - Total negative: 179.8
 - N negative channels: 26
-- P(≥ total negative): 0.800
+- P(≥ total negative): 0.784
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -1520,7 +1520,7 @@
 - N residual: 53.5
 - Total negative: 19.1
 - N negative channels: 42
-- P(≥ total negative): 0.867
+- P(≥ total negative): 0.877
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -1621,7 +1621,7 @@
 - N residual: 253.0
 - Total negative: 27.3
 - N negative channels: 20
-- P(≥ total negative): 0.761
+- P(≥ total negative): 0.739
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -1823,7 +1823,7 @@
 - N residual: 38.7
 - Total negative: 43.9
 - N negative channels: 46
-- P(≥ total negative): 0.736
+- P(≥ total negative): 0.691
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -1924,7 +1924,7 @@
 - N residual: 0.0
 - Total negative: 145.0
 - N negative channels: 45
-- P(≥ total negative): 0.837
+- P(≥ total negative): 0.835
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -2025,7 +2025,7 @@
 - N residual: 60.5
 - Total negative: 293.2
 - N negative channels: 42
-- P(≥ total negative): 0.688
+- P(≥ total negative): 0.703
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -2227,7 +2227,7 @@
 - N residual: 0.0
 - Total negative: 155.6
 - N negative channels: 37
-- P(≥ total negative): 0.764
+- P(≥ total negative): 0.742
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -2429,7 +2429,7 @@
 - N residual: 0.0
 - Total negative: 49.4
 - N negative channels: 46
-- P(≥ total negative): 0.888
+- P(≥ total negative): 0.890
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -2530,7 +2530,7 @@
 - N residual: 303.5
 - Total negative: 64.6
 - N negative channels: 37
-- P(≥ total negative): 0.782
+- P(≥ total negative): 0.812
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -2631,7 +2631,7 @@
 - N residual: 1073.8
 - Total negative: 17.8
 - N negative channels: 6
-- P(≥ total negative): 0.901
+- P(≥ total negative): 0.898
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -2732,7 +2732,7 @@
 - N residual: 97.9
 - Total negative: 24.8
 - N negative channels: 34
-- P(≥ total negative): 0.908
+- P(≥ total negative): 0.930
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -2833,7 +2833,7 @@
 - N residual: 307.2
 - Total negative: 48.5
 - N negative channels: 18
-- P(≥ total negative): 0.991
+- P(≥ total negative): 0.992
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -3035,7 +3035,7 @@
 - N residual: 1048.1
 - Total negative: 756.4
 - N negative channels: 19
-- P(≥ total negative): 0.972
+- P(≥ total negative): 0.983
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -3136,7 +3136,7 @@
 - N residual: 78.8
 - Total negative: 43.9
 - N negative channels: 28
-- P(≥ total negative): 0.685
+- P(≥ total negative): 0.708
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -3237,7 +3237,7 @@
 - N residual: 233.1
 - Total negative: 142.3
 - N negative channels: 16
-- P(≥ total negative): 0.542
+- P(≥ total negative): 0.551
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -3338,7 +3338,7 @@
 - N residual: 333.4
 - Total negative: 31.0
 - N negative channels: 16
-- P(≥ total negative): 0.970
+- P(≥ total negative): 0.972
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -3434,103 +3434,103 @@
 
 ## InsDel_H
 
-- Max neg fraction: 0.04
-- N subtract: 194.5
-- N residual: 286.5
-- Total negative: 19.2
-- N negative channels: 21
-- P(≥ total negative): 0.528
+- Max neg fraction: 0.01
+- N subtract: 91.6
+- N residual: 389.4
+- Total negative: 7.2
+- N negative channels: 16
+- P(≥ total negative): 0.612
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
-| [Del(C):R1]A              |      7.0 |       8 |  0.00538 |    |
-| [Del(C):R1]T              |     19.4 |      21 |  0.00838 |    |
-| [Del(C):R2]A              |     -0.6 |       1 |  0.00839 | <<<|
-| [Del(C):R2]T              |      4.2 |       6 |  0.00934 |    |
-| [Del(C):R3]A              |      0.5 |       1 |  0.00248 |    |
-| [Del(C):R3]T              |     -0.5 |       0 |  0.00248 | <<<|
-| [Del(C):R(4,5)]A          |      6.5 |       8 |  0.00753 |    |
-| [Del(C):R(4,5)]T          |      2.5 |       3 |  0.00240 |    |
-| [Del(C):R(1,5)]G          |      0.3 |       2 |  0.00851 |    |
-| Del(C):R(6,9)             |      3.6 |       4 |  0.00217 |    |
-| A[Del(T):R(1,4)]A         |      9.5 |      16 |  0.03337 |    |
-| A[Del(T):R(1,4)]C         |     -1.8 |       1 |  0.01465 | <<<|
-| A[Del(T):R(1,4)]G         |      1.4 |       3 |  0.00802 |    |
-| C[Del(T):R(1,4)]A         |      5.1 |       7 |  0.00982 |    |
-| C[Del(T):R(1,4)]C         |      5.7 |       7 |  0.00667 |    |
-| C[Del(T):R(1,4)]G         |      9.2 |      10 |  0.00422 |    |
-| G[Del(T):R(1,4)]A         |      4.8 |       6 |  0.00617 |    |
-| G[Del(T):R(1,4)]C         |      1.4 |       3 |  0.00832 |    |
-| G[Del(T):R(1,4)]G         |      0.1 |       2 |  0.01002 |    |
-| A[Del(T):R(5,7)]A         |      5.0 |       6 |  0.00533 |    |
-| A[Del(T):R(5,7)]C         |      5.8 |       6 |  0.00104 |    |
-| A[Del(T):R(5,7)]G         |      4.3 |       5 |  0.00354 |    |
-| C[Del(T):R(5,7)]A         |      2.2 |       3 |  0.00399 |    |
-| C[Del(T):R(5,7)]C         |      2.4 |       3 |  0.00319 |    |
-| C[Del(T):R(5,7)]G         |      0.3 |       1 |  0.00381 |    |
-| G[Del(T):R(5,7)]A         |      2.6 |       3 |  0.00203 |    |
-| G[Del(T):R(5,7)]C         |      4.6 |       5 |  0.00210 |    |
-| G[Del(T):R(5,7)]G         |      1.7 |       2 |  0.00160 |    |
-| A[Del(T):R(8,)]A          |      0.1 |       1 |  0.00443 |    |
-| A[Del(T):R(8,)]C          |      1.7 |       2 |  0.00146 |    |
-| A[Del(T):R(8,)]G          |      2.8 |       3 |  0.00102 |    |
-| C[Del(T):R(8,)]A          |      0.7 |       1 |  0.00174 |    |
-| C[Del(T):R(8,)]C          |      3.8 |       4 |  0.00095 |    |
-| C[Del(T):R(8,)]G          |      0.7 |       1 |  0.00129 |    |
+| [Del(C):R1]A              |      7.5 |       8 |  0.00538 |    |
+| [Del(C):R1]T              |     20.2 |      21 |  0.00838 |    |
+| [Del(C):R2]A              |      0.2 |       1 |  0.00839 |    |
+| [Del(C):R2]T              |      5.1 |       6 |  0.00934 |    |
+| [Del(C):R3]A              |      0.8 |       1 |  0.00248 |    |
+| [Del(C):R3]T              |     -0.2 |       0 |  0.00248 | <<<|
+| [Del(C):R(4,5)]A          |      7.3 |       8 |  0.00753 |    |
+| [Del(C):R(4,5)]T          |      2.8 |       3 |  0.00240 |    |
+| [Del(C):R(1,5)]G          |      1.2 |       2 |  0.00851 |    |
+| Del(C):R(6,9)             |      3.8 |       4 |  0.00217 |    |
+| A[Del(T):R(1,4)]A         |     12.9 |      16 |  0.03337 |    |
+| A[Del(T):R(1,4)]C         |     -0.3 |       1 |  0.01465 | <<<|
+| A[Del(T):R(1,4)]G         |      2.3 |       3 |  0.00802 |    |
+| C[Del(T):R(1,4)]A         |      6.1 |       7 |  0.00982 |    |
+| C[Del(T):R(1,4)]C         |      6.4 |       7 |  0.00667 |    |
+| C[Del(T):R(1,4)]G         |      9.6 |      10 |  0.00422 |    |
+| G[Del(T):R(1,4)]A         |      5.4 |       6 |  0.00617 |    |
+| G[Del(T):R(1,4)]C         |      2.2 |       3 |  0.00832 |    |
+| G[Del(T):R(1,4)]G         |      1.1 |       2 |  0.01002 |    |
+| A[Del(T):R(5,7)]A         |      5.5 |       6 |  0.00533 |    |
+| A[Del(T):R(5,7)]C         |      5.9 |       6 |  0.00104 |    |
+| A[Del(T):R(5,7)]G         |      4.7 |       5 |  0.00354 |    |
+| C[Del(T):R(5,7)]A         |      2.6 |       3 |  0.00399 |    |
+| C[Del(T):R(5,7)]C         |      2.7 |       3 |  0.00319 |    |
+| C[Del(T):R(5,7)]G         |      0.7 |       1 |  0.00381 |    |
+| G[Del(T):R(5,7)]A         |      2.8 |       3 |  0.00203 |    |
+| G[Del(T):R(5,7)]C         |      4.8 |       5 |  0.00210 |    |
+| G[Del(T):R(5,7)]G         |      1.9 |       2 |  0.00160 |    |
+| A[Del(T):R(8,)]A          |      0.6 |       1 |  0.00443 |    |
+| A[Del(T):R(8,)]C          |      1.9 |       2 |  0.00146 |    |
+| A[Del(T):R(8,)]G          |      2.9 |       3 |  0.00102 |    |
+| C[Del(T):R(8,)]A          |      0.8 |       1 |  0.00174 |    |
+| C[Del(T):R(8,)]C          |      3.9 |       4 |  0.00095 |    |
+| C[Del(T):R(8,)]G          |      0.9 |       1 |  0.00129 |    |
 | G[Del(T):R(8,)]A          |      1.9 |       2 |  0.00075 |    |
-| G[Del(T):R(8,)]C          |      1.8 |       2 |  0.00120 |    |
-| G[Del(T):R(8,)]G          |     -0.3 |       0 |  0.00174 | <<<|
-| A[Ins(C):R0]A             |     -1.1 |       0 |  0.00547 | <<<|
-| A[Ins(C):R0]T             |     -0.2 |       0 |  0.00125 | <<<|
-| Ins(C):R(0,3)             |      7.5 |      13 |  0.02828 |    |
-| Ins(C):R(4,6)             |      2.3 |       3 |  0.00385 |    |
-| Ins(C):R(7,)              |     -0.5 |       1 |  0.00752 | <<<|
-| A[Ins(T):R(0,4)]A         |      1.6 |       4 |  0.01248 |    |
-| A[Ins(T):R(0,4)]C         |      0.7 |       1 |  0.00173 |    |
-| A[Ins(T):R(0,4)]G         |     -0.7 |       0 |  0.00383 | <<<|
-| C[Ins(T):R(0,4)]A         |     -0.9 |       0 |  0.00472 | <<<|
-| C[Ins(T):R(0,4)]C         |      5.4 |       6 |  0.00328 |    |
-| C[Ins(T):R(0,4)]G         |      1.6 |       2 |  0.00209 |    |
-| G[Ins(T):R(0,4)]A         |      0.6 |       1 |  0.00194 |    |
-| G[Ins(T):R(0,4)]C         |      1.7 |       2 |  0.00171 |    |
-| G[Ins(T):R(0,4)]G         |      2.8 |       3 |  0.00105 |    |
-| A[Ins(T):R(5,7)]A         |      0.0 |       2 |  0.01019 |    |
-| A[Ins(T):R(5,7)]C         |     -1.3 |       0 |  0.00685 | <<<|
-| A[Ins(T):R(5,7)]G         |     -0.6 |       0 |  0.00322 | <<<|
-| C[Ins(T):R(5,7)]A         |     -0.0 |       1 |  0.00517 | <<<|
-| C[Ins(T):R(5,7)]C         |     -2.5 |       0 |  0.01283 | <<<|
-| C[Ins(T):R(5,7)]G         |     -1.4 |       1 |  0.01259 | <<<|
-| G[Ins(T):R(5,7)]A         |     -0.6 |       1 |  0.00823 | <<<|
-| G[Ins(T):R(5,7)]C         |     -2.2 |       0 |  0.01123 | <<<|
-| G[Ins(T):R(5,7)]G         |     -0.1 |       1 |  0.00546 | <<<|
-| A[Ins(T):R(8,)]A          |     -0.9 |       0 |  0.00463 | <<<|
-| A[Ins(T):R(8,)]C          |      1.5 |       2 |  0.00269 |    |
-| A[Ins(T):R(8,)]G          |     -1.7 |       0 |  0.00887 | <<<|
-| C[Ins(T):R(8,)]A          |     -0.8 |       0 |  0.00397 | <<<|
-| C[Ins(T):R(8,)]C          |      0.2 |       1 |  0.00386 |    |
-| C[Ins(T):R(8,)]G          |      4.2 |       5 |  0.00411 |    |
-| G[Ins(T):R(8,)]A          |      0.6 |       1 |  0.00190 |    |
-| G[Ins(T):R(8,)]C          |      1.1 |       2 |  0.00452 |    |
-| G[Ins(T):R(8,)]G          |     -0.4 |       0 |  0.00180 | <<<|
-| Del(2,4):R1               |      9.5 |      11 |  0.00777 |    |
-| Del(5,):R1                |     22.0 |      37 |  0.07688 |    |
-| Del(2,8):U(1,2):R(2,4)    |      3.2 |       6 |  0.01451 |    |
-| Del(2,):U(1,2):R(5,)      |      7.0 |       8 |  0.00504 |    |
-| Del(3,):U(3,):R2          |      4.3 |      12 |  0.03962 |    |
-| Del(3,):U(3,):R(3,)       |     10.3 |      13 |  0.01384 |    |
-| Ins(2,4):R0               |      4.5 |       7 |  0.01278 |    |
-| Ins(5,):R0                |     28.8 |      31 |  0.01143 |    |
-| Ins(2,4):R1               |      2.0 |       3 |  0.00510 |    |
-| Ins(5,):R1                |      6.1 |       8 |  0.00957 |    |
-| Ins(2,):R(2,4)            |      2.8 |       4 |  0.00621 |    |
-| Ins(2,):R(5,)             |      4.0 |       5 |  0.00503 |    |
-| Del(2,5):M1               |      9.6 |      12 |  0.01211 |    |
-| Del(3,5):M2               |      5.8 |       9 |  0.01666 |    |
-| Del(4,5):M(3,4)           |      3.6 |       4 |  0.00211 |    |
-| Del(6,):M1                |      9.1 |      17 |  0.04069 |    |
-| Del(6,):M2                |      9.3 |      15 |  0.02928 |    |
-| Del(6,):M3                |      7.2 |      11 |  0.01969 |    |
-| Del(6,):M(4,)             |      1.4 |      56 |  0.28082 |    |
+| G[Del(T):R(8,)]C          |      1.9 |       2 |  0.00120 |    |
+| G[Del(T):R(8,)]G          |     -0.2 |       0 |  0.00174 | <<<|
+| A[Ins(C):R0]A             |     -0.5 |       0 |  0.00547 | <<<|
+| A[Ins(C):R0]T             |     -0.1 |       0 |  0.00125 | <<<|
+| Ins(C):R(0,3)             |     10.4 |      13 |  0.02828 |    |
+| Ins(C):R(4,6)             |      2.6 |       3 |  0.00385 |    |
+| Ins(C):R(7,)              |      0.3 |       1 |  0.00752 |    |
+| A[Ins(T):R(0,4)]A         |      2.9 |       4 |  0.01248 |    |
+| A[Ins(T):R(0,4)]C         |      0.8 |       1 |  0.00173 |    |
+| A[Ins(T):R(0,4)]G         |     -0.4 |       0 |  0.00383 | <<<|
+| C[Ins(T):R(0,4)]A         |     -0.4 |       0 |  0.00472 | <<<|
+| C[Ins(T):R(0,4)]C         |      5.7 |       6 |  0.00328 |    |
+| C[Ins(T):R(0,4)]G         |      1.8 |       2 |  0.00209 |    |
+| G[Ins(T):R(0,4)]A         |      0.8 |       1 |  0.00194 |    |
+| G[Ins(T):R(0,4)]C         |      1.8 |       2 |  0.00171 |    |
+| G[Ins(T):R(0,4)]G         |      2.9 |       3 |  0.00105 |    |
+| A[Ins(T):R(5,7)]A         |      1.1 |       2 |  0.01019 |    |
+| A[Ins(T):R(5,7)]C         |     -0.6 |       0 |  0.00685 | <<<|
+| A[Ins(T):R(5,7)]G         |     -0.3 |       0 |  0.00322 | <<<|
+| C[Ins(T):R(5,7)]A         |      0.5 |       1 |  0.00517 |    |
+| C[Ins(T):R(5,7)]C         |     -1.2 |       0 |  0.01283 | <<<|
+| C[Ins(T):R(5,7)]G         |     -0.2 |       1 |  0.01259 | <<<|
+| G[Ins(T):R(5,7)]A         |      0.2 |       1 |  0.00823 |    |
+| G[Ins(T):R(5,7)]C         |     -1.0 |       0 |  0.01123 | <<<|
+| G[Ins(T):R(5,7)]G         |      0.5 |       1 |  0.00546 |    |
+| A[Ins(T):R(8,)]A          |     -0.4 |       0 |  0.00463 | <<<|
+| A[Ins(T):R(8,)]C          |      1.8 |       2 |  0.00269 |    |
+| A[Ins(T):R(8,)]G          |     -0.8 |       0 |  0.00887 | <<<|
+| C[Ins(T):R(8,)]A          |     -0.4 |       0 |  0.00397 | <<<|
+| C[Ins(T):R(8,)]C          |      0.6 |       1 |  0.00386 |    |
+| C[Ins(T):R(8,)]G          |      4.6 |       5 |  0.00411 |    |
+| G[Ins(T):R(8,)]A          |      0.8 |       1 |  0.00190 |    |
+| G[Ins(T):R(8,)]C          |      1.6 |       2 |  0.00452 |    |
+| G[Ins(T):R(8,)]G          |     -0.2 |       0 |  0.00180 | <<<|
+| Del(2,4):R1               |     10.3 |      11 |  0.00777 |    |
+| Del(5,):R1                |     30.0 |      37 |  0.07688 |    |
+| Del(2,8):U(1,2):R(2,4)    |      4.7 |       6 |  0.01451 |    |
+| Del(2,):U(1,2):R(5,)      |      7.5 |       8 |  0.00504 |    |
+| Del(3,):U(3,):R2          |      8.4 |      12 |  0.03962 |    |
+| Del(3,):U(3,):R(3,)       |     11.7 |      13 |  0.01384 |    |
+| Ins(2,4):R0               |      5.8 |       7 |  0.01278 |    |
+| Ins(5,):R0                |     30.0 |      31 |  0.01143 |    |
+| Ins(2,4):R1               |      2.5 |       3 |  0.00510 |    |
+| Ins(5,):R1                |      7.1 |       8 |  0.00957 |    |
+| Ins(2,):R(2,4)            |      3.4 |       4 |  0.00621 |    |
+| Ins(2,):R(5,)             |      4.5 |       5 |  0.00503 |    |
+| Del(2,5):M1               |     10.9 |      12 |  0.01211 |    |
+| Del(3,5):M2               |      7.5 |       9 |  0.01666 |    |
+| Del(4,5):M(3,4)           |      3.8 |       4 |  0.00211 |    |
+| Del(6,):M1                |     13.3 |      17 |  0.04069 |    |
+| Del(6,):M2                |     12.3 |      15 |  0.02928 |    |
+| Del(6,):M3                |      9.2 |      11 |  0.01969 |    |
+| Del(6,):M(4,)             |     30.3 |      56 |  0.28082 |    |
 | Complex                   |      0.0 |       0 |  0.00000 |    |
 
 ## InsDel_I
@@ -3641,7 +3641,7 @@
 - N residual: 30637.2
 - Total negative: 194.5
 - N negative channels: 3
-- P(≥ total negative): 0.409
+- P(≥ total negative): 0.429
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -3742,7 +3742,7 @@
 - N residual: 8181.6
 - Total negative: 1026.4
 - N negative channels: 26
-- P(≥ total negative): 0.856
+- P(≥ total negative): 0.815
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -3843,7 +3843,7 @@
 - N residual: 82691.4
 - Total negative: 5349.6
 - N negative channels: 9
-- P(≥ total negative): 0.743
+- P(≥ total negative): 0.748
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|
@@ -4045,7 +4045,7 @@
 - N residual: 17128.0
 - Total negative: 5173.4
 - N negative channels: 16
-- P(≥ total negative): 0.949
+- P(≥ total negative): 0.927
 
 | Channel                   |  Residual | Spectrum | Sig Prop |     |
 |---------------------------|-----------|---------|----------|-----|

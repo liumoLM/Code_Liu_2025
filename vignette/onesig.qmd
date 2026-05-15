@@ -87,6 +87,10 @@ if (
     !is.null(plot_paths$id89_target_sig_partial_spectrum)
 ) {
   cat('\n\n<details>\n<summary>Click to view decomposition of the linking tumor spectrum</summary>\n\n')
+  cat("Partial mutation signature of", 
+      sig_data$exemplar_89,
+      "due to", 
+      sig_data$type89_sig_id)
   displayplot(plot_paths$id89_target_sig_partial_spectrum, getp("hw89"))
   displayplot(plot_paths$id89_residual, getp("hw89"))
   cat(sprintf(

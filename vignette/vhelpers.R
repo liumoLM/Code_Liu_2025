@@ -639,7 +639,7 @@ generate_plots_to_files <- function(
   ymax = max(catalogtoplot) * 1.2
   p2 <- p89(
     catalogtoplot,
-    plot_title = paste0("Linking tumor", sig_data$exemplar_89),
+    plot_title = paste("Linking tumor", sig_data$exemplar_89),
     #paste0(
     #  "Spectrum of linking-tumor ",
     #  sig_data$exemplar_89,
@@ -648,41 +648,37 @@ generate_plots_to_files <- function(
     #  " = ",
     #  format(sig_data$cosine89, digits = getp("cosine_digits"))
     # ),
-    setyaxis = ymax
+    setyaxis = c(0, ymax)
   )
   save89(p2, paths$id89_catalog)
 
   # ID89 Plots 3 & 4: Decomposition (only for non-InsDel15/16)
   if (!sig_data$is_insdel15_16 && !is.null(sig_data$residual_spectrum)) {
-    target_sig_title <- paste0(
-      "Partial mutational spectrum of linking-tumor ",
+    target_sig_title <- paste(
+      "Mutations in",
       sig_data$exemplar_89,
-      " due to ",
+      "due to",
       sig_data$type89_sig_id
     )
 
-    residual_title <- paste0(
-      "Remaining mutations in ",
+    residual_title <- paste(
+      "Remaining mutations in",
       sig_data$exemplar_89,
-      " not due to ",
+      "not due to",
       sig_data$type89_sig_id
-      # " (A minus B) " #| Cosine similarity to ",
-      # sig_data$type89_sig_id,
-      # " = ",
-      # format(sig_data$cosine_sig_89_v_partial_spec, digits = 4)
     )
 
     p3 <- p89(
       sig_data$residual_spectrum,
       plot_title = residual_title,
-      setyaxis = ymax
+      setyaxis = c(0, ymax)
     )
     save89(p3, paths$id89_residual)
 
     p4 <- p89(
       sig_data$target_sig_partial_spectrum,
       plot_title = target_sig_title,
-      setyaxis = ymax
+      setyaxis = c(0, ymax)
     )
     save89(p4, paths$id89_target_sig_partial_spectrum)
   } else {
